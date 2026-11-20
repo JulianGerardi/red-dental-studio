@@ -35,4 +35,4 @@ export const Playground: Story = { render: (args) => <Demo key={JSON.stringify(a
 /* Sin nada marcado (estado vacío del gráfico). */
 export const Empty: Story = { parameters: { controls: { disable: true } }, render: () => <Demo pending={[]} active={[]} /> }
 /* Una región elegida (selected) y otra con finding. */
-export const PendingAndActive: Story = { parameters: { controls: { disable: true } }, render: () => <Demo pending={['Soft Palate']} active={['Right Hard Palate']} /> }
+export const PendingAndActive: Story = { parameters: { controls: { disable: true } }, render: () => <Demo pending={['Soft palate']} active={['Right hard palate']} /> }

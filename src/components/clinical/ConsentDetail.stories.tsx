@@ -74,8 +74,8 @@ export const Parts: Story = {
           ['Consent status', 'El estado en la columna Consent: ícono y palabra en el color del estado. Con onAbrir es un botón que lleva al detalle.', 'EstadoConsentimiento'],
           ['Consent sheet', 'La hoja del consentimiento con las afirmaciones y las dos líneas de firma.', 'ConsentDocument'],
           ['Signed mark', 'Quién firmó y cuándo, en lugar del botón de firma.', 'Firmado'],
-          ['Patient Signature', 'El paciente adopta una firma con su nombre e iniciales, o la dibuja.', 'FirmaPaciente'],
-          ['Provider Signature', 'El provider firma en el portal seguro con email y contraseña.', 'FirmaProveedor'],
+          ['Patient signature', 'El paciente adopta una firma con su nombre e iniciales, o la dibuja.', 'FirmaPaciente'],
+          ['Provider signature', 'El provider firma en el portal seguro con email y contraseña.', 'FirmaProveedor'],
           ['Signature window', 'El marco común de las dos ventanas de firma: título, bajada y pie con dos botones.', 'VentanaFirma'],
           ['Signature pad', 'El lienzo para dibujar la firma; devuelve la imagen o null si se borra.', 'PadFirma'],
           ['View consent', 'La hoja de lectura, sin firmar, que abre View consent desde Consent required.', 'VistaConsentimiento'],
@@ -116,7 +116,7 @@ export const States: Story = {
 export const PatientSignature: Story = { parameters: enIframe, render: () => <FirmaPaciente nombre="John Smith" descripcion="Procedure Consent - D2391 Resin-based composite – one surface, posterior" onClose={nada} onFirmar={nada} /> }
 export const ProviderSignature: Story = { parameters: enIframe, render: () => <FirmaProveedor nombre="Dr. Perez Martinez" onClose={nada} onFirmar={nada} /> }
 /* El botón de guardar disabled hasta que haya algo que firmar. */
-export const SignatureWindowDisabled: Story = { parameters: enIframe, render: () => <VentanaFirma titulo="Patient Signature" descripcion="Sign to accept this consent." guardar="Adopt and Sign" guardarDeshabilitado onClose={nada} onGuardar={nada}><p className="text-[13px] text-ink-muted">Draw or adopt a signature to continue.</p></VentanaFirma> }
+export const SignatureWindowDisabled: Story = { parameters: enIframe, render: () => <VentanaFirma titulo="Patient signature" descripcion="Sign to accept this consent." guardar="Adopt and sign" guardarDeshabilitado onClose={nada} onGuardar={nada}><p className="text-[13px] text-ink-muted">Draw or adopt a signature to continue.</p></VentanaFirma> }
 export const ViewConsent: Story = { parameters: enIframe, render: () => <VistaConsentimiento procedimiento={con('Requested')} onClose={nada} /> }
 
 /* ── Specs ─────────────────────────────────────────────────────────── */

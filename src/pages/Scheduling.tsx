@@ -40,7 +40,7 @@ export default function Scheduling() {
     () => (typeof window !== 'undefined' && window.innerWidth < 768 ? 'Day' : 'Week'),
   )
   const [fecha, setFecha] = useState(FECHA_ANCLA)
-  const [reqTab, setReqTab] = useState<'ASAP' | 'Waiting List'>('ASAP')
+  const [reqTab, setReqTab] = useState<'ASAP' | 'Waiting list'>('ASAP')
   /* Arranca cerrado: el panel de solicitudes es el estado desplegado del FAB
      y aparecía solo al entrar a Scheduling. */
   const [reqOpen, setReqOpen] = useState(false)
@@ -172,20 +172,7 @@ export default function Scheduling() {
         <PageTitle>Scheduling</PageTitle>
         <div className="flex flex-wrap items-center gap-2">
           {/* El Figma marca "Month" activo aunque la vista sea semanal. */}
-          <div className="flex items-center gap-1">
-            {(['Day', 'Week', 'Month'] as const).map((v) => (
-              <button
-                key={v}
-                onClick={() => setView(v)}
-                className={cn(
-                  'h-8 rounded-md px-4 text-xs font-medium transition-colors',
-                  view === v ? 'bg-dash-blue text-white' : 'text-ink-slate hover:text-ink-soft',
-                )}
-              >
-                {v}
-              </button>
-            ))}
-          </div>
+          <Tabs aria-label="Calendar view" tabs={['Day', 'Week', 'Month'] as const} value={view} onChange={setView} />
           <ViewMenu valor={vista} onGuardar={setVista} />
           {/* Event y Register appointment quedan fuera de la barra hasta que se
               defina qué hacen. No se borran: el markup sigue acá detrás de
@@ -248,7 +235,7 @@ export default function Scheduling() {
             fullWidth
             className="mt-3 shrink-0"
             aria-label="Request type"
-            tabs={(['ASAP', 'Waiting List'] as const).map((t) => ({ value: t, count: solicitudes.filter((x) => x.tipo === t).length }))}
+            tabs={(['ASAP', 'Waiting list'] as const).map((t) => ({ value: t, count: solicitudes.filter((x) => x.tipo === t).length }))}
             value={reqTab}
             onChange={setReqTab}
           />
@@ -351,7 +338,7 @@ export function SolicitudCard({
   return (
     <TarjetaTurno
       tono={urgente ? 'danger' : 'info'}
-      etiqueta={urgente ? 'ASAP' : (s.espera ?? 'Waiting List')}
+      etiqueta={urgente ? 'ASAP' : (s.espera ?? 'Waiting list')}
       nombre={s.patient}
       motivo={s.reason}
       cuando={`${fechaLegible(s.date)} · ${s.start} - ${s.end}`}

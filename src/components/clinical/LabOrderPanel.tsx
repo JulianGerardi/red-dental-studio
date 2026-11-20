@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Ban, CirclePlus, FileText, FlaskConical, History, Pencil } from 'lucide-react'
+import { Ban, FileText, FlaskConical, History, Pencil, Plus } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { aviso } from '@/components/ui/toaster'
 import { Button } from '@/components/ui/button'
@@ -24,7 +24,7 @@ const ABIERTAS: EstadoOrden[] = ['Requested', 'Pending', 'Delayed']
 
 /* Figma 4070:148911 "Lab Order — Section (List, Detail & New Laboratory Modal)": el listado, sobre la tabla estándar
    (DataTable) con buscador, filtro de estado y botones de la app, como la Problem List. El detalle y el modal "New
-   Laboratory" quedan pendientes. "active prescriptions" y "New Prescription" son texto de Prescription que quedó pegado
+   Laboratory" quedan pendientes. "active prescriptions" y "New prescription" son texto de Prescription que quedó pegado
    en el frame (anomalía 85). Ver design-reference/figma/modulos/clinical-mode.md. */
 
 function iniciales(nombre: string) {
@@ -46,7 +46,7 @@ const COLUMNAS: DataTableColumn<OrdenLab>[] = [
   { key: 'actualizado', header: 'Updated', width: 110, cell: (o) => o.actualizado },
   { key: 'creado', header: 'Created', width: 110, cell: (o) => o.creado },
   /* El frame pinta de rojo las que vencen pronto. */
-  { key: 'vence', header: 'Expiration Date', width: 120, cell: (o) => <span className={cn(o.urgente && 'font-semibold text-dash-bad-fg')}>{o.vence}</span> },
+  { key: 'vence', header: 'Expiration date', width: 120, cell: (o) => <span className={cn(o.urgente && 'font-semibold text-dash-bad-fg')}>{o.vence}</span> },
 ]
 
 export function LabOrderPanel({ ordenes: inicio = ORDENES, tarea, encuentroAbierto = false }: {
@@ -96,10 +96,10 @@ export function LabOrderPanel({ ordenes: inicio = ORDENES, tarea, encuentroAbier
         actions={(
           <>
             <Button variant="secondary" onClick={() => aviso.info('History is not available in this release.')}>
-              <History /> View History
+              <History /> View history
             </Button>
-            <Button onClick={() => aviso.info('New Prescription is not available in this release.')}>
-              <CirclePlus /> New Prescription
+            <Button onClick={() => aviso.info('New prescription is not available in this release.')}>
+              <Plus /> New prescription
             </Button>
           </>
         )}

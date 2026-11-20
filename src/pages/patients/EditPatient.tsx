@@ -22,7 +22,7 @@ export function Section({ title, children }: { title: string; children: React.Re
   if (useEnDrawer()) return <DrawerSection title={title}>{children}</DrawerSection>
   return (
     <section className={cn(TARJETA_PANEL, 'p-6')}>
-      <h2 className="text-sm font-semibold text-ink">{title}</h2>
+      <h2 className="text-sm font-bold text-ink">{title}</h2>
       <div className="mt-4 flex flex-col gap-4">{children}</div>
     </section>
   )
@@ -62,8 +62,8 @@ export default function EditPatientPage({ pacienteId = 'john-smith' }: { pacient
   const comunes = { d: f.d, cambiar: f.cambiar, errores: f.errores, conTitulo: false }
   return (
     <div className={CONTENEDOR_PAGINA}>
-      <div className="mb-4"><Breadcrumb items={[{ label: 'Patients', to: '/patients' }, { label: 'Edit Patient' }]} /></div>
-      <PageTitle>Edit Patient</PageTitle>
+      <div className="mb-4"><Breadcrumb items={[{ label: 'Patients', to: '/patients' }, { label: 'Edit patient' }]} /></div>
+      <PageTitle>Edit patient</PageTitle>
       <div className="mt-4 flex flex-col gap-4">
         {duplicado && <Alert tone="danger" title={duplicado}>Check the name and email, or find the existing patient in the list.</Alert>}
         <Card>
@@ -74,15 +74,15 @@ export default function EditPatientPage({ pacienteId = 'john-smith' }: { pacient
               <Pill tone={estado === 'Active' ? 'success' : 'neutral'} className="mt-1">{estado}</Pill>
             </span>
           </div>
-          <h3 className="mt-5 mb-4 text-sm font-bold text-ink">General Information</h3>
+          <h2 className="mt-5 mb-4 text-sm font-bold text-ink">General information</h2>
           <CamposGeneral {...comunes} portalVinculado={portalVinculado} />
         </Card>
-        <Card title="Contact Information"><CamposContacto {...comunes} /></Card>
-        <Card title="Address Information"><CamposDireccion {...comunes} /></Card>
-        <Card title="Demographic Information"><CamposDemography {...comunes} /></Card>
+        <Card title="Contact information"><CamposContacto {...comunes} /></Card>
+        <Card title="Address information"><CamposDireccion {...comunes} /></Card>
+        <Card title="Demographic information"><CamposDemography {...comunes} /></Card>
       </div>
       <div className="mt-4 flex justify-end gap-3">
-        <FormFooter onCancel={volver} onSave={guardar} saveLabel="Save Changes" />
+        <FormFooter onCancel={volver} onSave={guardar} saveLabel="Save changes" />
       </div>
     </div>
   )

@@ -165,7 +165,7 @@ export function NewProcedureDrawer({
   )
 
   return (
-    <Drawer open={open} onClose={onClose} title={mode === 'condition' ? 'New Condition' : 'New Procedure'} steps={pasos} step={paso} footer={footer}>
+    <Drawer open={open} onClose={onClose} title={mode === 'condition' ? 'New condition' : 'New procedure'} steps={pasos} step={paso} footer={footer}>
       <DrawerStep key={actual} index={paso} step={paso}>
         {actual === 'Procedure' && (
           <div className="flex w-full flex-col items-start gap-4">
@@ -196,7 +196,7 @@ export function NewProcedureDrawer({
                   emptyText="No procedure matches that search."
                 />
                 {/* Sin áreas tildadas se ve todo ("Show all treatment"): Clear all vuelve a eso. */}
-                <FilterMenu label="Filter by treatment area" groups={[{ title: 'Treatment Area', options: [...TREATMENT_AREAS], value: areas, onChange: (v) => setAreas(v as TreatmentArea[]) }]} />
+                <FilterMenu label="Filter by treatment area" groups={[{ title: 'Treatment area', options: [...TREATMENT_AREAS], value: areas, onChange: (v) => setAreas(v as TreatmentArea[]) }]} />
               </div>
             </div>
 
@@ -237,7 +237,7 @@ export function NewProcedureDrawer({
               <div className="border-dash-blue flex w-full items-center justify-between gap-2 rounded-md border px-3 py-2">
                 <span className="min-w-0 text-xs font-semibold text-ink">{procedure?.code} - {procedure?.label}</span>
                 <span className="flex shrink-0 items-center gap-1.5">
-                  <span className="bg-dash-count-bg text-dash-blue rounded-full px-2 py-0.5 text-[10px] font-semibold">{status}</span>
+                  <span className="bg-dash-count-bg text-dash-blue rounded-full px-2 py-0.5 text-[11px] font-semibold">{status}</span>
                   <TooltipProvider delayDuration={200}>
                     <ConAyuda texto={NOMBRE_ALCANCE[scope]}><span><CajaIcono estado="selected"><ScopeIcon scope={scope} /></CajaIcono></span></ConAyuda>
                   </TooltipProvider>

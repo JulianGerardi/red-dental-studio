@@ -68,13 +68,13 @@ type Persona = {
 export const esGuardian = (p: Persona) => p.badges.includes('Legal contact')
 
 const CONTACTO: Campo[] = [
-  { icon: Calendar, label: 'Date of Birth', value: '05/14/1982' },
+  { icon: Calendar, label: 'Date of birth', value: '05/14/1982' },
   { icon: Phone, label: 'Phone', value: '(555) 123-4567' },
   { icon: Mail, label: 'Email', value: 'abrilviola@gmail.com' },
-  { icon: MapPin, label: 'Contact Address', value: '123 Maple Street, Phoenix, AZ 85016' },
+  { icon: MapPin, label: 'Contact address', value: '123 Maple Street, Phoenix, AZ 85016' },
 ]
 const HOGAR: Campo[] = [
-  { icon: Calendar, label: 'Date of Birth', value: '05/14/1982' },
+  { icon: Calendar, label: 'Date of birth', value: '05/14/1982' },
   { icon: Mail, label: 'Email', value: 'abrilviola@gmail.com' },
 ]
 
@@ -131,7 +131,7 @@ export function PersonaCard({
 
 const PACIENTE = 'John Smith'
 const campo = (p: Persona, label: string) => p.campos.find((c) => c.label === label)?.value ?? ''
-const aDirectorio = (p: Persona): PersonaDirectorio => ({ name: p.name, initials: p.initials, dob: campo(p, 'Date of Birth'), email: campo(p, 'Email') })
+const aDirectorio = (p: Persona): PersonaDirectorio => ({ name: p.name, initials: p.initials, dob: campo(p, 'Date of birth'), email: campo(p, 'Email') })
 
 /* `nuevo`: la ruta .../relationships/new abre la lista con el drawer de Add Relationship ya abierto. */
 export default function Relationships({ nuevo = false }: { nuevo?: boolean }) {
@@ -152,10 +152,10 @@ export default function Relationships({ nuevo = false }: { nuevo?: boolean }) {
     setRelaciones((prev) => [{
       id: `r${Date.now()}`, pacienteId: `persona-${Date.now()}`, name: r.name, initials: r.initials, rol: r.rol, badges,
       campos: [
-        { icon: Calendar, label: 'Date of Birth', value: r.dob },
+        { icon: Calendar, label: 'Date of birth', value: r.dob },
         { icon: Phone, label: 'Phone', value: r.phone },
         { icon: Mail, label: 'Email', value: r.email },
-        { icon: MapPin, label: 'Contact Address', value: r.address },
+        { icon: MapPin, label: 'Contact address', value: r.address },
       ],
     }, ...prev])
     aviso.ok(`${r.name} was added as ${r.rol}.`)
@@ -177,22 +177,22 @@ export default function Relationships({ nuevo = false }: { nuevo?: boolean }) {
   return (
     <div className={CONTENEDOR_PAGINA}>
 
-      <PatientBreadcrumb name="John Smith" section="Relationships &amp; Billing" />
+      <PatientBreadcrumb name="John Smith" section="Relationships &amp; billing" />
       <div className="flex flex-col gap-5 lg:flex-row">
         <PatientSidePanel
           name="John Smith"
           initials="JS"
-          section="Relationships & Billing"
+          section="Relationships & billing"
           basePath={`/patients/${id}`}
         />
 
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center justify-between gap-3">
-            <PageTitle>Relationships &amp; Billing</PageTitle>
-            {/* El Figma diseña "Add Relationship" pero no dibuja de dónde se
+            <PageTitle>Relationships &amp; billing</PageTitle>
+            {/* El Figma diseña "Add relationship" pero no dibuja de dónde se
                 entra. Este botón es una decisión propia — anomalía 42. */}
-            <Button data-tour="pat-add-relationship" onClick={() => setAgregando(true)}>
-              <Plus /> Add Relationship
+            <Button size="md" data-tour="pat-add-relationship" onClick={() => setAgregando(true)}>
+              <Plus /> Add relationship
             </Button>
           </div>
 
@@ -202,7 +202,7 @@ export default function Relationships({ nuevo = false }: { nuevo?: boolean }) {
               <div className={TARJETA_PANEL}>
                 <EmptyState
                   icon={Users} title="No related contacts" detail="This patient doesn't have any related contacts yet."
-                  accion={{ label: 'Add Relationship', onClick: () => setAgregando(true) }}
+                  accion={{ label: 'Add relationship', onClick: () => setAgregando(true) }}
                 />
               </div>
             ) : (
@@ -212,8 +212,8 @@ export default function Relationships({ nuevo = false }: { nuevo?: boolean }) {
             )}
           </div>
 
-          <h2 className="mt-8 text-xl leading-none font-bold text-ink">
-            Household/Same Guarantor Patients
+          <h2 className="mt-8 text-[15px] font-bold text-ink">
+            Household/same guarantor patients
           </h2>
           <div className="mt-4 flex flex-col gap-4">
             {/* Mismo ⋮ que las relaciones (CON-4113, CON-4139). */}

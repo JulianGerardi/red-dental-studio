@@ -26,9 +26,12 @@ export type FilterGroup =
 
 export type FilterSearch = { label: string; placeholder?: string; value: string; onChange: (v: string) => void }
 
+/* Mismos nombres y altos que Button (sm 28 · md 32 · lg 36): antes "md" medía 36 acá y 32 en Button, y un filtro "md" no
+   quedaba alineado con un botón "md". md es el default: es el de la barra de una página (auditoría de normalización). */
 const TAMANO = {
   sm: 'h-7 gap-1.5 px-2.5 text-[12px] [&_svg]:size-3.5',
-  md: 'h-9 gap-2 px-3 text-[13px] [&_svg]:size-4',
+  md: 'h-8 gap-1.5 px-3 text-[13px] [&_svg]:size-4',
+  lg: 'h-9 gap-2 px-3 text-[13px] [&_svg]:size-4',
 } as const
 
 /* El aspecto del botón del filtro. Lo comparten los otros botones de herramientas de una tabla (Columns), para que la

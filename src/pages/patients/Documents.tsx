@@ -13,17 +13,17 @@ import { CONTENEDOR_PAGINA } from '@/lib/estilos'
 
 /* Figma 3753:80195 "Patient Profile — Documents". */
 
-type Doc = { id: string; name: string; firma: 'Signed' | 'Pending Signature'; fecha: string }
+type Doc = { id: string; name: string; firma: 'Signed' | 'Pending signature'; fecha: string }
 
 /* Nombres como los arma red.dev (Procedure Consent - código y procedimiento; Informed Consent / Refusal – caso), con los
    procedimientos y casos de John Smith. Antes repetía el "Isacc Cihtepin.doc" del Figma (treatments.md, 2026-11-12). */
 const DOCS: Doc[] = ([
-  ['Informed Consent for Dental Treatment – Endodontic Treatment', 'Pending Signature', '10/27/2026'],
-  ['Procedure Consent - D2950 Core buildup, including any pins when required', 'Pending Signature', '10/27/2026'],
-  ['Procedure Consent - D2954 Prefabricated post and core in addition to crown', 'Pending Signature', '10/27/2026'],
+  ['Informed Consent for Dental Treatment – Endodontic Treatment', 'Pending signature', '10/27/2026'],
+  ['Procedure Consent - D2950 Core buildup, including any pins when required', 'Pending signature', '10/27/2026'],
+  ['Procedure Consent - D2954 Prefabricated post and core in addition to crown', 'Pending signature', '10/27/2026'],
   ['Procedure Consent - D2750 Crown – porcelain fused to high noble metal', 'Signed', '10/22/2026'],
   ['Informed Refusal of Dental Treatment – Implant Option', 'Signed', '10/22/2026'],
-  ['Informed Consent for Dental Treatment – Crown Option', 'Pending Signature', '10/21/2026'],
+  ['Informed Consent for Dental Treatment – Crown Option', 'Pending signature', '10/21/2026'],
   ['Procedure Consent - D7140 Extraction – erupted tooth or exposed root (elevation and/or forceps removal)', 'Signed', '09/14/2026'],
   ['Procedure Consent - D2140 Amalgam – one surface, primary or permanent', 'Signed', '08/25/2026'],
   ['Procedure Consent - D0220 Intraoral – periapical first radiographic image', 'Signed', '08/25/2026'],
@@ -34,7 +34,7 @@ const DOCS: Doc[] = ([
 
 const FIRMA_TONO: Record<Doc['firma'], PillTone> = {
   Signed: 'success',
-  'Pending Signature': 'warning',
+  'Pending signature': 'warning',
 }
 
 /* La tabla estándar (ui/data-table) con las columnas de documentos. */
@@ -48,7 +48,7 @@ const COLUMNAS: DataTableColumn<Doc>[] = [
     ),
   },
   { key: 'firma', header: 'Signature', width: 200, cell: (d) => <Pill tone={FIRMA_TONO[d.firma]}>{d.firma}</Pill> },
-  { key: 'fecha', header: 'Last Update', width: 140, cell: (d) => d.fecha },
+  { key: 'fecha', header: 'Last update', width: 140, cell: (d) => d.fecha },
 ]
 
 export default function Documents() {
@@ -77,7 +77,7 @@ export default function Documents() {
           {/* El encabezado de las tablas por defecto (Locations, Employees): título con la acción alineada y el buscador de
               36px con Search en su fila (documents en treatments.md, 2026-10-12). */}
           <SettingsPageHeader
-            titulo="Documents Manager"
+            titulo="Documents manager"
             accion={(
               <Button
                 variant="secondary"

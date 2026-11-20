@@ -16,7 +16,7 @@ export function OpcionFinding({ finding }: { finding: Pick<Finding, 'condition' 
           {style.good ? <Check className="size-2.5" strokeWidth={3} /> : <X className="size-2.5" />}
           {finding.status}
         </span>
-        <span className="text-dash-blue flex items-center gap-1 text-[10px] font-semibold"><Calendar className="size-2.5" /> {finding.date}</span>
+        <span className="text-dash-blue flex items-center gap-1 text-[11px] font-semibold"><Calendar className="size-2.5" /> {finding.date}</span>
       </span>
       <span className="flex flex-col gap-0.5 pl-1">
         <span className="text-xs font-extrabold text-ink">
@@ -68,7 +68,7 @@ export function OpcionProcedimiento({ procedure }: { procedure: ProcedureOption 
         <span className="font-medium text-ink">{procedure.label}</span>
       </span>
       <span className="flex flex-wrap gap-1">
-        {alcances.map((s) => <span key={s} className="rounded bg-dash-count-bg px-1.5 py-0.5 text-[10px] font-semibold text-dash-blue">{s}</span>)}
+        {alcances.map((s) => <span key={s} className="rounded bg-dash-count-bg px-1.5 py-0.5 text-[11px] font-semibold text-dash-blue">{s}</span>)}
       </span>
     </span>
   )

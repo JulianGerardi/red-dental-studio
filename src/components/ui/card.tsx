@@ -14,7 +14,7 @@ export const CardHeader = ({ className, ...p }: React.HTMLAttributes<HTMLDivElem
   <div className={cn('flex items-start justify-between gap-3 px-5 pt-5', className)} {...p} />
 )
 export const CardTitle = ({ className, ...p }: React.HTMLAttributes<HTMLHeadingElement>) => (
-  <h3 className={cn('text-sm leading-snug font-semibold text-ink', className)} {...p} />
+  <h3 className={cn('text-sm leading-snug font-bold text-ink', className)} {...p} />
 )
 export const CardDescription = ({ className, ...p }: React.HTMLAttributes<HTMLParagraphElement>) => (
   <p className={cn('mt-0.5 text-[13px] text-ink-muted', className)} {...p} />

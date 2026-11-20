@@ -7,14 +7,14 @@ import { expect } from 'e2e'
 test('Sin suscripción elegida, la card va con guiones y Manage queda deshabilitado', async ({ app, screen }) => {
   await app.open('/patients/john-smith/insurance')
   await expect(screen.getByText('Select a subscription')).toBeVisible()
-  await expect(screen.getByRole('button', 'Manage Subscription')).toBeDisabled()
+  await expect(screen.getByRole('button', 'Manage subscription')).toBeDisabled()
   await expect(screen.getByRole('button', 'Delete subscription')).toHaveCount(0)
 
   /* Busca también por carrier: "aetna" encuentra la de Lucas Johnson. */
   await screen.getByPlaceholder('Search by name or ID').fill('aetna')
   await screen.getByRole('option', /^Lucas Johnson.*AET-234254/).tap()
   await expect(screen.getByText('Plan 234254534', { exact: true }).first()).toBeVisible()
-  await expect(screen.getByRole('button', 'Manage Subscription')).toBeEnabled()
+  await expect(screen.getByRole('button', 'Manage subscription')).toBeEnabled()
 })
 
 test('Una suscripción en uso no se borra; una libre, sí, después de confirmar', async ({ app, screen }) => {
@@ -37,11 +37,11 @@ test('Una suscripción en uso no se borra; una libre, sí, después de confirmar
   await expect(screen.getByText('Subscription not found.')).toBeVisible()
 })
 
-test('New Subscription pide carrier y plan, no deja duplicar y la nueva queda elegida', async ({ app, screen }) => {
+test('New subscription pide carrier y plan, no deja duplicar y la nueva queda elegida', async ({ app, screen }) => {
   await app.open('/patients/john-smith/insurance')
-  await screen.getByRole('button', 'Add New Subscription').tap()
-  const drawer = screen.getByRole('dialog', 'New Subscription')
-  await drawer.getByRole('button', 'Next Step').tap()
+  await screen.getByRole('button', 'Add new subscription').tap()
+  const drawer = screen.getByRole('dialog', 'New subscription')
+  await drawer.getByRole('button', 'Next step').tap()
   await drawer.getByRole('button', 'Save').tap()
   await expect(drawer.getByText('Uncompleted fields')).toBeVisible()
   await expect(drawer.getByPlaceholder('Select plan')).toBeDisabled()
@@ -57,7 +57,7 @@ test('New Subscription pide carrier y plan, no deja duplicar y la nueva queda el
   await drawer.getByRole('button', 'Save').tap()
   await expect(drawer.getByText('Duplicate subscription')).toBeVisible()
 
-  await drawer.getByRole('button', 'Clear Plan Name').tap()
+  await drawer.getByRole('button', 'Clear Plan name').tap()
   await drawer.getByPlaceholder('Select plan').tap()
   await drawer.getByRole('button', 'HMO Basic').tap()
   await drawer.getByRole('button', 'Save').tap()

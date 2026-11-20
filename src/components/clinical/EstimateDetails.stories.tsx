@@ -88,7 +88,7 @@ export const States: Story = {
               <EstimateDetails caso={caso} estimacion={{ ...base, estado: e }} onVolver={nada} onCalcular={nada} />
             </Muestra>
           ))}
-          <Muestra titulo="Presented / Locked" nota="Disabled: con el caso presentado no se recalcula."><EstimateDetails caso={presentado} estimacion={base} onVolver={nada} onCalcular={nada} /></Muestra>
+          <Muestra titulo="Presented / locked" nota="Disabled: con el caso presentado no se recalcula."><EstimateDetails caso={presentado} estimacion={base} onVolver={nada} onCalcular={nada} /></Muestra>
         </div>
       </Bloque>
     </Lienzo>

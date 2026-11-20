@@ -23,7 +23,7 @@ export const HORARIO_SEMANAL: Record<string, EstadoDia> = {
 
 /* Turnos programados de la locación, para el aviso de Working Hours: guardar horas que dejan afuera un turno Proposed o
    Booked pide resolverlo antes (CON-1546, CON-2890). Duran una hora. Ver figma/modulos/locations.md (2026-11-16). */
-export type EstadoTurnoLocacion = 'Proposed' | 'Booked' | 'Check In' | 'In Progress' | 'Cancelled' | 'No Show' | 'Waiting List'
+export type EstadoTurnoLocacion = 'Proposed' | 'Booked' | 'Check in' | 'In progress' | 'Cancelled' | 'No show' | 'Waiting list'
 
 export type TurnoLocacion = { id: string; fecha: Date; provider: string; paciente: string; estado: EstadoTurnoLocacion }
 
@@ -34,7 +34,7 @@ export const TURNOS_LOCACION: TurnoLocacion[] = [
   { id: 'wh4', fecha: new Date(2026, 10, 25, 16, 0), provider: 'Dr. Emily Chen', paciente: 'Noah James Smith', estado: 'Booked' },
   { id: 'wh5', fecha: new Date(2026, 10, 30, 9, 0), provider: 'Dr. Emily Chen', paciente: 'John Smith', estado: 'Booked' },
   /* En curso hoy: si un cambio lo deja afuera, bloquea la operación (CON-4167). */
-  { id: 'wh6', fecha: new Date(2026, 10, 16, 10, 0), provider: 'Dr. Emily Chen', paciente: 'Elias Aguirre', estado: 'Check In' },
+  { id: 'wh6', fecha: new Date(2026, 10, 16, 10, 0), provider: 'Dr. Emily Chen', paciente: 'Elias Aguirre', estado: 'Check in' },
 ]
 
 /* CON-404 "Registrar room": Name* y Type* obligatorios, Abbreviation opcional, Active / Inactive. Una sala inactiva no
@@ -90,7 +90,7 @@ export const EXCEPCIONES_INICIALES: Excepcion[] = [
     fecha: new Date(2026, 6, 4), horaInicio: '', horaFin: '', todoElDia: true, estado: 'Active',
   },
   {
-    id: 'exc2', nombre: 'Staff Training', abreviatura: 'TRN', razon: 'Staff Training',
+    id: 'exc2', nombre: 'Staff training', abreviatura: 'TRN', razon: 'Staff training',
     fecha: new Date(2026, 8, 18), horaInicio: '14:00 hs', horaFin: '17:00 hs', todoElDia: false, estado: 'Active',
   },
   {

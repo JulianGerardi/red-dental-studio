@@ -2,7 +2,7 @@ import { useId, useState, type KeyboardEvent, type ReactNode } from 'react'
 import { ChevronDown, Search, SearchX, X } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { aviso } from '@/components/ui/toaster'
-import { Button } from '@/components/ui/button'
+import { Button, buttonClasses } from '@/components/ui/button'
 import { EmptyState } from '@/components/ui/empty-state'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { ICONO_SUELTO } from '@/lib/estilos'
@@ -20,34 +20,34 @@ export const TODOS = 'all'
 
 export const ESTADOS_VISTA: OpcionVista[] = [
   { id: 'proposed', nombre: 'Proposed' },
-  { id: 'checkin', nombre: 'Check In' },
+  { id: 'checkin', nombre: 'Check in' },
   { id: 'cancelled', nombre: 'Cancelled' },
 ]
 
 /* En el orden en que se leen, de a dos por fila. */
 export const PROVIDERS_VISTA: OpcionVista[] = [
-  { id: 'martinez', nombre: "Dr. Martinez's", detalle: 'General Dentist' },
-  { id: 'brooks', nombre: 'Dr. Olivia Brooks', detalle: 'Pediatric Specialist' },
-  { id: 'okonkwo', nombre: 'Dr. Emily Okonkwo', detalle: 'Pediatric Specialist' },
-  { id: 'kim', nombre: 'Dr. Noah Kim', detalle: 'Pediatric Specialist' },
-  { id: 'torres', nombre: 'Dr. Michael Torres', detalle: 'Oral Surgeon' },
-  { id: 'garcia', nombre: 'Dr. Sofia Garcia', detalle: 'Pediatric Specialist' },
-  { id: 'chen', nombre: 'Dr. Sarah Chen', detalle: 'General Dentist' },
-  { id: 'nguyen', nombre: 'Dr. David Nguyen', detalle: 'Oral Surgeon' },
-  { id: 'wilson', nombre: 'Dr. James Wilson', detalle: 'General Dentist' },
-  { id: 'reed', nombre: 'Dr. Amelia Reed', detalle: 'Oral Surgeon' },
-  { id: 'patel', nombre: 'Dr. Priya Patel', detalle: 'General Dentist' },
-  { id: 'ahmed', nombre: 'Dr. Daniel Ahmed', detalle: 'Oral Surgeon' },
+  { id: 'martinez', nombre: "Dr. Martinez's", detalle: 'General dentist' },
+  { id: 'brooks', nombre: 'Dr. Olivia Brooks', detalle: 'Pediatric specialist' },
+  { id: 'okonkwo', nombre: 'Dr. Emily Okonkwo', detalle: 'Pediatric specialist' },
+  { id: 'kim', nombre: 'Dr. Noah Kim', detalle: 'Pediatric specialist' },
+  { id: 'torres', nombre: 'Dr. Michael Torres', detalle: 'Oral surgeon' },
+  { id: 'garcia', nombre: 'Dr. Sofia Garcia', detalle: 'Pediatric specialist' },
+  { id: 'chen', nombre: 'Dr. Sarah Chen', detalle: 'General dentist' },
+  { id: 'nguyen', nombre: 'Dr. David Nguyen', detalle: 'Oral surgeon' },
+  { id: 'wilson', nombre: 'Dr. James Wilson', detalle: 'General dentist' },
+  { id: 'reed', nombre: 'Dr. Amelia Reed', detalle: 'Oral surgeon' },
+  { id: 'patel', nombre: 'Dr. Priya Patel', detalle: 'General dentist' },
+  { id: 'ahmed', nombre: 'Dr. Daniel Ahmed', detalle: 'Oral surgeon' },
 ]
 
 /* Tal cual el diseño: cuatro "Operatory 2" y las especialidades de los providers como subtítulo (anomalías 28 y 91). */
 export const SALAS_VISTA: OpcionVista[] = [
-  { id: 'op1', nombre: 'Operatory 1', detalle: 'General Dentist' },
-  { id: 'op2', nombre: 'Operatory 2', detalle: 'Pediatric Specialist' },
-  { id: 'op2-b', nombre: 'Operatory 2', detalle: 'Pediatric Specialist' },
-  { id: 'op2-c', nombre: 'Operatory 2', detalle: 'Pediatric Specialist' },
-  { id: 'op2-d', nombre: 'Operatory 2', detalle: 'Pediatric Specialist' },
-  { id: 'op3', nombre: 'Operatory 3', detalle: 'Oral Surgeon' },
+  { id: 'op1', nombre: 'Operatory 1', detalle: 'General dentist' },
+  { id: 'op2', nombre: 'Operatory 2', detalle: 'Pediatric specialist' },
+  { id: 'op2-b', nombre: 'Operatory 2', detalle: 'Pediatric specialist' },
+  { id: 'op2-c', nombre: 'Operatory 2', detalle: 'Pediatric specialist' },
+  { id: 'op2-d', nombre: 'Operatory 2', detalle: 'Pediatric specialist' },
+  { id: 'op3', nombre: 'Operatory 3', detalle: 'Oral surgeon' },
 ]
 
 export const VISTA_INICIAL: VistaCalendario = { estado: 'proposed', provider: 'martinez', sala: 'op1' }
@@ -151,7 +151,7 @@ export function ViewFiltersPanel({
   const nombreDe = (lista: OpcionVista[], id: string) => lista.find((o) => o.id === id)?.nombre
   const nProviders = vista.provider === TODOS ? providers.length : 1
   const nSalas = vista.sala === TODOS ? salas.length : 1
-  /* Si la búsqueda esconde al provider elegido, el Tab entra por "Select all Providers". */
+  /* Si la búsqueda esconde al provider elegido, el Tab entra por "Select all providers". */
   const providerEnfocable = visibles.some((p) => p.id === vista.provider) ? vista.provider : TODOS
 
   const guardar = () => {
@@ -182,7 +182,7 @@ export function ViewFiltersPanel({
       <div className="min-h-0 flex-1 overflow-y-auto px-4 pt-3 pb-5 @2xl:px-6">
         <SeccionFiltro titulo="Status" conteo={`${vista.estado === TODOS ? ESTADOS_VISTA.length : 1} selected`}>
           <GrupoFiltro etiqueta="Status" className="mt-2 flex flex-wrap gap-x-2 gap-y-1">
-            {[{ id: TODOS, nombre: 'Select all Status' }, ...ESTADOS_VISTA].map((o) => (
+            {[{ id: TODOS, nombre: 'Select all statuses' }, ...ESTADOS_VISTA].map((o) => (
               <OpcionFiltro
                 key={o.id}
                 nombre={o.nombre}
@@ -210,7 +210,7 @@ export function ViewFiltersPanel({
             </label>
             <GrupoFiltro etiqueta="Providers" className="mt-3 flex flex-col gap-1">
               <OpcionFiltro
-                nombre="Select all Providers"
+                nombre="Select all providers"
                 on={vista.provider === TODOS}
                 enfocable={providerEnfocable === TODOS}
                 onElegir={() => elegir('provider')(TODOS)}
@@ -255,7 +255,7 @@ export function ViewFiltersPanel({
             className="border-t border-line pt-5 @4xl:border-t-0 @4xl:border-l @4xl:pt-0 @4xl:pl-6"
           >
             <GrupoFiltro etiqueta="Rooms" className="mt-3 grid gap-x-4 gap-y-1 @lg:grid-cols-2 @4xl:grid-cols-1">
-              {[{ id: TODOS, nombre: 'Select all Rooms' }, ...salas].map((s) => (
+              {[{ id: TODOS, nombre: 'Select all rooms' }, ...salas].map((s) => (
                 <OpcionFiltro
                   key={s.id}
                   nombre={s.nombre}
@@ -306,7 +306,7 @@ export function ViewMenu({ valor, onGuardar }: { valor: VistaCalendario; onGuard
       <PopoverTrigger asChild>
         <button
           type="button"
-          className="bg-dash-blue hover:bg-dash-blue-hover focus-visible:outline-dash-blue flex h-8 items-center gap-1.5 rounded-md px-4 text-xs font-medium text-white transition-colors focus-visible:outline-2 focus-visible:outline-offset-2"
+          className={buttonClasses({ size: 'md' })}
         >
           View
           <ChevronDown aria-hidden className={cn('size-3.5 transition-transform', abierto && 'rotate-180')} />

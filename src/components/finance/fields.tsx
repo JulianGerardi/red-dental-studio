@@ -71,7 +71,7 @@ export function PhoneFields({
     <div className={cn('grid gap-4 sm:grid-cols-2', className)}>
       <CountryCodeField required={required} value={value.codigo} onChange={(codigo) => onChange({ ...value, codigo })} />
       {nanp && (
-        <TextField label="Area Code (3 digits)" required={required} placeholder="555" value={value.area} onChange={digitos('area', 3)} error={errores?.area} />
+        <TextField label="Area code (3 digits)" required={required} placeholder="555" value={value.area} onChange={digitos('area', 3)} error={errores?.area} />
       )}
       <TextField
         label={nanp ? 'Number (7 digits)' : 'Number'} required={required} placeholder={nanp ? '000-0000' : '11 1234 5678'}

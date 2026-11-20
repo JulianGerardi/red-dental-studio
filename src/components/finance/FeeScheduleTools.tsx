@@ -3,7 +3,7 @@ import { FormFooter, ModalShell, OptionCheckbox, SelectField, TextField } from '
 import { OBLIGATORIO } from '@/lib/validacion'
 
 /* Las dos herramientas del editor de un fee schedule (red.dev): Copy form trae los precios de otro fee schedule y Bulk
-   Edit ("Increase All") los sube en monto o en porcentaje. Las dos llenan la columna New Fee; nada se guarda hasta Save.
+   Edit ("Increase all") los sube en monto o en porcentaje. Las dos llenan la columna New Fee; nada se guarda hasta Save.
    Ver settings-billing.md. */
 
 export function CopyFormDrawer({ opciones, onClose, onCopiar }: {
@@ -25,7 +25,7 @@ export function CopyFormDrawer({ opciones, onClose, onCopiar }: {
       <SelectField
         label="Fee schedule" required placeholder="Select an option" options={opciones} value={elegido} onChange={setElegido}
         error={intentado && !elegido ? OBLIGATORIO : undefined}
-        hint="Its fees replace every New Fee. Save to keep them."
+        hint="Its fees replace every new fee. Save to keep them."
       />
     </ModalShell>
   )
@@ -56,7 +56,7 @@ export function IncreaseAllDrawer({ onClose, onAplicar, seleccionados = 0 }: {
 
   return (
     <ModalShell
-      title={seleccionados ? 'Increase Selected' : 'Increase All'}
+      title={seleccionados ? 'Increase selected' : 'Increase all'}
       description={seleccionados ? `Increase the ${seleccionados} selected ${seleccionados === 1 ? 'fee' : 'fees'} by a specific amount or percentage.` : 'Increase all fees by a specific amount or percentage.'}
       onClose={onClose}
       width="max-w-[480px]"
@@ -65,7 +65,7 @@ export function IncreaseAllDrawer({ onClose, onAplicar, seleccionados = 0 }: {
       <div className="flex flex-col gap-4">
         <div className="grid gap-4 sm:grid-cols-2">
           <TextField
-            label={seleccionados ? 'Increase Selected Fees By' : 'Increase All Fees By'} required placeholder={por === '$' ? '$0.00' : '0'} value={monto}
+            label={seleccionados ? 'Increase selected fees by' : 'Increase all fees by'} required placeholder={por === '$' ? '$0.00' : '0'} value={monto}
             onChange={(v) => setMonto(v.replace(/[^\d.-]/g, ''))}
             error={!intentado || valido ? undefined : monto.trim() ? 'Enter an amount other than 0.' : OBLIGATORIO}
             hint="A negative number lowers the fees."

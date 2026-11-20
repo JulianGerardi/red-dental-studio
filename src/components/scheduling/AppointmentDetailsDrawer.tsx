@@ -38,7 +38,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 const W = 336
 
 /* CON-2990: por qué no se puede borrar un turno que ya no está en un estado temprano. */
-const BLOQUEO_BORRAR = 'Only Proposed or Waiting List appointments can be deleted.'
+const BLOQUEO_BORRAR = 'Only Proposed or Waiting list appointments can be deleted.'
 const BLOQUEO_EDITAR = 'Fulfilled, No-show and Cancelled appointments cannot be edited.'
 
 /* El detalle es de lectura: el turno se cambia desde "Edit appointment", no
@@ -259,7 +259,7 @@ export function AppointmentDetailsDrawer({
             </TooltipProvider>
           ))}
           <Button onClick={() => aviso.ok(`${patient} has been checked in.`)}>
-            Check In <ChevronDown />
+            Check in <ChevronDown />
           </Button>
         </div>
       </div>
@@ -275,7 +275,7 @@ export function AppointmentDetailsDrawer({
       {cuerpo}
       {confirmando && (
         <ConfirmDialog
-          title="Delete Appointment"
+          title="Delete appointment"
           icon="delete"
           confirmLabel="Delete"
           tone="danger"

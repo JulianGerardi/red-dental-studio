@@ -1,3 +1,5 @@
+import { SearchInput } from '@/components/ui/search-input'
+import { PADDING_PAGINA } from '@/lib/estilos'
 import { useEffect, useId, useRef, useState } from 'react'
 import { Chip } from '@/components/ui/chip'
 import { Search, Plus, Bold, Italic, Underline, Heading1, Heading2, Pilcrow, List, ListOrdered, Eye, Power, PowerOff, ArrowLeft, Check } from 'lucide-react'
@@ -15,7 +17,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 import { FilterMenu } from '@/components/ui/filter-menu'
 import { OBLIGATORIO } from '@/lib/validacion'
 
-/* Settings → Consents. Figma 4106:170620 ("New Consent Template"): lista de
+/* Settings → Consents. Figma 4106:170620 ("New consent template"): lista de
    templates a la izquierda y editor del texto -las tres variantes del frame son
    el mismo estado con y sin el error de validación, no pantallas distintas-.
    El preview, que en el Figma es una tercera columna, se abre en un drawer desde
@@ -24,8 +26,8 @@ import { OBLIGATORIO } from '@/lib/validacion'
    Opción 1 de las tres que planteó Julián para el flujo de consentimientos
    -la única con diseño de Figma-. Reusa piezas del sistema: Pill para los
    estados, el mismo anillo azul de fila seleccionada que usa `Seleccionable`
-   en TreatmentPlanPicker.tsx, y SelectField para "Current Title" -mismo
-   quirk que "First Name" en Employees.tsx: acá los campos son choices, no
+   en TreatmentPlanPicker.tsx, y SelectField para "Current title" -mismo
+   quirk que "First name" en Employees.tsx: acá los campos son choices, no
    texto libre-.
 
    "Consent text" son dos campos con su rótulo y su guía (Nature of procedure,
@@ -132,7 +134,7 @@ export const aBorrador = (t: ConsentTemplate): Borrador => ({
 })
 
 /* Con el editor único cada botón aplica su formato a lo seleccionado (`mousedown` sin foco para no perder la selección);
-   con los dos campos de texto no hay formato y avisa, como el botón "Select File" de Employees. */
+   con los dos campos de texto no hay formato y avisa, como el botón "Select file" de Employees. */
 const FORMATOS = [
   { icono: Bold, label: 'Bold', comando: 'bold' },
   { icono: Italic, label: 'Italic', comando: 'italic' },
@@ -226,19 +228,11 @@ export function ListaTemplates({ templates, elegidoId, q, onQ, filtro, onFiltro,
         <h2 className="text-sm font-bold text-ink">Templates</h2>
         <Button size="sm" onClick={onNuevo}><Plus /> New template</Button>
       </div>
-      {/* Buscador y después Filter, como Accounts: el filtro de estado es el menú de la app, no pestañas (consents.md, 2026-11-20). */}
+      {/* Buscador y después Filter, como Accounts (consents.md, 2026-11-20); dentro de la card, en sm (figma/README.md). */}
       <div className="flex items-center gap-2">
-        <div className="relative min-w-0 flex-1">
-          <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-ink-faint" />
-          <input
-            value={q}
-            onChange={(e) => onQ(e.target.value)}
-            placeholder="Search templates..."
-            aria-label="Search templates"
-            className="focus:border-dash-blue h-9 w-full rounded-md border border-line bg-white pr-3 pl-9 text-[13px] shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] placeholder:text-ink-faint focus:outline-none"
-          />
-        </div>
+        <SearchInput size="sm" value={q} onChange={onQ} placeholder="Search templates" aria-label="Search templates" className="sm:max-w-none" />
         <FilterMenu
+          size="sm"
           label="Filter templates by status"
           groups={[{
             type: 'single', title: 'Status', defaultValue: 'Active', value: filtro, onChange: (v) => onFiltro(v as Filtro),
@@ -271,7 +265,7 @@ export function SelectorProcedimientos({ elegidos, onCambiar, error }: {
   return (
     <div className="flex flex-col gap-2">
       <label htmlFor="consent-procedimiento" className="text-xs font-medium text-ink">
-        Search Procedure<span className="text-required">*</span>
+        Search procedure<span className="text-required">*</span>
       </label>
       <div className="relative">
         <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-ink-faint" />
@@ -279,7 +273,7 @@ export function SelectorProcedimientos({ elegidos, onCambiar, error }: {
           id="consent-procedimiento"
           value={q}
           onChange={(e) => setQ(e.target.value)}
-          placeholder="Search..."
+          placeholder="Search procedures"
           aria-invalid={error || undefined}
           className={cn(
             'h-9 w-full rounded-md border bg-white pr-3 pl-9 text-[13px] shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] placeholder:text-ink-faint focus:outline-none',
@@ -336,12 +330,12 @@ export function TextoConsentimiento({ naturaleza, riesgos, onNaturaleza, onRiesg
         <label className="flex flex-col gap-1.5">
           <span className="text-[11px] font-semibold tracking-wide text-ink-muted uppercase">Nature of procedure</span>
           <textarea rows={3} value={naturaleza} onChange={(e) => onNaturaleza(e.target.value)} className={caja} />
-          <span className="text-[11.5px] leading-snug text-ink-muted italic">{GUIA_NATURALEZA}</span>
+          <span className="text-[12px] leading-snug text-ink-muted italic">{GUIA_NATURALEZA}</span>
         </label>
         <label className="flex flex-col gap-1.5">
           <span className="text-[11px] font-semibold tracking-wide text-ink-muted uppercase">Risk and complications</span>
           <textarea rows={4} value={riesgos} onChange={(e) => onRiesgos(e.target.value)} className={caja} />
-          <span className="text-[11.5px] leading-snug text-ink-muted italic">{GUIA_RIESGOS}</span>
+          <span className="text-[12px] leading-snug text-ink-muted italic">{GUIA_RIESGOS}</span>
         </label>
       </div>
     </div>
@@ -408,7 +402,7 @@ export function EditorTemplate({ actual, borrador, onBorrador, intentado, onAlte
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div className="min-w-[200px] flex-1">
           <div className="flex flex-wrap items-center gap-2">
-            <h2 className="text-lg font-bold text-ink">{actual ? 'Edit Template' : 'New Consent Template'}</h2>
+            <h2 className="text-[15px] font-bold text-ink">{actual ? 'Edit template' : 'New consent template'}</h2>
             {actual && <Pill tone={actual.activo ? 'success' : 'neutral'} size="sm">{actual.activo ? 'Active' : 'Inactive'}</Pill>}
             {actual?.sistema && <Pill tone="info" size="sm">System</Pill>}
           </div>
@@ -430,7 +424,7 @@ export function EditorTemplate({ actual, borrador, onBorrador, intentado, onAlte
       )}
 
       <SelectField
-        label="Current Title"
+        label="Current title"
         required
         options={TITULOS_SUGERIDOS}
         value={borrador.titulo}
@@ -497,7 +491,7 @@ export function DrawerPreview({ abierto, onCerrar, borrador, vistaPaciente, onVi
             vistaPaciente ? 'border-dash-blue bg-dash-blue text-white' : 'border-line bg-white text-ink-slate hover:text-ink-soft',
           )}
         >
-          <Eye className="size-3.5" /> Patient View
+          <Eye className="size-3.5" /> Patient view
         </button>
       </div>
       <div className="mt-3">
@@ -578,8 +572,8 @@ export function SettingsConsents() {
   }
 
   return (
-    <div className="@container px-4 py-6 sm:px-8">
-      <SettingsPageHeader titulo="Consent Templates" />
+    <div className={cn('@container', PADDING_PAGINA)}>
+      <SettingsPageHeader titulo="Consent templates" />
 
       <div className="mt-4 grid grid-cols-1 gap-4 @3xl:grid-cols-[288px_minmax(0,1fr)]">
         <ListaTemplates

@@ -76,7 +76,7 @@ export function ClinicalToolbar({
                      5.32, label 11.52/600. Cada pestaña mide lo que dice: el
                      ancho de la fila lo da el padding de la pantalla, no un
                      estiramiento de los botones. */
-                  'flex h-[33.96px] shrink-0 items-center justify-center rounded-[5.32px] px-[21.27px] text-[11.52px] font-semibold whitespace-nowrap transition-colors',
+                  'flex h-[33.96px] shrink-0 items-center justify-center rounded-[5.32px] px-[21.27px] text-[12px] font-semibold whitespace-nowrap transition-colors',
                   'lg:grow',
                   on
                     ? 'bg-dash-blue font-semibold text-white'

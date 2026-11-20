@@ -90,7 +90,7 @@ const DONDE: [string, string][] = [
   ['Patient overview', 'Patients / John Smith'],
   ['Patient section (Treatments, Insurance, Ledger, Documents, Relationships & Billing)', 'Patients / John Smith / Ledger'],
   ['Add Relationship (drawer over the list)', 'Patients / John Smith / Relationships & Billing'],
-  ['Edit Patient', 'Patients / John Smith / Edit Patient'],
+  ['Edit patient', 'Patients / John Smith / Edit Patient'],
   ['Settings section', 'Settings / Locations'],
   ['Settings item', 'Settings / Locations / Abril'],
   ['Settings / Billing', 'Settings / Billing / Carriers / Aetna Dental Plans'],

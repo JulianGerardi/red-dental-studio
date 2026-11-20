@@ -1016,6 +1016,25 @@ encounter pasa a Completed o Fulfilled.
 Sin historia de Jira (pedido de Julián). *Dashboard* era el único título con `PageTitle size="lg"` (24px bold); pasa al
 tamaño por defecto (20px semibold), el de Patients, Scheduling y Billing.
 
+## Métricas: el bloque compacto, sin bajadas (2026-11-20)
+
+Sin historia de Jira; pedido de Julián con la propuesta de consistencia. La tira de arriba a la derecha vuelve a ser un
+bloque compacto: un solo bloque blanco, ancho al contenido, divisores verticales, ícono de 40, **rótulo y número en la
+misma línea** y nada debajo. Las bajadas ("2 completed", "1 new", "18 min avg.") se fueron de la vista y pasaron al ⓘ
+de cada métrica, que además dice qué cuenta: *Appointments for this day, without cancellations. N completed* · *Patients
+who checked in and have not checked out yet* · *Encounters started and not closed yet. 18 min avg.* "Waiting" pasa a
+**Waiting room**, el nombre del panel. En celular el bloque va debajo de la fecha, en columnas iguales y sin ícono.
+Es la variante compacta del Metric; la estándar (monto con contexto) es la de Ledger y Billing. Para validar: si alguien
+extraña ver "N completed" sin abrir el ⓘ.
+
+## "Show N more" al pie del panel, alineado entre columnas (2026-11-20)
+
+Sin historia de Jira; pedido de Julián con el Figma *Screens & Flows* `509:81656`. Las tres columnas se estiran a la
+misma altura, pero "Show N more" quedaba pegado a la última fila de cada lista: en Waiting room caía 45 px más arriba
+que en Appointments. Ahora va al pie del panel (`ShowMore alPie`, también en `ListGroup`): los dos botones quedan a la
+misma altura, a 16 px del borde de abajo, aunque cada lista mida distinto. Abierto ("Show less") sigue igual. En tablet
+y celular, con los paneles uno debajo del otro, no cambia nada. Para validar: si el hueco entre la última fila de
+Waiting room y su botón se lee como "hay más", o si conviene llenar ese alto con filas (`llenarAlto`).
 ## CON-2641 · CON-2643 · Pending Task con funcionalidad (2026-11-20)
 
 **Jira:** CON-2641 (Pending Tasks de la secretaria, Dashboard) y CON-2643 (Pending Tasks del paciente), epic CON-2639.
@@ -1060,5 +1079,9 @@ Prescription y Referral siguen "en construcción"; los cambios se pierden al rec
 
 **A validar:** qué hace cada opción del ⋮ con el encuentro abierto (los videos sólo muestran el estado deshabilitado),
 el ⋮ de Referral y el PDF de Lab Order.
+
+**Textos:** los de la app van en sentence case, como fijó #176 (*Complete this task*, *Back to history*, *Sign clinical
+note*, *Login to sign document*); el contenido del documento (vista y PDF) queda como el de red.dev (*Dental Clinical
+Note*, *Medical History*…), igual que los demás nombres de documentos.
 
 `tests/pending-tasks.e2e.ts`.

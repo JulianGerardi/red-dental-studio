@@ -103,7 +103,7 @@ export function AddRelationshipDrawer({
     setEmailAuto(e)
   }
   const nombre = persona?.name ?? [d.first.trim(), d.last.trim()].filter(Boolean).join(' ')
-  const rolTexto = guardian && guarantor ? 'Guardian and Guarantor' : guarantor ? 'Guarantor' : 'Guardian'
+  const rolTexto = guardian && guarantor ? 'Guardian and guarantor' : guarantor ? 'Guarantor' : 'Guardian'
   const sinPersona = aviso && paso === 0 && !persona && !nueva
   const sinRol = aviso && paso === pasoRel && !guardian && !guarantor
   const sinDireccion = aviso && paso === pasoRel && direccion === null
@@ -130,7 +130,7 @@ export function AddRelationshipDrawer({
 
   return (
     <ModalShell
-      title="Add Relationship"
+      title="Add relationship"
       description="Link a family member, guardian or guarantor to this patient."
       onClose={onClose}
       width="max-w-[560px]"
@@ -141,7 +141,7 @@ export function AddRelationshipDrawer({
       <DrawerStep index={0} step={paso}>
         <DrawerSection title="Find or create person">
           <PersonSearchField
-            label="Select person" required placeholder="Search by Name or Last Name"
+            label="Select person" required placeholder="Search patients by name"
             personas={DIRECTORIO.map((p) => p.name)}
             value={personaNombre} onChange={setPersonaNombre}
             disabled={nueva}
@@ -149,14 +149,14 @@ export function AddRelationshipDrawer({
             chips={(n) => { const p = DIRECTORIO.find((x) => x.name === n); return p && chipsPersona(p.dob, p.email) }}
           />
           <OptionCheckbox
-            label="Add New Person"
+            label="Add new person"
             checked={nueva}
             onChange={(v) => { setNueva(v); setAviso(false); if (v) setPersonaNombre('') }}
           />
           {nueva && (
             <div className="grid gap-4 sm:grid-cols-2">
-              <TextField label="First Name" required placeholder="First name" value={d.first} onChange={set('first')} error={falta('first')} />
-              <TextField label="Last Name" required placeholder="Last name" value={d.last} onChange={set('last')} error={falta('last')} />
+              <TextField label="First name" required placeholder="First name" value={d.first} onChange={set('first')} error={falta('first')} />
+              <TextField label="Last name" required placeholder="Last name" value={d.last} onChange={set('last')} error={falta('last')} />
               <TextField className="sm:col-span-2" label="Email" placeholder="Placeholder@gmail.com" value={d.emailNueva} onChange={set('emailNueva')} />
             </div>
           )}
@@ -164,7 +164,7 @@ export function AddRelationshipDrawer({
       </DrawerStep>
 
       {pideContacto && <DrawerStep index={1} step={paso}>
-        <DrawerSection title="General Information">
+        <DrawerSection title="General information">
           <div className="grid gap-4 sm:grid-cols-2">
             <SelectField label="Country" required value={d.country} onChange={set('country')} error={falta('country')} />
             <TextField label="Number" required placeholder="408-XXX-XXXX" value={d.number} onChange={set('number')} error={falta('number')} />
@@ -172,14 +172,14 @@ export function AddRelationshipDrawer({
           <TextField label="Email" required placeholder="Placeholder@gmail.com" value={d.email} onChange={set('email')} error={falta('email')} />
         </DrawerSection>
         {/* "Adress" sin doble D y las dos líneas como select: los dos salen del Figma. Anomalías 37 y 38. */}
-        <DrawerSection title="Adress Information">
+        <DrawerSection title="Address information">
           <div className="grid gap-4 sm:grid-cols-2">
-            <SelectField label="Adress line 1" required options={['123 Maple Street', '456 Oak Avenue', '789 Pine Road']} value={d.linea1} onChange={set('linea1')} error={falta('linea1')} />
-            <SelectField label="Adress line 2" required options={['Apt 2B', 'Suite 300', 'Floor 4']} value={d.linea2} onChange={set('linea2')} error={falta('linea2')} />
+            <SelectField label="Address line 1" required options={['123 Maple Street', '456 Oak Avenue', '789 Pine Road']} value={d.linea1} onChange={set('linea1')} error={falta('linea1')} />
+            <SelectField label="Address line 2" required options={['Apt 2B', 'Suite 300', 'Floor 4']} value={d.linea2} onChange={set('linea2')} error={falta('linea2')} />
             <SelectField label="Country" required value={d.paisDir} onChange={set('paisDir')} error={falta('paisDir')} />
             <SelectField label="Region" required options={['Arizona', 'California', 'Florida', 'New York']} value={d.region} onChange={set('region')} error={falta('region')} />
             <SelectField label="City" required options={['Phoenix', 'Los Angeles', 'Miami', 'New York']} value={d.ciudad} onChange={set('ciudad')} error={falta('ciudad')} />
-            <TextField label="Postal Code" required placeholder="5678" value={d.postal} onChange={set('postal')} error={falta('postal')} />
+            <TextField label="Postal code" required placeholder="5678" value={d.postal} onChange={set('postal')} error={falta('postal')} />
           </div>
         </DrawerSection>
       </DrawerStep>}
@@ -199,7 +199,7 @@ export function AddRelationshipDrawer({
             <FieldError>{sinDireccion ? 'Choose who is responsible for whom.' : undefined}</FieldError>
           </div>
           <SelectField
-            label="Relationship to Patient" required
+            label="Relationship to patient" required
             options={['Parent', 'Guardian', 'Sibling', 'Spouse', 'Child', 'Other']}
             value={d.rel} onChange={set('rel')} error={falta('rel')}
           />

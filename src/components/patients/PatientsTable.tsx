@@ -35,8 +35,8 @@ export const STATUS_TONO: Record<PatientStatus, PillTone> = {
 /* La tabla estándar de la app (ui/data-table) con las columnas de pacientes. El nombre y Overview llevan al dashboard
    del paciente; Edit abre el formulario. La foto es la que se subió en la ficha (patients.md, 2026-11-06). */
 const COLUMNAS: DataTableColumn<PatientRow>[] = [
-  { key: 'name', header: 'Full name', width: 220, cell: (r) => <PersonCell name={r.name} initials={r.initials} photo={fotoGuardada(clavePacienteFoto(r.id))} to={`/patients/${r.id}`} /> },
-  { key: 'birthday', header: 'Birthday', width: 160, cell: (r) => <TextCell>{r.birthday}</TextCell> },
+  { key: 'name', header: 'Name', width: 220, cell: (r) => <PersonCell name={r.name} initials={r.initials} photo={fotoGuardada(clavePacienteFoto(r.id))} to={`/patients/${r.id}`} /> },
+  { key: 'birthday', header: 'Date of birth', width: 160, cell: (r) => <TextCell>{r.birthday}</TextCell> },
   { key: 'email', header: 'Email', cell: (r) => <TextCell>{r.email}</TextCell> },
   { key: 'status', header: 'Status', width: 140, cell: (r) => <Pill tone={STATUS_TONO[r.status]}>{r.status}</Pill> },
 ]

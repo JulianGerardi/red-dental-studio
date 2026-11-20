@@ -70,8 +70,8 @@ export function LocationInsuranceDefaults({ locId, onDirtyChange }: { locId: str
     const rid = n.renderingId ?? n.alternateRenderingId
     if (n.renderingMode === 'PROVIDER' && !n.renderingId) e.rendering = 'Select a rendering provider before saving.'
     else if (rid && !providerElegible(rid)) e.rendering = NO_DISPONIBLE.rendering
-    if (!n.placeId) e.place = 'Select a default Place of Service before saving.'
-    else if (!PLACES.some((p) => p.id === n.placeId && p.active)) e.place = 'Select an active Place of Service.'
+    if (!n.placeId) e.place = 'Select a default place of service before saving.'
+    else if (!PLACES.some((p) => p.id === n.placeId && p.active)) e.place = 'Select an active place of service.'
     return e
   }
 
@@ -93,16 +93,16 @@ export function LocationInsuranceDefaults({ locId, onDirtyChange }: { locId: str
   return (
     <div className="flex flex-col gap-4">
       <Card>
-        <Encabezado titulo="Billing Provider" bajada="Select the provider or entity to identify as the billing provider on claims." />
+        <Encabezado titulo="Billing provider" bajada="Select the provider or entity to identify as the billing provider on claims." />
         <Opciones
-          etiqueta="Billing Provider"
+          etiqueta="Billing provider"
           valor={d.billingMode}
-          opciones={[['PROCEDURES', 'Provider of Procedures'], ['PROFILE', 'Specific Billing Profile']]}
+          opciones={[['PROCEDURES', 'Provider of procedures'], ['PROFILE', 'Specific billing profile']]}
           onChange={(v) => { set('billingMode', v); limpiarError('billing') }}
         />
         <Seleccion
           id="defaults-billing"
-          rotulo={especificoBilling ? 'Billing Profile' : 'Alternate Billing Profile'}
+          rotulo={especificoBilling ? 'Billing profile' : 'Alternate billing profile'}
           requerido={especificoBilling}
           vacio="No billing profile selected."
           error={errores.billing ?? (perfilElegido && !perfilElegible(perfilElegido) ? NO_DISPONIBLE.billing : undefined)}
@@ -114,21 +114,21 @@ export function LocationInsuranceDefaults({ locId, onDirtyChange }: { locId: str
       </Card>
 
       <Card>
-        <Encabezado titulo="Rendering Provider" bajada="Select the provider to identify as the treating provider on claims." />
+        <Encabezado titulo="Rendering provider" bajada="Select the provider to identify as the treating provider on claims." />
         <Opciones
-          etiqueta="Rendering Provider"
+          etiqueta="Rendering provider"
           valor={d.renderingMode}
-          opciones={[['PROCEDURES', 'Provider of Procedures'], ['PROVIDER', 'Specific Provider']]}
+          opciones={[['PROCEDURES', 'Provider of procedures'], ['PROVIDER', 'Specific provider']]}
           onChange={(v) => { set('renderingMode', v); limpiarError('rendering') }}
         />
         {!especificoRendering && (
           <Casilla on={d.usePatientPrimary} onChange={(v) => set('usePatientPrimary', v)} className="mt-4">
-            Use the patient's Primary Provider
+            Use the patient's primary provider
           </Casilla>
         )}
         <Seleccion
           id="defaults-rendering"
-          rotulo={especificoRendering ? 'Rendering Provider' : 'Alternate Rendering Provider'}
+          rotulo={especificoRendering ? 'Rendering provider' : 'Alternate rendering provider'}
           requerido={especificoRendering}
           vacio="No provider selected."
           error={errores.rendering ?? (providerElegido && !providerElegible(providerElegido) ? NO_DISPONIBLE.rendering : undefined)}
@@ -140,11 +140,11 @@ export function LocationInsuranceDefaults({ locId, onDirtyChange }: { locId: str
       </Card>
 
       <Card>
-        <Encabezado titulo="PPO Write-offs or Contracted Amounts" bajada="Choose whose carrier contracts are used to calculate PPO write-offs or contracted amounts." />
+        <Encabezado titulo="PPO write-offs or contracted amounts" bajada="Choose whose carrier contracts are used to calculate PPO write-offs or contracted amounts." />
         <Opciones
           etiqueta="Contract reference"
           valor={d.contractCalculation}
-          opciones={[['BILLING', 'Billing Provider'], ['RENDERING', 'Rendering Provider']]}
+          opciones={[['BILLING', 'Billing provider'], ['RENDERING', 'Rendering provider']]}
           onChange={(v) => set('contractCalculation', v)}
         />
         <div className="mt-5 flex flex-wrap items-start justify-between gap-4 border-t border-line-row pt-4">
@@ -161,10 +161,10 @@ export function LocationInsuranceDefaults({ locId, onDirtyChange }: { locId: str
       </Card>
 
       <Card>
-        <Encabezado titulo="Place of Service" bajada="Select the type of setting where services were rendered." />
+        <Encabezado titulo="Place of service" bajada="Select the type of setting where services were rendered." />
         <div id="defaults-place-campo" className="mt-4 sm:w-1/2 sm:pr-2">
           <SelectField
-            label="Default Place of Service"
+            label="Default place of service"
             required
             buscable
             buscarPlaceholder="Search by name or code"
@@ -177,10 +177,10 @@ export function LocationInsuranceDefaults({ locId, onDirtyChange }: { locId: str
       </Card>
 
       <Card>
-        <Encabezado titulo="Default Authorization for New Subscribers" bajada="Choose which authorization options are selected by default for new subscribers." />
+        <Encabezado titulo="Default authorization for new subscribers" bajada="Choose which authorization options are selected by default for new subscribers." />
         <div className="mt-4 flex flex-col gap-3">
-          <Casilla on={d.defaultReleaseInfo} onChange={(v) => set('defaultReleaseInfo', v)}>Release of Information</Casilla>
-          <Casilla on={d.defaultAssignBenefits} onChange={(v) => set('defaultAssignBenefits', v)}>Assignment of Benefits</Casilla>
+          <Casilla on={d.defaultReleaseInfo} onChange={(v) => set('defaultReleaseInfo', v)}>Release of information</Casilla>
+          <Casilla on={d.defaultAssignBenefits} onChange={(v) => set('defaultAssignBenefits', v)}>Assignment of benefits</Casilla>
         </div>
       </Card>
 
@@ -393,7 +393,7 @@ export function ElegirPerfilDrawer({ elegido, onClose, onElegir }: { elegido: st
         {!visibles.length && (
           <EmptyState
             title={elegibles.length ? 'No billing profiles match your search.' : 'No active billing profiles yet.'}
-            detail={elegibles.length ? undefined : 'Enable a billing profile for a location or set a provider as Primary Provider.'}
+            detail={elegibles.length ? undefined : 'Enable a billing profile for a location or set a provider as primary provider.'}
             className="py-10"
           />
         )}
@@ -440,7 +440,7 @@ export function ElegirProviderDrawer({ titulo, providers, elegido, onClose, onEl
         {!visibles.length && (
           <EmptyState
             title={providers.length ? 'No providers match your search.' : 'No available providers yet.'}
-            detail={providers.length ? undefined : 'Set a provider as Primary Provider to select it here.'}
+            detail={providers.length ? undefined : 'Set a provider as primary provider to select it here.'}
             className="py-10"
           />
         )}
@@ -454,7 +454,7 @@ export function ElegirProviderDrawer({ titulo, providers, elegido, onClose, onEl
 export function BloqueoDefaults({ tipo, referencias, onClose }: { tipo: 'perfil' | 'provider'; referencias: Referencia[]; onClose: () => void }) {
   return (
     <ConfirmDialog
-      title={tipo === 'perfil' ? 'Unable to disable billing profile' : 'Unable to deactivate Primary Provider'}
+      title={tipo === 'perfil' ? 'Unable to disable billing profile' : 'Unable to deactivate primary provider'}
       icon="warning"
       confirmLabel="Close"
       hideCancel
@@ -463,8 +463,8 @@ export function BloqueoDefaults({ tipo, referencias, onClose }: { tipo: 'perfil'
     >
       <p>
         {tipo === 'perfil'
-          ? 'This billing profile cannot be disabled because it is selected in Insurance Defaults.'
-          : 'Primary provider cannot be disabled because it is selected in Insurance Defaults.'}
+          ? 'This billing profile cannot be disabled because it is selected in Insurance defaults.'
+          : 'Primary provider cannot be disabled because it is selected in Insurance defaults.'}
       </p>
       <p className="mt-2">Update the following settings before trying again:</p>
       <ul className="mt-2 flex flex-col gap-1.5">

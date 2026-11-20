@@ -44,7 +44,7 @@ function Demo({ total, current, names }: Args) {
       <StepIndicator total={total} current={paso} labels={names ? NOMBRES.slice(0, total) : undefined} />
       <div className="flex gap-3 [&>button]:flex-1">
         <Button variant="secondary" disabled={paso <= 1} onClick={() => setPaso((p) => p - 1)}>Return</Button>
-        <Button disabled={paso > total} onClick={() => setPaso((p) => p + 1)}>Next Step</Button>
+        <Button disabled={paso > total} onClick={() => setPaso((p) => p + 1)}>Next step</Button>
       </div>
     </div>
   )

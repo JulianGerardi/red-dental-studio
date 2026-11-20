@@ -1,11 +1,10 @@
+import { SettingsSearch } from '@/components/settings/SettingsSearch'
+import { PADDING_PAGINA } from '@/lib/estilos'
 import { useCallback, useMemo, useState } from 'react'
 import { PageTitle } from '@/components/ui/page-title'
 import { Link, useNavigate, useParams } from 'react-router-dom'
-import {
-  CirclePlus, Trash2, FileText, Pencil, Ban, UserMinus,
-} from 'lucide-react'
+import { Trash2, FileText, Pencil, Ban, UserMinus, Plus } from 'lucide-react'
 import { EmptyState } from '@/components/ui/empty-state'
-import { SettingsSearch } from '@/components/settings/SettingsSearch'
 import { EditableAvatar } from '@/components/ui/editable-avatar'
 import { aviso } from '@/components/ui/toaster'
 import { SettingsPageHeader } from '@/components/settings/SettingsPageHeader'
@@ -33,7 +32,7 @@ import type { Referencia } from '@/data/insuranceDefaults'
 /* Settings → Employees. La lista es propia —el Figma de 3864:235190 sólo
    tiene la ficha de un empleado, no la tabla que lleva hasta ahí—, con las
    columnas que pasó Julián: casilla, nombre con avatar, fecha de nacimiento,
-   email, "Is Provider" y estado.
+   email, "Is provider" y estado.
 
    La ficha de cada persona —Employee / Roles & Location / Provider Info /
    Working Hours— vivía antes colgada de Locations: un empleado no es una
@@ -71,7 +70,7 @@ export function SettingsEmployees({ nuevo = false }: { nuevo?: boolean }) {
     })
   }
 
-  /* "Remove Provider Role" no borra a la persona, sólo el rol: si hiciera lo
+  /* "Remove provider role" no borra a la persona, sólo el rol: si hiciera lo
      mismo que Delete, dos ítems del mismo menú harían la misma acción. */
   const quitarRolProvider = (e: Empleado) => {
     setFilas((p) => p.map((x) => (x.id === e.id ? { ...x, esProvider: false } : x)))
@@ -79,18 +78,18 @@ export function SettingsEmployees({ nuevo = false }: { nuevo?: boolean }) {
   }
 
   return (
-    <div className="px-4 py-6 sm:px-8">
+    <div className={PADDING_PAGINA}>
       <SettingsPageHeader
         titulo="Employees"
         accion={(
-          <Button data-tour="set-team" onClick={() => setCreando(true)}>
-            <CirclePlus /> New Employee
+          <Button size="md" data-tour="set-team" onClick={() => setCreando(true)}>
+            <Plus /> New employee
           </Button>
         )}
       >
         <SettingsSearch value={q} onChange={setQ} placeholder="Search employees" />
         {seleccion.length > 0 && (
-          <span className="bg-dash-count-bg text-dash-blue-hover flex h-9 items-center rounded-md px-3 text-[13px] font-semibold">
+          <span className="bg-dash-count-bg text-dash-blue-hover flex h-8 items-center rounded-md px-3 text-[13px] font-semibold">
             {seleccion.length} selected
           </span>
         )}
@@ -100,10 +99,10 @@ export function SettingsEmployees({ nuevo = false }: { nuevo?: boolean }) {
         <DataTable
           columns={[
             /* A la ficha se entra sólo por el ⋮ → Edit (employees.md, 2026-11-18). */
-            { key: 'nombre', header: 'Full Name', width: 240, cell: (e) => <PersonCell name={e.nombre} initials={e.iniciales} /> },
-            { key: 'cumple', header: 'Birthdate', width: 120, cell: (e) => <TextCell>{e.cumpleanos}</TextCell> },
+            { key: 'nombre', header: 'Name', width: 240, cell: (e) => <PersonCell name={e.nombre} initials={e.iniciales} /> },
+            { key: 'cumple', header: 'Date of birth', width: 120, cell: (e) => <TextCell>{e.cumpleanos}</TextCell> },
             { key: 'email', header: 'Email', cell: (e) => <TextCell>{e.email}</TextCell> },
-            { key: 'provider', header: 'Is Provider', width: 100, cell: (e) => <ProviderPill si={e.esProvider} /> },
+            { key: 'provider', header: 'Provider', width: 100, cell: (e) => <ProviderPill si={e.esProvider} /> },
             { key: 'estado', header: 'Status', width: 100, cell: (e) => <EstadoPill estado={e.estado} /> },
           ]}
           rows={visibles}
@@ -141,7 +140,7 @@ export function SettingsEmployees({ nuevo = false }: { nuevo?: boolean }) {
                 </DropdownMenuItem>
               ))}
               <DropdownMenuItem variant="destructive" onSelect={() => quitarRolProvider(e)}>
-                <UserMinus className="size-4 shrink-0" /> Remove Provider Role
+                <UserMinus className="size-4 shrink-0" /> Remove provider role
               </DropdownMenuItem>
             </>
           )}
@@ -163,15 +162,15 @@ export function SettingsEmployees({ nuevo = false }: { nuevo?: boolean }) {
 
 /* ── Ficha de un empleado ─────────────────────────────────────────── */
 
-/* "Is Provider" no es solo un dato mas: decide que tabs tiene sentido ver.
+/* "Is provider" no es solo un dato mas: decide que tabs tiene sentido ver.
    Provider Info y Working Hours son de un provider tratante -especialidad,
    licencias, agenda-, no de alguien de mostrador. Antes las cuatro tabs
    estaban siempre, tuviera o no sentido. */
-const TABS_BASE = ['Employee', 'Roles & Location'] as const
-const TABS_PROVIDER = ['Provider Info', 'Working Hours'] as const
+const TABS_BASE = ['Employee', 'Roles & location'] as const
+const TABS_PROVIDER = ['Provider info', 'Working hours'] as const
 /* Aparece cuando el provider tiene Billing Profile (lo prepara guardar Primary Provider en Yes, CON-4004) y queda aunque
    se deshabilite, en modo lectura (CON-4007). Ver figma/modulos/billing-profile.md. */
-const TAB_BILLING = 'Insurance / Billing Profile' as const
+const TAB_BILLING = 'Insurance / billing profile' as const
 const TABS = [...TABS_BASE, ...TABS_PROVIDER, TAB_BILLING] as const
 type Tab = (typeof TABS)[number]
 const esTabProvider = (t: Tab): boolean => (TABS_PROVIDER as readonly string[]).includes(t) || t === TAB_BILLING
@@ -221,9 +220,9 @@ export function SettingsEmployeeDetail() {
     if (!primarioSucio) { aviso.ok('Employee information saved.'); return }
     const r = guardarPrimario(empleado.id, empleado.nombre, toggles.primario)
     if (r === 'bloqueado') { setBloqueo(referencias(claveProvider(empleado.id), empleado.id)); return }
-    aviso.ok(r === 'creado' ? 'Primary Provider enabled. Insurance / Billing Profile is now available.'
-      : r === 'reactivado' ? 'Primary Provider enabled. The billing profile is active again.'
-      : 'Primary Provider deactivated. The billing profile is now read-only.')
+    aviso.ok(r === 'creado' ? 'Primary provider enabled. Insurance / billing profile is now available.'
+      : r === 'reactivado' ? 'Primary provider enabled. The billing profile is active again.'
+      : 'Primary provider deactivated. The billing profile is now read-only.')
   }
   /* Si el provider o su perfil están elegidos en Insurance Defaults, no se pregunta: se frena y se dice dónde (CON-4031). */
   const guardar = () => {
@@ -238,20 +237,20 @@ export function SettingsEmployeeDetail() {
   }
   const alternarProvider = (v: boolean) => {
     setEsProvider(v)
-    if (v) aviso.ok('Provider Info and Working Hours are now available for this employee.')
+    if (v) aviso.ok('Provider info and Working hours are now available for this employee.')
     else if (esTabProvider(tab)) setTab('Employee')
   }
 
   return (
-    <div className="px-4 py-6 sm:px-8">
-      <PageTitle>{tab === 'Employee' ? 'Employee Information' : tab}</PageTitle>
+    <div className={PADDING_PAGINA}>
+      <PageTitle>{tab === 'Employee' ? 'Employee information' : tab}</PageTitle>
 
       <Tabs size="sm"
         className="mt-4"
         aria-label="Employee sections"
         /* Las pestañas de provider nacen con el mismo pop que el resto de los
            popovers del sistema -misma curva que `fab-panel-in`-, para que quede
-           claro que "Is Provider" acaba de destrabar algo, no que la pantalla
+           claro que "Is provider" acaba de destrabar algo, no que la pantalla
            se reordenó sola. */
         tabs={tabsVisibles.map((t) => ({ value: t, className: esTabProvider(t) ? 'motion-safe:animate-[tab-in_180ms_cubic-bezier(0.16,1,0.3,1)]' : undefined }))}
         value={tab}
@@ -280,69 +279,69 @@ export function SettingsEmployeeDetail() {
                 </div>
                 <span className="flex items-center gap-2">
                   <Toggle on={esProvider} onChange={alternarProvider} />
-                  <span className="text-[13px] text-ink">Is Provider</span>
+                  <span className="text-[13px] text-ink">Is provider</span>
                 </span>
               </div>
 
               {/* La ficha edita a alguien que ya existe: no vincula a otra persona (employees.md, 2026-11-18). */}
-              <h3 className="mt-5 text-sm font-bold text-ink">General Information</h3>
+              <h2 className="mt-5 text-sm font-bold text-ink">General information</h2>
               <div className="mt-4 grid gap-4 sm:grid-cols-2">
-                <SelectField label="First Name" required options={['Michael', 'Sarah', 'Elena']} value={empleado.nombre.split(' ')[0]} />
-                {/* "Lasr Name" es del Figma. */}
-                <SelectField label="Lasr Name" required options={['John', 'Stone', 'Martinez']} value={empleado.nombre.split(' ').slice(1).join(' ')} />
+                <SelectField label="First name" required options={['Michael', 'Sarah', 'Elena']} value={empleado.nombre.split(' ')[0]} />
+                {/* "Last name" es del Figma. */}
+                <SelectField label="Last name" required options={['John', 'Stone', 'Martinez']} value={empleado.nombre.split(' ').slice(1).join(' ')} />
                 <TextField label="Email" required placeholder="Placeholder" value={empleado.email} />
                 <DateField label="Birthdate" required placeholder={empleado.cumpleanos} />
               </div>
             </Card>
 
-            <Card title="Contact Information">
+            <Card title="Contact information">
               <div className="grid gap-4 sm:grid-cols-2">
-                <CountryCodeField label="Area Code" required />
+                <CountryCodeField label="Area code" required />
                 <TextField label="Number" required placeholder="Placeholder" />
+                <TextField label="Extension" placeholder="Placeholder" />
               </div>
-              <TextField className="mt-4" label="Extension" placeholder="Placeholder" />
             </Card>
 
-            {/* "Adress Information" es del Figma, igual que en Relationships. */}
-            <Card title="Adress Information">
+            {/* "Address information" es del Figma, igual que en Relationships. */}
+            <Card title="Address information">
               <div className="grid gap-4 sm:grid-cols-2">
                 <SelectField label="Address line 1" required options={['123 Maple Street', '456 Oak Avenue']} />
                 <SelectField label="Address line 2" required options={['Apt 2B', 'Suite 300']} />
                 <SelectField label="Country" required />
                 <SelectField label="Region" required options={['California', 'Florida']} />
                 <SelectField label="City" required options={['Los Angeles', 'Miami']} />
-                <SelectField label="Postal Code" required options={['90001', '33101']} />
+                <SelectField label="Postal code" required options={['90001', '33101']} />
               </div>
             </Card>
           </>
         )}
 
-        {tab === 'Roles & Location' && <RolesLocation />}
+        {tab === 'Roles & location' && <RolesLocation />}
 
-        {tab === 'Provider Info' && (
+        {tab === 'Provider info' && (
           <>
-            {/* "Provider Identify" y "Spciality" son del Figma. */}
-            <Card title="Provider Identify">
+            {/* "Provider identify" y "Spciality" son del Figma. */}
+            <Card title="Provider identify">
               <div className="grid gap-4 sm:grid-cols-2">
-                <SelectField label="Short Name" required options={['MJ', 'Dr. John']} value={empleado.iniciales} />
+                <SelectField label="Short name" required options={['MJ', 'Dr. John']} value={empleado.iniciales} />
                 <SelectField label="Time" required options={['Full time', 'Part time']} />
-                <SelectField label="Provider Type" required options={['Dentist', 'Hygienist', 'Assistant']} value={empleado.cargo} />
+                <SelectField label="Provider type" required options={['Dentist', 'Hygienist', 'Assistant']} value={empleado.cargo} />
                 <SelectField label="Spciality" required options={['General', 'Orthodontics', 'Endodontics']} />
               </div>
             </Card>
 
-            <Card title="Contact Information">
+            <Card title="Contact information">
               <div className="grid gap-6 sm:grid-cols-3">
                 <div className="flex flex-col gap-1.5">
-                  <Toggle label="Is a Primary Provider*" on={toggles.primario} onChange={(v) => setToggles((p) => ({ ...p, primario: v }))} />
+                  <Toggle label="Is a primary provider*" on={toggles.primario} onChange={(v) => setToggles((p) => ({ ...p, primario: v }))} />
                   {primarioSucio && (
                     <span className="text-[11px] font-medium text-warn-fg">
-                      {toggles.primario ? 'Save to set up its Insurance / Billing Profile.' : 'Save to deactivate it.'}
+                      {toggles.primario ? 'Save to set up its insurance / billing profile.' : 'Save to deactivate it.'}
                     </span>
                   )}
                 </div>
                 <Toggle label="Signature on file" on={toggles.firma} onChange={(v) => setToggles((p) => ({ ...p, firma: v }))} />
-                <Toggle label="Locum Tenens Treating Provider" on={toggles.locum} onChange={(v) => setToggles((p) => ({ ...p, locum: v }))} />
+                <Toggle label="Locum tenens treating provider" on={toggles.locum} onChange={(v) => setToggles((p) => ({ ...p, locum: v }))} />
               </div>
             </Card>
 
@@ -359,9 +358,9 @@ export function SettingsEmployeeDetail() {
                 <div className="flex flex-col gap-4">
                   {credenciales.map((c) => (
                     <div key={c} className="flex items-end gap-3">
-                      <SelectField className="flex-1" label="Credential Number" required options={['CR-1029', 'CR-4471']} />
-                      <SelectField className="flex-1" label="Credential Type" required options={['License', 'DEA', 'NPI']} />
-                      <DateTextField className="flex-1" label="Expiration Date" />
+                      <SelectField className="flex-1" label="Credential number" required options={['CR-1029', 'CR-4471']} />
+                      <SelectField className="flex-1" label="Credential type" required options={['License', 'DEA', 'NPI']} />
+                      <DateTextField className="flex-1" label="Expiration date" />
                       <button
                         type="button"
                         aria-label="Remove credential"
@@ -377,7 +376,7 @@ export function SettingsEmployeeDetail() {
                     onClick={() => setCredenciales((p) => [...p, Math.max(0, ...p) + 1])}
                     className="text-dash-blue flex items-center gap-1.5 self-start text-[13px] font-semibold hover:underline"
                   >
-                    <CirclePlus className="size-4" /> Add credential
+                    <Plus className="size-4" /> Add credential
                   </button>
                 </div>
               )}
@@ -388,20 +387,20 @@ export function SettingsEmployeeDetail() {
               <button
                 type="button"
                 onClick={() => aviso.info('File upload is not available in this release.')}
-                className="flex w-full flex-col items-center gap-2 rounded-lg border-2 border-dashed border-[#93c5fd] bg-[#fafcff] px-6 py-10 sm:w-[420px]"
+                className="flex w-full flex-col items-center gap-2 rounded-lg border-2 border-dashed border-info-line-strong bg-info-subtle px-6 py-10 sm:w-[420px]"
               >
                 <FileText className="text-dash-blue size-8" strokeWidth={1.5} />
                 <span className="text-sm font-bold text-ink">Drag and drop your files</span>
                 <span className="text-[11px] text-ink-faint">JPEG, PND, PDF, and MP4 formats, up to 50MB</span>
                 <span className="bg-dash-blue mt-2 rounded-md px-4 py-2 text-[13px] font-medium text-white">
-                  Select File
+                  Select file
                 </span>
               </button>
             </Card>
           </>
         )}
 
-        {tab === 'Working Hours' && (
+        {tab === 'Working hours' && (
           <Card>
             <div className="flex flex-wrap items-center justify-between gap-3">
               <h2 className="text-sm font-bold text-ink">Coordinated Universal Time (UTC)</h2>
@@ -410,7 +409,7 @@ export function SettingsEmployeeDetail() {
                 onClick={() => setNuevaHora(true)}
                 className="text-dash-blue flex items-center gap-1.5 text-[13px] font-semibold hover:underline"
               >
-                <CirclePlus className="size-4" /> Add new hour
+                <Plus className="size-4" /> Add new hour
               </button>
             </div>
 
@@ -438,11 +437,11 @@ export function SettingsEmployeeDetail() {
                             className="rounded-r-[3px] border-l-[3px] px-2 py-2 text-left transition-shadow hover:shadow-md"
                             style={{ backgroundColor: t.bg, borderLeftColor: t.bar }}
                           >
-                            <span className="block text-[10px] font-medium" style={{ color: t.fg }}>
+                            <span className="block text-[11px] font-medium" style={{ color: t.fg }}>
                               {b.horas}
                             </span>
-                            <span className="block text-[11px] text-[#18181b]">{b.sala}</span>
-                            <span className="block text-[10px] text-ink-muted">{b.empresa}</span>
+                            <span className="block text-[11px] text-ink">{b.sala}</span>
+                            <span className="block text-[11px] text-ink-muted">{b.empresa}</span>
                           </button>
                         )
                       })}
@@ -479,7 +478,7 @@ export function SettingsEmployeeDetail() {
 
       {apagarPrimario && (
         <ConfirmDialog
-          title="Deactivate Primary Provider?"
+          title="Deactivate primary provider?"
           confirmLabel="Deactivate"
           onCancel={() => setApagarPrimario(false)}
           onConfirm={() => { setApagarPrimario(false); guardarFicha() }}

@@ -20,7 +20,7 @@ const USO: Record<ButtonVariant, string> = {
   success: 'Starts or arrives: Check In on an appointment. Same green as the Check In pill.',
 }
 /* El texto de ejemplo de cada variante: el que tiene en la app. */
-const TEXTO: Partial<Record<ButtonVariant, string>> = { destructive: 'Delete', success: 'Check In' }
+const TEXTO: Partial<Record<ButtonVariant, string>> = { destructive: 'Delete', success: 'Check in' }
 const ALTO: Record<ButtonSize, string> = { sm: '28px', md: '32px', lg: '36px' }
 
 /* Estado forzado con el addon de pseudo-estados: la clase va en un

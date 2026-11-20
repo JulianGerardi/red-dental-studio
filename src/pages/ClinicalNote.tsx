@@ -70,7 +70,7 @@ function FirmarDialog({ onCancel, onFirmar }: { onCancel: () => void; onFirmar: 
       <DialogContent className="gap-4 p-5 sm:max-w-[575px]">
         <DialogTitle className="flex items-center gap-2 text-base font-bold text-ink">
           <span className="flex size-6 items-center justify-center rounded-md border border-line"><PenLine className="size-3.5" aria-hidden /></span>
-          Login to Sign Document
+          Login to sign document
         </DialogTitle>
         <DialogDescription className="text-[13px] text-ink-soft">
           For security and legal purposes, please re-enter your credentials to sign this document electronically.
@@ -115,15 +115,15 @@ export default function ClinicalNote() {
   const [firmada, setFirmada] = useState<Date>()
 
   const doc = tarea && documentoTarea(tarea, firmada)
-  const volver = () => navegar(`/patients/${id}/clinical-mode?tab=${encodeURIComponent('Patient Summary')}`)
+  const volver = () => navegar(`/patients/${id}/clinical-mode?tab=${encodeURIComponent('Patient summary')}`)
 
   return (
     <div className="bg-page-background flex h-svh flex-col p-4 sm:p-[30px] lg:px-12">
       <div className="mx-auto flex min-h-0 w-full max-w-[1440px] flex-1 flex-col rounded-lg bg-white shadow-panel">
         <div className="flex flex-wrap items-center gap-3 border-b border-line-soft px-4 py-3 sm:px-6">
-          <Button variant="ghost" size="sm" onClick={volver}><ChevronLeft /> Back to History</Button>
+          <Button variant="ghost" size="sm" onClick={volver}><ChevronLeft /> Back to history</Button>
           {tarea && <span className="h-5 w-px bg-line" aria-hidden />}
-          {tarea && <h1 className="text-[14px] font-semibold text-ink">Clinical Note - {tarea.person}</h1>}
+          {tarea && <h1 className="text-[14px] font-semibold text-ink">Clinical note - {tarea.person}</h1>}
           {doc && (
             <Button variant="secondary" size="sm" className="ml-auto" disabled={!listo}
               onClick={() => abrirDocumento(doc, () => aviso.error("We couldn't open the PDF. Allow pop-ups for this site and try again."))}>
@@ -134,7 +134,7 @@ export default function ClinicalNote() {
 
         <div className="min-h-0 flex-1 overflow-y-auto bg-surface-subtle/40 px-4 py-6 sm:px-6">
           {!doc ? (
-            <EmptyState icon={FileText} title="Clinical Note not found" detail="It may have been signed or removed. Go back to the history to find it." />
+            <EmptyState icon={FileText} title="Clinical note not found" detail="It may have been signed or removed. Go back to the history to find it." />
           ) : !listo ? (
             <p role="status" className="flex h-full flex-col items-center justify-center gap-2 text-[13px] text-ink-muted">
               <Loader2 className="text-dash-blue size-6 animate-spin" aria-hidden /> Preparing document...
@@ -146,7 +146,7 @@ export default function ClinicalNote() {
 
         {doc && listo && !firmada && (
           <div className="flex justify-center border-t border-line-soft px-4 py-3">
-            <Button onClick={() => setFirmando(true)}><PenLine /> Sign Clinical Note</Button>
+            <Button onClick={() => setFirmando(true)}><PenLine /> Sign clinical note</Button>
           </div>
         )}
       </div>

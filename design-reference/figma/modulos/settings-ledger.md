@@ -67,3 +67,10 @@ menú Filter.
    (o **All · Patient · Insurance**) pasan a un solo `FilterMenu` con dos grupos de una opción: *View* y *Type*, cada
    tipo con su cantidad. Cambiar de *View* vuelve *Type* a All, como antes. Clear all vuelve a Adjustments Types y All.
 2. El buscador pasa a `SettingsSearch` (sigue diciendo "Search patients", anomalía 2).
+
+## Enabled, Name y el buscador de cada pestaña (2026-11-20)
+
+Normalización (ver `figma/README.md`, misma fecha): la columna de switches se llama **Enabled** en las dos pestañas (un
+estado editable no es una acción); la primera columna de Adjustment types se llama **Name**; las pestañas son
+**Adjustment types** y **Payment methods**; el buscador dice "Search adjustment types" o "Search payment methods" según
+la pestaña (el frame decía "Search patients", anomalía 2, corregida). El pie dice "Showing X to Y of N …".

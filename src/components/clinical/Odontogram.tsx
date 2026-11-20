@@ -11,7 +11,7 @@ import type { Finding } from '@/components/clinical/dental/data'
    propios tonos. Ver design-reference/figma/modulos/clinical-mode.md. */
 
 /* Un problema todavía sin resolver, no uno cerrado (Treated/Discarded/...). */
-const PROBLEMA_ABIERTO: Finding['status'][] = ['Active', 'Monitoring', 'In Treatment']
+const PROBLEMA_ABIERTO: Finding['status'][] = ['Active', 'Monitoring', 'In treatment']
 
 export function ToothCell({
   tooth, selected, onToggle, onSurface, problema, finding, flip,

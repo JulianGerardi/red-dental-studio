@@ -18,7 +18,7 @@ export type Turno = Appointment & {
   completado?: boolean
   enCurso?: boolean
   /** Cerrado sin atenderse: sale de Appointments y de la Waiting Room. Cancelled libera el lugar; No Show no (CON-1827, CON-1828). */
-  cerrado?: 'Cancelled' | 'No Show'
+  cerrado?: 'Cancelled' | 'No show'
 }
 
 /* Las tres etapas de la Waiting Room, según el encounter (CON-1670): Planned → Checked in, On Hold → On hold,
@@ -50,7 +50,7 @@ export type DiaDashboard = {
   encuentros: { abiertos: number; promedio: string }
 }
 
-export const TASK_KINDS = ['Clinical Note', 'Lab Orders', 'Prescriptions', 'Referrals']
+export const TASK_KINDS = ['Clinical note', 'Lab orders', 'Prescriptions', 'Referrals']
 
 /* El frame muestra las cuatro cards rotuladas "Referrals" bajo el tab
    "Clinical Note" (anomalía 20). Con el filtro andando el rótulo tiene que
@@ -61,7 +61,7 @@ export const TASK_KINDS = ['Clinical Note', 'Lab Orders', 'Prescriptions', 'Refe
    falta firmar, como red.dev). El PDF existe una vez pedida la orden: las Pending todavía no tienen (dashboard.md,
    2026-11-20). */
 const ESTADOS_TAREA: Record<string, string[]> = {
-  'Clinical Note': ['Fulfilled'], 'Lab Orders': ['Pending', 'Requested', 'Delayed'], Prescriptions: ['Pending'], Referrals: ['Requested', 'Pending'],
+  'Clinical note': ['Fulfilled'], 'Lab orders': ['Pending', 'Requested', 'Delayed'], Prescriptions: ['Pending'], Referrals: ['Requested', 'Pending'],
 }
 type Persona = { name: string; provider: string }
 const ELENA: Persona = { name: 'Elena Marquez', provider: 'Dr. Elena Martinez' }
@@ -363,7 +363,7 @@ export const DIA_CARGADO: DiaDashboard = {
 /* Las tareas del Patient Dashboard: todas del paciente de la ficha (CON-2643, CA9). Tres Lab Orders, una por estado, y
    dos de cada uno de los otros tipos: las mismas nueve de antes. */
 export const TAREAS_PACIENTE: PendingTask[] = tareas('paciente', 3, '10/02/2026', ['11/14/2026', '12/05/2026', '11/28/2026'], [{ name: 'John Smith', provider: MARTINEZ }])
-  .filter((t) => t.kind === 'Lab Orders' || !t.id?.endsWith('-3'))
+  .filter((t) => t.kind === 'Lab orders' || !t.id?.endsWith('-3'))
 
 /* Para Clinical Mode: la tarea que abrió Complete this Task, venga del Dashboard o del Patient Dashboard. */
 export const buscarTarea = (id: string) =>

@@ -65,7 +65,7 @@ export function NombreTurno({ appt, id, activa, onSelect, className }: Pick<Prop
    y el kebab con Edit appointment. Sin el badge Check In: se confundía con el botón (comparativa del 2026-11-19, ver
    dashboard.md). Angosta en dos renglones; ancha en columnas. */
 export function AppointmentRow({ appt, id, activa, onSelect, onEdit, ocultarOperatorio, chips, estado, onAccion, acciones }: PropsTurno) {
-  const accion = appt.accion ?? 'Check Out'
+  const accion = appt.accion ?? 'Check out'
   const iniciales = <Avatar initials={appt.initials} size={28} />
   const fin = estado ?? (
     <Button size="sm" variant={ACCION_TURNO[accion]} className="shrink-0" onClick={(e) => { e.stopPropagation(); accionTurno(appt); onAccion?.(appt) }}>{accion} <ArrowRight /></Button>
@@ -124,13 +124,13 @@ export function AppointmentRow({ appt, id, activa, onSelect, onEdit, ocultarOper
 }
 
 const ICONO_TAREA: Record<string, LucideIcon> = {
-  'Clinical Note': ClipboardList, 'Lab Orders': FlaskConical, Prescriptions: Pill, Referrals: Send,
+  'Clinical note': ClipboardList, 'Lab orders': FlaskConical, Prescriptions: Pill, Referrals: Send,
 }
 
 /* Expired date si la fecha ya pasó, como red.dev; la Clinical Note no lo lleva (dashboard.md, 2026-11-20). */
 const vencida = (t: PendingTask, hoy: Date) => {
   const f = new Date(t.expiration)
-  return t.kind !== 'Clinical Note' && !Number.isNaN(f.getTime()) && f < new Date(hoy.getFullYear(), hoy.getMonth(), hoy.getDate())
+  return t.kind !== 'Clinical note' && !Number.isNaN(f.getTime()) && f < new Date(hoy.getFullYear(), hoy.getMonth(), hoy.getDate())
 }
 
 type PropsTarea = {
@@ -150,7 +150,7 @@ type PropsTarea = {
 export function TaskRow({ task, encuentroAbierto = false, onAccion, hoy = new Date() }: PropsTarea) {
   const Icono = ICONO_TAREA[task.kind] ?? ClipboardList
   const expirada = vencida(task, hoy)
-  const fecha = task.kind === 'Clinical Note' ? 'Completed' : 'Register'
+  const fecha = task.kind === 'Clinical note' ? 'Completed' : 'Register'
   return (
     <div className="flex flex-wrap items-center gap-x-3 gap-y-2 px-3 py-2.5">
       <span className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-info-bg text-dash-busy-fg"><Icono className="size-4" /></span>
@@ -180,7 +180,7 @@ export function TaskRow({ task, encuentroAbierto = false, onAccion, hoy = new Da
             <FileText className="text-dash-bad-fg size-3.5" />
           </button>
         )}
-        <Button size="sm" className="shrink-0" onClick={() => (onAccion ? onAccion(task, 'Complete') : completarTarea(task))}>Complete this Task <ArrowRight /></Button>
+        <Button size="sm" className="shrink-0" onClick={() => (onAccion ? onAccion(task, 'Complete') : completarTarea(task))}>Complete this task <ArrowRight /></Button>
         {onAccion && <MenuTarea task={task} abierto={encuentroAbierto} onAccion={onAccion} />}
       </span>
     </div>

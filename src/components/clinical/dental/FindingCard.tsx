@@ -21,7 +21,7 @@ export function FindingCard({
             {style.good ? <Check className="size-2.5" strokeWidth={3} /> : <X className="size-2.5" />}
             {finding.status}
           </span>
-          <span className="text-dash-blue flex items-center gap-1 text-[10px] font-semibold">
+          <span className="text-dash-blue flex items-center gap-1 text-[11px] font-semibold">
             <Calendar className="size-2.5" /> {finding.date}
           </span>
         </div>

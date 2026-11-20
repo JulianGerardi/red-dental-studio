@@ -14,9 +14,9 @@ const meta = {
         component: [
           'Add Condition de Extraoral/Intraoral: por región del gráfico, no por diente -el drawer de `NewProcedureDrawer` no sirve acá, siempre carga contra un diente-.',
           '',
-          '**Dos pasos**, los dos titulados "New Condition" como en la app real: **Condition** -las regiones elegidas en el gráfico, afuera, como chips removibles; el catálogo de condición, propio, con buscador- y **Descriptors** -la misma guía visual de [DescriptorFields](/docs/components-clinical-dental-descriptorfields--docs)-.',
+          '**Dos pasos**, los dos titulados "New condition" como en la app real: **Condition** -las regiones elegidas en el gráfico, afuera, como chips removibles; el catálogo de condición, propio, con buscador- y **Descriptors** -la misma guía visual de [DescriptorFields](/docs/components-clinical-dental-descriptorfields--docs)-.',
           '',
-          '**El botón del paso 1 dice "Select descriptors"**, no "Next Step": así lo dice la app real. Deshabilitado hasta elegir una condition.',
+          '**El botón del paso 1 dice "Select descriptors"**, no "Next step": así lo dice la app real. Deshabilitado hasta elegir una condition.',
           '',
           '**Probalo:** en *Playground* elegí "Atrophy" y avanzá.',
         ].join('\n'),
@@ -25,7 +25,7 @@ const meta = {
   },
   args: {
     open: true,
-    regions: ['Right Forehead', 'Right Posterior Head'],
+    regions: ['Right forehead', 'Right posterior head'],
     onRemoveRegion: () => {},
     onClose: () => {},
     onSave: () => {},

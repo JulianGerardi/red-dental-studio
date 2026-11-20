@@ -31,7 +31,7 @@ export const Finding: Story = {
       <FilaArea area={{ tipo: 'Tooth', valor: '3' }} />
       <FilaDato icono={<IconoFecha />} rotulo="Date">05/14/2026</FilaDato>
       <FilaDato icono={<IconoProveedor />} rotulo="Provider">Elena Martinez</FilaDato>
-      <FilaDato icono={<IconoExamen />} rotulo="Exam">Dental Assessment</FilaDato>
+      <FilaDato icono={<IconoExamen />} rotulo="Exam">Dental assessment</FilaDato>
     </div>
   ),
 }
@@ -41,7 +41,7 @@ export const NameAndStatus: Story = {
   render: () => (
     <div className="flex flex-col gap-3">
       <FilaNombre nombre="Chronic enamel dental caries" estado="Active" />
-      <FilaNombre nombre="Localized periodontal pocketing" estado="In Treatment" tono="info" />
+      <FilaNombre nombre="Localized periodontal pocketing" estado="In treatment" tono="info" />
       <FilaNombre nombre="Oral candidiasis" estado="Discarded" tono="danger" />
     </div>
   ),
@@ -64,7 +64,7 @@ export const TreatmentAreas: Story = {
       </Bloque>
       <Bloque titulo="Treatment areas">
         <div className="flex flex-col gap-3">
-          {TIPOS_AREA.map((t) => <FilaArea key={t} area={{ tipo: t, valor: t === 'Tooth' ? '3' : t === 'Range' ? '3 – 5' : t === 'Quadrant' ? 'Upper Left' : t === 'Arch' ? 'Maxillary' : t === 'Mouth' ? 'Full mouth' : t === 'Intraoral' ? 'Soft Palate' : 'Right Temple Area' }} />)}
+          {TIPOS_AREA.map((t) => <FilaArea key={t} area={{ tipo: t, valor: t === 'Tooth' ? '3' : t === 'Range' ? '3 – 5' : t === 'Quadrant' ? 'Upper Left' : t === 'Arch' ? 'Maxillary' : t === 'Mouth' ? 'Full mouth' : t === 'Intraoral' ? 'Soft palate' : 'Right temple area' }} />)}
         </div>
       </Bloque>
     </Lienzo>

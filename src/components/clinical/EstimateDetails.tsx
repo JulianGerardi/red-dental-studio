@@ -109,7 +109,7 @@ export function EstimateDetails({ caso, estimacion, onVolver, onCalcular }: {
   return (
     <div className={cn(TARJETA_PANEL, 'p-4 sm:p-6')}>
       <Button variant="secondary" size="md" onClick={onVolver}>
-        <ArrowLeft /> Back to Case
+        <ArrowLeft /> Back to case
       </Button>
 
       <div className="mt-6 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
@@ -248,11 +248,11 @@ export function EstimateDetails({ caso, estimacion, onVolver, onCalcular }: {
 
 /* Prototype controls, como el HTML de referencia de Julián: elegir el escenario, simular un cambio del plan y forzar que
    el próximo cálculo falle. Es una herramienta de demo, no parte del producto (clinical-mode.md, 2026-10-28). */
-export const ESCENARIOS = ['Update needed', 'Up to date', 'Not calculated', 'Update failed', 'Presented / Locked'] as const
+export const ESCENARIOS = ['Update needed', 'Up to date', 'Not calculated', 'Update failed', 'Presented / locked'] as const
 export type Escenario = (typeof ESCENARIOS)[number]
 
 const ESCENARIO_DE: Partial<Record<Situacion, Escenario>> = {
-  desactualizada: 'Update needed', 'al-dia': 'Up to date', 'sin-calcular': 'Not calculated', fallo: 'Update failed', bloqueada: 'Presented / Locked',
+  desactualizada: 'Update needed', 'al-dia': 'Up to date', 'sin-calcular': 'Not calculated', fallo: 'Update failed', bloqueada: 'Presented / locked',
 }
 
 export function PrototypeControls({ situacion, onEscenario, onSimular, fallar, onFallar }: {

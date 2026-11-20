@@ -1,3 +1,4 @@
+import { buttonClasses } from '@/components/ui/button'
 import { useState } from 'react'
 import { X } from 'lucide-react'
 import { cn } from '@/lib/utils'
@@ -50,8 +51,8 @@ export function LinkTreatmentPlanDrawer({ onClose }: { onClose: () => void }) {
                 )}
               >
                 <div className="flex items-center justify-between gap-2">
-                  <span className="rounded-full border border-dash-ok-fg bg-white px-2 py-[2px] text-[10px] font-semibold text-dash-ok-fg">
-                    Check In
+                  <span className="rounded-full border border-dash-ok-fg bg-white px-2 py-[2px] text-[11px] font-semibold text-dash-ok-fg">
+                    Check in
                   </span>
                   <span className="text-[13px] font-bold text-ink">{p.date}</span>
                 </div>
@@ -94,7 +95,7 @@ export function LinkTreatmentPlanDrawer({ onClose }: { onClose: () => void }) {
                     <span
                       key={i}
                       className={cn(
-                        'rounded-full border px-2 py-[3px] text-[10px]',
+                        'rounded-full border px-2 py-[3px] text-[11px]',
                         on ? 'border-dash-blue text-dash-blue' : 'border-line text-ink-faint',
                       )}
                     >
@@ -123,7 +124,7 @@ export function LinkTreatmentPlanDrawer({ onClose }: { onClose: () => void }) {
           </button>
           <button
             onClick={() => { aviso.ok('Treatment plan visit linked.'); onClose() }}
-            className="bg-dash-blue hover:bg-dash-blue-hover h-9 rounded-md px-6 text-[13px] font-medium text-white"
+            className={buttonClasses({ className: 'px-6' })}
           >
             Save
           </button>

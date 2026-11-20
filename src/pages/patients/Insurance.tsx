@@ -1,6 +1,7 @@
+import { PageTitle } from '@/components/ui/page-title'
 import { useState } from 'react'
-import { useParams } from 'react-router-dom'
-import { CirclePlus, CreditCard, PersonStanding, ShieldHalf, Hospital, AArrowUp, Eye, Trash2 } from 'lucide-react'
+import { Link, useParams } from 'react-router-dom'
+import { CreditCard, PersonStanding, ShieldHalf, Hospital, AArrowUp, Eye, Trash2, Plus } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { DataTable, TextCell, type DataTableColumn } from '@/components/ui/data-table'
 import { PatientSidePanel } from '@/components/patients/PatientSidePanel'
@@ -17,14 +18,14 @@ import {
   type PlanPaciente, type RelacionPlan, type Suscripcion,
 } from '@/data/insurance'
 import { aviso } from '@/components/ui/toaster'
-import { CONTENEDOR_PAGINA, TARJETA_PANEL } from '@/lib/estilos'
+import { CONTENEDOR_PAGINA, TARJETA_PANEL, TABLA_LINK } from '@/lib/estilos'
 import { OBLIGATORIO } from '@/lib/validacion'
 
 /* Figma 3817:865128 "Insurance", frames 3817:865704 y 3831:897436.
 
    El breadcrumb del frame termina en "Documents" en azul aunque la pantalla
    sea Insurance — ver modulos/insurance.md, anomalías 60 a 66. El título del
-   frame, "Patients Plans", pasó a "Insurance Plans" como en red.dev (2026-11-12). */
+   frame, "Patients Plans", pasó a "Insurance plans" como en red.dev (2026-11-12). */
 
 /* Pills con fondo tintado, como el resto del sistema. Muestreados del frame:
    Primary y Self usan el azul, Child el verde, Spouse el neutro, Active el
@@ -47,10 +48,11 @@ const COLUMNAS: DataTableColumn<PlanPaciente>[] = [
   { key: 'order', header: 'Order', width: 92, cell: (p) => <Pill tone={ORDEN_TONO}>{p.orden}</Pill> },
   { key: 'carrier', header: 'Carrier', width: 92, cell: (p) => <TextCell>{p.carrier}</TextCell> },
   { key: 'plan', header: 'Plan', width: 124, cell: (p) => <TextCell>{p.plan}</TextCell> },
-  { key: 'subscriber', header: 'Subscriber', width: 128, cell: (p) => <TextCell>{p.subscriber}</TextCell> },
+  /* Link, como en la app real (Julián, 2026-11-20): lleva a Relationships, donde están las personas del paciente. */
+  { key: 'subscriber', header: 'Subscriber', width: 128, cell: (p) => <Link to="../relationships" relative="path" onClick={(e) => e.stopPropagation()} className={TABLA_LINK}>{p.subscriber}</Link> },
   { key: 'relation', header: 'Relation', width: 92, cell: (p) => <Pill tone={RELACION_TONO[p.relacion]}>{p.relacion}</Pill> },
-  { key: 'coverage', header: 'Coverage Period', width: 148, headerInfo: 'The dates during which this insurance coverage is active for the patient.', cell: (p) => <span className="leading-tight">{p.cobertura}</span> },
-  { key: 'priority', header: 'Priority Period', width: 150, headerInfo: 'The dates during which this plan has held its current coordination priority.', cell: (p) => <span className="flex flex-col gap-0.5 leading-tight">{p.prioridad.map((t) => <span key={t}>{t}</span>)}</span> },
+  { key: 'coverage', header: 'Coverage period', width: 148, headerInfo: 'The dates during which this insurance coverage is active for the patient.', cell: (p) => <span className="leading-tight">{p.cobertura}</span> },
+  { key: 'priority', header: 'Priority period', width: 150, headerInfo: 'The dates during which this plan has held its current coordination priority.', cell: (p) => <span className="flex flex-col gap-0.5 leading-tight">{p.prioridad.map((t) => <span key={t}>{t}</span>)}</span> },
   { key: 'status', header: 'Status', width: 92, cell: (p) => <Pill tone={ESTADO_TONO[p.estado]}>{p.estado}</Pill> },
 ]
 
@@ -185,7 +187,7 @@ export default function Insurance() {
 
         <div className="flex min-w-0 flex-1 flex-col">
           <div className="flex flex-wrap items-center justify-between gap-3">
-            <h1 className="text-xl leading-[1.3] font-semibold text-ink">Insurance Plans</h1>
+            <PageTitle>Insurance plans</PageTitle>
             <Switch on={historial} onChange={setHistorial} label="Show plan history" />
           </div>
 
@@ -211,7 +213,7 @@ export default function Insurance() {
               {/* Suscripción + datos del paciente */}
               <div className="grid gap-4 lg:grid-cols-2">
                 <section className={cn(TARJETA_PANEL, 'flex flex-col p-4 sm:p-5')}>
-                  <h2 className="text-sm font-semibold text-ink">Subscription Information</h2>
+                  <h2 className="text-sm font-bold text-ink">Subscription information</h2>
                   <p className="mt-0.5 text-[11px] text-ink-muted">
                     Select an existing subscription or create new one.
                   </p>
@@ -233,7 +235,7 @@ export default function Insurance() {
                     onClick={() => setModal('nueva')}
                     className="text-dash-blue mt-2 flex items-center gap-1.5 self-end text-[13px] font-semibold hover:underline"
                   >
-                    <CirclePlus className="size-4" /> Add New Subscription
+                    <Plus className="size-4" /> Add new subscription
                   </button>
 
                   {/* Sin elegir: "Select a subscription" y guiones. Elegida: el plan y su estado. */}
@@ -246,7 +248,7 @@ export default function Insurance() {
                     <FilaDato icon={CreditCard} label="Subscriber ID" value={elegida?.subscriberId ?? '-'} />
                     <FilaDato icon={ShieldHalf} label="Carrier" value={elegida?.carrier ?? '-'} loading={cargando} />
                     <FilaDato icon={Hospital} label="Plan" value={elegida?.plan ?? '-'} loading={cargando} />
-                    <FilaDato icon={AArrowUp} label="Coverage Period" value={elegida?.cobertura ?? '-'} />
+                    <FilaDato icon={AArrowUp} label="Coverage period" value={elegida?.cobertura ?? '-'} />
                     <FilaDato icon={Eye} label="Dependents" value={elegida ? String(elegida.dependientes) : '-'} loading={cargando} />
                   </div>
 
@@ -258,40 +260,40 @@ export default function Insurance() {
                         <Trash2 />
                       </Button>
                     )}
-                    <Button disabled={!elegida || cargando} onClick={() => setModal('gestionar')}>Manage Subscription</Button>
+                    <Button disabled={!elegida || cargando} onClick={() => setModal('gestionar')}>Manage subscription</Button>
                   </div>
                 </section>
 
                 <section className={cn(TARJETA_PANEL, 'flex flex-col p-4 sm:p-5')}>
-                  <h2 className="text-sm font-semibold text-ink">Patient Information</h2>
+                  <h2 className="text-sm font-bold text-ink">Patient information</h2>
 
                   <SelectField
-                    className="mt-4" label="Relationship to Subscriber" required options={RELACIONES}
+                    className="mt-4" label="Relationship to subscriber" required options={RELACIONES}
                     value={d.relacion} onChange={set('relacion')} error={req('relacion')}
                   />
 
                   {/* El orden lo calcula el sistema (ordenSiguiente): sólo se muestra. Antes había, además, un select con el
                       mismo rótulo (anomalías 62 y 63); red.dev ya no lo tiene. */}
-                  <div className="mt-4 flex items-center gap-2.5 rounded-md bg-[#eff4ff] px-3 py-2">
+                  <div className="mt-4 flex items-center gap-2.5 rounded-md bg-info-bg px-3 py-2">
                     <CreditCard className="size-4 shrink-0 text-ink-muted" strokeWidth={1.8} />
                     <span className="leading-tight">
-                      <span className="block text-[11px] text-ink-faint">Coordination Order</span>
+                      <span className="block text-[11px] text-ink-faint">Coordination order</span>
                       <span className="block text-[13px] text-ink">{orden}</span>
                     </span>
                   </div>
 
                   <div className="mt-4 grid gap-2 sm:grid-cols-2">
-                    <OptionCheckbox label="Assignment of Benefits" checked={beneficios} onChange={setBeneficios} />
-                    <OptionCheckbox label="Release of Information" checked={informacion} onChange={setInformacion} />
+                    <OptionCheckbox label="Assignment of benefits" checked={beneficios} onChange={setBeneficios} />
+                    <OptionCheckbox label="Release of information" checked={informacion} onChange={setInformacion} />
                   </div>
 
                   <div className="mt-4 grid gap-4 sm:grid-cols-2">
-                    <DateTextField label="Coverage Start" required value={d.inicio} onChange={set('inicio')} error={req('inicio')} />
-                    <DateTextField label="Coverage End" value={d.fin} onChange={set('fin')} />
+                    <DateTextField label="Coverage start" required value={d.inicio} onChange={set('inicio')} error={req('inicio')} />
+                    <DateTextField label="Coverage end" value={d.fin} onChange={set('fin')} />
                   </div>
                   <div className="mt-4 grid gap-4 sm:grid-cols-2">
                     <SelectField label="Eligibility" required options={ELEGIBILIDAD} value={d.elegibilidad} onChange={set('elegibilidad')} error={req('elegibilidad')} />
-                    <DateTextField label="Verification Date" value={d.verificacion} onChange={set('verificacion')} />
+                    <DateTextField label="Verification date" value={d.verificacion} onChange={set('verificacion')} />
                   </div>
                   <TextArea className="mt-4" label="Notes" placeholder="Add notes" value={d.notas} onChange={set('notas')} />
 

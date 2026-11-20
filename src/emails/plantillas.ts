@@ -4,7 +4,7 @@
 import { armarMail, variablesDe, type Bloque, type Remitente } from './marco.ts'
 
 export type Categoria =
-  | 'Onboarding' | 'Scheduling' | 'Treatment Plan' | 'Consent/Document' | 'Patient' | 'Employee' | 'Subscription' | 'Guardian'
+  | 'Onboarding' | 'Scheduling' | 'Treatment plan' | 'Consent/Document' | 'Patient' | 'Employee' | 'Subscription' | 'Guardian'
 
 export type Origen = 'doc' | 'propuesta'
 
@@ -211,7 +211,7 @@ export const MAILS: Mail[] = [
   },
   {
     id: 'treatment-plan-ready',
-    categoria: 'Treatment Plan',
+    categoria: 'Treatment plan',
     nombre: 'Treatment plan ready',
     disparador: 'Treatment plan ready',
     destinatario: 'Patient',

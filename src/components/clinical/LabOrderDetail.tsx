@@ -106,10 +106,10 @@ export function LabOrderDetail({ tarea, abierto, onVolver, onAccion }: {
 
       {/* La cabecera: qué es, hasta cuándo, en qué estado y sus acciones. */}
       <div className={cn(TARJETA_PANEL, 'flex flex-wrap items-center gap-3 px-4 py-3 sm:px-6')}>
-        <h2 className="text-[15px] font-semibold text-ink uppercase">Lab Order</h2>
+        <h2 className="text-[15px] font-semibold text-ink uppercase">Lab order</h2>
         <span className="ml-auto flex flex-wrap items-center gap-3">
           <fieldset disabled={!abierto} className="flex items-center gap-2">
-            <FieldLabel required>Delivery Expiration Date</FieldLabel>
+            <FieldLabel required>Delivery expiration date</FieldLabel>
             <DatePicker value={vence} onChange={setVence} error={!!errores.vence} className="w-40" />
           </fieldset>
           <Pill tone={TONO_ESTADO[tarea.state] ?? 'info'}>{tarea.state}</Pill>
@@ -120,19 +120,19 @@ export function LabOrderDetail({ tarea, abierto, onVolver, onAccion }: {
       </div>
 
       <div className="grid min-w-0 gap-4 lg:grid-cols-2">
-        <section className={cn(TARJETA_PANEL, 'flex flex-col gap-4 p-4 sm:p-5')} aria-label="General Information">
-          <Titulo icono={FileText}>General Information</Titulo>
+        <section className={cn(TARJETA_PANEL, 'flex flex-col gap-4 p-4 sm:p-5')} aria-label="General information">
+          <Titulo icono={FileText}>General information</Titulo>
           <div className="flex items-end gap-2">
-            <SearchField label="Receiving Laboratory" required className="min-w-0 flex-1" options={LABORATORIOS} value={lab} onChange={setLab} error={errores.lab} disabled={!abierto} />
-            <Button variant="secondary" disabled={!abierto} className={cn(errores.lab && 'mb-6')} onClick={() => aviso.info('New Laboratory is not available in this release.')}><Plus /> New Laboratory</Button>
+            <SearchField label="Receiving laboratory" required className="min-w-0 flex-1" options={LABORATORIOS} value={lab} onChange={setLab} error={errores.lab} disabled={!abierto} />
+            <Button variant="secondary" disabled={!abierto} className={cn(errores.lab && 'mb-6')} onClick={() => aviso.info('New laboratory is not available in this release.')}><Plus /> New laboratory</Button>
           </div>
           <label className="flex w-fit items-center gap-2 text-[13px] text-ink">
             <Checkbox on={asap} onChange={setAsap} label="ASAP" disabled={!abierto} /> ASAP
           </label>
-          <SearchField label="Procedures" placeholder="Search by Code or Description" options={PROCEDIMIENTOS} value={procedimiento} onChange={setProcedimiento} disabled={!abierto} />
+          <SearchField label="Procedures" placeholder="Search by code or description" options={PROCEDIMIENTOS} value={procedimiento} onChange={setProcedimiento} disabled={!abierto} />
 
           <div className="flex flex-col gap-3">
-            <FieldLabel>Teeth &amp; Surface</FieldLabel>
+            <FieldLabel>Teeth &amp; surface</FieldLabel>
             <div className="flex flex-wrap gap-2" role="group" aria-label="Dentition">
               {denticion
                 ? [botonDenticion('Permanent', 'Permanent', User), botonDenticion('Primary', 'Primary', Baby)]
@@ -161,8 +161,8 @@ export function LabOrderDetail({ tarea, abierto, onVolver, onAccion }: {
 
         <fieldset disabled={!abierto} className={cn(TARJETA_PANEL, 'flex min-w-0 flex-col gap-4 p-4 sm:p-5')} aria-label="Details">
           <Titulo icono={FileText}>Details</Titulo>
-          <TextArea label="Dental Work Requested" required rows={3} value={trabajo} onChange={setTrabajo} error={errores.trabajo} disabled={!abierto} />
-          <TextArea label="Special Instructions" rows={3} placeholder="Enter special instructions" value={indicaciones} onChange={setIndicaciones} disabled={!abierto} />
+          <TextArea label="Dental work requested" required rows={3} value={trabajo} onChange={setTrabajo} error={errores.trabajo} disabled={!abierto} />
+          <TextArea label="Special instructions" rows={3} placeholder="Enter special instructions" value={indicaciones} onChange={setIndicaciones} disabled={!abierto} />
           <div className="flex flex-col gap-2">
             <FieldLabel>Attachments</FieldLabel>
             <div className="flex flex-col items-center gap-2 rounded-lg border-2 border-dashed border-line-strong px-4 py-6 text-center">
@@ -170,7 +170,7 @@ export function LabOrderDetail({ tarea, abierto, onVolver, onAccion }: {
               <span className="text-[13px] font-semibold text-ink">Drag and drop your files</span>
               <span className="text-[11px] text-ink-muted">PDF, JPG, PNG, up to 10MB</span>
               <label className={cn('h-8 rounded-md border border-line bg-white px-3 text-[13px] leading-8 font-medium', abierto ? 'cursor-pointer hover:bg-surface-subtle' : 'cursor-not-allowed opacity-50')}>
-                Select File
+                Select file
                 <input type="file" accept=".pdf,.jpg,.jpeg,.png" className="sr-only" disabled={!abierto} onChange={(e) => { const n = e.target.files?.[0]?.name; if (n) setAdjuntos([...adjuntos, n]) }} />
               </label>
               {adjuntos.length > 0 && <ul className="text-[12px] text-ink">{adjuntos.map((a) => <li key={a}>{a}</li>)}</ul>}

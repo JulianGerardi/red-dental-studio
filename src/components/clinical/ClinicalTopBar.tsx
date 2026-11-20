@@ -102,7 +102,7 @@ export function ResumenWorkflow({ k, progreso, onAbrir }: { k: TipoBadge; progre
       <div className="mt-3 flex flex-col items-center gap-2 rounded-lg border border-line-soft px-3 py-4 text-center">
         <span className="bg-info-bg text-dash-blue flex size-8 items-center justify-center rounded-lg"><FileText className="size-4" aria-hidden /></span>
         <p className="text-[12px] text-ink-muted">The patient has not answered the {wf.nombre.toLowerCase()} questions yet.</p>
-        <Button size="sm" onClick={onAbrir}>Answer in Treatment</Button>
+        <Button size="sm" onClick={onAbrir}>Answer in treatment</Button>
       </div>
     )
   }
@@ -126,7 +126,7 @@ export function ResumenWorkflow({ k, progreso, onAbrir }: { k: TipoBadge; progre
       </div>
       <div className="mt-3 flex items-center justify-between gap-2 border-t border-line-soft pt-2">
         <span className="text-[11px] text-ink-muted">Completed {progreso.completado}</span>
-        <Button variant="link" size="sm" onClick={onAbrir}>Open in Treatment</Button>
+        <Button variant="link" size="sm" onClick={onAbrir}>Open in treatment</Button>
       </div>
     </>
   )
@@ -140,13 +140,13 @@ export function ClinicalNoteDialog({ open, onClose, paciente }: { open: boolean;
   if (!open) return null
   return (
     <ConfirmDialog
-      title="Clinical Note"
+      title="Clinical note"
       confirmLabel="Review and sign"
       cancelLabel="Remind me later"
-      onCancel={() => { onClose(); setNotaPendiente(paciente, true); aviso.info('We will remind you to sign the Clinical Note.') }}
-      onConfirm={() => { onClose(); setNotaPendiente(paciente, false); aviso.ok('Clinical Note signed.') }}
+      onCancel={() => { onClose(); setNotaPendiente(paciente, true); aviso.info('We will remind you to sign the clinical note.') }}
+      onConfirm={() => { onClose(); setNotaPendiente(paciente, false); aviso.ok('Clinical note signed.') }}
     >
-      <p>The clinical encounter has been completed.<br />You can sign the Clinical Note now or defer the signature and complete it later.</p>
+      <p>The clinical encounter has been completed.<br />You can sign the clinical note now or defer the signature and complete it later.</p>
     </ConfirmDialog>
   )
 }
@@ -161,7 +161,7 @@ type Flot =
    categoría clínica y sigue con su lista simple. */
 const CATEGORIA_DE: Record<string, Categoria> = {
   medications: 'Medication',
-  conditions: 'Medical Conditions',
+  conditions: 'Medical conditions',
   allergies: 'Allergies',
 }
 
@@ -176,15 +176,15 @@ export function OpcionesEncuentro({ estado, onCambiar, onCompletar }: {
     <>
       {estado === 'enCurso' ? (
         <DropdownMenuItem onSelect={() => onCambiar('enPausa', 'Encounter paused.')}>
-          <Pause /> Pause Encounter
+          <Pause /> Pause encounter
         </DropdownMenuItem>
       ) : (
         <DropdownMenuItem onSelect={onCompletar}>
-          <CircleCheck /> Complete Encounter
+          <CircleCheck /> Complete encounter
         </DropdownMenuItem>
       )}
       <DropdownMenuItem onSelect={() => onCambiar('sinEmpezar', 'Patient discharged.')}>
-        <LogOut /> Discharge Patient
+        <LogOut /> Discharge patient
       </DropdownMenuItem>
     </>
   )
@@ -224,7 +224,7 @@ export function ClinicalTopBar({
         className={cn(
           /* Cápsula más alta que en el export: con 18.17 el ícono queda en
              12px y no se distingue de qué es cada contador. */
-          'flex h-[26px] shrink-0 items-center gap-[4px] rounded-full border border-[#E5E7EB] bg-[#F9FAFB] px-[6px] transition-colors hover:bg-[#f1f5ff]',
+          'flex h-[26px] shrink-0 items-center gap-[4px] rounded-full border border-line bg-surface-alt px-[6px] transition-colors hover:bg-info-bg',
           on && 'border-dash-blue bg-dash-count-bg',
         )}
       >
@@ -232,7 +232,7 @@ export function ClinicalTopBar({
         {/* El cero va en gris: un contador vacío no es una novedad. */}
         {/* El export pinta el badge de azul también con 0: no se separa el
             caso vacío. */}
-        <span className="bg-dash-blue flex size-[17px] items-center justify-center rounded-full text-[9px] leading-none text-white">
+        <span className="bg-dash-blue flex size-[17px] items-center justify-center rounded-full text-[10px] leading-none text-white">
           {cuenta(c)}
         </span>
       </button>
@@ -303,16 +303,16 @@ export function ClinicalTopBar({
           se abre hacia la derecha con su texto y empuja lo que tiene al lado.
           Antes se abría por encima y tapaba los contadores (Medications y
           compañía): Julián pidió que no se superpongan. */}
-      <Link to={volverA} aria-label="Exit clinical Mode" className={cn(BOTON, 'hover:bg-surface-subtle')}>
+      <Link to={volverA} aria-label="Exit Clinical Mode" className={cn(BOTON, 'hover:bg-surface-subtle')}>
         <ChevronLeft className="size-[18px] shrink-0" />
-        <span className={ETIQUETA}>Exit clinical Mode</span>
+        <span className={ETIQUETA}>Exit Clinical Mode</span>
       </Link>
 
       {/* Overwiev no es una pestaña: es el botón que vuelve al panel del
           paciente desde cualquier examen o registro. */}
       <button
         onClick={onOverview}
-        aria-label="Overwiev"
+        aria-label="Overview"
         aria-current={enOverview ? 'page' : undefined}
         /* Seleccionado sigue siendo el azul sólido de la pestaña activa de la
            botonera aunque el resto esté escondido: es el estado de "acá
@@ -326,7 +326,7 @@ export function ClinicalTopBar({
         )}
       >
         <PanelsTopLeft className="size-[18px] shrink-0" />
-        <span className={ETIQUETA}>Overwiev</span>
+        <span className={ETIQUETA}>Overview</span>
       </button>
 
       {/* CC y TR hasta lg: en tablet al final de la primera línea, en el
@@ -369,7 +369,7 @@ export function ClinicalTopBar({
           <span
             key={c.valor}
             className={cn(
-              'flex h-full items-center justify-center px-[6px] text-[11.79px] leading-[16px] whitespace-nowrap text-black',
+              'flex h-full items-center justify-center px-[6px] text-[12px] leading-[16px] whitespace-nowrap text-ink',
               i < CONSTANTES.length - 1 && 'border-r border-line',
             )}
           >
@@ -381,7 +381,7 @@ export function ClinicalTopBar({
       {/* "user-info-bar": avatar de 23.71 y el nombre en 11.95/600. */}
       <span className="flex shrink-0 items-center gap-[3.19px]">
         <Avatar initials="JP" size={24} />
-        <span className="text-[11.95px] leading-[14px] font-semibold whitespace-nowrap text-[#18181B]">
+        <span className="text-[12px] leading-[14px] font-semibold whitespace-nowrap text-ink">
           Julio Perez
         </span>
       </span>
@@ -395,7 +395,7 @@ export function ClinicalTopBar({
           curso, ámbar en pausa (el Pending Encounter de la ficha). Sin empezar no hay menú: no hay nada que pausar. */}
       <div className={cn(
         'flex h-[31.79px] shrink-0 items-center overflow-hidden rounded-full max-md:flex-1',
-        encuentro === 'enPausa' ? 'bg-amber text-[#7a4a00]' : 'bg-status-ok text-white',
+        encuentro === 'enPausa' ? 'bg-amber text-amber-fg' : 'bg-status-ok text-white',
       )}>
         <button
           type="button"
@@ -405,14 +405,14 @@ export function ClinicalTopBar({
             else completar()
           }}
           className={cn(
-            'flex h-full items-center justify-center gap-[7.86px] pl-[12.77px] text-[10.8px] font-semibold whitespace-nowrap transition-colors max-md:flex-1',
-            encuentro === 'enPausa' ? 'hover:bg-[#f0a913]' : 'hover:bg-[#1fae54]',
+            'flex h-full items-center justify-center gap-[7.86px] pl-[12.77px] text-[11px] font-semibold whitespace-nowrap transition-colors max-md:flex-1',
+            encuentro === 'enPausa' ? 'hover:bg-amber-hover' : 'hover:bg-status-ok-hover',
             encuentro === 'sinEmpezar' ? 'pr-[12.77px]' : 'pr-[6px]',
           )}
         >
-          {encuentro === 'sinEmpezar' && <><Play className="size-[13.75px]" /> Start Encounter</>}
-          {encuentro === 'enCurso' && <><CircleCheck className="size-[13.75px]" /> Complete Encounter</>}
-          {encuentro === 'enPausa' && <><Pause className="size-[13.75px]" /> Pending Encounter</>}
+          {encuentro === 'sinEmpezar' && <><Play className="size-[13.75px]" /> Start encounter</>}
+          {encuentro === 'enCurso' && <><CircleCheck className="size-[13.75px]" /> Complete encounter</>}
+          {encuentro === 'enPausa' && <><Pause className="size-[13.75px]" /> Pending encounter</>}
         </button>
         {encuentro !== 'sinEmpezar' && (
           <DropdownMenu>
@@ -420,7 +420,7 @@ export function ClinicalTopBar({
               aria-label="Encounter options"
               className={cn(
                 'group flex h-full items-center pr-[12.77px] pl-[2px] transition-colors',
-                encuentro === 'enPausa' ? 'hover:bg-[#f0a913]' : 'hover:bg-[#1fae54]',
+                encuentro === 'enPausa' ? 'hover:bg-amber-hover' : 'hover:bg-status-ok-hover',
               )}
             >
               <ChevronDown className="size-[15.71px] transition-transform group-data-[state=open]:rotate-180" />

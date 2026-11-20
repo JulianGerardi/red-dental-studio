@@ -1,3 +1,4 @@
+import { PADDING_PAGINA } from '@/lib/estilos'
 import { useState } from 'react'
 import { PageTitle } from '@/components/ui/page-title'
 import { useParams } from 'react-router-dom'
@@ -21,7 +22,7 @@ import { StatCard } from '@/components/ui/stat-card'
 
    Corrección importante sobre la versión anterior: esta pantalla es
    siempre sobre la CUENTA -la clínica-, nunca sobre "mi perfil personal".
-   El título fijo del sitio real es "Edit Account" en las tres pestañas, no
+   El título fijo del sitio real es "Edit account" en las tres pestañas, no
    uno por tab; Information trae Name/Subdomain/Fee Schedule Name/Logo +
    Contact + Address de LA CLÍNICA (nada de First Name/Last Name ahí). La
    persona -nombre, apellido, fecha de nacimiento- vive en Owner, que es el
@@ -85,15 +86,15 @@ export function SettingsAccount() {
   const sinDuenio = !!cuenta && cuenta.duenos === '—'
 
   return (
-    <div className="px-4 py-6 sm:px-8">
-      <PageTitle>Edit Account</PageTitle>
+    <div className={PADDING_PAGINA}>
+      <PageTitle>Edit account</PageTitle>
 
       <Tabs size="sm" className="mt-4" aria-label="Account sections" tabs={TABS} value={tab} onChange={setTab} />
 
       <div className="mt-4 flex flex-col gap-4">
         {tab === 'Information' && (
           <>
-            <Card title="General Information">
+            <Card title="General information">
               {/* Mismo recorte que el avatar de Owner -cuadrado con esquinas
                   redondeadas, arriba de los campos, no metido adentro del
                   grid-: son dos identidades visuales (cuenta y dueño) y
@@ -104,14 +105,14 @@ export function SettingsAccount() {
               <div className="grid gap-4 sm:grid-cols-2">
                 <TextField label="Name" value={general.nombre} onChange={(v) => setGeneral((g) => ({ ...g, nombre: v }))} />
                 <TextField label="Subdomain" placeholder="Placeholder" value={general.subdominio} onChange={(v) => setGeneral((g) => ({ ...g, subdominio: v }))} />
-                <TextField label="Fee Schedule Name" placeholder="Placeholder" value={general.feeSchedule} onChange={(v) => setGeneral((g) => ({ ...g, feeSchedule: v }))} />
+                <TextField label="Fee schedule name" placeholder="Placeholder" value={general.feeSchedule} onChange={(v) => setGeneral((g) => ({ ...g, feeSchedule: v }))} />
               </div>
             </Card>
 
-            <Card title="Contact Information">
-              <div className="grid gap-4 sm:grid-cols-3">
+            <Card title="Contact information">
+              <div className="grid gap-4 sm:grid-cols-2">
                 <CountryCodeField required value={contacto.codigo} onChange={(v) => setContacto((c) => ({ ...c, codigo: v }))} />
-                <TextField label="Area Code (3 digits)" required placeholder="Placeholder" value={contacto.areaCode} onChange={(v) => setContacto((c) => ({ ...c, areaCode: v }))} />
+                <TextField label="Area code (3 digits)" required placeholder="Placeholder" value={contacto.areaCode} onChange={(v) => setContacto((c) => ({ ...c, areaCode: v }))} />
                 <TextField label="Number (7 digits)" required placeholder="Placeholder" value={contacto.numero} onChange={(v) => setContacto((c) => ({ ...c, numero: v }))} />
               </div>
               <div className="mt-4 grid gap-4 sm:grid-cols-2">
@@ -120,15 +121,15 @@ export function SettingsAccount() {
               </div>
             </Card>
 
-            <Card title="Address Information">
+            <Card title="Address information">
               <div className="grid gap-4 sm:grid-cols-2">
                 <SelectField label="Address line 1" required options={['123 Biscayne Blvd', '456 Ocean Drive']} value={domicilio.linea1} onChange={(v) => setDomicilio((d) => ({ ...d, linea1: v }))} />
                 <SelectField label="Address line 2" options={['Suite 300', 'Apt 2B']} value={domicilio.linea2} onChange={(v) => setDomicilio((d) => ({ ...d, linea2: v }))} />
                 <SelectField label="Country" required options={['United States']} value={domicilio.pais} onChange={(v) => setDomicilio((d) => ({ ...d, pais: v }))} />
                 <SelectField label="State" required options={['Florida', 'California']} value={domicilio.region} onChange={(v) => setDomicilio((d) => ({ ...d, region: v }))} />
                 <SelectField label="City" required options={['Miami', 'Los Angeles']} value={domicilio.ciudad} onChange={(v) => setDomicilio((d) => ({ ...d, ciudad: v }))} />
-                <SelectField label="ZIP Code" required options={['33101', '90001']} value={domicilio.cp} onChange={(v) => setDomicilio((d) => ({ ...d, cp: v }))} />
-                <SelectField label="Time Zone" required options={['(-05:00) New York', '(-08:00) Los Angeles']} value={domicilio.zonaHoraria} onChange={(v) => setDomicilio((d) => ({ ...d, zonaHoraria: v }))} />
+                <SelectField label="ZIP code" required options={['33101', '90001']} value={domicilio.cp} onChange={(v) => setDomicilio((d) => ({ ...d, cp: v }))} />
+                <SelectField label="Time zone" required options={['(-05:00) New York', '(-08:00) Los Angeles']} value={domicilio.zonaHoraria} onChange={(v) => setDomicilio((d) => ({ ...d, zonaHoraria: v }))} />
               </div>
             </Card>
           </>
@@ -137,10 +138,10 @@ export function SettingsAccount() {
         {tab === 'Subscription' && (
           <>
             <div>
-              <h2 className="text-[15px] font-bold text-ink">Subscription Summary</h2>
+              <h2 className="text-[15px] font-bold text-ink">Subscription summary</h2>
               {/* Las métricas con la card de la app (`ui/stat-card`), como el Ledger y Billing (ledger.md, 2026-11-19). */}
               <div className="mt-3 grid grid-cols-2 gap-3 lg:grid-cols-4">
-                <StatCard enFila label="Current Plan" value={cuenta ? cuenta.plan : 'Prueba Red'} caption="Plan currently assigned to the account" />
+                <StatCard enFila label="Current plan" value={cuenta ? cuenta.plan : 'Prueba Red'} caption="Plan currently assigned to the account" />
                 <StatCard enFila label="Licenses" value={cuenta ? cuenta.licencias : '3 Used / 170 Total'} caption="167 available licenses based on active and suspended employees." />
                 <StatCard enFila label="Expired on" value={cuenta ? (cuenta.vence || '—') : '12/31/2026'} caption="Subscription end date" />
                 <StatCard enFila label="Status" value={cuenta ? (cuenta.estado in ESTADO_TONO_CUENTA ? cuenta.estado : '—') : 'Active'} caption="Current subscription status" />
@@ -148,13 +149,13 @@ export function SettingsAccount() {
             </div>
 
             <div>
-              <h2 className="text-[15px] font-bold text-ink">Subscription History</h2>
+              <h2 className="text-[15px] font-bold text-ink">Subscription history</h2>
               <div className="mt-3 overflow-x-auto rounded-lg border border-line-row bg-white">
                 {cuenta ? (
                   <EmptyState icon={CreditCard} title="No billing history" detail="This account doesn't have a subscription history yet." className="border-0" />
                 ) : (
                   <div className="min-w-[620px]">
-                    <div className="flex items-center gap-3 bg-surface-alt px-3 py-2.5 text-[11px] font-semibold text-ink-muted uppercase">
+                    <div className="flex items-center gap-3 bg-surface-alt px-3 py-2.5 text-[11px] font-semibold text-ink-muted">
                       <span className="min-w-0 flex-1">Plan</span>
                       <span className="w-[90px] shrink-0">Status</span>
                       <span className="w-[100px] shrink-0">Expired on</span>
@@ -187,25 +188,25 @@ export function SettingsAccount() {
               </Card>
             ) : (
               <>
-                <Card title="Owner Information">
+                <Card title="Owner information">
                   {cuenta && (
                     <div className="mb-4 flex items-center gap-3">
                       <Avatar initials={iniciales(cuenta.duenos)} size={44} />
                       <span className="inline-flex items-center gap-1 rounded-full border border-purple-fg bg-purple-bg px-2 py-[2px] text-[11px] font-semibold text-purple-fg">
-                        <Crown className="size-3" /> Practice Owner
+                        <Crown className="size-3" /> Practice owner
                       </span>
                     </div>
                   )}
                   <div className="grid gap-4 sm:grid-cols-2">
-                    <TextField label="First Name" required placeholder="Salomon" value={duenio.first} onChange={(v) => setDuenio((d) => ({ ...d, first: v }))} />
-                    <TextField label="Middle Name" placeholder="Middle name" value={duenio.middle} onChange={(v) => setDuenio((d) => ({ ...d, middle: v }))} />
-                    <TextField label="Last Name" required placeholder="Brujis" value={duenio.last} onChange={(v) => setDuenio((d) => ({ ...d, last: v }))} />
+                    <TextField label="First name" required placeholder="Salomon" value={duenio.first} onChange={(v) => setDuenio((d) => ({ ...d, first: v }))} />
+                    <TextField label="Middle name" placeholder="Middle name" value={duenio.middle} onChange={(v) => setDuenio((d) => ({ ...d, middle: v }))} />
+                    <TextField label="Last name" required placeholder="Brujis" value={duenio.last} onChange={(v) => setDuenio((d) => ({ ...d, last: v }))} />
                     <DateField label="Birthdate" required placeholder="Select" />
                   </div>
                   <TextField className="mt-4" label="Email" required placeholder="sbrujis@confidentally.com" value={duenio.email} onChange={(v) => setDuenio((d) => ({ ...d, email: v }))} />
                 </Card>
 
-                <Card title="Contact Information">
+                <Card title="Contact information">
                   <label className="mb-4 flex items-center gap-2 text-[13px] text-ink-soft">
                     <input
                       type="checkbox"
@@ -215,14 +216,14 @@ export function SettingsAccount() {
                     />
                     Copy contact information from account
                   </label>
-                  <div className="grid gap-4 sm:grid-cols-3">
+                  <div className="grid gap-4 sm:grid-cols-2">
                     <CountryCodeField
                       required
                       value={copiarContacto ? contacto.codigo : duenioContacto.codigo}
                       onChange={(v) => !copiarContacto && setDuenioContacto((c) => ({ ...c, codigo: v }))}
                     />
                     <TextField
-                      label="Area Code (3 digits)" required placeholder="Placeholder"
+                      label="Area code (3 digits)" required placeholder="Placeholder"
                       value={copiarContacto ? contacto.areaCode : duenioContacto.areaCode}
                       onChange={(v) => !copiarContacto && setDuenioContacto((c) => ({ ...c, areaCode: v }))}
                     />
@@ -234,7 +235,7 @@ export function SettingsAccount() {
                   </div>
                 </Card>
 
-                <Card title="Address Information">
+                <Card title="Address information">
                   <label className="mb-4 flex items-center gap-2 text-[13px] text-ink-soft">
                     <input
                       type="checkbox"
@@ -271,7 +272,7 @@ export function SettingsAccount() {
                       onChange={(v) => !copiarDomicilio && setDuenioDomicilio((d) => ({ ...d, ciudad: v }))}
                     />
                     <SelectField
-                      label="ZIP Code" required options={['33101', '90001']}
+                      label="ZIP code" required options={['33101', '90001']}
                       value={copiarDomicilio ? domicilio.cp : duenioDomicilio.cp}
                       onChange={(v) => !copiarDomicilio && setDuenioDomicilio((d) => ({ ...d, cp: v }))}
                     />

@@ -1,3 +1,4 @@
+import { CONTENEDOR_PAGINA } from '@/lib/estilos'
 import { useState } from 'react'
 import { PageTitle } from '@/components/ui/page-title'
 import { ChevronDown, ChevronRight } from 'lucide-react'
@@ -22,7 +23,7 @@ export default function Help() {
   const alternar = (id: ModuleId) => setAbiertos((p) => (p.includes(id) ? p.filter((m) => m !== id) : [...p, id]))
 
   return (
-    <div className="px-4 py-6 sm:px-8">
+    <div className={CONTENEDOR_PAGINA}>
       <PageTitle>What can we help you with?</PageTitle>
 
       <div className="mt-5 flex flex-col gap-3">

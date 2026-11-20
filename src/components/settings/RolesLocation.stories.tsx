@@ -21,7 +21,7 @@ export const AssignRole: Story = {
 /* Estado de error: Save sin elegir rol ni sedes. */
 export const AssignRoleWithErrors: Story = { ...AssignRole, play: secuencia(pulsar(/^save$/i), esperar(/required|at least|must|invalid/i)) }
 
-/* Sin roles: estado vacío con la acción "Add Role". Se llega quitando los tres. */
+/* Sin roles: estado vacío con la acción "Add role". Se llega quitando los tres. */
 export const Empty: Story = {
   render: () => <RolesLocation />,
   play: async (c) => {

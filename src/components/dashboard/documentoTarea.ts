@@ -32,7 +32,7 @@ export function documentoTarea(t: PendingTask, firmado?: Date): Documento {
   const nacio = `${largo(p.nacimiento)} (${edad} yrs)`
   const provider = (t.provider ?? '').replace(/^Dr\.\s*/, '')
   const visita = new Date(t.register)
-  if (t.kind === 'Clinical Note') {
+  if (t.kind === 'Clinical note') {
     return {
       titulo: 'Dental Clinical Note',
       paciente: t.person,
@@ -58,7 +58,7 @@ export function documentoTarea(t: PendingTask, firmado?: Date): Documento {
     }
   }
   /* Lab Order, Prescription y Referral: el mismo formato con los datos de la tarea. */
-  const tipo = { 'Lab Orders': 'Lab Order', Prescriptions: 'Prescription', Referrals: 'Referral' }[t.kind] ?? t.kind
+  const tipo = { 'Lab orders': 'Lab Order', Prescriptions: 'Prescription', Referrals: 'Referral' }[t.kind] ?? t.kind
   return {
     titulo: tipo,
     paciente: t.person,

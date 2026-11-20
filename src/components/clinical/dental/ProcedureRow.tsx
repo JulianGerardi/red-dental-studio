@@ -60,7 +60,7 @@ export function ProcedureRow({
         <span className={cn('font-bold', CODIGO[estado])}>{procedure.code} - </span>
         <span className={cn('font-medium', TEXTO[estado])}>{procedure.label}</span>
         <span className="mt-1 block">
-          <span className={cn('rounded px-1.5 py-0.5 text-[10px] font-semibold', apagada || estado === 'inactive' ? 'bg-surface-muted text-ink-muted' : 'bg-dash-count-bg text-dash-blue')}>{procedure.area}</span>
+          <span className={cn('rounded px-1.5 py-0.5 text-[11px] font-semibold', apagada || estado === 'inactive' ? 'bg-surface-muted text-ink-muted' : 'bg-dash-count-bg text-dash-blue')}>{procedure.area}</span>
         </span>
       </button>
       <TooltipProvider delayDuration={200}>

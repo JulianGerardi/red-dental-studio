@@ -1,7 +1,7 @@
 import { ARANCELES } from '@/data/finanzas'
 
-/* Opciones compartidas entre "New Location" (pantalla completa), la pestaña
-   Information de la ficha de una locación y "New Employee": los mismos
+/* Opciones compartidas entre "New location" (pantalla completa), la pestaña
+   Information de la ficha de una locación y "New employee": los mismos
    catálogos, para no repetirlos en cada formulario. */
 export const PAISES = ['United States of America (the)', 'Canada', 'Argentina', 'Spain', 'Mexico']
 export const CODIGOS = ['(+1) United States of America (the)', '(+1) Canada', '(+54) Argentina', '(+34) Spain', '(+52) Mexico']

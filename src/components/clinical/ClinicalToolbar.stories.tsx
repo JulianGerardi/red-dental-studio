@@ -23,6 +23,6 @@ export const Default: Story = { render: () => <Demo /> }
 
 /* Con un registro abierto, las pestañas son los registros y "Exams" vuelve a los exámenes. */
 export const RecordSelected: Story = {
-  args: { pestana: 'Treatment Plan' },
+  args: { pestana: 'Treatment plan' },
   render: (args) => <ClinicalToolbar {...args} />,
 }

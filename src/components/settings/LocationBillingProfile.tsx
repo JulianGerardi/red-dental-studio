@@ -102,14 +102,14 @@ export function LocationBillingProfile({
       <Card>
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div className="min-w-0 max-w-[640px]">
-            <h2 className="text-sm font-bold text-ink">Use this Location as a Billing Provider</h2>
+            <h2 className="text-sm font-bold text-ink">Use this location as a billing provider</h2>
             <p className="mt-1 text-xs leading-relaxed text-ink-muted">
               Set the billing identity, contacts and credentials this location uses on claims.
             </p>
           </div>
           <div className="flex items-center gap-3">
             <EstadoPerfilPill estado={estado} />
-            <Toggle on={activo} onChange={alternar} ariaLabel="Use this Location as a Billing Provider" />
+            <Toggle on={activo} onChange={alternar} ariaLabel="Use this location as a billing provider" />
           </div>
         </div>
         {configurando && (
@@ -122,7 +122,7 @@ export function LocationBillingProfile({
           <EmptyState
             icon={Receipt}
             title="Set up this location's billing information"
-            detail="Turn on “Use this Location as a Billing Provider” to start."
+            detail="Turn on “Use this location as a billing provider” to start."
             className="py-12"
           />
         </Card>
@@ -230,7 +230,7 @@ export function LocationBillingProfile({
             aviso.ok('Billing profile disabled.')
           }}
         >
-          It can no longer be chosen as Billing Provider and becomes read-only. Its data and carrier contracts are
+          It can no longer be chosen as billing provider and becomes read-only. Its data and carrier contracts are
           kept.{haySucios && ' Unsaved changes will be discarded.'}
         </ConfirmDialog>
       )}

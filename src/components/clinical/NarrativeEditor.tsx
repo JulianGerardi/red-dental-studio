@@ -15,7 +15,7 @@ type Estado = 'generando' | 'borrador' | 'editado' | 'aplicado' | 'vacio'
 
 const ESTADO: Record<Estado, { texto: string; punto: string }> = {
   generando: { texto: 'Generating narrative from the answered questions…', punto: 'bg-dash-blue' },
-  borrador: { texto: 'Original Clinical Draft', punto: 'bg-status-ok' },
+  borrador: { texto: 'Original clinical draft', punto: 'bg-status-ok' },
   editado: { texto: 'Unsaved changes', punto: 'bg-warn-fg' },
   aplicado: { texto: 'Edited narrative', punto: 'bg-status-ok' },
   vacio: { texto: 'No answered questions to summarize', punto: 'bg-ink-faint' },
@@ -97,7 +97,7 @@ export function NarrativeEditor({
 
   return (
     <Drawer
-      open={open} onClose={cerrar} size="xl" title="AI Narrative Editor" description={`${wf.codigo} - Published v${wf.version}`}
+      open={open} onClose={cerrar} size="xl" title="AI narrative editor" description={`${wf.codigo} - Published v${wf.version}`}
       footer={confirmar ? (
         <div className="flex flex-col gap-2">
           <p className="text-[12px] text-ink">
@@ -115,7 +115,7 @@ export function NarrativeEditor({
             {ESTADO[estado].texto}
             {guardada && !generando && estado !== 'editado' && <span className="not-italic">· {guardada.fecha}</span>}
           </span>
-          <Button className="w-full" disabled={estado !== 'editado'} onClick={aplicar}><Send /> Apply Changes</Button>
+          <Button className="w-full" disabled={estado !== 'editado'} onClick={aplicar}><Send /> Apply changes</Button>
           <Button variant="secondary" className="w-full" disabled={generando} onClick={regenerar}><RefreshCw /> Regenerate</Button>
         </div>
       )}

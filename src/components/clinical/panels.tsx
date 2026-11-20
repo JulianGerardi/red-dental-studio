@@ -19,7 +19,7 @@ export function TreatmentPlanPanel() {
     <div className="flex flex-col gap-5 lg:flex-row">
       <div className="bg-background w-full rounded-xl border p-0 shadow-sm lg:w-[300px] lg:shrink-0">
         <div className="bg-primary text-primary-foreground flex items-center gap-2 rounded-t-xl px-4 py-3 text-sm font-medium">
-          <Inbox className="size-4" /> Unassigned Items
+          <Inbox className="size-4" /> Unassigned items
         </div>
         <div className="p-4">
           {PLAN_CASES.map((c, i) => (
@@ -31,7 +31,7 @@ export function TreatmentPlanPanel() {
                 <span className="text-sm font-medium">{c.date}</span>
                 <span
                   className={cn(
-                    'ml-auto rounded-full px-2 py-0.5 text-[10px] font-semibold tracking-wide',
+                    'ml-auto rounded-full px-2 py-0.5 text-[11px] font-semibold tracking-wide',
                     c.status === 'PLANNING'
                       ? 'bg-amber-100 text-amber-700'
                       : 'bg-muted text-muted-foreground',
@@ -61,9 +61,9 @@ export function TreatmentPlanPanel() {
 
       <div className="min-w-0 flex-1 rounded-xl border bg-background shadow-sm">
         <div className="flex flex-wrap items-center gap-3 p-5">
-          <h2 className="text-lg font-semibold">Unassigned</h2>
+          <h2 className="text-[15px] font-bold text-ink">Unassigned</h2>
           <div className="flex w-full flex-wrap gap-3 sm:ml-auto sm:w-auto">
-            {['New Treatment Group', 'New Alternative Case', 'Move to'].map((l) => (
+            {['New treatment group', 'New alternative case', 'Move to'].map((l) => (
               <button key={l} disabled
                 className="bg-primary-disabled text-primary-disabled-foreground h-9 cursor-not-allowed rounded-md px-4 text-sm font-medium">
                 {l}
@@ -74,10 +74,10 @@ export function TreatmentPlanPanel() {
 
         <div className="grid gap-4 border-b px-5 pb-5 md:grid-cols-2 xl:grid-cols-4">
           {[
-            { icon: Search, label: 'Search Procedure', ph: 'Code or Description...' },
+            { icon: Search, label: 'Search procedure', ph: 'Code or description...' },
             { icon: User, label: 'Providers', ph: 'Select providers...' },
-            { icon: Calendar, label: 'Creation Date', ph: 'Pick a date range' },
-            { icon: LayoutGrid, label: 'Anatomical Areas', ph: 'Select areas...' },
+            { icon: Calendar, label: 'Creation date', ph: 'Pick a date range' },
+            { icon: LayoutGrid, label: 'Anatomical areas', ph: 'Select areas...' },
           ].map(({ icon: Icon, label, ph }) => (
             <div key={label}>
               <p className="text-muted-foreground mb-1 flex items-center gap-2 text-sm">
@@ -153,7 +153,7 @@ export function TreatmentPanel() {
           <span className="mx-auto flex size-12 items-center justify-center rounded-full bg-red-50">
             <CircleAlert className="text-destructive size-6" />
           </span>
-          <h3 className="mt-4 text-lg font-semibold">No Active Encounter Found</h3>
+          <h3 className="mt-4 text-lg font-semibold">No active encounter found</h3>
           <p className="text-muted-foreground mt-2 text-sm">
             You cannot proceed without an active encounter. Please ensure the patient has an
             open encounter and try again.
@@ -184,7 +184,7 @@ export function PatientSummaryPanel() {
           <thead>
             <tr className="text-muted-foreground border-b">
               <th className="px-4 py-3"><input type="checkbox" aria-label="Select all" /></th>
-              {['Date', 'Status', 'Clinic Note', 'Reason for appt', 'Provider', 'Procedures', ...flagCols, 'Actions'].map((h, i) => (
+              {['Date', 'Status', 'Clinic note', 'Reason for appt', 'Provider', 'Procedures', ...flagCols, 'Actions'].map((h, i) => (
                 <th key={i} className="px-4 py-3 text-left font-medium whitespace-nowrap">{h}</th>
               ))}
             </tr>
@@ -196,7 +196,7 @@ export function PatientSummaryPanel() {
                 <td className="px-4 py-4">
                   <span className="flex items-center gap-2 font-semibold whitespace-nowrap">
                     <Calendar className="text-muted-foreground size-4" /> {r.date}
-                    {r.latest && <span className="bg-accent text-primary rounded px-1.5 py-0.5 text-[10px] font-medium">Latest</span>}
+                    {r.latest && <span className="bg-accent text-primary rounded px-1.5 py-0.5 text-[11px] font-medium">Latest</span>}
                   </span>
                   <span className="text-muted-foreground mt-1 flex items-center gap-1 text-xs">
                     <MapPin className="size-3" /> {r.tz}
@@ -249,7 +249,7 @@ export function PatientSummaryPanel() {
 export function LabOrderPanel() {
   return (
     <div>
-      <RecordToolbar newLabel="New Lab Order" />
+      <RecordToolbar newLabel="New lab order" />
       <div className="space-y-3">
         {LAB_ORDERS.map((o, i) => (
           <RecordRow key={i} provider={o.provider} status={o.status}
@@ -266,7 +266,7 @@ export function LabOrderPanel() {
 export function PrescriptionPanel() {
   return (
     <div>
-      <RecordToolbar newLabel="New Prescription" />
+      <RecordToolbar newLabel="New prescription" />
       <div className="space-y-3">
         {PRESCRIPTIONS.map((p, i) => (
           <RecordRow key={i} provider={p.provider} status={p.status}
@@ -283,17 +283,17 @@ export function PrescriptionPanel() {
 export function ReferralPanel() {
   return (
     <div>
-      <RecordToolbar newLabel="New Referral" />
+      <RecordToolbar newLabel="New referral" />
       <div className="space-y-3">
         {REFERRALS.map((r, i) => (
-          <RecordRow key={i} provider={r.provider} providerRole="Referring Provider" status={r.status}
+          <RecordRow key={i} provider={r.provider} providerRole="Referring provider" status={r.status}
             created={r.created} updated={r.updated} expires={r.expires}>
             <span className="leading-tight">
               <span className="block text-sm">
                 <span className="font-semibold">{r.referred}</span>
                 <span className="text-muted-foreground"> | {r.specialty}</span>
               </span>
-              <span className="text-muted-foreground block text-xs">Referred Provider</span>
+              <span className="text-muted-foreground block text-xs">Referred provider</span>
             </span>
           </RecordRow>
         ))}

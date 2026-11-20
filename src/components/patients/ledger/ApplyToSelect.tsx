@@ -29,7 +29,7 @@ export function ApplyToSelect({
           className={cn(control(error), 'flex h-9 items-center justify-between gap-2 px-3 text-left text-ink transition-colors data-[state=open]:border-dash-blue')}
         >
           <span className="min-w-0 truncate">{elegida?.etiqueta ?? 'Select'}</span>
-          <ChevronDown aria-hidden className="size-4 shrink-0 text-black" />
+          <ChevronDown aria-hidden className="size-4 shrink-0 text-ink" />
         </DropdownMenuTrigger>
         <DropdownMenuContent align="start" style={{ width: 'max(var(--radix-dropdown-menu-trigger-width), 280px)' }}>
           <DropdownMenuLabel className="text-[11px] font-semibold tracking-wide text-ink-muted uppercase">{titulo}</DropdownMenuLabel>

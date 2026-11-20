@@ -30,7 +30,7 @@ import { buscarTarea } from '@/components/dashboard/dashboard-data'
 
    Es un takeover: no usa el shell de la app —ni rail ni header—, porque la
    pantalla se ocupa entera con el paciente que se está atendiendo. La única
-   salida es "Exit clinical Mode".
+   salida es "Exit Clinical Mode".
 
    Desviación anotada: el frame pone en el centro un **render 3D** de la boca,
    que es una imagen. Acá va el odontograma de DentAssmt, de sólo lectura y con
@@ -53,7 +53,7 @@ export default function ClinicalMode() {
   /* Overwiev no es una pestaña más: es el estado inicial y el botón de la
      barra vuelve acá desde cualquier examen o registro. */
   const [enOverview, setEnOverview] = useState(!casoPedido && !tabPedida)
-  const [pestana, setPestana] = useState<Pestana>(casoPedido ? 'Treatment Plan' : tabPedida ?? 'Vitals')
+  const [pestana, setPestana] = useState<Pestana>(casoPedido ? 'Treatment plan' : tabPedida ?? 'Vitals')
   const [encuentro, setEncuentro] = useEstadoEncuentro()
   const [ampliado, setAmpliado] = useState(false)
   /* El caso que se abrió desde una card del Overview; sin caso, Treatment Plan entra por Unassigned. */
@@ -80,8 +80,8 @@ export default function ClinicalMode() {
         <div className="relative shrink-0 lg:w-[360px]">
           <TreatmentPlanList
             llena
-            onAbrir={(id) => { setCasoAbierto(id); irA('Treatment Plan') }}
-            onEstimado={(id) => { setCasoAbierto(id); irA('Treatment Plan'); setEstimadoAbierto(true) }}
+            onAbrir={(id) => { setCasoAbierto(id); irA('Treatment plan') }}
+            onEstimado={(id) => { setCasoAbierto(id); irA('Treatment plan'); setEstimadoAbierto(true) }}
           />
         </div>
       )}
@@ -112,14 +112,14 @@ export default function ClinicalMode() {
     ? overview
     : pestana === 'Vitals'
       ? <ExamLayout findings={false}><VitalsPanel /></ExamLayout>
-      : pestana === 'Lab Order'
-        ? <LabOrderPanel tarea={tareaPedida?.kind === 'Lab Orders' ? tareaPedida : undefined} encuentroAbierto={encuentro !== 'sinEmpezar'} />
+      : pestana === 'Lab order'
+        ? <LabOrderPanel tarea={tareaPedida?.kind === 'Lab orders' ? tareaPedida : undefined} encuentroAbierto={encuentro !== 'sinEmpezar'} />
         : pestana === 'Radiographic'
           ? <RadiographyPanel />
-          : pestana === 'Treatment Plan'
+          : pestana === 'Treatment plan'
             ? <TreatmentPlanSection key={`${casoAbierto ?? 'todos'}-${estimadoAbierto}-${consentimientoAbierto}-${accionPendiente}`} casoInicial={casoAbierto} estimadoInicial={estimadoAbierto} consentimientoInicial={consentimientoAbierto} accionInicial={accionPendiente} />
             : pestana === 'Treatment'
-            ? <TreatmentPanel onTreatmentPlan={() => irA('Treatment Plan')} />
+            ? <TreatmentPanel onTreatmentPlan={() => irA('Treatment plan')} />
             : pestana === 'Dental assessment'
               ? <DentalAssessmentExam />
               : pestana === 'Extraoral'
@@ -148,6 +148,8 @@ export default function ClinicalMode() {
     <NavegacionClinica.Provider value={ir}>
     <div className="bg-page-background min-h-svh p-4 sm:p-[30px] lg:px-12">
       <div className="mx-auto w-full max-w-[1440px]">
+      {/* Sin título visible: el h1 es para lectores de pantalla (auditoría de normalización, figma/README.md). */}
+      <h1 className="sr-only">Clinical Mode · {patient.first} {patient.last}</h1>
       <ClinicalTopBar
         volverA={`/patients/${id ?? patient.id}`}
         encuentro={encuentro}

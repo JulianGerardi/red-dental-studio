@@ -19,7 +19,7 @@ const TONO = {
 export function FilaFirma({ f }: { f: Firma }) {
   const ok = f.estado === 'Signed'
   return (
-    <span className="flex min-w-0 items-center gap-1.5 text-[12.5px] whitespace-nowrap">
+    <span className="flex min-w-0 items-center gap-1.5 text-[13px] whitespace-nowrap">
       {ok
         ? <CircleCheck className="size-4 shrink-0 text-dash-ok-fg" aria-hidden />
         : <CircleAlert className="size-4 shrink-0 text-warn-fg" aria-hidden />}
@@ -85,8 +85,8 @@ export function PanelHistorial({ onClose, procedimientos = [], onAbrirProcedimie
             <span className="min-w-0 flex-1 pb-5">
               <span className="block text-[13px] font-semibold text-ink">{h.evento}</span>
               {h.abrir ? (
-                <button type="button" onClick={h.abrir} className="text-dash-blue block text-left text-[12.5px] font-medium hover:underline">{h.documento}</button>
-              ) : <span className="block text-[12.5px] font-medium text-ink-soft">{h.documento}</span>}
+                <button type="button" onClick={h.abrir} className="text-dash-blue block text-left text-[13px] font-medium hover:underline">{h.documento}</button>
+              ) : <span className="block text-[13px] font-medium text-ink-soft">{h.documento}</span>}
               <span className="block text-[12px] text-ink-muted">{[h.fecha, h.detalle].filter(Boolean).join(' · ')}</span>
             </span>
           </li>

@@ -33,7 +33,7 @@ const meta = {
           '',
           '**Barra:** el buscador primero y después **Filter** (Elements / Filter) con los estados de la orden, su cantidad y el punto del color de su pill; a la derecha *View History* (secundario) y *New Prescription* (la acción principal), los dos con `ui/button`. **Tabla:** Provider y Patient con las iniciales del equipo, la pill de estado, las fechas (la de vencimiento en rojo si vence pronto) y el kebab de fila (*View order*, *Edit order* y, si sigue abierta, *Cancel order* con Undo). **Pie:** el de la tabla estándar, con *Show* 5 / 10 / 20 y la paginación.',
           '',
-          '"active prescriptions" y "New Prescription" son texto de Prescription que quedó en el frame (anomalía 85): se copian tal cual. El detalle de la orden y el modal *New Laboratory* quedan pendientes.',
+          '"active prescriptions" y "New prescription" son texto de Prescription que quedó en el frame (anomalía 85): se copian tal cual. El detalle de la orden y el modal *New Laboratory* quedan pendientes.',
           '',
           '**Probalo:** en *Playground* buscá, filtrá por estado, abrí el menú de una fila y cancelá una orden; desde *Controls* cambiá cuántas órdenes hay (0 muestra el vacío) y el ancho.',
         ].join('\n'),
@@ -62,8 +62,8 @@ export const Parts: Story = {
       <Bloque titulo="Toolbar" nota="El buscador y Filter a la izquierda; las acciones a la derecha. Todo de 36px de alto.">
         <Muestras>
           <ConRotulo rotulo="Filter (sin aplicar / con 2 estados)"><span className="flex gap-2"><FilterTrigger /><FilterTrigger count={2} /></span></ConRotulo>
-          <ConRotulo rotulo="View History · secondary lg"><Button variant="secondary"><History /> View History</Button></ConRotulo>
-          <ConRotulo rotulo="New Prescription · primary lg"><Button><CirclePlus /> New Prescription</Button></ConRotulo>
+          <ConRotulo rotulo="View History · secondary lg"><Button variant="secondary"><History /> View history</Button></ConRotulo>
+          <ConRotulo rotulo="New Prescription · primary lg"><Button><CirclePlus /> New prescription</Button></ConRotulo>
         </Muestras>
       </Bloque>
       <Bloque titulo="Status pills" nota="ORDEN_TONO: el mismo tono en la tabla, en el punto del filtro y en el detalle de la Problem List (RecordDetail).">
@@ -76,11 +76,11 @@ export const Parts: Story = {
           <tr><td className="font-semibold">Card</td><td>La card de la página: blanca, sombra, sin borde, 16px de aire.</td><td><code>TARJETA_PANEL</code></td></tr>
           <tr><td className="font-semibold">Search</td><td>Filtra mientras se tipea por provider, paciente o estado.</td><td><code>DataTable search</code></td></tr>
           <tr><td className="font-semibold">Filter</td><td>Estados de la orden, de a varios, con cantidad y color; sin nada tildado se ve todo. Se borra con Clear all.</td><td><code>DataTable filter</code> → FilterMenu</td></tr>
-          <tr><td className="font-semibold">View History</td><td>Acción secundaria. Avisa que no está en esta versión.</td><td><code>Button secondary</code></td></tr>
-          <tr><td className="font-semibold">New Prescription</td><td>La acción principal. Avisa que no está en esta versión.</td><td><code>Button</code></td></tr>
+          <tr><td className="font-semibold">View history</td><td>Acción secundaria. Avisa que no está en esta versión.</td><td><code>Button secondary</code></td></tr>
+          <tr><td className="font-semibold">New prescription</td><td>La acción principal. Avisa que no está en esta versión.</td><td><code>Button</code></td></tr>
           <tr><td className="font-semibold">Provider · Patient</td><td>El Avatar y el nombre, sin link.</td><td>como <code>PersonCell</code></td></tr>
           <tr><td className="font-semibold">Status</td><td>La pill del estado.</td><td><code>Pill</code></td></tr>
-          <tr><td className="font-semibold">Expiration Date</td><td>En rojo y semibold si vence pronto (<code>urgente</code>).</td><td>—</td></tr>
+          <tr><td className="font-semibold">Expiration date</td><td>En rojo y semibold si vence pronto (<code>urgente</code>).</td><td>—</td></tr>
           <tr><td className="font-semibold">Row menu</td><td>View order, Edit order y, en Requested / Pending / Delayed, Cancel order (rojo) con Undo.</td><td><code>RowActionsMenu</code></td></tr>
           <tr><td className="font-semibold">Footer</td><td>"Showing X to Y of N active prescriptions", Show 5 / 10 / 20 y las páginas.</td><td><code>DataTable</code></td></tr>
         </Tabla>

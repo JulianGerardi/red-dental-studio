@@ -1,7 +1,8 @@
+import { SettingsSearch } from '@/components/settings/SettingsSearch'
+import { PADDING_PAGINA } from '@/lib/estilos'
 import { useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Pencil, Trash2, Plus, MapPin } from 'lucide-react'
-import { SettingsSearch } from '@/components/settings/SettingsSearch'
 import { aviso } from '@/components/ui/toaster'
 import { SettingsPageHeader } from '@/components/settings/SettingsPageHeader'
 import { DropdownMenuItem } from '@/components/ui/dropdown-menu'
@@ -46,11 +47,11 @@ export function SettingsLocations({ nuevo = false }: { nuevo?: boolean }) {
   }
 
   return (
-    <div className="px-4 py-6 sm:px-8">
+    <div className={PADDING_PAGINA}>
       <SettingsPageHeader
         titulo="Locations"
         accion={(
-          <Button data-tour="set-locations" onClick={() => setCreando(true)}>
+          <Button size="md" data-tour="set-locations" onClick={() => setCreando(true)}>
             <Plus /> New location
           </Button>
         )}
@@ -62,10 +63,10 @@ export function SettingsLocations({ nuevo = false }: { nuevo?: boolean }) {
         <DataTable
           columns={[
             /* El nombre es el acceso, como en la tabla de pacientes. */
-            { key: 'nombre', header: 'Location name', width: 180, cell: (l) => <TextCell>{l.nombre}</TextCell> },
+            { key: 'nombre', header: 'Name', width: 180, cell: (l) => <TextCell>{l.nombre}</TextCell> },
             { key: 'empleados', header: 'Employees', width: 100, cell: (l) => l.empleados },
-            { key: 'salas', header: 'Room', width: 80, cell: (l) => l.salas },
-            { key: 'info', header: 'Information', cell: (l) => <TextCell>{l.info}</TextCell> },
+            { key: 'salas', header: 'Rooms', width: 80, cell: (l) => l.salas },
+            { key: 'info', header: 'Address', cell: (l) => <TextCell>{l.info}</TextCell> },
           ]}
           rows={visibles}
           rowKey={(l) => l.id}

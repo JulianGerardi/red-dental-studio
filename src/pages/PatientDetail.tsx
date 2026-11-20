@@ -26,9 +26,9 @@ import { useMedia } from '@/lib/media'
 
 const CLINICAL: { label: Categoria; icon: LucideIcon }[] = [
   { label: 'Allergies', icon: PersonStanding },
-  { label: 'Medical Conditions', icon: Clipboard },
+  { label: 'Medical conditions', icon: Clipboard },
   { label: 'Medication', icon: PillIcon },
-  { label: 'Past Surgery and Hospitalization', icon: ClipboardList },
+  { label: 'Past surgery and hospitalization', icon: ClipboardList },
 ]
 
 
@@ -37,7 +37,7 @@ export const TOPE = { tareas: 3, turnos: 3, turnosColumna: 7 }
 
 const APPTS: { status: PatientAppointmentStatus; cancel?: boolean }[] = [
   { status: 'Booked', cancel: true }, { status: 'Cancelled' }, { status: 'Fulfilled' },
-  { status: 'No Show' }, { status: 'No Show' }, { status: 'No Show' }, { status: 'No Show' },
+  { status: 'No show' }, { status: 'No show' }, { status: 'No show' }, { status: 'No show' },
 ]
 
 export function Card({ className, children }: { className?: string; children: React.ReactNode }) {
@@ -83,7 +83,7 @@ export default function PatientDetail({ turnos = APPTS.length }: { turnos?: numb
   const [encuentro] = useEstadoEncuentro()
   const accionesTarea = useAccionesTarea({ paciente: id })
   const tareas = tipoTarea === 'All' ? TASKS : TASKS.filter((t) => t.kind === tipoTarea)
-  const [apptTab, setApptTab] = useState<'Next' | 'Next Appointments'>('Next')
+  const [apptTab, setApptTab] = useState<'Next' | 'Next appointments'>('Next')
   /* Desde lg Appointments es una columna del alto de Pending Task + Pending documents: entran más turnos. */
   const enColumna = useMedia('(min-width: 1024px)')
 
@@ -91,6 +91,7 @@ export default function PatientDetail({ turnos = APPTS.length }: { turnos?: numb
     <div className={CONTENEDOR_PAGINA}>
 
       <PatientBreadcrumb name="John Smith" />
+      <h1 className="sr-only">John Smith · Overview</h1>
       {/* Desde lg el alto lo da el menú del paciente -la pantalla termina donde termina Address-, con un piso para que
           colapsado no se achique: el contenido de al lado no lo estira, se acomoda adentro (patient-dashboard.md,
           2026-10-29). */}
@@ -156,7 +157,7 @@ export default function PatientDetail({ turnos = APPTS.length }: { turnos?: numb
 
               <Card className="flex min-h-0 flex-1 flex-col p-5">
                 <div className="flex items-center justify-between gap-3">
-                  <h2 className="text-[15px] font-bold text-ink">Pending Task</h2>
+                  <h2 className="text-[15px] font-bold text-ink">Pending task</h2>
                   <Tabs
                     size="sm" aria-label="Filter tasks"
                     tabs={[
@@ -179,7 +180,7 @@ export default function PatientDetail({ turnos = APPTS.length }: { turnos?: numb
 
             <Card className="flex min-h-0 flex-col p-4">
               <h2 className="text-[15px] font-bold text-ink">Appointments</h2>
-              <Tabs size="sm" fullWidth className="mt-3" aria-label="Appointments" tabs={['Next', 'Next Appointments'] as const} value={apptTab} onChange={setApptTab} />
+              <Tabs size="sm" fullWidth className="mt-3" aria-label="Appointments" tabs={['Next', 'Next appointments'] as const} value={apptTab} onChange={setApptTab} />
               <div className="mt-3 flex min-h-0 flex-1 flex-col">
                 {/* En columna, alto fijo y scroll adentro, como Pending Task; apilado, "Show N more". */}
                 <ShowMore total={appts.length} limit={enColumna ? TOPE.turnosColumna : TOPE.turnos} enCaja={enColumna} llenarAlto={enColumna} cargarAlScroll={enColumna} label="appointments" className="flex flex-col gap-2">

@@ -15,8 +15,11 @@ export const BOTON_ICONO_REDONDO =
 /** Ícono suelto dentro de una card o una tabla: sin caja, pero **en negro**.
     Un ícono que hace algo —el kebab, el history, el ojo— se dibuja con el
     mismo peso que el texto que acompaña; en gris parecía deshabilitado. */
+/* En pantallas táctiles el área de toque crece a 36px con un ::after invisible, sin mover nada (AREA_TOQUE). */
+export const AREA_TOQUE = "relative pointer-coarse:after:absolute pointer-coarse:after:-inset-1"
+
 export const ICONO_SUELTO =
-  'flex size-7 shrink-0 items-center justify-center rounded-md text-ink transition-colors hover:bg-surface-muted'
+  `${AREA_TOQUE} flex size-7 shrink-0 items-center justify-center rounded-md text-ink transition-colors hover:bg-surface-muted`
 
 /* Contenedor de página del módulo de Patients (Dashboard, Scheduling,
    Billing, Patients y todo /patients/:id/*): a 1400px fijo, una pantalla de
@@ -30,6 +33,10 @@ export const ICONO_SUELTO =
 export const ANCHO_PAGINA = 'mx-auto w-full max-w-[1400px] 2xl:max-w-[1800px]'
 
 export const CONTENEDOR_PAGINA = `${ANCHO_PAGINA} px-4 py-6 sm:px-6`
+
+/* Las pantallas de Settings ya están dentro de ANCHO_PAGINA (SettingsLayout): sólo el padding, el mismo de CONTENEDOR_PAGINA
+   para que el contenido arranque en el mismo borde que el resto de la app (auditoría de normalización, 2026-11-20). */
+export const PADDING_PAGINA = 'px-4 py-6 sm:px-6'
 
 /* La card que va sobre el fondo gris de la página (los paneles del Dashboard, las cards del Patient Dashboard y de las
    pantallas del paciente): blanca, con sombra y **sin borde** (Julián, 2026-10-06). Las cards que van adentro de una de

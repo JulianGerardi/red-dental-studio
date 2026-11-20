@@ -1,7 +1,7 @@
 import { Outlet, useLocation } from 'react-router-dom'
 import { PageTitle } from '@/components/ui/page-title'
 import { cn } from '@/lib/utils'
-import { ANCHO_PAGINA } from '@/lib/estilos'
+import { ANCHO_PAGINA, PADDING_PAGINA } from '@/lib/estilos'
 import {
   UserCog, Building2, Users, ShieldCheck, SlidersHorizontal, CreditCard, Library, CircleUser, Lock,
   FileSignature, type LucideIcon,
@@ -29,8 +29,8 @@ export const SETTINGS_ICONS: Record<string, LucideIcon> = {
    de otro modo obliga a abrir el menú flotante del rail. */
 /* Settings → Billing lleva el breadcrumb de red.dev: Settings › Finance › Carriers › Aetna Dental Plans › Edit ›
    Insurance plans › Acme Corp › Edit. Un /new que abre un drawer sobre la lista termina en la lista. */
-const TITULOS_FINANZAS: Record<string, string> = { 'fee-schedule': 'Fee Schedules', carriers: 'Carriers', 'coverage-table': 'Coverage Table' }
-const NUEVO_FINANZAS: Record<string, string> = { 'fee-schedule': 'New Fee Schedule', 'coverage-table': 'New Coverage Table' }
+const TITULOS_FINANZAS: Record<string, string> = { 'fee-schedule': 'Fee schedules', carriers: 'Carriers', 'coverage-table': 'Coverage tables' }
+const NUEVO_FINANZAS: Record<string, string> = { 'fee-schedule': 'New fee schedule', 'coverage-table': 'New coverage table' }
 
 /* Billing sigue la regla del resto de Settings (Julián, 2026-10-09): Settings › Billing › sección › ítem, con el nombre del
    menú y sin un tramo "Edit"; el último no es link. El plan cuelga de su carrier. Ver settings-billing.md. */
@@ -90,7 +90,6 @@ function migasDe(pathname: string, nombreFinanzas: (seccion: string, id: string)
     const cuenta = CUENTAS.find((c) => c.id === detalleCuenta[1])
     migas.push({ label: cuenta?.nombre ?? detalleCuenta[1] })
   }
-  /* Sin tramo propio (Profile, /settings/account, se abre desde el menú de la cuenta) es de primer nivel: sin rastro. */
   return migas.length > 1 ? migas : []
 }
 
@@ -108,8 +107,9 @@ export function SettingsLayout() {
        a 1400/1800. Ahora comparte el ancho, y la barra de arriba se alinea
        con todas las pantallas por igual. */
     <div className={cn(ANCHO_PAGINA, 'min-h-full')}>
+      {/* Mismo aire que PatientBreadcrumb: 24 arriba y 16 hasta el título (la pantalla de abajo pierde su padding de arriba). */}
       {migas.length > 0 && (
-        <div className="px-4 pt-5 sm:px-8">
+        <div className="px-4 pt-6 sm:px-6 [&+*]:pt-4!">
           <Breadcrumb items={migas} />
         </div>
       )}
@@ -120,7 +120,7 @@ export function SettingsLayout() {
 
 export function SettingsGeneral() {
   return (
-    <div className="px-4 py-6 sm:px-8">
+    <div className={PADDING_PAGINA}>
       <PageTitle>Settings</PageTitle>
 
       <div className="mt-6 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
@@ -139,7 +139,7 @@ export function SettingsPlaceholder() {
   const { pathname } = useLocation()
   const label = [...SETTINGS_NAV].reverse().find((n) => pathname.startsWith(n.to))?.label ?? 'Settings'
   return (
-    <div className="px-4 py-6 sm:px-8">
+    <div className={PADDING_PAGINA}>
       <PageTitle>{label}</PageTitle>
       <Card className="mt-6 flex">
         <EmptyState

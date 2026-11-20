@@ -8,7 +8,7 @@ const SIN_ENCUENTRO = /no open encounter for the selected patient/
 
 test('Sin encuentro abierto las opciones del ⋮ quedan deshabilitadas y un tooltip dice por qué', async ({ app, screen }) => {
   await app.open('/')
-  await screen.getByRole('tab', /^Lab Orders/).tap()
+  await screen.getByRole('tab', /^Lab orders/).tap()
   await screen.getByRole('button', 'Actions for Lab order for James Foster').tap()
   await expect(screen.getByRole('menuitem', 'Cancel')).toHaveAttribute('aria-disabled', 'true')
   /* El tooltip abre también con el foco del teclado. */
@@ -18,7 +18,7 @@ test('Sin encuentro abierto las opciones del ⋮ quedan deshabilitadas y un tool
 
 test('Request pasa la orden a Requested y Cancel la saca de la lista', async ({ app, screen }) => {
   await app.open('/')
-  await screen.getByRole('tab', /^Lab Orders/).tap()
+  await screen.getByRole('tab', /^Lab orders/).tap()
   /* Olivia Brooks está en el sillón: su encuentro está abierto. */
   await screen.getByRole('button', 'Actions for Lab order for Olivia Brooks').tap()
   await screen.getByRole('menuitem', 'Request').tap()
@@ -28,36 +28,36 @@ test('Request pasa la orden a Requested y Cancel la saca de la lista', async ({ 
   await screen.getByRole('button', 'Actions for Lab order for Olivia Brooks').tap()
   await screen.getByRole('menuitem', 'Cancel').tap()
   await screen.getByRole('dialog', 'Cancel this lab order?').getByRole('button', 'Cancel lab order').tap()
-  await expect(screen.getByRole('tab', 'Lab Orders (1)')).toBeVisible()
+  await expect(screen.getByRole('tab', 'Lab orders (1)')).toBeVisible()
 })
 
 test('Complete this Task abre el detalle de la orden, en sólo lectura sin encuentro', async ({ app, screen }) => {
   await app.open('/')
-  await screen.getByRole('tab', /^Lab Orders/).tap()
+  await screen.getByRole('tab', /^Lab orders/).tap()
   /* Por vencimiento, la de James Foster (todavía no llegó) va primero. */
-  await screen.getByRole('button', /Complete this Task/).first().tap()
+  await screen.getByRole('button', /Complete this task/).first().tap()
   await expect(screen.getByText('Read-only mode')).toBeVisible()
   await expect(screen.getByRole('button', 'Save')).toBeDisabled()
   await screen.getByRole('button', 'Cancel').tap()
-  await expect(screen.getByRole('button', 'View History')).toBeVisible()
+  await expect(screen.getByRole('button', 'View history')).toBeVisible()
 })
 
 test('Complete this Task abre la Clinical Note; se firma con el login y Back to History va a Patient Summary', async ({ app, screen }) => {
   await app.open('/patients/1')
-  await screen.getByRole('tab', /^Clinical Note/).tap()
-  await screen.getByRole('button', /Complete this Task/).first().tap()
-  await expect(screen.getByRole('heading', 'Clinical Note - John Smith')).toBeVisible()
+  await screen.getByRole('tab', /^Clinical note/).tap()
+  await screen.getByRole('button', /Complete this task/).first().tap()
+  await expect(screen.getByRole('heading', 'Clinical note - John Smith')).toBeVisible()
   await expect(screen.getByText('Dental Clinical Note').first()).toBeVisible()
 
-  await screen.getByRole('button', 'Sign Clinical Note').tap()
-  const login = screen.getByRole('dialog', 'Login to Sign Document')
+  await screen.getByRole('button', 'Sign clinical note').tap()
+  const login = screen.getByRole('dialog', 'Login to sign document')
   await expect(login.getByRole('button', 'Sign')).toBeDisabled()
   await login.getByPlaceholder('example@example.com').fill('sarah@example.com')
   await login.getByPlaceholder('Enter password').fill('secret')
   await login.getByRole('button', 'Sign').tap()
-  await expect(screen.getByText('Clinical Note signed.')).toBeVisible()
-  await expect(screen.getByRole('button', 'Sign Clinical Note')).toHaveCount(0)
+  await expect(screen.getByText('Clinical note signed.')).toBeVisible()
+  await expect(screen.getByRole('button', 'Sign clinical note')).toHaveCount(0)
 
-  await screen.getByRole('button', 'Back to History').tap()
-  await expect(screen.getByRole('button', 'Patient Summary')).toBeVisible()
+  await screen.getByRole('button', 'Back to history').tap()
+  await expect(screen.getByRole('button', 'Patient summary')).toBeVisible()
 })

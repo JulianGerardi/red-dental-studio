@@ -42,7 +42,7 @@ const meta = {
       },
     },
   },
-  args: { selectedPatient: 'Maria Abril Viola', view: 'Patient View', filter: 'All', search: '', emptyActivity: false },
+  args: { selectedPatient: 'Maria Abril Viola', view: 'Patient view', filter: 'All', search: '', emptyActivity: false },
   argTypes: {
     selectedPatient: { control: 'select', options: ['None', ...NOMBRES], description: 'None es el resumen de la clínica; un nombre abre la vista de ese paciente.' },
     view: { control: 'inline-radio', options: [...VISTAS_PACIENTE], description: 'Con paciente: sólo lo suyo o todo lo de su garante.' },
@@ -82,12 +82,12 @@ const PARTES: [string, string, string][] = [
   ['Bento', 'Izquierda: los números y la actividad. Derecha (280px desde 1024px): Find Patient arriba, a la altura de los números, y Today abajo, cada uno con su alto natural. La tabla va de a 8 filas: a 1440 × 900 la pantalla se ve entera, sin scroll. Con un paciente el bento guarda el alto del resumen.', 'Billing'],
   ['Summary numbers', 'Cinco números de toda la clínica, cada uno en una card de página (sombra, sin borde). Cinco en fila desde 1280px, 3 + 2 antes, 2 + 2 + 1 en el celular; etiqueta, número y bajada alineados entre cards (subgrid). No cambian con el paciente.', 'Stat enFila'],
   ['Info circle', 'Arriba a la derecha de cada número de arriba y de Today: al pasar el mouse, tocar o llegar con Tab explica qué cuenta (los textos de red.dev).', 'InfoTip'],
-  ['Recent Billing Activity', 'Resumen: toda la clínica y las Tabs de tipo. Paciente: los botones arriba del título, su nombre en el título, Patient View / Guarantor View y sólo sus movimientos (sin saldos: son de la cuenta entera, no de la location).', 'ActividadReciente · Panel'],
+  ['Recent billing activity', 'Resumen: toda la clínica y las Tabs de tipo. Paciente: los botones arriba del título, su nombre en el título, Patient View / Guarantor View y sólo sus movimientos (sin saldos: son de la cuenta entera, no de la location).', 'ActividadReciente · Panel'],
   ['Patient actions', 'Sólo con paciente, arriba del título y a la izquierda: Patient Payment, Credit Adjustment y Charge Adjustment (cada uno abre su drawer, como red.dev: CON-4147) y Export statement. Button md.', 'AccionesPaciente · Panel top'],
   ['Activity table', 'La tabla de la app, compacta. En el resumen, clic en una fila abre la vista de ese paciente. Con paciente, la fila se despliega (chevron, Collapse all / Expand all).', 'DataTable'],
   ['Row detail', 'Con paciente: el detalle del Ledger según el tipo (Procedure, Charge Adjustment, Patient Payment, Credit Adjustment; el pago del seguro con los datos de siempre). La acción del pie y los links abren el registro de sólo lectura.', 'DetalleMovimiento · LedgerRowModal'],
   ['Patient card', 'Sólo con paciente: de borde a borde arriba de Find Patient, con iniciales (sin borde), nombre, rol (y su garante si es Patient) y la X que vuelve al resumen. Entra sutil, estilo Apple: 2px, un desenfoque leve que se aclara y opacidad (360ms).', 'PacienteElegido · Panel top'],
-  ['Find Patient', 'Panel con el buscador (nombre, apellido o email) y los resultados: se ven tres y "Show N more" abre el resto con scroll adentro, sin estirar el panel (ui/show-more, como Patients).', 'BuscarPaciente · Panel · ShowMore'],
+  ['Find patient', 'Panel con el buscador (nombre, apellido o email) y los resultados: se ven tres y "Show N more" abre el resto con scroll adentro, sin estirar el panel (ui/show-more, como Patients).', 'BuscarPaciente · Panel · ShowMore'],
   ['Patient result', 'InnerCard con iniciales, nombre, último pago y saldo. Hover gris; el elegido queda en celeste.', 'ResultadoPaciente'],
   ['Today', 'Panel con tres números del día, cada uno en una InnerCard baja (p-2.5, como las cards de Patients): etiqueta con su círculo de info y bajada a la izquierda, el número a la derecha.', 'Panel · Stat compacta'],
   ['Payment and adjustment drawers', 'New Patient Payment (-), Credit Adjustment (-) y Enter Charge (+) Adjustment: un drawer por botón (CON-4147).', 'PostPaymentDialog'],
@@ -146,7 +146,7 @@ function Buscador({ q, elegido }: { q: string; elegido?: string }) {
 
 /* Recent Billing Activity con su estado. `sinCoincidencias`: hay actividad pero ninguna del tipo elegido (con los datos
    de ejemplo cada tipo tiene filas). `sinMovimientos`: un paciente sin nada posteado. */
-function Actividad({ filtro: inicialFiltro = 'All', elegido, vista: inicialVista = 'Patient View', vacia, sinCoincidencias, sinMovimientos, abierta }: {
+function Actividad({ filtro: inicialFiltro = 'All', elegido, vista: inicialVista = 'Patient view', vacia, sinCoincidencias, sinMovimientos, abierta }: {
   filtro?: FiltroActividad; elegido?: string; vista?: VistaPaciente; vacia?: boolean; sinCoincidencias?: boolean; sinMovimientos?: boolean; abierta?: string
 }) {
   const [filtro, setFiltro] = useState(inicialFiltro)
@@ -154,12 +154,12 @@ function Actividad({ filtro: inicialFiltro = 'All', elegido, vista: inicialVista
   const [vista, setVista] = useState(inicialVista)
   const paciente = PACIENTES_BILLING.find((p) => p.nombre === sel)
   const grupo = sel ? grupoDeGarante(sel) : []
-  const quienes = vista === 'Guarantor View' ? grupo.map((p) => p.nombre) : [sel]
+  const quienes = vista === 'Guarantor view' ? grupo.map((p) => p.nombre) : [sel]
   const filas = vacia || sinCoincidencias || sinMovimientos ? [] : sel ? ACTIVIDAD_RECIENTE.filter((m) => quienes.includes(m.paciente)) : porTipo(filtro)
   return (
     <ActividadReciente
       filas={filas} sinActividad={vacia} filtro={filtro} onFiltro={setFiltro} paciente={paciente} vista={vista} onVista={setVista}
-      onElegir={(n) => { setSel(n); setVista('Patient View') }}
+      onElegir={(n) => { setSel(n); setVista('Patient view') }}
       onAccion={nada} onExportar={nada}
       abierta={abierta}
     />
@@ -193,7 +193,7 @@ export const States: Story = {
             <Estado titulo="Long name" nota="El nombre se corta con “…”; el saldo no se mueve." ancho={280}><Resultado largo /></Estado>
           </Fila>
         </Bloque>
-        <Bloque titulo="Find Patient">
+        <Bloque titulo="Find patient">
           <Fila>
             <Estado titulo="Overview" nota="Sin paciente: el buscador y tres recientes; 'Show N more' abre el resto (ver Show more open). Tocá uno." ancho={280}><Buscador q="" /></Estado>
             <Estado titulo="Patient selected" nota="Su card arriba de todo y su resultado en celeste. La X lo suelta." ancho={280}><Buscador q="" elegido="Maria Abril Viola" /></Estado>
@@ -201,13 +201,13 @@ export const States: Story = {
             <Estado titulo="No results" nota="Nada coincide con lo escrito." ancho={280}><Buscador q="zzz" /></Estado>
           </Fila>
         </Bloque>
-        <Bloque titulo="Recent Billing Activity" nota="Tocá una fila del resumen para abrir la vista de ese paciente, y las Tabs para cambiar de vista.">
+        <Bloque titulo="Recent billing activity" nota="Tocá una fila del resumen para abrir la vista de ese paciente, y las Tabs para cambiar de vista.">
           <Fila>
             <Estado titulo="Overview" nota="Toda la clínica, con las Tabs de tipo. Hover gris en cada fila." ancho={960}><Actividad /></Estado>
-            <Estado titulo="Patient View" nota="Su nombre en el título y sólo sus movimientos, sin saldos ni columna Balance. Las filas ya no eligen." ancho={960}><Actividad elegido="Maria Abril Viola" /></Estado>
+            <Estado titulo="Patient view" nota="Su nombre en el título y sólo sus movimientos, sin saldos ni columna Balance. Las filas ya no eligen." ancho={960}><Actividad elegido="Maria Abril Viola" /></Estado>
             <Estado titulo="Patient View, payment open" nota="Un pago desplegado: Scope, la sede, cuánto se recibió y aplicó, y el cargo al que fue (el link abre su registro)." ancho={960}><Actividad elegido="Maria Abril Viola" abierta="act-Maria Abril Viola-1" /></Estado>
             <Estado titulo="Patient View, charge open" nota="Un cargo: lo cobrado, lo que pagaron el seguro y el paciente, y lo que falta de ese cargo." ancho={960}><Actividad elegido="Brent Crosby" abierta="act-Brent Crosby-0" /></Estado>
-            <Estado titulo="Guarantor View" nota="Todo lo que paga su garante (acá John Hayes y Maria Abril Viola), con la columna Patient para distinguirlos." ancho={960}><Actividad elegido="Maria Abril Viola" vista="Guarantor View" /></Estado>
+            <Estado titulo="Guarantor view" nota="Todo lo que paga su garante (acá John Hayes y Maria Abril Viola), con la columna Patient para distinguirlos." ancho={960}><Actividad elegido="Maria Abril Viola" vista="Guarantor view" /></Estado>
             <Estado titulo="Patient without activity" nota="Un paciente sin nada posteado: se puede registrar el primer pago desde los botones de arriba." ancho={960}><Actividad elegido="Brent Crosby" sinMovimientos /></Estado>
             <Estado titulo="Filtered, no entries" nota="Resumen: hay actividad pero ninguna del tipo elegido en las Tabs." ancho={960}><Actividad filtro="Adjustments" sinCoincidencias /></Estado>
             <Estado titulo="Empty" nota="Todavía no se posteó nada en la clínica." ancho={960}><Actividad vacia /></Estado>

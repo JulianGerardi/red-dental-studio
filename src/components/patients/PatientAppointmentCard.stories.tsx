@@ -18,5 +18,5 @@ type Story = StoryObj<typeof meta>
 
 export const Booked: Story = {}
 export const Fulfilled: Story = { args: { status: 'Fulfilled', onCancel: undefined } }
-export const NoShow: Story = { name: 'No show', args: { status: 'No Show', onCancel: undefined } }
+export const NoShow: Story = { name: 'No show', args: { status: 'No show', onCancel: undefined } }
 export const Cancelled: Story = { args: { status: 'Cancelled', onCancel: undefined } }

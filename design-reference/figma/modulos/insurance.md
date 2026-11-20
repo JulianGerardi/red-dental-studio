@@ -240,3 +240,9 @@ Al comparar Insurance con red.dev para CON-4138, dos cosas de red.dev están bie
   coverage is active for the patient." y "The dates during which this plan has held its current coordination
   priority.". Es el `InfoTip` del sistema (card con título y texto, abre con mouse, dedo o teclado). Para ponerlo,
   `DataTableColumn` (`ui/data-table`) suma `headerInfo`: el texto de la explicación; sin él la columna queda igual.
+
+## El Subscriber de la tabla es un link (2026-11-20)
+
+Julián: en la app real el nombre del subscriber es un hipervínculo, así que va con el diseño de links de tabla
+(`TABLA_LINK`: semibold azul, subrayado al pasar). Lleva a Relationships del paciente, donde están las personas
+vinculadas; si el destino real es otro (la ficha del subscriber), se cambia el `to`.

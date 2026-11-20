@@ -32,9 +32,9 @@ export const fullName = (p: Patient) => `${p.first} ${p.last}`
 
 export const CLINICAL_SECTIONS = [
   { key: 'allergies', label: 'Allergies', count: 2, icon: 'accessibility' },
-  { key: 'conditions', label: 'Medical Conditions', count: 1, icon: 'clipboard' },
+  { key: 'conditions', label: 'Medical conditions', count: 1, icon: 'clipboard' },
   { key: 'medication', label: 'Medication', count: 13, icon: 'pill' },
-  { key: 'surgery', label: 'Past Surgery and Hospitalization', count: 3, icon: 'clipboard-list' },
+  { key: 'surgery', label: 'Past surgery and hospitalization', count: 3, icon: 'clipboard-list' },
 ] as const
 
 export const INSURANCE = [
@@ -43,8 +43,8 @@ export const INSURANCE = [
 ]
 
 export const PENDING_TASKS = [
-  { type: 'Lab Order', state: 'Requested', patient: 'Mara Otero', flag: 'Expired Date', provider: 'Dr. Salgado', register: '01/28/2026', expiration: '01/29/2026' },
-  { type: 'Lab Order', state: 'Requested', patient: 'Mara Otero', flag: 'Expired Date', provider: 'Dr. Salgado', register: '04/07/2026', expiration: '04/07/2026' },
+  { type: 'Lab order', state: 'Requested', patient: 'Mara Otero', flag: 'Expired date', provider: 'Dr. Salgado', register: '01/28/2026', expiration: '01/29/2026' },
+  { type: 'Lab order', state: 'Requested', patient: 'Mara Otero', flag: 'Expired date', provider: 'Dr. Salgado', register: '04/07/2026', expiration: '04/07/2026' },
 ]
 
 export const APPOINTMENTS = [
@@ -60,7 +60,7 @@ export const ROOMS = [
 /* Las cards del overview de Settings, las de red.dev (captura de Julián, 2026-11-19): sin Parameters, Libraries, Patient
    Portal ni Security, y con Consents. Ver settings-accounts.md. */
 export const SETTINGS_SECTIONS = [
-  { to: '/settings/accounts', title: 'Account', desc: 'Manage your account and their access.', icon: 'user-cog' },
+  { to: '/settings/account', title: 'Account', desc: 'Manage your account and their access.', icon: 'user-cog' },
   { to: '/settings/locations', title: 'Locations', desc: 'Configure and manage your practice locations.', icon: 'building' },
   { to: '/settings/team', title: 'Employees', desc: 'Manage your team members and their access.', icon: 'users' },
   { to: '/settings/roles', title: 'Roles', desc: 'Define and assign permissions and roles.', icon: 'shield-check' },

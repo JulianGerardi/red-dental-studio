@@ -27,13 +27,13 @@ export function EditConditionDrawer({
   onClose: () => void
   onSave: (patch: Partial<Finding>) => void
 }) {
-  const [pestana, setPestana] = useState<PestanaEdicion>('General Information')
+  const [pestana, setPestana] = useState<PestanaEdicion>('General information')
   const [surfaces, setSurfaces] = useState<Surface[]>([])
   const [notes, setNotes] = useState('')
   const [descriptors, setDescriptors] = useState<Record<string, string>>({})
   useEffect(() => {
     if (!finding) return
-    setPestana('General Information')
+    setPestana('General information')
     setSurfaces(finding.surfaces as Surface[])
     setNotes(finding.notes)
     setDescriptors(finding.descriptors ?? {})
@@ -46,16 +46,16 @@ export function EditConditionDrawer({
 
   return (
     <Drawer
-      open={!!finding} onClose={onClose} title="Edit Finding" footer={<DrawerActions onCancel={onClose} onSave={guardar} />}
-      tabs={<Tabs tabs={PESTANAS_EDICION} value={pestana} onChange={setPestana} fullWidth size="sm" aria-label="Edit Finding sections" />}
+      open={!!finding} onClose={onClose} title="Edit finding" footer={<DrawerActions onCancel={onClose} onSave={guardar} />}
+      tabs={<Tabs tabs={PESTANAS_EDICION} value={pestana} onChange={setPestana} fullWidth size="sm" aria-label="Edit finding sections" />}
     >
-      {finding && pestana === 'General Information' && (
+      {finding && pestana === 'General information' && (
         <div className="flex flex-col gap-5">
           <div className="flex flex-col gap-4">
             <FilaNombre nombre={mayuscula(finding.condition)} estado={finding.status} tono={TONO_ESTADO[finding.status]} />
             <FilaDato icono={<IconoFecha />} rotulo="Creation date">{fechaCorta(finding.date)}</FilaDato>
             <FilaDato icono={<IconoExamen />} rotulo="Exams">
-              <Pill tone="success" size="sm">{finding.examen ?? 'Dental Assessment'}</Pill>
+              <Pill tone="success" size="sm">{finding.examen ?? 'Dental assessment'}</Pill>
             </FilaDato>
             <FilaDato icono={<IconoProveedor />} rotulo="Provider">{finding.provider}</FilaDato>
 
@@ -73,7 +73,7 @@ export function EditConditionDrawer({
                       {surfaces.map((s) => <Chip key={s}>{s} - {SURFACE_NAMES[s]}</Chip>)}
                     </div>
                   )}
-                  <p className="text-[10px] leading-[1.3] text-ink-muted">Select a surface to update the finding</p>
+                  <p className="text-[11px] leading-[1.3] text-ink-muted">Select a surface to update the finding</p>
                 </div>
               </div>
             </section>
@@ -84,7 +84,7 @@ export function EditConditionDrawer({
       )}
       {finding && pestana === 'Descriptors' && (
         <section className="flex flex-col gap-3.5">
-          <p className="text-xs font-medium text-ink">Selected Descriptors</p>
+          <p className="text-xs font-medium text-ink">Selected descriptors</p>
           <DescriptorFields value={descriptors} onChange={setDescriptors} />
         </section>
       )}

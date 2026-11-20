@@ -5,7 +5,7 @@ const meta = {
   title: 'Components/Dashboard/AppointmentCard',
   component: AppointmentCard,
   args: {
-    appt: { name: 'Noah James', initials: 'NJ', provider: 'Dr. Elena Martinez', operatory: 'Operatory 2', time: '10:00', accion: 'Check Out' },
+    appt: { name: 'Noah James', initials: 'NJ', provider: 'Dr. Elena Martinez', operatory: 'Operatory 2', time: '10:00', accion: 'Check out' },
   },
   decorators: [(Story) => <div className="w-[360px]"><Story /></div>],
 } satisfies Meta<typeof AppointmentCard>

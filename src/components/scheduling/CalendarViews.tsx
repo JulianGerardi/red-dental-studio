@@ -72,7 +72,7 @@ export function ColumnaDia({
       }}
       className={cn(
         'relative min-w-0 flex-1 border-l border-line-hair transition-colors',
-        resaltada && 'bg-[#f5f8ff]',
+        resaltada && 'bg-info-subtle',
       )}
     >
       {HORAS.map((h) => (
@@ -82,7 +82,7 @@ export function ColumnaDia({
       {BLOCKED.filter((b) => b.day === fecha.getDay()).map((b, i) => (
         <div
           key={i}
-          className="absolute inset-x-0 bg-[#e8e8e8]"
+          className="absolute inset-x-0 bg-line-row"
           style={{ top: (b.start - START_HOUR) * HOUR_PX, height: b.duration * HOUR_PX }}
         />
       ))}
@@ -227,15 +227,15 @@ export function VistaMes({ eventos, fecha, onMover, onAbrir }: Props) {
                   'flex min-h-[68px] flex-col gap-1 border-r border-b border-line-hair p-1 transition-colors md:min-h-[104px] md:p-1.5',
                   i % 7 === 6 && 'border-r-0',
                   fuera && 'bg-surface-subtle',
-                  destino === clave && 'bg-[#f5f8ff]',
-                  diaAbierto && mismoDia(diaAbierto, d) && 'bg-[#eff6ff] md:bg-transparent',
+                  destino === clave && 'bg-info-subtle',
+                  diaAbierto && mismoDia(diaAbierto, d) && 'bg-info-bg md:bg-transparent',
                   propios.length > 0 && 'cursor-pointer md:cursor-default',
                 )}
               >
                 <span
                   className={cn(
                     'flex size-6 shrink-0 items-center justify-center self-start rounded-full text-[11px] font-semibold md:text-[12px]',
-                    mismoDia(d, hoy) ? 'bg-dash-blue text-white' : fuera ? 'text-[#c4c4c8]' : 'text-ink',
+                    mismoDia(d, hoy) ? 'bg-dash-blue text-white' : fuera ? 'text-ink-faint' : 'text-ink',
                   )}
                 >
                   {d.getDate()}

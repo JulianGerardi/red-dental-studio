@@ -74,10 +74,10 @@ export const normalizarDefaults = (d: DefaultsSeguro): DefaultsSeguro => ({
 
 export type CampoReferencia = 'billingProfileId' | 'alternateBillingId' | 'renderingId' | 'alternateRenderingId'
 export const ROTULO_REFERENCIA: Record<CampoReferencia, string> = {
-  billingProfileId: 'Specific Billing Profile',
-  alternateBillingId: 'Alternate Billing Profile',
-  renderingId: 'Specific Rendering Provider',
-  alternateRenderingId: 'Alternate Rendering Provider',
+  billingProfileId: 'Specific billing profile',
+  alternateBillingId: 'Alternate billing profile',
+  renderingId: 'Specific rendering provider',
+  alternateRenderingId: 'Alternate rendering provider',
 }
 export type Referencia = { locId: string; campo: CampoReferencia }
 

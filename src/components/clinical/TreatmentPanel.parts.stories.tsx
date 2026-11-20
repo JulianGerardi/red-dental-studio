@@ -63,7 +63,7 @@ export const FiltersApplied: Story = { render: () => <Filtros inicial={{ categor
 export const Narrative: Story = {
   render: () => (
     <div className="max-w-[640px]">
-      <NarrativeSummary narrativa={{ html: '<h2>Chief Complaint</h2><h3>Reason for Visit</h3><ul><li>Problem / Concern</li><li>Sharp pain on the lower right when drinking something cold.</li></ul>', origen: 'draft', fecha: 'Oct 05, 9:20 AM' }} onAbrir={() => {}} />
+      <NarrativeSummary narrativa={{ html: '<h2>Chief Complaint</h2><h3>Reason for visit</h3><ul><li>Problem / Concern</li><li>Sharp pain on the lower right when drinking something cold.</li></ul>', origen: 'draft', fecha: 'Oct 05, 9:20 AM' }} onAbrir={() => {}} />
     </div>
   ),
 }

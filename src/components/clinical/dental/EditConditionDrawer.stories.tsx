@@ -16,7 +16,7 @@ const meta = {
     },
   },
   args: {
-    finding: { id: 'F-1', area: 'Tooth 3', condition: 'chronic enamel dental caries', descriptor: 'Deep', date: 'May 14, 2026', status: 'Active', tooth: 3, provider: 'Elena Martinez', surfaces: ['O', 'DB'], notes: 'Occlusal decay detected on routine exam.', linked: [], diagnoses: [], kind: 'condition', descriptors: { borders: 'Raised' }, examen: 'Dental Assessment' },
+    finding: { id: 'F-1', area: 'Tooth 3', condition: 'chronic enamel dental caries', descriptor: 'Deep', date: 'May 14, 2026', status: 'Active', tooth: 3, provider: 'Elena Martinez', surfaces: ['O', 'DB'], notes: 'Occlusal decay detected on routine exam.', linked: [], diagnoses: [], kind: 'condition', descriptors: { borders: 'Raised' }, examen: 'Dental assessment' },
     onClose: () => {},
     onSave: () => {},
   },

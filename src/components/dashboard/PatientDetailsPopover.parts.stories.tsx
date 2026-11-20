@@ -11,7 +11,7 @@ type Story = StoryObj<typeof meta>
 export const DataRow: Story = {
   render: () => (
     <div className="flex w-[260px] flex-col gap-2">
-      <FilaDato icon={CalendarDays} label="Date of Birth" value="May 14, 1982" />
+      <FilaDato icon={CalendarDays} label="Date of birth" value="May 14, 1982" />
       <FilaDato icon={Phone} label="Phone" value="(555) 123-4567" />
       <FilaDato icon={Mail} label="Email" value="a-very-long-email-address@example-clinic.com" wrap />
     </div>

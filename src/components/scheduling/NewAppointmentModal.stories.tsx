@@ -45,7 +45,7 @@ export const Parts: Story = {
   parameters: { layout: 'padded', controls: { disable: true }, docs: { story: { inline: true } } },
   render: () => (
     <PasosDelDrawer pasos={[
-      { nombre: 'Patient and Scheduling', secciones: 'Patient, Primary y Additional Provider · Requestor y Reason for Visit · Date, Start y End Time (con el calendario del día al costado) · Operatory y Status', obligatorios: 'Patient, Primary Provider, Date, Start y End Time, Operatory, Status' },
+      { nombre: 'Patient and scheduling', secciones: 'Patient, Primary y Additional Provider · Requestor y Reason for Visit · Date, Start y End Time (con el calendario del día al costado) · Operatory y Status', obligatorios: 'Patient, Primary Provider, Date, Start y End Time, Operatory, Status' },
       { nombre: 'Link to treatment plan visit', secciones: 'Treatment plan · Visit (la fila de una visita linkeada muestra su otro turno) · Additional: ASAP, Follow-up, Premedicate · Notes', obligatorios: 'Nada: el link es opcional. Si la visita está linkeada a otro turno, Save pregunta si se mueve.' },
     ]} nota="Un solo paso con pregunta, no uno por escenario: la pregunta de mover la visita sólo aparece cuando hace falta, así el indicador siempre dice dos pasos." />
   ),

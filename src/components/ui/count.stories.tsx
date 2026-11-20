@@ -54,7 +54,7 @@ export const States: Story = {
 /* Como se usa: en la cabecera de las cards clínicas del dashboard del paciente. */
 const CARDS = [
   { titulo: 'Allergies', Icono: PersonStanding, cuenta: '4' },
-  { titulo: 'Medical Conditions', Icono: Clipboard, cuenta: '4' },
+  { titulo: 'Medical conditions', Icono: Clipboard, cuenta: '4' },
   { titulo: 'Medication', Icono: PillIcon, cuenta: '12' },
 ]
 export const InContext: Story = {

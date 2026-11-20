@@ -9,7 +9,7 @@ import type { ClinicalItem } from '@/data/clinicalItems'
    cuelga un popup debajo con la lista de ítems. */
 
 const BADGE = {
-  Prescribed: 'border-dash-blue bg-[#eff6ff] text-dash-blue',
+  Prescribed: 'border-dash-blue bg-info-bg text-dash-blue',
   Completed: 'border-dash-ok-fg bg-dash-ok-bg text-dash-ok-fg',
 }
 
@@ -73,7 +73,7 @@ export function ClinicalPopover({
       role="dialog"
       aria-label={title}
       style={{ left, top, width: ancho }}
-      className="motion-safe:animate-[fab-panel-in_160ms_cubic-bezier(0.16,1,0.3,1)] absolute z-40 origin-top rounded-lg border border-line bg-[#fafcff] p-2 shadow-floating"
+      className="motion-safe:animate-[fab-panel-in_160ms_cubic-bezier(0.16,1,0.3,1)] absolute z-40 origin-top rounded-lg border border-line bg-info-subtle p-2 shadow-floating"
     >
       <div className="flex flex-col gap-1.5">
         {items.length === 0 && (
@@ -85,7 +85,7 @@ export function ClinicalPopover({
         {items.map((it) => (
           <div
             key={it.id}
-            className="group rounded-md border border-transparent bg-white px-3 py-2 transition-colors hover:border-dash-blue hover:bg-[#eff6ff]"
+            className="group rounded-md border border-transparent bg-white px-3 py-2 transition-colors hover:border-dash-blue hover:bg-info-bg"
           >
             {/* El nombre va en su propia línea. Compartiendo fila con la pill,
                 el "Since" y los dos íconos, en un panel angosto se truncaba
@@ -95,12 +95,12 @@ export function ClinicalPopover({
               <span className="group-hover:text-dash-blue min-w-0 flex-1 text-[13px] font-semibold break-words text-ink transition-colors">
                 {it.name}
               </span>
-              <span className={cn('shrink-0 rounded-full border px-2 py-[1px] text-[10px] font-semibold', BADGE[it.status])}>
+              <span className={cn('shrink-0 rounded-full border px-2 py-[1px] text-[11px] font-semibold', BADGE[it.status])}>
                 {it.status}
               </span>
             </div>
             <div className="mt-1 flex items-center gap-2">
-              <span className="min-w-0 flex-1 truncate text-[10px] tracking-wide text-ink-faint">
+              <span className="min-w-0 flex-1 truncate text-[11px] tracking-wide text-ink-faint">
                 {it.detail}
               </span>
               <span className="shrink-0 text-[11px] text-ink-muted">Since: {it.since}</span>
@@ -128,7 +128,7 @@ export function ClinicalPopover({
         <button
           type="button"
           onClick={onAdd}
-          className="text-dash-blue hover:bg-dash-count-bg flex items-center justify-center gap-1.5 rounded-md border border-dashed border-[#c3d0ee] px-3 py-2 text-xs font-medium transition-colors"
+          className="text-dash-blue hover:bg-dash-count-bg flex items-center justify-center gap-1.5 rounded-md border border-dashed border-info-line px-3 py-2 text-xs font-medium transition-colors"
         >
           <Plus className="size-3.5" /> Add {title}
         </button>

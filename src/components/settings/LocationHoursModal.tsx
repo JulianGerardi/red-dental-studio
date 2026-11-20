@@ -1,6 +1,6 @@
 import { DrawerActions } from '@/components/ui/drawer'
 import { useState } from 'react'
-import { CirclePlus, X } from 'lucide-react'
+import { X, Plus } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { ModalShell, SelectField } from '@/components/patients/form'
 import { aviso } from '@/components/ui/toaster'
@@ -8,7 +8,7 @@ import { ConfirmDialog } from '@/components/ui/confirm-dialog'
 import type { EstadoDia } from '@/data/location-detail'
 import { OBLIGATORIO } from '@/lib/validacion'
 
-/* Misma grilla de media hora que "New Exception": desplegable, no texto
+/* Misma grilla de media hora que "New exception": desplegable, no texto
    libre con máscara. */
 const HORAS = Array.from({ length: 48 }, (_, i) => {
   const h = Math.floor(i / 2)
@@ -130,12 +130,12 @@ export function LocationHoursModal({
             <div className="flex items-start gap-2">
               <div className="grid flex-1 grid-cols-2 gap-4">
                 <SelectField
-                  label="Start Time" required placeholder="00:00 hs" options={HORAS} value={r.inicio}
+                  label="Start time" required placeholder="00:00 hs" options={HORAS} value={r.inicio}
                   onChange={cambiar(i, 'inicio')}
                   error={intentado && !r.inicio ? OBLIGATORIO : undefined}
                 />
                 <SelectField
-                  label="End Time" required placeholder="00:00 hs" options={HORAS} value={r.fin}
+                  label="End time" required placeholder="00:00 hs" options={HORAS} value={r.fin}
                   onChange={cambiar(i, 'fin')}
                   error={intentado && !r.fin ? OBLIGATORIO : undefined}
                 />
@@ -162,7 +162,7 @@ export function LocationHoursModal({
           onClick={() => setRangos((p) => [...p, { inicio: '', fin: '' }])}
           className="text-dash-blue -mt-2 flex items-center gap-1.5 self-start text-[13px] font-semibold hover:underline"
         >
-          <CirclePlus className="size-4" /> Add another time range
+          <Plus className="size-4" /> Add another time range
         </button>
 
         <div className="border-t border-line pt-4">

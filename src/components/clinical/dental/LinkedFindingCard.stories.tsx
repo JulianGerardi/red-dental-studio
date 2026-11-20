@@ -20,7 +20,7 @@ function Demo(args: React.ComponentProps<typeof LinkedFindingCard>) {
 export const Default: Story = { render: (args) => <Demo {...args} /> }
 
 /* Sin superficies: sólo el nombre del hallazgo y su zona. */
-export const WithoutSurfaces: Story = { args: { finding: { id: 'F-2', condition: 'oral candidiasis', area: 'Soft Palate', surfaces: [], date: 'May 12, 2026', status: 'Active' } }, render: (args) => <Demo {...args} /> }
+export const WithoutSurfaces: Story = { args: { finding: { id: 'F-2', condition: 'oral candidiasis', area: 'Soft palate', surfaces: [], date: 'May 12, 2026', status: 'Active' } }, render: (args) => <Demo {...args} /> }
 
 /* El diagnóstico de Link to diagnosis: sólo código y superficies, sin estado ni fecha. Linked y sin vincular. */
 export const Diagnosis: Story = {

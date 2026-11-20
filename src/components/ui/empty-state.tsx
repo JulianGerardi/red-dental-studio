@@ -45,7 +45,7 @@ export function EmptyState({
         </button>
       )}
       {pill && (
-        <span className="mt-1 rounded-md bg-[#f2f5f7] px-2 py-1 text-[10px] font-semibold tracking-wide text-dash-delta uppercase">
+        <span className="mt-1 rounded-md bg-surface-slate px-2 py-1 text-[10px] font-semibold tracking-wide text-dash-delta uppercase">
           {pill}
         </span>
       )}

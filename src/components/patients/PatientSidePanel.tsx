@@ -29,7 +29,7 @@ const NAV: { key: string; icon: LucideIcon; to?: string }[] = [
   { key: 'Documents', icon: ClipboardList, to: '/documents' },
   /* Handshake: la relación con otras personas y quién se hace cargo de pagar. Antes era Ban, el de "prohibido"
      (patient-dashboard.md, 2026-11-06). */
-  { key: 'Relationships & Billing', icon: Handshake, to: '/relationships' },
+  { key: 'Relationships & billing', icon: Handshake, to: '/relationships' },
 ]
 
 const GENERAL = [
@@ -93,7 +93,7 @@ export function InfoBlock({
           type="button"
           onClick={onEdit}
           aria-label={`Edit ${title}`}
-          className="text-ink-muted transition-colors hover:text-black"
+          className="text-ink-muted transition-colors hover:text-ink"
         >
           <Pencil className="size-3.5" />
         </button>
@@ -144,6 +144,7 @@ export function PatientSidePanel({
   const [colapsadoCompartido, setColapsado] = useColapso()
   const colapsado = vista.collapsed ?? colapsadoCompartido
   const [info, setInfo] = useState(false)
+  const [datosAbiertos, setDatosAbiertos] = useState(false)
   const paciente = basePath.split('/').pop() ?? ''
   const notaGuardada = useNotaPendiente(paciente)
   const notaPendiente = vista.pendingSignature ?? notaGuardada
@@ -182,7 +183,7 @@ export function PatientSidePanel({
         onClick={() => setColapsado((v) => !v)}
         aria-label={colapsado ? 'Expand patient menu' : 'Collapse patient menu'}
         className={cn(
-          'hidden rounded-md text-ink-muted hover:bg-surface-muted hover:text-black lg:mb-2 lg:flex lg:size-9 lg:items-center lg:justify-center',
+          'hidden rounded-md text-ink-muted hover:bg-surface-muted hover:text-ink lg:mb-2 lg:flex lg:size-9 lg:items-center lg:justify-center',
           FOCO,
           colapsado ? 'lg:mx-auto' : 'lg:ml-auto',
         )}
@@ -213,7 +214,7 @@ export function PatientSidePanel({
         </div>
         <div className={cn('flex min-w-0 flex-col items-start gap-1.5 lg:items-center', colapsado && 'lg:hidden')}>
           <p className="truncate text-lg font-bold text-ink">{name}</p>
-          <span className="rounded-full border border-dash-ok-fg bg-dash-ok-bg px-2 py-[2px] text-[10px] font-semibold text-dash-ok-fg">
+          <span className="rounded-full border border-dash-ok-fg bg-dash-ok-bg px-2 py-[2px] text-[11px] font-semibold text-dash-ok-fg">
             Active
           </span>
           <p className="text-[11px] text-ink-muted">50 years</p>
@@ -225,7 +226,7 @@ export function PatientSidePanel({
         <Link
           to={`${basePath}/clinical-mode`}
           data-tour="pat-clinical-mode"
-          className="text-dash-blue flex w-full items-center justify-center gap-2 rounded-md bg-[#eef5ff] py-2 text-[13px] font-medium"
+          className="text-dash-blue flex w-full items-center justify-center gap-2 rounded-md bg-info-bg py-2 text-[13px] font-medium"
         >
           <Eye className="size-3.5" /> Clinical Mode
         </Link>
@@ -237,12 +238,12 @@ export function PatientSidePanel({
       {colapsado && (
         <div className="mt-2 hidden flex-col items-center gap-1 lg:flex">
           {/* Un pendiente no se pierde al colapsar: queda como ícono, igual que Clinical Mode. */}
-          {notaPendiente && conTooltip('Pending Signature', <PendingSignatureButton soloIcono onClick={() => setFirmar(true)} />)}
+          {notaPendiente && conTooltip('Pending signature', <PendingSignatureButton soloIcono onClick={() => setFirmar(true)} />)}
           {conTooltip('Clinical Mode', (
             <Link
               to={`${basePath}/clinical-mode`}
               aria-label="Clinical Mode"
-              className="text-dash-blue flex size-9 items-center justify-center rounded-md bg-[#eef5ff]"
+              className="text-dash-blue flex size-9 items-center justify-center rounded-md bg-info-bg"
             >
               <Eye className="size-4" />
             </Link>
@@ -320,7 +321,19 @@ export function PatientSidePanel({
       />
       </div>
 
-      <div className={cn('grid gap-x-6 sm:grid-cols-2 lg:grid-cols-1', colapsado && 'lg:hidden')}>
+      {/* Por debajo de lg General y Contact van plegados: abiertos empujaban el título de la sección debajo del primer
+          scroll (auditoría de normalización, patient-dashboard.md, 2026-11-20). En desktop siempre se ven. */}
+      <button
+        type="button"
+        onClick={() => setDatosAbiertos((v) => !v)}
+        aria-expanded={datosAbiertos}
+        aria-controls="datos-paciente"
+        className={cn('mt-3 flex h-9 w-full items-center gap-1.5 rounded-md px-1 text-[13px] font-semibold text-ink hover:bg-surface-muted lg:hidden', FOCO)}
+      >
+        Patient information
+        <ChevronDown aria-hidden className={cn('size-4 text-ink-muted transition-transform', datosAbiertos && 'rotate-180')} />
+      </button>
+      <div id="datos-paciente" className={cn('gap-x-6 sm:grid-cols-2 lg:grid lg:grid-cols-1', datosAbiertos ? 'grid' : 'hidden', colapsado && 'lg:hidden')}>
         <InfoBlock title="General" items={GENERAL} onEdit={onEditGeneral ?? (() => navigate(`${basePath}/edit`))} />
         <InfoBlock title="Contact" items={CONTACT} onEdit={onEditContact ?? (() => setContacto(true))} />
       </div>
@@ -341,7 +354,7 @@ export function PendingSignatureButton({ soloIcono, className, ...props }: React
   return (
     <button
       type="button"
-      aria-label={soloIcono ? 'Pending Signature' : undefined}
+      aria-label={soloIcono ? 'Pending signature' : undefined}
       {...props}
       className={cn(
         'flex items-center justify-center gap-2 bg-purple-bg text-[13px] font-semibold text-purple-fg hover:bg-purple-fg/15',
@@ -351,25 +364,25 @@ export function PendingSignatureButton({ soloIcono, className, ...props }: React
       )}
     >
       <Signature className={cn('shrink-0', soloIcono ? 'size-4' : 'size-3.5')} />
-      {!soloIcono && 'Pending Signature'}
+      {!soloIcono && 'Pending signature'}
     </button>
   )
 }
 
 
 /* Figma (Design System) 7740:12244, con los estados de CON-1612 y las mismas opciones que la barra de Clinical Mode
-   (clinical-mode.md, 2026-11-13): sin empezar "Start Encounter" (lleva a Clinical Mode, CON-2994), en curso "Complete
-   Encounter" y en pausa "Pending Encounter" en ámbar. El estado es uno solo para la ficha y Clinical Mode.
+   (clinical-mode.md, 2026-11-13): sin empezar "Start encounter" (lleva a Clinical Mode, CON-2994), en curso "Complete
+   Encounter" y en pausa "Pending encounter" en ámbar. El estado es uno solo para la ficha y Clinical Mode.
 
    El verde queda en #1e9850, el de la plataforma, y no en el #28c563 del
    design system: es el mismo botón que el popup del paciente, que Julián pidió
    alinear. El ámbar sí es el #ffb82c del sistema, pero con texto oscuro: el
    frame lo pone en blanco y sobre ese fondo no se lee. */
-const VERDE = 'bg-green text-white hover:bg-[#18763e]'
+const VERDE = 'bg-green text-white hover:bg-green-deep'
 const ENCUENTRO: Record<EstadoEncuentro, { label: string; clase: string; icono: React.ReactNode }> = {
-  sinEmpezar: { label: 'Start Encounter', clase: VERDE, icono: <Play className="size-3.5 shrink-0" /> },
-  enCurso: { label: 'Complete Encounter', clase: VERDE, icono: <CircleCheck className="size-3.5 shrink-0" /> },
-  enPausa: { label: 'Pending Encounter', clase: 'bg-amber text-[#7a4a00] hover:bg-[#f0a913]', icono: <Pause className="size-3.5 shrink-0" /> },
+  sinEmpezar: { label: 'Start encounter', clase: VERDE, icono: <Play className="size-3.5 shrink-0" /> },
+  enCurso: { label: 'Complete encounter', clase: VERDE, icono: <CircleCheck className="size-3.5 shrink-0" /> },
+  enPausa: { label: 'Pending encounter', clase: 'bg-amber text-amber-fg hover:bg-amber-hover', icono: <Pause className="size-3.5 shrink-0" /> },
 }
 
 /** Deja el botón de encuentro en un estado desde afuera (Storybook). */

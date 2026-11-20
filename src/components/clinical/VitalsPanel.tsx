@@ -1,3 +1,4 @@
+import { buttonClasses } from '@/components/ui/button'
 import { useRef, useState } from 'react'
 import { Minus, Plus, Paperclip, Mic } from 'lucide-react'
 import { cn } from '@/lib/utils'
@@ -318,7 +319,7 @@ export function VitalsPanel() {
             <button
               disabled={!nota.trim()}
               onClick={() => { aviso.ok('Note added to the encounter.'); setNota('') }}
-              className="bg-dash-blue hover:bg-dash-blue-hover ml-auto h-8 rounded-md px-4 text-[13px] font-semibold text-white transition-colors disabled:bg-surface-muted disabled:text-ink-faint"
+              className={buttonClasses({ size: 'md', className: 'ml-auto' })}
             >
               Send
             </button>

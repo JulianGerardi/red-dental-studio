@@ -20,9 +20,9 @@ export type ClinicalItem = {
 
 export type Categoria =
   | 'Allergies'
-  | 'Medical Conditions'
+  | 'Medical conditions'
   | 'Medication'
-  | 'Past Surgery and Hospitalization'
+  | 'Past surgery and hospitalization'
 
 export type Campo =
   | { tipo: 'buscador'; key: string; label: string; req?: boolean; opciones: string[] }
@@ -48,7 +48,7 @@ const ESTADOS: Estado[] = ['Prescribed', 'Completed']
 
 export const CONFIG: Record<Categoria, ConfigCategoria> = {
   Allergies: {
-    titulo: 'New Allergy',
+    titulo: 'New allergy',
     singular: 'Allergy',
     principal: 'allergy',
     campos: [
@@ -56,22 +56,22 @@ export const CONFIG: Record<Categoria, ConfigCategoria> = {
       { tipo: 'select', key: 'status', label: 'Status', req: true, opciones: ESTADOS },
       { tipo: 'select', key: 'severity', label: 'Severity', req: true, opciones: ['Mild', 'Moderate', 'Severe'] },
       { tipo: 'select', key: 'reaction', label: 'Reaction', req: true, opciones: ['Rash', 'Swelling', 'Anaphylaxis', 'Nausea', 'Shortness of breath'] },
-      { tipo: 'fecha', key: 'start', label: 'Approx Start Date', req: true },
-      { tipo: 'fecha', key: 'end', label: 'Approx End Date' },
+      { tipo: 'fecha', key: 'start', label: 'Approx start date', req: true },
+      { tipo: 'fecha', key: 'end', label: 'Approx end date' },
       { tipo: 'notas', key: 'notes', label: 'Notes', ph: 'Add notes' },
     ],
     resumen: (v) => [v.severity, v.reaction].filter(Boolean).join(' - ').toUpperCase(),
   },
 
-  'Medical Conditions': {
-    titulo: 'New Medical Condition',
-    singular: 'Medical Condition',
+  'Medical conditions': {
+    titulo: 'New medical condition',
+    singular: 'Medical condition',
     principal: 'condition',
     campos: [
-      { tipo: 'buscador', key: 'condition', label: 'Medical Condition', req: true, opciones: ['Hypertension', 'Type 2 Diabetes', 'Asthma', 'Anemia', 'Hypothyroidism'] },
+      { tipo: 'buscador', key: 'condition', label: 'Medical condition', req: true, opciones: ['Hypertension', 'Type 2 Diabetes', 'Asthma', 'Anemia', 'Hypothyroidism'] },
       { tipo: 'select', key: 'status', label: 'Status', req: true, opciones: ESTADOS },
-      { tipo: 'fecha', key: 'start', label: 'Approx Start Date', req: true },
-      { tipo: 'fecha', key: 'end', label: 'Approx End Date' },
+      { tipo: 'fecha', key: 'start', label: 'Approx start date', req: true },
+      { tipo: 'fecha', key: 'end', label: 'Approx end date' },
       { tipo: 'notas', key: 'notes', label: 'Notes', ph: 'Add notes' },
     ],
     resumen: (v) => v.notes || v.status.toUpperCase(),
@@ -79,8 +79,8 @@ export const CONFIG: Record<Categoria, ConfigCategoria> = {
 
   Medication: {
     /* El frame se llama "New Medication Form" pero el título dice
-       "New Allergy". Se replica — ver anomalía 44. */
-    titulo: 'New Allergy',
+       "New allergy". Se replica — ver anomalía 44. */
+    titulo: 'New allergy',
     singular: 'Medication',
     principal: 'medication',
     campos: [
@@ -88,11 +88,11 @@ export const CONFIG: Record<Categoria, ConfigCategoria> = {
       /* "Strenght" es el error del Figma. Anomalía 45. */
       { tipo: 'texto', key: 'strength', label: 'Strenght', req: true, ph: '500' },
       { tipo: 'unidad', key: 'strengthUnit', opciones: ['mg', 'g', 'ml', 'mcg'] },
-      { tipo: 'select', key: 'form', label: 'Dosage Form', req: true, opciones: ['Tablet', 'Capsule', 'Syrup', 'Injection'] },
+      { tipo: 'select', key: 'form', label: 'Dosage form', req: true, opciones: ['Tablet', 'Capsule', 'Syrup', 'Injection'] },
       { tipo: 'select', key: 'status', label: 'Status', req: true, opciones: ESTADOS },
-      { tipo: 'fecha', key: 'start', label: 'Approx Start Date', req: true },
-      { tipo: 'fecha', key: 'end', label: 'Approx End Date', req: true },
-      { tipo: 'titulo', label: 'Direction for Use' },
+      { tipo: 'fecha', key: 'start', label: 'Approx start date', req: true },
+      { tipo: 'fecha', key: 'end', label: 'Approx end date', req: true },
+      { tipo: 'titulo', label: 'Direction for use' },
       { tipo: 'texto', key: 'dose', label: 'Dose', req: true, ph: '1' },
       { tipo: 'unidad', key: 'doseUnit', opciones: ['Tablet', 'Capsule', 'ml', 'Drop'] },
       { tipo: 'select', key: 'frequency', label: 'Frequency', req: true, opciones: ['Once daily', 'Twice daily', 'Three times daily', 'As needed'] },
@@ -103,16 +103,16 @@ export const CONFIG: Record<Categoria, ConfigCategoria> = {
     resumen: (v) => [v.dose, v.frequency].filter(Boolean).join(' - ').toUpperCase(),
   },
 
-  'Past Surgery and Hospitalization': {
+  'Past surgery and hospitalization': {
     /* Mismo caso que Medication: el frame es de cirugías y el título dice
-       "New Allergy". Anomalía 44. */
-    titulo: 'New Allergy',
-    singular: 'Past Surgery or Hospitalization',
+       "New allergy". Anomalía 44. */
+    titulo: 'New allergy',
+    singular: 'Past surgery or hospitalization',
     principal: 'surgery',
     campos: [
-      { tipo: 'buscador', key: 'surgery', label: 'Past Surgery or Hospitalization', req: true, opciones: ['Appendectomy', 'Cesarean section', 'Tonsillectomy', 'Gallbladder removal', 'Hernia repair'] },
+      { tipo: 'buscador', key: 'surgery', label: 'Past surgery or hospitalization', req: true, opciones: ['Appendectomy', 'Cesarean section', 'Tonsillectomy', 'Gallbladder removal', 'Hernia repair'] },
       /* Sin fecha de fin, como en el frame; la fecha va en la columna izquierda, como en los demás (Drawer → Specs → Fields). */
-      { tipo: 'fecha', key: 'start', label: 'Approx Start Date', req: true },
+      { tipo: 'fecha', key: 'start', label: 'Approx start date', req: true },
       { tipo: 'notas', key: 'notes', label: 'Notes', ph: 'Add notes' },
     ],
     resumen: (v) => v.notes || '—',
@@ -150,7 +150,7 @@ const semilla = (cat: Categoria, filas: Record<string, string>[]) =>
   filas.map((f) => aItem(cat, f))
 
 export const ITEMS_INICIALES: Record<Categoria, ClinicalItem[]> = {
-  'Past Surgery and Hospitalization': semilla('Past Surgery and Hospitalization', [
+  'Past surgery and hospitalization': semilla('Past surgery and hospitalization', [
     { surgery: 'Appendectomy', status: 'Prescribed', start: '27 / 04 / 26', notes: '10 - ONCE DAILY' },
     { surgery: 'Cesarean section', status: 'Completed', start: '27 / 04 / 26', notes: '5 - TWICE DAILY' },
     { surgery: 'Tonsillectomy', status: 'Prescribed', start: '27 / 04 / 26', notes: '6 - AS NEEDED' },
@@ -162,7 +162,7 @@ export const ITEMS_INICIALES: Record<Categoria, ClinicalItem[]> = {
     { allergy: 'Peanuts', status: 'Prescribed', severity: 'Severe', reaction: 'Anaphylaxis', start: '27 / 04 / 26' },
     { allergy: 'Pollen', status: 'Completed', severity: 'Moderate', reaction: 'Nausea', start: '27 / 04 / 26' },
   ]),
-  'Medical Conditions': semilla('Medical Conditions', [
+  'Medical conditions': semilla('Medical conditions', [
     { condition: 'Hypertension', status: 'Prescribed', start: '27 / 04 / 26', notes: '10 - ONCE DAILY' },
     { condition: 'Type 2 Diabetes', status: 'Completed', start: '27 / 04 / 26', notes: '5 - TWICE DAILY' },
     { condition: 'Asthma', status: 'Prescribed', start: '27 / 04 / 26', notes: '6 - AS NEEDED' },

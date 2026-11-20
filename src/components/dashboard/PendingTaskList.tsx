@@ -8,7 +8,7 @@ import type { PendingTask } from './PendingTaskCard'
    rótulo en versalitas y la cuenta, y las filas en una sola caja con divisores finos. Los primeros `limit` y "Show N
    more" abre el resto con scroll adentro (ui/show-more). La usan Pending Task del Dashboard y del Patient Dashboard.
    Ver design-reference/figma/modulos/dashboard.md. */
-const ORDEN = ['Clinical Note', 'Lab Orders', 'Prescriptions', 'Referrals']
+const ORDEN = ['Clinical note', 'Lab orders', 'Prescriptions', 'Referrals']
 
 /* Dentro de cada tipo, por vencimiento y después por registro (CON-2641 y CON-2643, CA4). */
 const fecha = (s: string) => new Date(s).getTime() || 0

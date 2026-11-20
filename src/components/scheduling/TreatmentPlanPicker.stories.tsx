@@ -10,7 +10,7 @@ import { Bloque, ConRotulo, Lienzo, Muestras, Muestra, Tabla, Token } from '@/de
 const PLAN: Plan = { id: 'p1', estado: 'Accepted', date: '02/12/2026', doctor: 'Dr. Elena Martinez', therapy: 'Crown and root canal', visitas: 2, procedimientos: 4 }
 const VISITA: Visita = { id: 'v1', name: 'Visit 1', procedimientos: ['D3310 – Endodontic therapy', 'D2740 – Crown – porcelain/ceramic'], total: '$1,240.00' }
 const VINCULADA: TurnoVinculado = { fecha: 'Sep 28, 2026', hora: '1:15 PM', estado: 'Fulfilled' }
-const ESTADOS: TurnoVinculado['estado'][] = ['Booked', 'Fulfilled', 'No Show', 'Cancelled']
+const ESTADOS: TurnoVinculado['estado'][] = ['Booked', 'Fulfilled', 'No show', 'Cancelled']
 
 type Args = { seleccionada: boolean; vinculada: boolean; estado: TurnoVinculado['estado'] }
 

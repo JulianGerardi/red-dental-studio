@@ -48,7 +48,7 @@ export const Footer: Story = { render: () => <FormFooter onCancel={() => {}} onS
 export const Modal: Story = {
   parameters: { layout: 'fullscreen', docs: { story: { inline: false, iframeHeight: 620 } } },
   render: () => (
-    <ModalShell title="New Allergy" onClose={() => {}} footer={<FormFooter onCancel={() => {}} onSave={() => {}} />}>
+    <ModalShell title="New allergy" onClose={() => {}} footer={<FormFooter onCancel={() => {}} onSave={() => {}} />}>
       <div className="flex flex-col gap-4">
         <SearchField label="Allergy" options={['Penicillin', 'Latex']} />
         <TextField label="Reaction" placeholder="Describe the reaction" />
@@ -62,12 +62,12 @@ export const CountryCode: Story = { render: () => <CountryCodeField value="(+1) 
 
 /* Un grupo de campos plegado dentro de un drawer (Guardian → Contact Information, CON-2858): cerrado resume lo cargado,
    se abre al tocarlo y, con un error adentro, se abre solo y se pinta de rojo. */
-export const CollapsibleClosed: Story = { render: () => <CollapsibleFields title="Contact Information" required summary="+1 (324) 359-6750"><TextField label="Area Code" value="324" /></CollapsibleFields> }
-export const CollapsibleOpen: Story = { render: () => <CollapsibleFields title="Contact Information" required summary="Not loaded yet" defaultOpen><TextField label="Area Code" placeholder="555" /></CollapsibleFields> }
-export const CollapsibleWithError: Story = { render: () => <CollapsibleFields title="Contact Information" required summary="Complete the phone number." error><TextField label="Area Code" placeholder="555" error="Complete the phone number." /></CollapsibleFields> }
+export const CollapsibleClosed: Story = { render: () => <CollapsibleFields title="Contact information" required summary="+1 (324) 359-6750"><TextField label="Area code" value="324" /></CollapsibleFields> }
+export const CollapsibleOpen: Story = { render: () => <CollapsibleFields title="Contact information" required summary="Not loaded yet" defaultOpen><TextField label="Area code" placeholder="555" /></CollapsibleFields> }
+export const CollapsibleWithError: Story = { render: () => <CollapsibleFields title="Contact information" required summary="Complete the phone number." error><TextField label="Area code" placeholder="555" error="Complete the phone number." /></CollapsibleFields> }
 
 /* La fila de una persona en un buscador: nombre, tipo y los chips que la distinguen de otra con el mismo nombre. */
 export const PersonRow: Story = { render: () => <PersonaFila nombre="Jessica Miller" subtitulo="Contact" chips={chipsPersona('05/14/1982', 'jessica.miller@gmail.com')} /> }
 
 /* Estado vacío (empty): el buscador sin coincidencias dice qué pasó. */
-export const SearchEmpty: Story = { render: () => <SearchField label="Carrier Name" value="zzz" options={['Aetna', 'Cigna']} emptyText="Carrier not found." onChange={() => {}} /> }
+export const SearchEmpty: Story = { render: () => <SearchField label="Carrier name" value="zzz" options={['Aetna', 'Cigna']} emptyText="Carrier not found." onChange={() => {}} /> }

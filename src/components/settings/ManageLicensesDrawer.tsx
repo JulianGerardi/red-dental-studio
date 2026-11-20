@@ -33,7 +33,7 @@ export function ManageLicensesDrawer({ cuenta, onClose, onGuardar }: { cuenta: C
 
   return (
     <ModalShell
-      title="Manage Licenses"
+      title="Manage licenses"
       description={cuenta.nombre}
       onClose={onClose}
       width="max-w-[480px]"

@@ -32,7 +32,7 @@ export function Card({ r, onAbrir }: { r: Radiografia; onAbrir: () => void }) {
         </span>
       </button>
       <div className="mt-2 flex items-center gap-2 px-1 pb-1">
-        <span className="bg-dash-count-bg text-dash-blue-hover flex size-6 shrink-0 items-center justify-center rounded-full text-[9px] font-semibold">
+        <span className="bg-dash-count-bg text-dash-blue-hover flex size-6 shrink-0 items-center justify-center rounded-full text-[10px] font-semibold">
           DT
         </span>
         <span className="min-w-0 flex-1 truncate text-[12px] text-ink-medium">{r.profesional}</span>
@@ -81,7 +81,7 @@ export function RadiographyPanel() {
         <input
           value={q}
           onChange={(e) => setQ(e.target.value)}
-          placeholder="Search..."
+          placeholder="Search radiographs"
           aria-label="Search images"
           className="focus:border-dash-blue h-9 w-full rounded-md border border-line bg-white pr-3 pl-9 text-[13px] shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] placeholder:text-ink-faint focus:outline-none"
         />

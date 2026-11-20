@@ -20,11 +20,11 @@ export type AccionUI = AccionTarea | 'Complete' | 'PDF'
 
 export const SIN_ENCUENTRO = 'You do not have permission to perform this action because there is no open encounter for the selected patient.'
 
-const SINGULAR: Record<string, string> = { 'Clinical Note': 'Clinical note', 'Lab Orders': 'Lab order', Prescriptions: 'Prescription', Referrals: 'Referral' }
+const SINGULAR: Record<string, string> = { 'Clinical note': 'Clinical note', 'Lab orders': 'Lab order', Prescriptions: 'Prescription', Referrals: 'Referral' }
 export const nombreTarea = (t: PendingTask) => SINGULAR[t.kind] ?? t.kind
 
 /* La pestaña de Clinical Mode que abre Complete this Task. La Clinical Note abre su propia pantalla. */
-export const PESTANA_TAREA: Record<string, string> = { 'Lab Orders': 'Lab Order', Prescriptions: 'Prescription', Referrals: 'Referral' }
+export const PESTANA_TAREA: Record<string, string> = { 'Lab orders': 'Lab order', Prescriptions: 'Prescription', Referrals: 'Referral' }
 
 /* Los colores de red.dev: Pending naranja, Requested azul, Fulfilled rojo. */
 export const TONO_ESTADO: Record<string, PillTone> = { Pending: 'warning', Requested: 'info', Delayed: 'warning', Fulfilled: 'danger' }
@@ -32,7 +32,7 @@ export const TONO_ESTADO: Record<string, PillTone> = { Pending: 'warning', Reque
 /* El menú ⋮ de red.dev: Lab Order con Edit, Request, Cancel y Delete; Prescription con Activate y Cancel. La Clinical
    Note no lleva y el de Referral no aparece en los videos. */
 export function accionesDe(t: PendingTask): AccionTarea[] {
-  if (t.kind === 'Lab Orders') return ['Edit', 'Request', 'Cancel', 'Delete']
+  if (t.kind === 'Lab orders') return ['Edit', 'Request', 'Cancel', 'Delete']
   if (t.kind === 'Prescriptions') return ['Activate', 'Cancel']
   return []
 }
@@ -79,7 +79,7 @@ export function aplicarAccion(t: PendingTask, accion: AccionTarea | 'Sign') {
   else if (accion === 'Activate') { guardar(id, { ...antes, fuera: true }); aviso.ok(`${nombre} for ${t.person} activated.`, deshacer) }
   else if (accion === 'Cancel') { guardar(id, { ...antes, state: 'Canceled', fuera: true }); aviso.ok(`${nombre} for ${t.person} canceled.`) }
   else if (accion === 'Delete') { guardar(id, { ...antes, fuera: true }); aviso.ok(`${nombre} for ${t.person} deleted.`) }
-  else if (accion === 'Sign') { guardar(id, { ...antes, fuera: true }); aviso.ok('Clinical Note signed.') }
+  else if (accion === 'Sign') { guardar(id, { ...antes, fuera: true }); aviso.ok('Clinical note signed.') }
 }
 
 /* El PDF de la tarea (formato de red.dev, documentoTarea.ts) en una pestaña nueva. */
@@ -98,8 +98,8 @@ export function useAccionesTarea({ paciente, alAbrir }: { paciente?: string; alA
     alAbrir?.(t)
     const ficha = paciente ?? t.patientId ?? 'john-smith'
     /* La Clinical Note abre su pantalla (Back to History, View PDF, Sign Clinical Note), como red.dev. */
-    if (t.kind === 'Clinical Note') { navegar(`/patients/${ficha}/clinical-note/${t.id ?? ''}`); return }
-    const pestana = PESTANA_TAREA[t.kind] ?? 'Lab Order'
+    if (t.kind === 'Clinical note') { navegar(`/patients/${ficha}/clinical-note/${t.id ?? ''}`); return }
+    const pestana = PESTANA_TAREA[t.kind] ?? 'Lab order'
     navegar(`/patients/${ficha}/clinical-mode?tab=${encodeURIComponent(pestana)}${t.id ? `&task=${t.id}` : ''}`)
   }
 

@@ -7,7 +7,7 @@ import type { Finding } from './data'
 const HALLAZGOS: Finding[] = [
   { id: 'F-1', area: 'Tooth 3', condition: 'chronic enamel dental caries', descriptor: 'Deep', date: 'May 14, 2026', status: 'Active', tooth: 3, provider: 'Elena Martinez', surfaces: ['O', 'DB'], notes: '', linked: [], diagnoses: [] },
   { id: 'F-3', area: 'Tooth 20', condition: 'localized periodontal pocketing', descriptor: 'Moderate', date: 'May 14, 2026', status: 'Active', tooth: 20, provider: 'Elena Martinez', surfaces: ['B', 'MB'], notes: '', linked: [], diagnoses: [] },
-  { id: 'F-5', area: 'Soft Palate', condition: 'oral candidiasis', descriptor: 'Red', date: 'May 14, 2026', status: 'Active', tooth: null, provider: 'Sarah Stone', surfaces: [], notes: '', linked: [], diagnoses: [] },
+  { id: 'F-5', area: 'Soft palate', condition: 'oral candidiasis', descriptor: 'Red', date: 'May 14, 2026', status: 'Active', tooth: null, provider: 'Sarah Stone', surfaces: [], notes: '', linked: [], diagnoses: [] },
 ]
 
 const meta = {
@@ -37,7 +37,7 @@ const meta = {
 export default meta
 type Story = StoryObj<typeof meta>
 
-/* Paso 1, Procedure: búsqueda con las pestañas Existing y Planned. "Next Step" se habilita al elegir uno. */
+/* Paso 1, Procedure: búsqueda con las pestañas Existing y Planned. "Next step" se habilita al elegir uno. */
 export const Playground: Story = {}
 
 /* Desde Add Condition: arranca en Existing, lo que el paciente ya tiene hecho. */

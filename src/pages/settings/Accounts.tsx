@@ -1,3 +1,4 @@
+import { PADDING_PAGINA } from '@/lib/estilos'
 import { useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Plus, Building2, Pencil, KeyRound, Ban } from 'lucide-react'
@@ -67,7 +68,7 @@ const COLUMNAS: DataTableColumn<Cuenta>[] = [
   { key: 'plan', header: 'Plan', width: 130, cell: (c) => <TextCell>{c.plan}</TextCell> },
   { key: 'suscripcion', header: 'Subscription', width: 90, cell: (c) => c.suscripcion },
   { key: 'vence', header: 'Expires on', width: 95, cell: (c) => c.vence },
-  { key: 'estadoSub', header: 'Subscription Status', width: 110, cell: (c) => c.estadoSuscripcion },
+  { key: 'estadoSub', header: 'Subscription status', width: 110, cell: (c) => c.estadoSuscripcion },
   { key: 'locaciones', header: 'Locations', width: 80, cell: (c) => c.locaciones },
   { key: 'empleados', header: 'Employees', width: 85, cell: (c) => c.empleados },
   { key: 'licencias', header: 'Licenses', width: 75, cell: (c) => c.licencias },
@@ -75,6 +76,8 @@ const COLUMNAS: DataTableColumn<Cuenta>[] = [
   { key: 'estado', header: 'Status', width: 85, cell: (c) => <Pill tone={ESTADO_TONO[c.estado]}>{c.estado}</Pill> },
 ]
 
+/* Sin ruta desde 2026-11-20: una clínica ve sólo su cuenta (/settings/account). Queda por los datos y los drawers que la
+   usan; ver settings-accounts.md. */
 export function SettingsAccounts() {
   const navigate = useNavigate()
   const [q, setQ] = useState('')
@@ -93,12 +96,12 @@ export function SettingsAccounts() {
   )
 
   return (
-    <div className="px-4 py-6 sm:px-8">
+    <div className={PADDING_PAGINA}>
       <SettingsPageHeader
         titulo="Accounts overview"
-        accion={<Button onClick={() => setNueva(true)}><Plus /> New Account</Button>}
+        accion={<Button size="md" onClick={() => setNueva(true)}><Plus /> New account</Button>}
       >
-        <SettingsSearch value={q} onChange={setQ} />
+        <SettingsSearch value={q} onChange={setQ} placeholder="Search accounts" onSearch={() => setQ((v) => v.trim())} />
         <FilterMenu
           label="Filter by status"
           groups={[{
@@ -124,7 +127,7 @@ export function SettingsAccounts() {
                 <Pencil className="size-4 shrink-0" /> Edit
               </DropdownMenuItem>
               <DropdownMenuItem onSelect={() => setLicencias(c)}>
-                <KeyRound className="size-4 shrink-0" /> Manage Licenses
+                <KeyRound className="size-4 shrink-0" /> Manage licenses
               </DropdownMenuItem>
               <DropdownMenuItem variant="destructive" onSelect={() => aviso.warn(`${c.nombre} suspended.`)}>
                 <Ban className="size-4 shrink-0" /> Suspend

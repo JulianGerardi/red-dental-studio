@@ -156,7 +156,7 @@ export function PillTipo({ m }: { m: Movimiento }) {
   return <Pill tone={TONO_TIPO[tipo]} size="sm" className="whitespace-nowrap">{ROTULO_TIPO[tipo] ?? tipo}</Pill>
 }
 const esCargo = (m: Movimiento) => m.monto > 0
-const cuenta = (m: Movimiento) => (alcanceDe(m) === 'guarantor' ? 'Guarantor / Account' : m.paciente)
+const cuenta = (m: Movimiento) => (alcanceDe(m) === 'guarantor' ? 'Guarantor / account' : m.paciente)
 const motivoDe = (m: Movimiento) => m.motivo ?? (m.descripcion && m.descripcion !== '—' ? m.descripcion : undefined)
 
 /** Lo que el detalle lee: las aplicaciones al día (Apply credit suma las suyas), las transacciones y a dónde llevan los
@@ -215,7 +215,7 @@ export function FilasTransaccion({ m, aplicaciones = APLICACIONES, movimientos =
   if (!tipo) return null
   const cargo = esCargo(m)
   const ver = onVerTransaccion ?? ((x: Movimiento) => aviso.info(`Opens ${nombreTipo(x)} ${refDe(x)}.`))
-  const abrirCaso = (caso: string) => (onAbrirClinica ? onAbrirClinica({ caso }) : aviso.info('Opens the case in Treatment Plan.'))
+  const abrirCaso = (caso: string) => (onAbrirClinica ? onAbrirClinica({ caso }) : aviso.info('Opens the case in the treatment plan.'))
   const filas = (cargo ? aplicadoA(m.id, aplicaciones) : aplicadoDesde(m.id, aplicaciones))
     .map((a) => ({ a, otra: movimientos.find((x) => x.id === (cargo ? a.origen : a.cargo)) }))
     .filter((f): f is { a: Aplicacion; otra: Movimiento } => !!f.otra)
@@ -263,7 +263,7 @@ export function FilasTransaccion({ m, aplicaciones = APLICACIONES, movimientos =
                 <tr>
                   <th className="py-1.5 pr-3 font-medium">Date applied</th>
                   <th className="py-1.5 pr-3 font-medium">{cargo ? 'Source transaction' : 'Destination charge'}</th>
-                  <th className="py-1.5 pr-3 font-medium">Patient / Account</th>
+                  <th className="py-1.5 pr-3 font-medium">Patient / account</th>
                   <th className="py-1.5 pr-3 font-medium">{cargo ? 'Reference / reason' : 'Procedure / reason'}</th>
                   <th className="py-1.5 text-right font-medium">Applied amount</th>
                 </tr>
@@ -287,7 +287,7 @@ export function FilasTransaccion({ m, aplicaciones = APLICACIONES, movimientos =
   )
 }
 
-const BOTON_CREDITO = 'text-dash-blue inline-flex items-center gap-1.5 rounded-md border border-[#c7d9fb] bg-info-bg px-2.5 py-1 text-[12px] font-medium hover:bg-[#e3edff]'
+const BOTON_CREDITO = 'text-dash-blue inline-flex items-center gap-1.5 rounded-md border border-info-line bg-info-bg px-2.5 py-1 text-[12px] font-medium hover:bg-info-strong-bg'
 
 /** El contenido del detalle, sin el marco. Las cuatro transacciones de la historia llevan su lista (título, filas y pie
     con su acción y Read-only summary); Insurance Payment, los datos de siempre. Lo usan el Ledger y la tabla de Billing

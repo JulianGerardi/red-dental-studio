@@ -16,7 +16,7 @@ const meta = {
           '',
           '**Add Condition abre el drawer propio** ([RegionConditionDrawer](/docs/components-clinical-dental-regionconditiondrawer--docs)), no el de diente: `ExamLayout` ahora acepta `onCondicion` para reemplazarlo por examen. Add Procedure sigue siendo el genérico -pendiente, no es lo que pidió esta tanda-.',
           '',
-          '**Probalo:** clickeá una región del gráfico -queda en ámbar- y después "Add Condition": el drawer abre con esa región ya puesta en "Selected area".',
+          '**Probalo:** clickeá una región del gráfico -queda en ámbar- y después "Add condition": el drawer abre con esa región ya puesta en "Selected area".',
         ].join('\n'),
       },
     },

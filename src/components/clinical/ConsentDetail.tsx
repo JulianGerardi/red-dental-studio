@@ -176,7 +176,7 @@ export function ConsentDetail({ procedimiento: p, pendiente, onVolver, onFirmar 
           <ConAyuda texto={reconocido ? 'Present the consent to the patient for signature' : 'The patient checks every acknowledgment in the document first.'}>
             <span>
               <Button variant="secondary" size="md" disabled={!reconocido} onClick={() => setFirmando('Patient')}>
-                <PenLine /> Patient Signature
+                <PenLine /> Patient signature
               </Button>
             </span>
           </ConAyuda>
@@ -188,7 +188,7 @@ export function ConsentDetail({ procedimiento: p, pendiente, onVolver, onFirmar 
           {firmas.Provider ? (
             <Firmado rol="Provider" fecha={firmas.Provider} />
           ) : (
-            <Button size="md" onClick={() => setFirmando('Provider')}><PenLine /> Provider Signature</Button>
+            <Button size="md" onClick={() => setFirmando('Provider')}><PenLine /> Provider signature</Button>
           )}
         </span>
         </>}
@@ -215,7 +215,7 @@ export function Firmado({ rol, fecha }: { rol: Firmante; fecha: string }) {
 }
 
 const iniciales = (nombre: string) => nombre.split(/\s+/).filter(Boolean).map((x) => x[0]!.toUpperCase()).join('').slice(0, 3)
-const LEGAL = 'By selecting Adopt and Sign, I agree that the signature and initials are the electronic representation of my signature and initials for all purposes when I (or my agent) use them in documents, including legally binding contracts.'
+const LEGAL = 'By selecting Adopt and sign, I agree that the signature and initials are the electronic representation of my signature and initials for all purposes when I (or my agent) use them in documents, including legally binding contracts.'
 
 /* Las firmas se hacen en un pop up: en red.dev el botón lleva a un portal para firmar, acá es una ventana encima del
    consentimiento (no un drawer). Ver clinical-mode.md (2026-11-02). */
@@ -232,7 +232,7 @@ export function VentanaFirma({ titulo, descripcion, cancelar = 'Cancel', guardar
   return (
     <Dialog open onOpenChange={(o) => { if (!o) onClose() }}>
       <DialogContent showCloseButton={false} className="flex max-h-[92vh] flex-col gap-0 overflow-hidden p-0 sm:max-w-[600px]">
-        <div className="flex items-center gap-1.5 border-b border-line bg-surface-muted px-5 py-2 text-[11.5px] font-medium text-ink-muted">
+        <div className="flex items-center gap-1.5 border-b border-line bg-surface-muted px-5 py-2 text-[12px] font-medium text-ink-muted">
           <Lock className="size-3.5" aria-hidden /> Secure signing portal
         </div>
         <DialogHeader className="gap-1 px-5 pt-4">
@@ -261,7 +261,7 @@ export function FirmaPaciente({ nombre, descripcion, onClose, onFirmar }: {
   const [impreso, setImpreso] = useState(nombre)
   const [ini, setIni] = useState(iniciales(nombre))
   const [iniTocadas, setIniTocadas] = useState(false)
-  const [modo, setModo] = useState<'Adopt Signature' | 'Draw'>('Adopt Signature')
+  const [modo, setModo] = useState<'Adopt signature' | 'Draw'>('Adopt signature')
   const [dibujada, setDibujada] = useState<string | null>(null)
   const [pad, setPad] = useState(0)
   const firmada = modo === 'Draw' ? !!dibujada : impreso.trim().length > 1
@@ -273,19 +273,19 @@ export function FirmaPaciente({ nombre, descripcion, onClose, onFirmar }: {
 
   return (
     <VentanaFirma
-      titulo="Patient Signature"
+      titulo="Patient signature"
       descripcion={descripcion}
-      guardar="Adopt and Sign"
+      guardar="Adopt and sign"
       guardarDeshabilitado={!!falta}
       onClose={onClose}
       onGuardar={() => onFirmar({ ...(modo === 'Draw' ? { imagen: dibujada ?? undefined } : { texto: impreso.trim() }), iniciales: ini.trim() || undefined })}
     >
       <div className="flex flex-col gap-5">
         <div className="grid grid-cols-2 gap-4">
-          <TextField label="Printed Name" value={impreso} onChange={(v) => { setImpreso(v); if (!iniTocadas) setIni(iniciales(v)) }} />
+          <TextField label="Printed name" value={impreso} onChange={(v) => { setImpreso(v); if (!iniTocadas) setIni(iniciales(v)) }} />
           <TextField label="Initials" value={ini} onChange={(v) => { setIni(v.toUpperCase().slice(0, 4)); setIniTocadas(true) }} />
         </div>
-        <Tabs tabs={['Adopt Signature', 'Draw'] as const} value={modo} onChange={setModo} size="sm" aria-label="Signature method" className="self-start" />
+        <Tabs tabs={['Adopt signature', 'Draw'] as const} value={modo} onChange={setModo} size="sm" aria-label="Signature method" className="self-start" />
         <div className="flex flex-col gap-1.5">
           <div className="flex items-center justify-between">
             <span className="text-xs font-medium text-ink">Preview</span>
@@ -320,7 +320,7 @@ export function FirmaProveedor({ nombre, onClose, onFirmar }: { nombre: string; 
   const listo = /\S+@\S+\.\S+/.test(email) && clave.length > 0
   return (
     <VentanaFirma
-      titulo="Provider Signature"
+      titulo="Provider signature"
       descripcion="For security and legal purposes, please re-enter your credentials to sign this document electronically."
       guardar="Sign"
       guardarDeshabilitado={!listo}

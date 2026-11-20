@@ -52,7 +52,7 @@ export function WaitingRoomList({ pacientes, ahora, limit, seleccionada, onSelec
   if (grupos.length === 0) return null
   const total = pacientes.length
   return (
-    <ShowMore total={total} limit={limit ?? total} label="patients in the waiting room" className="flex flex-col gap-4">
+    <ShowMore total={total} limit={limit ?? total} alPie label="patients in the waiting room" className="flex flex-col gap-4">
       {(n) => {
         const cuantos = n >= total ? grupos.map((g) => g.filas.length) : repartir(grupos.map((g) => g.filas.length), n)
         return grupos.map((g, gi) => (
@@ -66,7 +66,7 @@ export function WaitingRoomList({ pacientes, ahora, limit, seleccionada, onSelec
                 return (
                   <li key={id} className={TARJETA_INTERNA}>
                     <AppointmentRow
-                      appt={{ ...p, accion: 'Check Out' }} id={id} activa={seleccionada === id}
+                      appt={{ ...p, accion: 'Check out' }} id={id} activa={seleccionada === id}
                       chips={p.etapa === 'Checked in'}
                       estado={texto && <Pill tone="warning" size="sm" className="tabular-nums">{texto}</Pill>}
                       onSelect={onSelect} onEdit={onEdit && (() => onEdit(p))} onAccion={onAccion && (() => onAccion(p))}

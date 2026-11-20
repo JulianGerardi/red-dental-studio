@@ -30,7 +30,7 @@ export const TONO_ESTADO: Record<string, PillTone> = {
   Active: 'success', Posted: 'success', Fulfilled: 'success', Completed: 'success', Paid: 'success',
   Booked: 'info', Pending: 'info', Requested: 'info', Scheduled: 'info',
   'In progress': 'purple', 'Check-in': 'purple',
-  'No Show': 'warning', Expired: 'warning', Overdue: 'warning',
+  'No show': 'warning', Expired: 'warning', Overdue: 'warning',
   Cancelled: 'danger', Voided: 'danger',
   Inactive: 'neutral',
 }
@@ -129,7 +129,7 @@ export const DATOS = {
       { id: 'a2', initials: 'MV', patient: 'Maria Abril Viola', date: '12 Mar 2025', time: '11:30', provider: 'Dr. Emily Chen', operatory: 'Operatory 1', reason: 'Routine cleaning', status: 'Check-in' },
       { id: 'a3', initials: 'EA', patient: 'Elias Aguirre', date: '12 Mar 2025', time: '13:00', provider: 'Sarah Stone', operatory: 'Operatory 3', reason: 'Broken crown, in pain', status: 'In progress' },
       { id: 'a4', initials: 'JS', patient: 'John Smith', date: '13 Mar 2025', time: '09:15', provider: 'Dr. Salgado', operatory: 'Operatory 2', reason: 'Prophylaxis - adult', status: 'Fulfilled' },
-      { id: 'a5', initials: 'SR', patient: 'Sofía Romero', date: '13 Mar 2025', time: '15:30', provider: 'Dr. Emily Chen', operatory: 'Operatory 1', reason: 'Periodic evaluation', status: 'No Show' },
+      { id: 'a5', initials: 'SR', patient: 'Sofía Romero', date: '13 Mar 2025', time: '15:30', provider: 'Dr. Emily Chen', operatory: 'Operatory 1', reason: 'Periodic evaluation', status: 'No show' },
       { id: 'a6', initials: 'LF', patient: 'Lucas Fernández', date: '14 Mar 2025', time: '08:45', provider: 'Dr. Salgado', operatory: 'Operatory 3', reason: 'Whitening', status: 'Cancelled' },
     ],
   },

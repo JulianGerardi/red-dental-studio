@@ -19,7 +19,7 @@ export type PendingTask = {
   pdf?: boolean
 }
 
-/* Lo que hace "Complete this Task". Lo comparten la card y la fila de la propuesta (DashboardRows). */
+/* Lo que hace "Complete this task". Lo comparten la card y la fila de la propuesta (DashboardRows). */
 export const completarTarea = (task: PendingTask) => aviso.ok(`${task.kind} for ${task.person} marked as complete.`)
 
 export function PendingTaskCard({ task }: { task: PendingTask }) {
@@ -66,7 +66,7 @@ export function PendingTaskCard({ task }: { task: PendingTask }) {
         onClick={() => completarTarea(task)}
         className="bg-dash-blue hover:bg-dash-blue-hover flex w-full items-center justify-center gap-1.5 rounded-lg py-2.5 text-[13px] font-medium text-white transition-colors"
       >
-        Complete this Task <ArrowRight className="size-3.5" />
+        Complete this task <ArrowRight className="size-3.5" />
       </button>
     </InnerCard>
   )

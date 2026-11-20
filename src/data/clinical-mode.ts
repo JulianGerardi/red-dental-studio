@@ -56,7 +56,7 @@ export const EXAMENES = [
   'Vitals', 'ROS', 'Physical', 'Extraoral', 'Intraoral', 'Dental assessment', 'Periodontal', 'Radiographic',
 ] as const
 export const REGISTROS = [
-  'Treatment Plan', 'Treatment', 'Patient Summary', 'Lab Order', 'Prescription', 'Referral',
+  'Treatment plan', 'Treatment', 'Patient summary', 'Lab order', 'Prescription', 'Referral',
 ] as const
 export type Pestana = (typeof EXAMENES)[number] | (typeof REGISTROS)[number]
 
@@ -106,19 +106,19 @@ export type Problema = {
 }
 
 export const PROBLEMAS: Problema[] = [
-  { id: 'p1', fecha: '08/20/2026', ubicacion: 'Soft Palate', superficie: '-', condicion: 'Abscess (morphologic abnormality)', examen: 'Intraoral', proveedor: 'Perez Martinez', estado: 'Active' },
-  { id: 'p2', fecha: '08/20/2026', ubicacion: 'Right Temple Area', superficie: '-', condicion: 'Abscess (morphologic abnormality)', examen: 'Extraoral', proveedor: 'Perez Martinez', estado: 'Active' },
+  { id: 'p1', fecha: '08/20/2026', ubicacion: 'Soft palate', superficie: '-', condicion: 'Abscess (morphologic abnormality)', examen: 'Intraoral', proveedor: 'Perez Martinez', estado: 'Active' },
+  { id: 'p2', fecha: '08/20/2026', ubicacion: 'Right temple area', superficie: '-', condicion: 'Abscess (morphologic abnormality)', examen: 'Extraoral', proveedor: 'Perez Martinez', estado: 'Active' },
   { id: 'p3', fecha: '08/20/2026', ubicacion: '-', superficie: '-', condicion: 'Generally unwell', examen: 'Physical', proveedor: 'Perez Martinez', nota: 'Reports fatigue for the last week; no fever.', estado: 'Active' },
   { id: 'p4', fecha: '08/20/2026', ubicacion: '-', superficie: '-', condicion: 'Abnormal weight gain', examen: 'ROS', proveedor: 'Perez Martinez', nota: 'Gained 6 kg in three months; refer to physician.', estado: 'Active' },
-  { id: 'p5', fecha: '08/14/2026', ubicacion: '-', pieza: 3, superficie: 'O', condicion: 'Chronic enamel dental caries', examen: 'Dental Assessment', proveedor: 'Perez Martinez', nota: 'Deep lesion, monitor after restoration.', estado: 'In treatment' },
-  { id: 'p6', fecha: '08/14/2026', ubicacion: '-', pieza: 14, superficie: 'O, D', condicion: 'Chronic enamel dental caries', examen: 'Dental Assessment', proveedor: 'Perez Martinez', nota: 'Occlusal decay detected on routine exam.', estado: 'Active' },
+  { id: 'p5', fecha: '08/14/2026', ubicacion: '-', pieza: 3, superficie: 'O', condicion: 'Chronic enamel dental caries', examen: 'Dental assessment', proveedor: 'Perez Martinez', nota: 'Deep lesion, monitor after restoration.', estado: 'In treatment' },
+  { id: 'p6', fecha: '08/14/2026', ubicacion: '-', pieza: 14, superficie: 'O, D', condicion: 'Chronic enamel dental caries', examen: 'Dental assessment', proveedor: 'Perez Martinez', nota: 'Occlusal decay detected on routine exam.', estado: 'Active' },
   { id: 'p7', fecha: '08/02/2026', ubicacion: '-', pieza: 22, superficie: 'L', condicion: 'Dental calculus', examen: 'Periodontal', proveedor: 'Michael Johnson', nota: 'Subgingival calculus, scaling scheduled.', estado: 'Active' },
   { id: 'p8', fecha: '07/28/2026', ubicacion: '-', pieza: 8, superficie: 'B', condicion: 'Abrasion of teeth', examen: 'Extraoral', proveedor: 'Michael Johnson', nota: 'Cervical abrasion from brushing technique.', estado: 'Monitoring' },
   { id: 'p9', fecha: '07/19/2026', ubicacion: '-', pieza: 19, superficie: 'D, L', condicion: 'Recurrent caries', examen: 'Intraoral', proveedor: 'Perez Martinez', estado: 'Treated' },
-  { id: 'p10', fecha: '07/05/2026', ubicacion: '-', pieza: 30, superficie: 'M, L', condicion: 'Fractured restoration', examen: 'Dental Assessment', proveedor: 'Perez Martinez', estado: 'Externally treated' },
-  { id: 'p11', fecha: '06/21/2026', ubicacion: 'Lower Lip', superficie: '-', condicion: 'Mucocele', examen: 'Intraoral', proveedor: 'Michael Johnson', estado: 'Referred' },
+  { id: 'p10', fecha: '07/05/2026', ubicacion: '-', pieza: 30, superficie: 'M, L', condicion: 'Fractured restoration', examen: 'Dental assessment', proveedor: 'Perez Martinez', estado: 'Externally treated' },
+  { id: 'p11', fecha: '06/21/2026', ubicacion: 'Lower lip', superficie: '-', condicion: 'Mucocele', examen: 'Intraoral', proveedor: 'Michael Johnson', estado: 'Referred' },
   { id: 'p12', fecha: '06/10/2026', ubicacion: '-', pieza: 1, superficie: '-', condicion: 'Impacted third molar', examen: 'Radiography', proveedor: 'Perez Martinez', nota: 'Patient prefers to wait until symptoms appear.', estado: 'Patient declined' },
-  { id: 'p13', fecha: '06/02/2026', ubicacion: '-', pieza: 9, superficie: 'I', condicion: 'Enamel hypoplasia', examen: 'Dental Assessment', proveedor: 'Michael Johnson', estado: 'No treatment needed' },
+  { id: 'p13', fecha: '06/02/2026', ubicacion: '-', pieza: 9, superficie: 'I', condicion: 'Enamel hypoplasia', examen: 'Dental assessment', proveedor: 'Michael Johnson', estado: 'No treatment needed' },
   { id: 'p14', fecha: '05/15/2026', ubicacion: '-', pieza: 12, superficie: '-', condicion: 'Gingival recession', examen: 'Periodontal', proveedor: 'Perez Martinez', estado: 'Discarded' },
 ]
 
@@ -144,7 +144,7 @@ export const PROCEDIMIENTOS: ProcedimientoPaciente[] = [
   { id: 'pr2', fecha: '08/25/2026', ubicacion: '', pieza: 30, superficie: 'B, M', codigo: 'D2140', nombre: 'Amalgam – one surface, primary or permanent', proveedor: 'Michael Johnson', nota: 'Patient asked to postpone; replaced by a composite plan.', estado: 'Discarded' },
   { id: 'pr3', fecha: '08/25/2026', ubicacion: '', pieza: 31, superficie: 'B, D, M', codigo: 'D2140', nombre: 'Amalgam – one surface, primary or permanent', proveedor: 'Michael Johnson', estado: 'In progress' },
   { id: 'pr4', fecha: '06/14/2026', ubicacion: '', pieza: 16, superficie: '-', codigo: 'D7140', nombre: 'Extraction – erupted tooth or exposed root (elevation and/or forceps removal)', proveedor: 'Perez Martinez', estado: 'In progress' },
-  { id: 'pr5', fecha: '05/15/2026', ubicacion: 'Soft Palate', superficie: '-', codigo: 'D7286', nombre: 'Incisional biopsy of oral tissue – soft', proveedor: 'Perez Martinez', estado: 'Discarded' },
+  { id: 'pr5', fecha: '05/15/2026', ubicacion: 'Soft palate', superficie: '-', codigo: 'D7286', nombre: 'Incisional biopsy of oral tissue – soft', proveedor: 'Perez Martinez', estado: 'Discarded' },
   { id: 'pr6', fecha: '05/02/2026', ubicacion: '', pieza: 3, superficie: 'O', codigo: 'D2391', nombre: 'Resin-based composite – one surface, posterior', proveedor: 'Perez Martinez', estado: 'Pending' },
   { id: 'pr7', fecha: '05/02/2026', ubicacion: '', pieza: 14, superficie: 'O, D', codigo: 'D2392', nombre: 'Resin-based composite – two surfaces, posterior', proveedor: 'Perez Martinez', estado: 'Pending' },
   { id: 'pr13', fecha: '04/28/2026', ubicacion: '', pieza: 19, superficie: '-', codigo: 'D2950', nombre: 'Core buildup, including any pins when required', proveedor: 'Perez Martinez', estado: 'Pending' },
@@ -155,7 +155,7 @@ export const PROCEDIMIENTOS: ProcedimientoPaciente[] = [
   { id: 'pr8', fecha: '04/18/2026', ubicacion: '', superficie: '-', codigo: 'D1110', nombre: 'Prophylaxis – adult', proveedor: 'Michael Johnson', nota: 'Light calculus on lower anteriors.', estado: 'Completed' },
   { id: 'pr9', fecha: '04/18/2026', ubicacion: '', superficie: '-', codigo: 'D0120', nombre: 'Periodic oral evaluation – established patient', proveedor: 'Michael Johnson', estado: 'Completed' },
   { id: 'pr10', fecha: '03/03/2026', ubicacion: '', pieza: 19, superficie: '-', codigo: 'D3330', nombre: 'Endodontic therapy, molar tooth', proveedor: 'Perez Martinez', estado: 'Referred' },
-  { id: 'pr11', fecha: '02/12/2026', ubicacion: 'Upper Arch', superficie: '-', codigo: 'D4341', nombre: 'Periodontal scaling and root planing – four or more teeth per quadrant', proveedor: 'Michael Johnson', estado: 'Discontinued' },
+  { id: 'pr11', fecha: '02/12/2026', ubicacion: 'Upper arch', superficie: '-', codigo: 'D4341', nombre: 'Periodontal scaling and root planing – four or more teeth per quadrant', proveedor: 'Michael Johnson', estado: 'Discontinued' },
 ]
 
 /* Lo que cuelga de cada registro, para el detalle desplegable de la tabla (2026-10-08): el caso de Treatment Plan y el
@@ -213,7 +213,7 @@ export const ULTIMA_CONDICION: UltimaCondicion = {
   condicion: 'Caries',
   actualizado: '06/20/2025',
   pieza: 3,
-  examen: 'Dental Assessment',
+  examen: 'Dental assessment',
 }
 
 /* ── Lab Order (Figma 4070:148911, listado) ────────────────────────── */
@@ -275,7 +275,7 @@ export const VITALES: Vital[] = [
     alternador: { grupo: ['Weight', 'Hight'], unidades: ['lb', 'kg'] },
   },
   {
-    id: 'blood-pressure', titulo: 'Blood Pressure', subtitulo: 'Systolic / Diastolic measurement',
+    id: 'blood-pressure', titulo: 'Blood pressure', subtitulo: 'Systolic / diastolic measurement',
     campos: [
       { label: 'Systolic', valor: 120, min: 50, max: 250, paso: 1 },
       { label: 'Diastolic', valor: 80, min: 30, max: 150, paso: 1 },
@@ -293,7 +293,7 @@ export const VITALES: Vital[] = [
     unidad: 'bpm', rango: 'Range: 6 - 60 bpm',
   },
   {
-    id: 'heart-rate', titulo: 'Heart Rate', subtitulo: 'Measurement',
+    id: 'heart-rate', titulo: 'Heart rate', subtitulo: 'Measurement',
     campos: [{ valor: 25, min: 40, max: 220, paso: 1 }],
     unidad: 'bpm', rango: 'Range: 40 - 220 bpm',
   },
@@ -331,12 +331,12 @@ export type Hallazgo = {
 
 /* Seis, que es lo que dice el pie del componente: "All result (6)". */
 export const HALLAZGOS: Hallazgo[] = [
-  { id: 'f1', estado: 'Discarded', fecha: '27, August 2025', zona: 'Soft Palate', condicion: 'Oral Candidiasis', descriptores: 'Red' },
-  { id: 'f2', estado: 'Active',    fecha: '27, August 2025', zona: 'Soft Palate', condicion: 'Oral Candidiasis', descriptores: 'Red' },
-  { id: 'f3', estado: 'Discarded', fecha: '27, August 2025', zona: 'Soft Palate', condicion: 'Oral Candidiasis', descriptores: 'Red' },
-  { id: 'f4', estado: 'Active',    fecha: '27, August 2025', zona: 'Soft Palate', condicion: 'Oral Candidiasis', descriptores: 'Red' },
-  { id: 'f5', estado: 'Discarded', fecha: '27, August 2025', zona: 'Soft Palate', condicion: 'Oral Candidiasis', descriptores: 'Red' },
-  { id: 'f6', estado: 'Active',    fecha: '27, August 2025', zona: 'Soft Palate', condicion: 'Oral Candidiasis', descriptores: 'Red' },
+  { id: 'f1', estado: 'Discarded', fecha: '27, August 2025', zona: 'Soft palate', condicion: 'Oral Candidiasis', descriptores: 'Red' },
+  { id: 'f2', estado: 'Active',    fecha: '27, August 2025', zona: 'Soft palate', condicion: 'Oral Candidiasis', descriptores: 'Red' },
+  { id: 'f3', estado: 'Discarded', fecha: '27, August 2025', zona: 'Soft palate', condicion: 'Oral Candidiasis', descriptores: 'Red' },
+  { id: 'f4', estado: 'Active',    fecha: '27, August 2025', zona: 'Soft palate', condicion: 'Oral Candidiasis', descriptores: 'Red' },
+  { id: 'f5', estado: 'Discarded', fecha: '27, August 2025', zona: 'Soft palate', condicion: 'Oral Candidiasis', descriptores: 'Red' },
+  { id: 'f6', estado: 'Active',    fecha: '27, August 2025', zona: 'Soft palate', condicion: 'Oral Candidiasis', descriptores: 'Red' },
 ]
 
 export const ZONAS = ['Uper left', 'Upper right', 'Lower left', 'Lower right']

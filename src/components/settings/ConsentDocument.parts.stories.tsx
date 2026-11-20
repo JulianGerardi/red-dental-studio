@@ -11,6 +11,6 @@ export const DocumentSection: Story = { render: () => <div className="w-[420px] 
 
 /* La línea de firma del documento (CON-2905, CON-2913): vacía, con el nombre adoptado y sus iniciales, y con el nombre
    escrito por el provider. */
-export const SignatureLineEmpty: Story = { render: () => <div className="w-[420px] bg-white p-6"><LineaFirma rol="Patient / Legal Guardian" nombre="John Smith" /></div> }
-export const SignatureLineAdopted: Story = { render: () => <div className="w-[420px] bg-white p-6"><LineaFirma rol="Patient / Legal Guardian" nombre="John Smith" firma={{ fecha: '11/13/2026', nombre: 'John Smith', iniciales: 'JS' }} /></div> }
+export const SignatureLineEmpty: Story = { render: () => <div className="w-[420px] bg-white p-6"><LineaFirma rol="Patient / legal guardian" nombre="John Smith" /></div> }
+export const SignatureLineAdopted: Story = { render: () => <div className="w-[420px] bg-white p-6"><LineaFirma rol="Patient / legal guardian" nombre="John Smith" firma={{ fecha: '11/13/2026', nombre: 'John Smith', iniciales: 'JS' }} /></div> }
 export const SignatureLineTyped: Story = { render: () => <div className="w-[420px] bg-white p-6"><LineaFirma rol="Provider" nombre="Dr. Perez Martinez" firma={{ fecha: '11/13/2026', nombre: 'Perez Martinez', texto: 'Perez Martinez' }} /></div> }

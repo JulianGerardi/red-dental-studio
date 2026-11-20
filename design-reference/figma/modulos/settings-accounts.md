@@ -205,3 +205,13 @@ los filtros"*). Accounts es la referencia: **buscador → Search → Filter** (`
 
 **A validar con usuarios:** que en Ledger Options se note qué lista se está viendo con la elección adentro del Filter
 (la pista es el encabezado de la tabla); y que en Billing nadie extrañe ver los cuatro tipos a la vista.
+
+## Una clínica ve sólo su cuenta: Account abre Edit Account (2026-11-20)
+
+Julián, con un video de la app real: *"Lo de accounts overview está mal: sólo se puede ver la info de una sola"* cuenta.
+En la app real Settings › Account abre directo **Edit Account** (Information / Subscription / Owner) con el rastro
+Settings › Account. Cambios: el ítem del menú y la card del overview dicen **Account** y van a `/settings/account`; esa
+pantalla tiene breadcrumb; `/settings/accounts` y `/settings/accounts/:id` redirigen a `/settings/account`.
+`SettingsAccounts` (la lista) queda sin ruta en `Accounts.tsx`, que sigue exportando los datos y lo que usan
+NewAccountDrawer y ManageLicensesDrawer. El flujo de Figma `scripts/figma/flujos/settings-accounts.mjs` todavía captura
+la lista: actualizarlo al documentar.

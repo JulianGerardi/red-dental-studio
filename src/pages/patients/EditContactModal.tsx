@@ -7,27 +7,27 @@ import { aviso } from '@/components/ui/toaster'
 export function EditContactModal({ onClose }: { onClose: () => void }) {
   return (
     <ModalShell
-      title="Edit Contact Details" description="Update this patient's contact information" onClose={onClose} width="max-w-[480px]"
+      title="Edit contact details" description="Update this patient's contact information" onClose={onClose} width="max-w-[480px]"
       actions={<DrawerActions onCancel={onClose} onSave={() => { aviso.ok('Contact details updated.'); onClose() }} />}
     >
       <div className="flex flex-col gap-6">
-        <DrawerSection title="Contact Details">
+        <DrawerSection title="Contact details">
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-            <TextField label="Area Code" placeholder="+1" />
-            <TextField label="Phone Number" placeholder="(555) 123-4567" />
-            <TextField label="Email Address" placeholder="john.smith@hotmail.com" />
+            <TextField label="Area code" placeholder="+1" />
+            <TextField label="Phone number" placeholder="(555) 123-4567" />
+            <TextField label="Email address" placeholder="john.smith@hotmail.com" />
           </div>
         </DrawerSection>
 
         <DrawerSection title="Address">
           {/* De a dos como New Location y New Employee (Drawer → Specs → Fields). */}
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-            <TextField label="Address Line 1" placeholder="Street and number" />
-            <TextField label="Address Line 2" placeholder="Apartment, suite, etc." />
+            <TextField label="Address line 1" placeholder="Street and number" />
+            <TextField label="Address line 2" placeholder="Apartment, suite, etc." />
             <SelectField label="Country" required />
             <SelectField label="State" required />
             <TextField label="City" required placeholder="City" />
-            <TextField label="ZIP Code" placeholder="00000" />
+            <TextField label="ZIP code" placeholder="00000" />
           </div>
         </DrawerSection>
       </div>

@@ -56,7 +56,7 @@ export function FindingActionsMenu({
           return (
             <DropdownMenuItem
               key={action} disabled={disabled}
-              className={copy.destructive ? 'text-field-error focus:bg-[#fef2f2] focus:text-field-error' : undefined}
+              className={copy.destructive ? 'text-field-error focus:bg-dash-bad-bg focus:text-field-error' : undefined}
               onSelect={() => onAction(action)}
             >
               <Icon className="size-4" /> {copy.label}
@@ -64,7 +64,7 @@ export function FindingActionsMenu({
           )
         })}
         <DropdownMenuSeparator />
-        <DropdownMenuItem className="text-field-error focus:bg-[#fef2f2] focus:text-field-error" onSelect={() => onAction('delete')}>
+        <DropdownMenuItem className="text-field-error focus:bg-dash-bad-bg focus:text-field-error" onSelect={() => onAction('delete')}>
           <Trash2 className="size-4" /> Delete
         </DropdownMenuItem>
       </DropdownMenuContent>
