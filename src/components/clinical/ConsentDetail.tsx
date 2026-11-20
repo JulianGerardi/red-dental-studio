@@ -72,7 +72,7 @@ export function EstadoConsentimiento({ estado, onAbrir, de, nombre }: {
     </button>
       </TooltipTrigger>
       <TooltipContent side="top" className="max-w-[320px] flex-col items-start gap-0.5 bg-ink leading-snug text-white">
-        {nombre && <span className="block font-semibold">Procedure consent - {nombre}</span>}
+        {nombre && <span className="block font-semibold">Procedure Consent - {nombre}</span>}
         {ayuda}
       </TooltipContent>
     </Tooltip>
@@ -195,7 +195,7 @@ export function ConsentDetail({ procedimiento: p, pendiente, onVolver, onFirmar 
       </div>
 
       {firmando === 'Patient' && (
-        <FirmaPaciente nombre={PACIENTE} descripcion={`Procedure consent - ${p.codigo} ${p.nombre}`} onClose={() => setFirmando(null)} onFirmar={(r) => { onFirmar('Patient', r); setFirmando(null) }} />
+        <FirmaPaciente nombre={PACIENTE} descripcion={`Procedure Consent - ${p.codigo} ${p.nombre}`} onClose={() => setFirmando(null)} onFirmar={(r) => { onFirmar('Patient', r); setFirmando(null) }} />
       )}
       {firmando === 'Provider' && (
         <FirmaProveedor nombre={p.proveedor} onClose={() => setFirmando(null)} onFirmar={(r) => { onFirmar('Provider', r); setFirmando(null) }} />

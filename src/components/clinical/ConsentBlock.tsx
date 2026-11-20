@@ -45,7 +45,7 @@ function entradasDe(procedimientos: Pick<Procedimiento, 'id' | 'codigo' | 'nombr
   }))
   const procs = procedimientos.flatMap((p) => {
     if (!tieneDocumento(p.consentimiento)) return []
-    const documento = `Procedure consent - ${p.codigo} ${p.nombre}`
+    const documento = `Procedure Consent - ${p.codigo} ${p.nombre}`
     const abrirP = abrir && (() => abrir(p.id))
     const firmas = p.firmas ?? {}
     const faltan = (['Patient', 'Provider'] as const).filter((r) => !firmas[r])
