@@ -51,11 +51,11 @@ test('Pending documents: tabs por urgencia, sin botón', async ({ app, screen })
   await app.open('/patients/1')
   /* Arranca en Overdue (el primer grupo, 2 documentos). */
   await expect(screen.getByRole('tab', 'Overdue (2)')).toBeVisible()
-  await expect(screen.getByText('Informed consent – Periodontal treatment')).toBeVisible()
+  await expect(screen.getByText('Informed Consent – Periodontal treatment')).toBeVisible()
   await expect(screen.getByText('Notice of privacy practices (HIPAA)')).toHaveCount(0)
   await expect(screen.getByRole('button', /Show \d+ more/)).toHaveCount(0)
 
   await screen.getByRole('tab', /^Later/).tap()
   await expect(screen.getByText('Notice of privacy practices (HIPAA)')).toBeVisible()
-  await expect(screen.getByText('Informed consent – Periodontal treatment')).toHaveCount(0)
+  await expect(screen.getByText('Informed Consent – Periodontal treatment')).toHaveCount(0)
 })

@@ -71,7 +71,7 @@ export function PatientPaymentPanel({
       codigo: '—',
       descripcion: componentes.length === 1
         ? `${componentes[0].metodo}${componentes[0].ref ? ` ${componentes[0].ref}` : ''}`
-        : `Patient payment · ${componentes.length} methods`,
+        : `Patient Payment · ${componentes.length} methods`,
       provider: 'Front desk',
       tipo: 'Payment',
       monto: -total,

@@ -92,7 +92,7 @@ export function OdontogramaOverview({ ampliado = false, onAmpliar, onDetalle, ul
             {ultima.pieza && <span className="sr-only"> on tooth {ultima.pieza}</span>}
           </span>
         </span>
-        <span className="shrink-0 text-[11px] whitespace-nowrap text-ink-muted">Last Update: {ultima.actualizado}</span>
+        <span className="shrink-0 text-[11px] whitespace-nowrap text-ink-muted">Last update: {ultima.actualizado}</span>
         {pestana && (
           <button
             type="button"

@@ -230,7 +230,7 @@ export function LocationBillingProfile({
             aviso.ok('Billing profile disabled.')
           }}
         >
-          It can no longer be chosen as Billing Provider and becomes read-only. Its data and carrier contracts are
+          It can no longer be chosen as billing provider and becomes read-only. Its data and carrier contracts are
           kept.{haySucios && ' Unsaved changes will be discarded.'}
         </ConfirmDialog>
       )}

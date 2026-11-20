@@ -108,7 +108,7 @@ test('Start con Sign now lleva al consentimiento, se firma ahí y deja el plan I
   await screen.getByRole('button', /Actions for D2950/).tap()
   await screen.getByRole('menuitem', /Start/).tap()
   await screen.getByRole('button', 'Sign now').tap()
-  await expect(screen.getByRole('heading', /Procedure Consent - D2950/)).toBeVisible()
+  await expect(screen.getByRole('heading', /Procedure consent - D2950/)).toBeVisible()
   await expect(screen.getByText('Sign to start this procedure')).toBeVisible()
   // El paciente ya firmó: falta el provider, en el pop up del portal.
   await screen.getByRole('button', /Provider signature/).tap()
@@ -131,7 +131,7 @@ test('Sign now y Back deja el procedimiento sin cambios', async ({ app, screen }
   await screen.getByRole('button', /Actions for D2750/).tap()
   await screen.getByRole('menuitem', /Start/).tap()
   await screen.getByRole('button', 'Sign now').tap()
-  await expect(screen.getByRole('heading', /Procedure Consent - D2750/)).toBeVisible()
+  await expect(screen.getByRole('heading', /Procedure consent - D2750/)).toBeVisible()
   await screen.getByRole('button', 'Back').tap()
   await expect(screen.getByText(/The procedure has not changed/).first()).toBeVisible()
   await expect(screen.getByRole('button', /Open consent for D2750: Requested/)).toBeVisible()
@@ -150,7 +150,7 @@ test('la columna Consent muestra los estados de CON-4119', async ({ app, screen 
   await expect(screen.getByText(/Consent will be automatically generated 24h before the appointment, or when starting\/completing the procedure\./).first()).toBeVisible()
 
   await screen.getByRole('button', /Open consent for D2750: Rejected/).tap()
-  await expect(screen.getByRole('heading', /Procedure Consent - D2750/)).toBeVisible()
+  await expect(screen.getByRole('heading', /Procedure consent - D2750/)).toBeVisible()
   await expect(screen.getByText(/Consent rejected by patient\. It can no longer be signed\./)).toBeVisible()
   await expect(screen.getByRole('button', /Patient signature/)).toHaveCount(0)
 
@@ -163,7 +163,7 @@ test('la columna Consent muestra los estados de CON-4119', async ({ app, screen 
 test('la columna Consent abre el consentimiento y ahí firman paciente y provider', async ({ app, screen }) => {
   await app.open('/patients/patient-0001/clinical-mode?case=c3')
   await screen.getByRole('button', /Open consent for D2391: Requested/).tap()
-  await expect(screen.getByRole('heading', /Procedure Consent - D2391/)).toBeVisible()
+  await expect(screen.getByRole('heading', /Procedure consent - D2391/)).toBeVisible()
   // El paciente marca las afirmaciones en el documento antes de firmar.
   await expect(screen.getByRole('button', /Patient signature/)).toBeDisabled()
   for (let i = 0; i < 5; i++) await screen.getByRole('checkbox').nth(i).tap()
@@ -190,8 +190,8 @@ test('el historial del caso lista los consentimientos de cada procedimiento', as
   await screen.getByRole('button', 'Consent history').tap()
   const historial = screen.getByRole('dialog', 'Consent history')
   await expect(historial.getByText(/Case consent v3/).first()).toBeVisible()
-  await historial.getByRole('button', /Procedure Consent - D2950/).first().tap()
-  await expect(screen.getByRole('heading', /Procedure Consent - D2950/)).toBeVisible()
+  await historial.getByRole('button', /Procedure consent - D2950/).first().tap()
+  await expect(screen.getByRole('heading', /Procedure consent - D2950/)).toBeVisible()
   // Back vuelve al historial, no al caso.
   await screen.getByRole('button', 'Back').tap()
   await expect(screen.getByRole('dialog', 'Consent history')).toBeVisible()
@@ -313,5 +313,5 @@ test('al cambiar de caso queda una sola card de Informed consent', async ({ app,
   await screen.getByRole('button', /04\/17\/2026/).tap()
   await screen.getByRole('button', /Implant Option/).tap()
   await screen.getByRole('button', /Bridge Option/).tap()
-  await expect(screen.getByText('Informed consent for Dental Treatment – Prueba 1')).toBeVisible()
+  await expect(screen.getByText('Informed Consent for Dental Treatment – Prueba 1')).toBeVisible()
 })

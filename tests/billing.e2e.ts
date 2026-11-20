@@ -5,7 +5,7 @@ import { expect } from 'e2e'
 
 test('Elegir un paciente muestra sólo lo suyo, Patient / Guarantor view y los botones; la X vuelve al resumen', async ({ app, screen }) => {
   await app.open('/billing')
-  await expect(screen.getByRole('button', /Patient Payment/)).toHaveCount(0)
+  await expect(screen.getByRole('button', /Patient payment/)).toHaveCount(0)
   await expect(screen.getByText(/Showing 1 to 8 of 21 results/)).toBeVisible()
 
   const maria = screen.getByRole('button', /Maria Abril Viola/)
@@ -13,7 +13,7 @@ test('Elegir un paciente muestra sólo lo suyo, Patient / Guarantor view y los b
   await expect(maria).toHaveAttribute('aria-current', 'true')
   await expect(screen.getByRole('heading', 'Maria Abril Viola — Recent billing activity')).toBeVisible()
   await expect(screen.getByText(/Patient · Guarantor: John Hayes/)).toBeVisible()
-  await expect(screen.getByRole('button', /Patient Payment/)).toBeVisible()
+  await expect(screen.getByRole('button', /Patient payment/)).toBeVisible()
   await expect(screen.getByText(/Showing 1 to 2 of 2 results/)).toBeVisible()
 
   await screen.getByRole('tab', 'Guarantor view').tap()
@@ -21,7 +21,7 @@ test('Elegir un paciente muestra sólo lo suyo, Patient / Guarantor view y los b
 
   await screen.getByRole('button', 'Clear selected patient').tap()
   await expect(screen.getByRole('heading', 'Recent billing activity')).toBeVisible()
-  await expect(screen.getByRole('button', /Patient Payment/)).toHaveCount(0)
+  await expect(screen.getByRole('button', /Patient payment/)).toHaveCount(0)
   await expect(screen.getByText(/Showing 1 to 8 of 21 results/)).toBeVisible()
   await expect(maria).not.toHaveAttribute('aria-current')
 })
@@ -106,7 +106,7 @@ test('Cada botón abre su drawer, como red.dev, y lo posteado aparece en la tabl
   await app.open('/billing')
   await screen.getByRole('button', /Maria Abril Viola/).first().tap()
 
-  await screen.getByRole('button', /Charge Adjustment \(\+\)/).tap()
+  await screen.getByRole('button', /Charge adjustment \(\+\)/).tap()
   let drawer = screen.getByRole('dialog')
   await expect(drawer.getByRole('heading', 'Enter charge (+) adjustment')).toBeVisible()
   await drawer.getByRole('button', /^Save/).tap()
@@ -115,7 +115,7 @@ test('Cada botón abre su drawer, como red.dev, y lo posteado aparece en la tabl
   await drawer.getByRole('button', /^Save/).tap()
   await expect(screen.getByText(/Charge Adjustment of \$25\.00 posted for Maria Abril Viola/)).toBeVisible()
 
-  await screen.getByRole('button', /Patient Payment \(-\)/).tap()
+  await screen.getByRole('button', /Patient payment \(-\)/).tap()
   drawer = screen.getByRole('dialog')
   await expect(drawer.getByRole('heading', 'New patient payment (-)')).toBeVisible()
   await drawer.getByRole('button', 'Add another payment method').tap()

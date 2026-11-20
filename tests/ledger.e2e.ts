@@ -57,7 +57,7 @@ test('el ⋮ de un procedimiento lleva a su estimación en Clinical Mode', async
 test('Patient payment (-) abre su drawer y lo guardado entra a la tabla', async ({ app, screen }) => {
   await app.open('/patients/john-smith/ledger')
   await expect(screen.getByRole('tab', 'Transactions')).toHaveCount(0)
-  await screen.getByRole('button', /^Patient Payment \(-\)/).tap()
+  await screen.getByRole('button', /^Patient payment \(-\)/).tap()
   const drawer = screen.getByRole('dialog')
   await expect(drawer.getByRole('heading', 'New patient payment (-)')).toBeVisible()
   await drawer.getByRole('textbox', /^Amount/).fill('50')
@@ -68,7 +68,7 @@ test('Patient payment (-) abre su drawer y lo guardado entra a la tabla', async 
 
 test('Charge adjustment (+) abre su drawer y pide el monto', async ({ app, screen }) => {
   await app.open('/patients/john-smith/ledger')
-  await screen.getByRole('button', /^Charge Adjustment \(\+\)/).tap()
+  await screen.getByRole('button', /^Charge adjustment \(\+\)/).tap()
   const drawer = screen.getByRole('dialog')
   await expect(drawer.getByRole('heading', 'Enter charge (+) adjustment')).toBeVisible()
   await drawer.getByRole('button', /^Save/).tap()
@@ -81,7 +81,7 @@ test('Charge adjustment (+) abre su drawer y pide el monto', async ({ app, scree
 /* La lógica de CON-3738, CON-3739 y CON-3735 (ledger.md, 2026-11-19). */
 test('Patient Payment abre con el total abierto repartido del más viejo al más nuevo', async ({ app, screen }) => {
   await app.open('/patients/john-smith/ledger')
-  await screen.getByRole('button', /^Patient Payment \(-\)/).tap()
+  await screen.getByRole('button', /^Patient payment \(-\)/).tap()
   await expect(screen.getByRole('textbox', /^Amount/)).toHaveValue('6308.00')
   await expect(screen.getByRole('textbox', 'Applied to Bitewings – four radiographic images')).toHaveValue('35.00')
   await expect(screen.getByRole('textbox', 'Applied to Crown – porcelain/ceramic')).toHaveValue('635.00')
@@ -99,7 +99,7 @@ test('Patient Payment abre con el total abierto repartido del más viejo al más
 
 test('Un pago de más queda como crédito sin aplicar y Apply to recarga los cargos', async ({ app, screen }) => {
   await app.open('/patients/john-smith/ledger')
-  await screen.getByRole('button', /^Patient Payment \(-\)/).tap()
+  await screen.getByRole('button', /^Patient payment \(-\)/).tap()
   await screen.getByRole('button', 'Apply to').tap()
   await expect(screen.getByRole('menuitem', /Emma Smith/)).toBeVisible()
   await screen.getByRole('menuitem', /Emma Smith/).tap()
@@ -117,7 +117,7 @@ test('Un pago de más queda como crédito sin aplicar y Apply to recarga los car
 
 test('Credit adjustment (-) pide el monto, reparte y avisa', async ({ app, screen }) => {
   await app.open('/patients/john-smith/ledger')
-  await screen.getByRole('button', /^Credit Adjustment \(-\)/).tap()
+  await screen.getByRole('button', /^Credit adjustment \(-\)/).tap()
   const drawer = screen.getByRole('dialog')
   // Una sola página, como red.dev: sin pasos, sin ícono en el título y el tipo arranca vacío (ledger.md, 2026-11-20).
   await expect(drawer.getByRole('button', /Next step/)).toHaveCount(0)
@@ -135,14 +135,14 @@ test('Credit adjustment (-) pide el monto, reparte y avisa', async ({ app, scree
 /* Sin transacciones abiertas no hay a qué aplicar: sin métodos de pago y Save apagado, como red.dev (ledger.md, 2026-11-20). */
 test('quien ya no tiene cargos abiertos no muestra métodos de pago y Save queda apagado', async ({ app, screen }) => {
   await app.open('/patients/john-smith/ledger')
-  await screen.getByRole('button', /^Patient Payment \(-\)/).tap()
+  await screen.getByRole('button', /^Patient payment \(-\)/).tap()
   await screen.getByRole('button', 'Apply to').tap()
   await screen.getByRole('menuitem', /Maximiliano/).tap()
   await expect(screen.getByText(/Showing 1 open transaction\b/)).toBeVisible()
   await screen.getByRole('button', /^Save/).tap()
   await expect(screen.getByText(/posted for Maximiliano Fernández-Ugarte/)).toBeVisible()
 
-  await screen.getByRole('button', /^Patient Payment \(-\)/).tap()
+  await screen.getByRole('button', /^Patient payment \(-\)/).tap()
   await screen.getByRole('button', 'Apply to').tap()
   await screen.getByRole('menuitem', /Maximiliano/).tap()
   const drawer = screen.getByRole('dialog')

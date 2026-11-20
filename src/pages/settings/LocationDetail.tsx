@@ -527,7 +527,7 @@ export function RoomsTab() {
                 There are scheduled appointments assigned to {baja.nombre}. You can review and manage each appointment
                 individually or confirm to move all of them to the waiting list.
               </p>
-              <p className="mt-3 font-semibold text-ink">Affected Appointments ({baja.turnos.length})</p>
+              <p className="mt-3 font-semibold text-ink">Affected appointments ({baja.turnos.length})</p>
               <ul className="mt-1.5 flex max-h-52 flex-col gap-2 overflow-y-auto">
                 {baja.turnos.map((t) => (
                   <li key={t.id} className="flex items-start justify-between gap-3 leading-snug">

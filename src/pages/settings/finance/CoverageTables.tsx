@@ -61,7 +61,7 @@ export function CoverageTableEditor({ tabla, abrirExcepciones = false }: { tabla
       <div className="flex flex-wrap justify-end gap-2">
         {tabla && (
           <Button variant="secondary" onClick={() => setExcepciones(true)}>
-            <ShieldAlert /> Manage Exceptions{tabla.excepciones.length ? ` (${tabla.excepciones.length})` : ''}
+            <ShieldAlert /> Manage exceptions{tabla.excepciones.length ? ` (${tabla.excepciones.length})` : ''}
           </Button>
         )}
         <Button onClick={agregarRango}><Plus /> Add range</Button>

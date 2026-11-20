@@ -45,7 +45,7 @@ test('Insurance scrollea adentro, sin mover el menú del paciente', async ({ app
 
   await region.swipe({ direction: 'up', momentum: 'fast' })
   await expect(screen.getByRole('link', 'Treatments')).toBeVisible()
-  await expect(screen.getByText('Patient information')).toBeVisible()
+  await expect(screen.getByRole('heading', 'Patient information')).toBeVisible()
 })
 
 /* Pending signature: el encuentro terminó y la Clinical note quedó sin firmar. Ocupa el lugar del botón de encuentro,
