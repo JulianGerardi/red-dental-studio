@@ -44,7 +44,7 @@ export function LedgerAllocationTable({
               </div>
             ))
           ) : cargos.length === 0 ? (
-            <p className="border-t border-line-row px-4 py-5 text-[13px] text-ink-muted">No open transactions to apply this against: the full amount stays as unapplied credit.</p>
+            <p className="border-t border-line-row px-4 py-5 text-[13px] text-ink-muted">No open transactions.</p>
           ) : (
             cargos.map((c) => {
               const ap = numero(aplicado[c.id])

@@ -1,5 +1,4 @@
 import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
-import { SquareMinus, SquarePlus } from 'lucide-react'
 import { DrawerActions, DrawerStep } from '@/components/ui/drawer'
 import { DatePicker } from '@/components/ui/date-picker'
 import { FieldError, FieldLabel, ModalShell } from '@/components/patients/form'
@@ -68,23 +67,14 @@ export function CampoFecha({ value, onChange, error }: { value: Date | null; onC
   )
 }
 
-/** Una sección del formulario: con `caja`, una card con su título que se pliega con el cuadradito (Payment Information, como
-    red.dev); sin ella, sólo los campos (las secciones del drawer van sin caja). */
-export function SeccionLedger({ titulo, caja, children }: { titulo: string; caja?: boolean; children: ReactNode }) {
-  const [abierta, setAbierta] = useState(true)
-  if (!caja) return <div className="flex flex-col gap-4">{children}</div>
-  const Icono = abierta ? SquareMinus : SquarePlus
+/** La card de datos de los tres drawers, con su título como red.dev (Payment Information, Credit Adjustment Information,
+    Adjustment Information), sin el ícono ni el plegado de red.dev (pedido de Julián, ledger.md 2026-11-20). */
+export function SeccionLedger({ titulo, children }: { titulo: string; children: ReactNode }) {
   return (
-    <div className="rounded-lg border border-line bg-white p-4 sm:p-5">
-      <button
-        type="button" aria-expanded={abierta} onClick={() => setAbierta((v) => !v)}
-        className="flex items-center gap-2 rounded text-sm font-bold text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-dash-blue"
-      >
-        <Icono aria-hidden className="size-5 text-ink-muted" strokeWidth={1.5} /> {titulo}
-      </button>
-      {/* Plegada se esconde y no se desmonta: lo tipeado se conserva. */}
-      <div hidden={!abierta} className="mt-4 flex flex-col gap-4">{children}</div>
-    </div>
+    <section aria-label={titulo} className="flex flex-col gap-4 rounded-lg border border-line bg-white p-4 sm:p-5">
+      <h3 className="text-sm font-bold text-ink">{titulo}</h3>
+      {children}
+    </section>
   )
 }
 

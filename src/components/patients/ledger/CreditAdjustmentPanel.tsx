@@ -23,7 +23,8 @@ export function CreditAdjustmentPanel({
   const opciones = opcionesAplicaA(garante, dependientes)
   const [fecha, setFecha] = useState<Date | null>(ahora)
   const [aplicaA, setAplicaA] = useState(alcanceInicial)
-  const [tipo, setTipo] = useState<string>(TIPOS_AJUSTE_CREDITO[0])
+  /* Arranca sin tipo, para elegirlo (red.dev: "Select credit type"). */
+  const [tipo, setTipo] = useState('')
   const [monto, setMonto] = useState('')
   const [notas, setNotas] = useState('')
   const [intentado, setIntentado] = useState(false)
@@ -33,11 +34,12 @@ export function CreditAdjustmentPanel({
 
   const errorMonto = !monto.trim() ? OBLIGATORIO : total <= 0 ? MENSAJES.monto : undefined
   const errorFecha = !fecha ? OBLIGATORIO : esFutura(fecha, ahora) ? MENSAJES.futura : undefined
-  const validarPrimero = () => { setIntentado(true); return !errorMonto && !errorFecha && !!tipo }
+  /* Sin transacciones abiertas, Save apagado, como red.dev (ledger.md, 2026-11-20). */
+  const sinCargos = !ap.cargando && ap.cargos.length === 0
 
   const guardar = () => {
     setIntentado(true)
-    if (errorMonto || errorFecha || !tipo || ap.error || ap.cargando || !fecha) return
+    if (sinCargos || errorMonto || errorFecha || !tipo || ap.error || ap.cargando || !fecha) return
     const m: Omit<Movimiento, 'id'> = {
       fecha: formatMDY(fecha),
       paciente: aplicaA === ALCANCE_GUARANTOR ? garante : aplicaA,
@@ -61,7 +63,10 @@ export function CreditAdjustmentPanel({
       <div className={grilla}>
         <CampoFecha value={fecha} onChange={setFecha} error={intentado ? errorFecha : undefined} />
         <ApplyToSelect opciones={opciones} value={aplicaA} onChange={setAplicaA} titulo="Apply credit to" />
-        <SelectField label="Adjustment type" required options={[...TIPOS_AJUSTE_CREDITO]} value={tipo} onChange={setTipo} />
+        <SelectField
+          label="Adjustment type" required placeholder="Select credit type" options={[...TIPOS_AJUSTE_CREDITO]} value={tipo}
+          onChange={setTipo} error={intentado && !tipo ? OBLIGATORIO : undefined}
+        />
         <TextField
           label="Amount" required placeholder="$ 0.00" value={monto} onChange={(v) => setMonto(limpiarImporte(v))}
           error={intentado ? errorMonto : undefined}
@@ -79,10 +84,10 @@ export function CreditAdjustmentPanel({
   )
 
   return (
+    /* Una sola página, como el pago y red.dev: los datos y Ledger Transactions debajo (ledger.md, 2026-11-20). */
     <ShellLedger
-      titulo="Credit Adjustment (-)" pasos={['Adjustment', 'Allocation']}
-      primero={primero} segundo={tabla} validarPrimero={validarPrimero}
-      onGuardar={guardar} onCancelar={onCancelar} guardando={ap.cargando}
+      titulo="Credit Adjustment (-)" primero={primero} segundo={tabla}
+      onGuardar={guardar} onCancelar={onCancelar} guardando={ap.cargando || sinCargos}
     />
   )
 }

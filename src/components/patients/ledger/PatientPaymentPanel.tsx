@@ -37,6 +37,15 @@ export function PatientPaymentPanel({
 
   const total = Math.round(metodos.reduce((a, f) => a + numero(f.monto), 0) * 100) / 100
   const ap = useAplicacion({ movs, aplicaciones, aplicaA, total, mensajeExceso: MENSAJES.pagoAplicado })
+  /* Sin transacciones abiertas no hay a qué aplicar: sin métodos de pago y Save apagado, como red.dev (ledger.md, 2026-11-20). */
+  const sinCargos = !ap.cargando && ap.cargos.length === 0
+  /* Otro Apply to: con un solo método, el importe pasa a ser lo abierto del nuevo alcance (red.dev). */
+  const cambiarAplicaA = (v: string) => {
+    setAplicaA(v)
+    if (metodos.length > 1) return
+    const abierto = cargosAbiertos(movs, aplicaciones, pacienteDeAlcance(v)).reduce((a, c) => a + c.guarantor, 0)
+    setMetodos((p) => [{ ...p[0], monto: abierto > 0 ? abierto.toFixed(2) : '' }])
+  }
 
   const setFila = (id: number, cambios: Partial<Metodo>) => setMetodos((p) => p.map((f) => (f.id === id ? { ...f, ...cambios } : f)))
   const errorMonto = (f: Metodo) => (!f.monto.trim() ? OBLIGATORIO : numero(f.monto) <= 0 ? MENSAJES.monto : undefined)
@@ -48,7 +57,7 @@ export function PatientPaymentPanel({
 
   const guardar = () => {
     setIntentado(true)
-    if (hayErrorDeCampos() || ap.error || ap.cargando || !fecha) return
+    if (sinCargos || hayErrorDeCampos() || ap.error || ap.cargando || !fecha) return
     const componentes = metodos.map((f) => {
       const campos = CAMPOS_METODO[f.metodo] ?? []
       const ref = campos.length ? (f.metodo === 'Check Payment' ? `#${f.extra.cheque}` : f.extra[campos[0].id]) : undefined
@@ -79,18 +88,19 @@ export function PatientPaymentPanel({
   const grilla = 'grid flex-1 gap-4 sm:grid-cols-2'
 
   const primero = (
-    <SeccionLedger titulo="Payment Information" caja>
+    <SeccionLedger titulo="Payment Information">
       {/* El hueco de la derecha es el del botón + / −: las columnas quedan alineadas con las de los métodos. */}
       <div className="flex items-start gap-2">
         <div className={grilla}>
           <CampoFecha value={fecha} onChange={setFecha} error={intentado ? errorFecha : undefined} />
-          <ApplyToSelect opciones={opciones} value={aplicaA} onChange={setAplicaA} titulo="Apply payment to" />
+          <ApplyToSelect opciones={opciones} value={aplicaA} onChange={cambiarAplicaA} titulo="Apply payment to" />
         </div>
         <span aria-hidden className="w-9 shrink-0" />
       </div>
 
       {/* Los métodos en su propia caja gris, como red.dev: cada uno con su importe y lo que pide (cheque y banco, ID de
           autorización o número de referencia). + suma otro y − lo saca (CON-3738). */}
+      {!sinCargos && (
       <div className="flex flex-col gap-3 rounded-lg border border-line bg-surface-subtle p-3">
         {metodos.map((f, i) => (
           <div key={f.id} className="flex items-start gap-2">
@@ -120,7 +130,7 @@ export function PatientPaymentPanel({
             {i === metodos.length - 1 && (
               <button
                 type="button" aria-label="Add another payment method"
-                onClick={() => setMetodos((p) => [...p, filaVacia(Math.max(...p.map((x) => x.id)) + 1, '', METODOS_PAGO[1])])}
+                onClick={() => setMetodos((p) => [...p, filaVacia(Math.max(...p.map((x) => x.id)) + 1, '0.00', METODOS_PAGO[1])])}
                 className={botonMetodo}
               >
                 <Plus className="size-4" />
@@ -129,6 +139,7 @@ export function PatientPaymentPanel({
           </div>
         ))}
       </div>
+      )}
 
       <TextArea label="Notes" placeholder="Add a note (optional)" value={notas} onChange={setNotas} />
     </SeccionLedger>
@@ -142,6 +153,6 @@ export function PatientPaymentPanel({
   )
 
   return (
-    <ShellLedger titulo="New Patient Payment (-)" primero={primero} segundo={tabla} onGuardar={guardar} onCancelar={onCancelar} guardando={ap.cargando} />
+    <ShellLedger titulo="New Patient Payment (-)" primero={primero} segundo={tabla} onGuardar={guardar} onCancelar={onCancelar} guardando={ap.cargando || sinCargos} />
   )
 }
