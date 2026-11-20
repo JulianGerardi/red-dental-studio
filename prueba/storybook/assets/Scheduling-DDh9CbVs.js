@@ -1,0 +1,359 @@
+import{n as e,r as t}from"./rolldown-runtime-DkW27tQK.js";var n=t({default:()=>r}),r;function i(){return(i=e((()=>{r=`import { Tabs } from '@/components/ui/tabs'
+import { useState } from 'react'
+import { Plus, CalendarCheck, CalendarClock, Inbox } from 'lucide-react'
+import { AppointmentDetailsDrawer } from '@/components/scheduling/AppointmentDetailsDrawer'
+import { ViewMenu, VISTA_INICIAL, type VistaCalendario } from '@/components/scheduling/ViewFiltersPanel'
+import { NewAppointmentModal, type DatosTurno } from '@/components/scheduling/NewAppointmentModal'
+import { formatDMY } from '@/components/ui/date-picker'
+import {
+  SOLICITUDES, datosDeSolicitud, fechaLegible, type Solicitud,
+} from '@/components/scheduling/requests-data'
+import { cn } from '@/lib/utils'
+import { aviso } from '@/components/ui/toaster'
+import { PageTitle } from '@/components/ui/page-title'
+import { DatePicker, sameDay } from '@/components/ui/date-picker'
+import {
+  EVENTOS_INICIALES, FECHA_ANCLA, BLOCK_STYLE,
+  type EventoConFecha, type ApptState,
+  fmtExacta,
+} from '@/components/scheduling/calendar-data'
+import { HORAS, hora24 } from '@/components/scheduling/AppointmentSlotPicker'
+import {
+  VistaDia, VistaSemana, VistaMes, type Vista,
+} from '@/components/scheduling/CalendarViews'
+import { StatusLegend } from '@/components/scheduling/StatusLegend'
+import { EmptyState } from '@/components/ui/empty-state'
+import { CONTENEDOR_PAGINA } from '@/lib/estilos'
+import { Button } from '@/components/ui/button'
+import { TarjetaTurno } from '@/components/scheduling/TarjetaTurno'
+import { useFabDePagina } from '@/components/help/HelpProvider'
+
+
+/* Interruptor de lo que está en el tablero pero todavía no se usa. En false
+   el markup existe y no se renderiza; se prende cuando se defina el alcance. */
+const PENDIENTES = false
+
+export default function Scheduling() {
+  /* En celular la vista semanal obliga a scrollear de costado para ver un
+     día: arranca en Day, como Google Calendar. */
+  const [view, setView] = useState<Vista>(
+    () => (typeof window !== 'undefined' && window.innerWidth < 768 ? 'Day' : 'Week'),
+  )
+  const [fecha, setFecha] = useState(FECHA_ANCLA)
+  const [reqTab, setReqTab] = useState<'ASAP' | 'Waiting list'>('ASAP')
+  /* Arranca cerrado: el panel de solicitudes es el estado desplegado del FAB
+     y aparecía solo al entrar a Scheduling. */
+  const [reqOpen, setReqOpen] = useState(false)
+  /* El FAB de solicitudes ocupa la esquina: Confibot se apila arriba (help.md). */
+  useFabDePagina()
+  /* El detalle se queda con el turno entero: la hora y la fecha que muestra
+     tienen que ser las del bloque que se clickeó, no un texto fijo. */
+  const [detail, setDetail] = useState<{ ev: EventoConFecha; rect: DOMRect } | null>(null)
+  const abrirDetalle = (e: EventoConFecha, el: HTMLElement) =>
+    setDetail({ ev: e, rect: el.getBoundingClientRect() })
+  const [panel, setPanel] = useState<'new' | null>(null)
+  /* Lo que se guardó en View: el panel arranca de acá y Cancel lo deja como estaba. */
+  const [vista, setVista] = useState<VistaCalendario>(VISTA_INICIAL)
+  /* Las solicitudes son estado: se agendan o se caen, y en los dos casos
+     desaparecen de la lista. */
+  const [solicitudes, setSolicitudes] = useState<Solicitud[]>(SOLICITUDES)
+  const [agendando, setAgendando] = useState<Solicitud | null>(null)
+  /* Edit appointment desde el detalle: el turno y lo que el drawer recibe cargado. */
+  const [editando, setEditando] = useState<{ ev: EventoConFecha; datos: DatosTurno } | null>(null)
+
+  /* Los turnos se pueden arrastrar a otro día y hora. El Figma no lo muestra
+     —es un frame estático— pero es lo que se espera de un calendario. */
+  const [eventos, setEventos] = useState<EventoConFecha[]>(EVENTOS_INICIALES)
+
+  const mover = (i: number, nueva: Date, start?: number) => {
+    setEventos((prev) =>
+      prev.map((ev, j) => {
+        if (j !== i) return ev
+        const tope = 18 - ev.duration
+        const hora = start === undefined ? ev.start : Math.min(Math.max(start, 8), tope)
+        aviso.ok(
+          \`\${ev.patient} moved to \${nueva.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}, \${fmtExacta(hora)}.\`,
+        )
+        return { ...ev, fecha: nueva, start: hora }
+      }),
+    )
+  }
+
+  const visibles = solicitudes.filter((s) => s.tipo === reqTab)
+
+  const cancelarSolicitud = (s: Solicitud) => {
+    const indice = solicitudes.findIndex((x) => x.id === s.id)
+    setSolicitudes((prev) => prev.filter((x) => x.id !== s.id))
+    aviso.warn(\`Request for \${s.patient} was cancelled.\`, {
+      label: 'Undo',
+      onClick: () => setSolicitudes((prev) => [...prev.slice(0, indice), s, ...prev.slice(indice)]),
+    })
+  }
+
+  /* Datos crudos del modal -> turno de la grilla. Compartido por "agendar una
+     solicitud" y por "New appointment" suelto: los dos arman el mismo tipo de
+     evento, sólo cambia qué pasa con la solicitud de origen (si hay una). */
+  type DatosGuardado = { patient: string; date: string; start: string; end: string; status: string; primary?: string; operatory?: string; reason?: string }
+  const construirEvento = (d: DatosGuardado): EventoConFecha => {
+    const [dd, mm, yyyy] = d.date.split('-').map(Number)
+    const dia = new Date(yyyy, mm - 1, dd)
+    const desde = HORAS.indexOf(d.start)
+    const hasta = HORAS.indexOf(d.end)
+    const inicio = desde >= 0 ? hora24(d.start) : 9
+    const duracion = desde >= 0 && hasta > desde ? hasta - desde : 1
+    const estado = (d.status in BLOCK_STYLE ? d.status : 'Booked') as ApptState
+    return {
+      start: inicio, duration: duracion, patient: d.patient, state: estado, fecha: dia,
+      provider: d.primary || 'Unassigned', room: d.operatory || 'Unassigned', reason: d.reason || 'Appointment',
+    }
+  }
+
+  /* Agendar una solicitud la saca de la lista y la pone en la grilla. El turno
+     puede caer en otro día que el que se está mirando: el sistema no cambia de
+     pantalla solo, lo ofrece en el toast. */
+  const agendarSolicitud = (s: Solicitud, d: DatosGuardado) => {
+    const nuevo = construirEvento(d)
+    setEventos((prev) => [...prev, nuevo])
+    setSolicitudes((prev) => prev.filter((x) => x.id !== s.id))
+    const rotulo = nuevo.fecha.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+    aviso.ok(\`\${d.patient} scheduled for \${rotulo} at \${d.start}.\`, {
+      label: \`Go to \${rotulo}\`,
+      onClick: () => { setFecha(nuevo.fecha); setView('Day') },
+    })
+    return true
+  }
+
+  /* "New appointment" suelto -sin solicitud de origen-: mismo armado de
+     evento, sin nada que sacar de la lista de espera. Antes no pasaba
+     \`onGuardar\` acá y el modal sólo mostraba un toast sin tocar la grilla. */
+  const crearTurno = (d: DatosGuardado) => {
+    setEventos((prev) => [...prev, construirEvento(d)])
+    return false
+  }
+
+  /* Turno de la grilla -> datos del drawer. El drawer va de hora en hora: 08:15 se muestra como 08 AM. */
+  const datosDeEvento = (ev: EventoConFecha): DatosTurno => {
+    const i = HORAS.findIndex((h) => hora24(h) === Math.floor(ev.start))
+    const desde = HORAS[i] ?? ''
+    const hasta = i < 0 ? '' : HORAS[Math.min(i + Math.max(1, Math.round(ev.duration)), HORAS.length - 1)]
+    return {
+      patient: ev.patient, primary: ev.provider, operatory: ev.room, reason: ev.reason, status: ev.state,
+      date: formatDMY(ev.fecha), start: desde, end: hasta,
+    }
+  }
+  const abrirEdicion = (ev: EventoConFecha) => {
+    setDetail(null)
+    setEditando({ ev, datos: datosDeEvento(ev) })
+  }
+  /* Guardar la edición (CON-3249): el turno se actualiza en su lugar. Si no se tocaron las horas, conserva las exactas
+     (08:15 no pasa a 08:00 por guardar otro dato). */
+  const guardarEdicion = (ev: EventoConFecha, inicial: DatosTurno, d: DatosGuardado) => {
+    const nuevo = construirEvento(d)
+    const mismasHoras = d.start === inicial.start && d.end === inicial.end
+    const actualizado = mismasHoras ? { ...nuevo, start: ev.start, duration: ev.duration } : nuevo
+    setEventos((prev) => prev.map((e) => (e === ev ? actualizado : e)))
+    const rotulo = actualizado.fecha.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+    aviso.ok(\`Appointment for \${d.patient} updated: \${rotulo}, \${fmtExacta(actualizado.start)}.\`)
+    return true
+  }
+
+  /* Delete (CON-2990): el turno sale de la grilla; la pregunta la hace el detalle. */
+  const borrarTurno = (ev: EventoConFecha) => {
+    setEventos((prev) => prev.filter((e) => e !== ev))
+    setDetail(null)
+    aviso.ok(\`\${ev.patient}'s appointment was deleted.\`)
+  }
+
+
+  return (
+    <div className={CONTENEDOR_PAGINA}>
+      {/* Al lado del título, sólo las acciones; la vista y los filtros van con la fecha (scheduling.md, 2026-11-20). */}
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <PageTitle>Scheduling</PageTitle>
+        <div className="flex flex-wrap items-center gap-2">
+          {/* Event y Register appointment quedan fuera de la barra hasta que se
+              defina qué hacen. No se borran: el markup sigue acá detrás de
+              PENDIENTES, así volver a mostrarlos es cambiar una constante y no
+              rehacer los botones. Event nunca tuvo destino en el Figma;
+              Register appointment abría el mismo modal que New appointment. */}
+          {PENDIENTES && (
+            <>
+              <button
+                onClick={() => aviso.info('Event scheduling is not available in this release.')}
+                className="bg-dash-blue hover:bg-dash-blue-hover h-8 rounded-md px-4 text-xs font-medium text-white transition-colors"
+              >
+                Event
+              </button>
+              <button
+                onClick={() => setPanel('new')}
+                className="bg-dash-blue hover:bg-dash-blue-hover flex h-8 items-center gap-1.5 rounded-md px-4 text-xs font-medium text-white transition-colors"
+              >
+                <Plus className="size-3.5" /> Register appointment
+              </button>
+            </>
+          )}
+          <Button size="md" onClick={() => setPanel('new')} data-tour="sched-new">
+            <Plus /> New appointment
+          </Button>
+        </div>
+      </div>
+
+      {/* La fecha con el selector de la app, igual que el Dashboard (sin flechas); al lado, Status legend. A la derecha,
+          Day / Week / Month y View: cambian qué se ve, como la fecha (scheduling.md, 2026-11-20). */}
+      <div className="mt-4 flex flex-wrap items-center justify-between gap-2">
+        <div className="flex flex-wrap items-center gap-2">
+          <DatePicker variant="toolbar" value={fecha} onChange={setFecha} />
+          {/* Volver a hoy; desaparece cuando ya estás en hoy, como en el Dashboard. */}
+          {!sameDay(fecha, FECHA_ANCLA) && (
+            <Button variant="secondary" size="md" onClick={() => setFecha(FECHA_ANCLA)} title="Go to today">
+              <CalendarClock /> Today
+            </Button>
+          )}
+          <StatusLegend />
+        </div>
+        <div className="flex flex-wrap items-center gap-2">
+          {/* El Figma marca "Month" activo aunque la vista sea semanal. */}
+          <Tabs aria-label="Calendar view" tabs={['Day', 'Week', 'Month'] as const} value={view} onChange={setView} />
+          <ViewMenu valor={vista} onGuardar={setVista} />
+        </div>
+      </div>
+
+      {/* Grilla: la misma agenda en tres vistas. */}
+      {view === 'Day' && (
+        <VistaDia eventos={eventos} fecha={fecha} onMover={mover} onAbrir={abrirDetalle} />
+      )}
+      {view === 'Week' && (
+        <VistaSemana eventos={eventos} fecha={fecha} onMover={mover} onAbrir={abrirDetalle} />
+      )}
+      {view === 'Month' && (
+        <VistaMes eventos={eventos} fecha={fecha} onMover={mover} onAbrir={abrirDetalle} />
+      )}
+
+      {/* Panel flotante de solicitudes + FAB. 280 de ancho, como la columna Appointments del Patient Dashboard: la
+          card de solicitud es la misma y mide lo mismo (scheduling.md, 2026-10-12). */}
+      {reqOpen && (
+        <div className="motion-safe:animate-[fab-panel-in_180ms_cubic-bezier(0.16,1,0.3,1)] fixed right-[100px] bottom-8 z-30 flex max-h-[70svh] w-[min(280px,calc(100vw-116px))] origin-bottom-right flex-col rounded-lg border border-line bg-white p-4 shadow-floating">
+          <p className="text-[13px] font-bold text-ink">Appointment requests</p>
+          <Tabs
+            size="sm"
+            fullWidth
+            className="mt-3 shrink-0"
+            aria-label="Request type"
+            tabs={(['ASAP', 'Waiting list'] as const).map((t) => ({ value: t, count: solicitudes.filter((x) => x.tipo === t).length }))}
+            value={reqTab}
+            onChange={setReqTab}
+          />
+
+          {/* La lista scrollea sola: el panel está anclado al FAB y no puede
+              crecer hasta tapar el calendario. */}
+          <div className="-mr-1 mt-3 flex min-h-0 flex-col gap-2 overflow-y-auto pr-1">
+            {visibles.length === 0 ? (
+              <EmptyState
+                icon={Inbox}
+                title="No requests"
+                detail={
+                  reqTab === 'ASAP'
+                    ? 'No one is waiting for the first available slot.'
+                    : 'Nothing on the waiting list right now.'
+                }
+                className="py-6"
+              />
+            ) : (
+              visibles.map((s) => (
+                <SolicitudCard
+                  key={s.id}
+                  s={s}
+                  onCancel={() => cancelarSolicitud(s)}
+                  onSchedule={() => setAgendando(s)}
+                />
+              ))
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Anillo del design system: 3px de stroke a 3px del botón. Se usa
+          outline + outline-offset en vez de box-shadow para que el hueco sea
+          transparente y deje ver el fondo, en lugar de pintarse de blanco. */}
+      <button
+        onClick={() => setReqOpen((v) => !v)}
+        aria-label="Appointment requests"
+        aria-pressed={reqOpen}
+        className={cn(
+          'bg-dash-blue fixed right-8 bottom-8 z-30 flex size-[60px] items-center justify-center',
+          'rounded-full text-white transition-all outline-none',
+          'hover:bg-dash-ring',
+          'shadow-lg [outline-style:solid] outline-[3px] outline-offset-[3px] outline-transparent',
+          'focus-visible:outline-[var(--color-dash-ring)]',
+          reqOpen && 'outline-[var(--color-dash-ring)]',
+        )}
+      >
+        <CalendarCheck className="size-6" />
+      </button>
+
+      {detail && (
+        <AppointmentDetailsDrawer
+          patient={detail.ev.patient}
+          estado={detail.ev.state}
+          inicio={detail.ev.start}
+          duracion={detail.ev.duration}
+          fecha={detail.ev.fecha}
+          provider={detail.ev.provider}
+          room={detail.ev.room}
+          reason={detail.ev.reason}
+          anchor={detail.rect}
+          onClose={() => setDetail(null)}
+          onDelete={() => borrarTurno(detail.ev)}
+          onEdit={() => abrirEdicion(detail.ev)}
+        />
+      )}
+      {panel === 'new' && <NewAppointmentModal onGuardar={crearTurno} onClose={() => setPanel(null)} />}
+      {editando && (
+        <NewAppointmentModal
+          edicion
+          inicial={editando.datos}
+          onGuardar={(d) => guardarEdicion(editando.ev, editando.datos, d)}
+          onClose={() => setEditando(null)}
+        />
+      )}
+      {/* Agendar una solicitud es crear un turno, no editarlo: el modal es el
+          mismo pero llega con lo que el paciente ya había pedido. */}
+      {agendando && (
+        <NewAppointmentModal
+          inicial={datosDeSolicitud(agendando)}
+          onGuardar={(d) => agendarSolicitud(agendando, d)}
+          onClose={() => setAgendando(null)}
+        />
+      )}
+    </div>
+  )
+}
+
+/* Una solicitud tiene dos salidas y las dos están en la card. Es la misma card que los turnos del Patient
+   Dashboard (TarjetaTurno); el rojo es sólo para ASAP: en la lista de espera nada es urgente por definición. */
+export function SolicitudCard({
+  s, onCancel, onSchedule,
+}: {
+  s: Solicitud
+  onCancel: () => void
+  onSchedule: () => void
+}) {
+  const urgente = s.tipo === 'ASAP'
+  return (
+    <TarjetaTurno
+      tono={urgente ? 'danger' : 'info'}
+      etiqueta={urgente ? 'ASAP' : (s.espera ?? 'Waiting list')}
+      nombre={s.patient}
+      motivo={s.reason}
+      cuando={\`\${fechaLegible(s.date)} · \${s.start} - \${s.end}\`}
+      lugar={s.location}
+      acciones={
+        <>
+          <Button variant="secondary" size="sm" onClick={onCancel}>Cancel</Button>
+          <Button size="sm" onClick={onSchedule}>Schedule</Button>
+        </>
+      }
+    />
+  )
+}
+`})))()}export{n,i as r,r as t};
