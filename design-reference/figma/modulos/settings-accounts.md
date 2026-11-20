@@ -178,7 +178,9 @@ Julián: la pestaña Subscription de Edit Account no estaba alineada en tamaños
   ficha del paciente al lado; en Billing y el Ledger miden 252–259px.
 - **Los títulos de sección eran los distintos:** *Subscription Summary* y *Subscription History* estaban en 16px. Pasan a
   15px bold, como *Recent Billing Activity* de Billing.
-- **Sin cambiar, para decidir:** las pestañas (Information / Subscription / Owner) miden 32px y Cancel / Save 36px. En el
-  Ledger y Billing las pestañas son de 28px y los botones de 32px, pero estas son las de todas las pantallas de edición
-  de Settings (Location, Employee, Ledger options, Carriers, Insurance Plan) y el pie es `FormFooter`, compartido.
-  Si se achican, conviene hacerlo en todo Settings a la vez.
+- **Pestañas y pie, en todo Settings** (Julián: "hacelo"):
+  - Las pestañas de las pantallas de edición pasan a `Tabs size="sm"` (28px), como el Ledger y Billing: Account,
+    Location, Employee, Ledger options, Carriers e Insurance Plan.
+  - `FormFooter` (Cancel / Save) pasa a 32px en una pantalla, como los botones de acción del Ledger. Vale también para
+    Edit Patient e Insurance del paciente, que lo comparten.
+  - Adentro de un drawer el pie sigue en 36px, como `DrawerActions`: lo fija `ModalShell`.

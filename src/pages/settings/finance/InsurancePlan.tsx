@@ -381,7 +381,7 @@ export function SettingsInsurancePlan() {
         titulo="Edit Insurance Plan"
         etiquetas={<Pill tone={TONO_ESTADO[p.estado]}>{p.estado}</Pill>}
       />
-      <Tabs
+      <Tabs size="sm"
         className="mt-5" aria-label="Insurance plan sections" value={seccion.nombre}
         tabs={SECCIONES_PLAN.map((s) => s.nombre)}
         onChange={(n) => {

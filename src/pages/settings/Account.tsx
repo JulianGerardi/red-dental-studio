@@ -88,7 +88,7 @@ export function SettingsAccount() {
     <div className="px-4 py-6 sm:px-8">
       <PageTitle>Edit Account</PageTitle>
 
-      <Tabs className="mt-4" aria-label="Account sections" tabs={TABS} value={tab} onChange={setTab} />
+      <Tabs size="sm" className="mt-4" aria-label="Account sections" tabs={TABS} value={tab} onChange={setTab} />
 
       <div className="mt-4 flex flex-col gap-4">
         {tab === 'Information' && (

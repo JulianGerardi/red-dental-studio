@@ -133,7 +133,7 @@ export function SettingsLedgerOptions() {
         </select>
       </SettingsPageHeader>
 
-      <Tabs className="mt-4" aria-label="Filter options" tabs={filtros} value={filtro} onChange={(f) => { setFiltro(f); setPagina(1) }} />
+      <Tabs size="sm" className="mt-4" aria-label="Filter options" tabs={filtros} value={filtro} onChange={(f) => { setFiltro(f); setPagina(1) }} />
 
       <div className="mt-4 w-full overflow-x-auto rounded-lg border border-line-row bg-white">
         <div className={tab === 'Adjustments Types' ? 'min-w-[820px]' : 'min-w-[620px]'}>
