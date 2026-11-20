@@ -82,3 +82,9 @@ Pedido de Julián. Corrige el 2026-11-20 anterior: qué lista se ve no es un fil
 1. El grupo *View* del Filter pasa a `Tabs` `sm` debajo del título, como las fichas de Settings (Location, Account,
    Employee). Cambiar de pestaña vuelve *Type* a All, limpia el buscador y la página, como antes.
 2. El Filter queda con un solo grupo, *Type*, con las opciones de la pestaña y su cantidad.
+
+### Las pestañas, a la derecha de la fila del buscador (2026-11-20)
+
+Pedido de Julián: las pestañas van a la altura del buscador, en la otra punta de la tabla. Buscador y Filter a la
+izquierda, *Adjustment types / Payment methods* a la derecha, alineadas al borde derecho de la tabla, en `md` (32, el alto
+del buscador). En el celular bajan a su propio renglón.

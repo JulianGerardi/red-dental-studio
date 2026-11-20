@@ -103,3 +103,10 @@ Disable Clinical Practitioner*).
    cosa. Las pestañas *Provider info* quedan: CON-3542 las llama así.
 3. Pendiente (no se pidió): CON-4085 suma "Credentials expired" con un ícono debajo del *Yes* cuando vence una
    credencial requerida; CON-3542 pide validar turnos y encounters antes de deshabilitar (hoy se deshabilita directo).
+
+### CON-4085 · *Credentials expired* debajo del *Yes* (2026-11-20)
+
+Debajo del *Yes* de *Clinical practitioner*, un ícono de advertencia y "Credentials expired" en el tono warning cuando la
+persona tiene al menos una credencial requerida vencida (`credencialesVencidas` en `data/employees.ts`; en el mock, Julio
+Perez). Sin link: a la ficha se entra por el ⋮ (2026-11-18). Que desaparezca al renovar la credencial depende del
+backend; acá no hay vencimientos calculados.

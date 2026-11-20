@@ -3,7 +3,7 @@ import { PADDING_PAGINA } from '@/lib/estilos'
 import { useCallback, useMemo, useState } from 'react'
 import { PageTitle } from '@/components/ui/page-title'
 import { Link, useNavigate, useParams } from 'react-router-dom'
-import { Trash2, FileText, Pencil, Ban, UserMinus, Plus } from 'lucide-react'
+import { Trash2, FileText, Pencil, Ban, UserMinus, Plus, TriangleAlert } from 'lucide-react'
 import { EmptyState } from '@/components/ui/empty-state'
 import { EditableAvatar } from '@/components/ui/editable-avatar'
 import { aviso } from '@/components/ui/toaster'
@@ -42,8 +42,18 @@ export function EstadoPill({ estado }: { estado: Empleado['estado'] }) {
   return <Pill tone={estado === 'Active' ? 'success' : 'neutral'}>{estado}</Pill>
 }
 
-export function ProviderPill({ si }: { si: boolean }) {
-  return <Pill tone={si ? 'info' : 'neutral'}>{si ? 'Yes' : 'No'}</Pill>
+export function ProviderPill({ si, vencidas }: { si: boolean; /** Credenciales requeridas vencidas (CON-4085). */ vencidas?: boolean }) {
+  const pill = <Pill tone={si ? 'info' : 'neutral'}>{si ? 'Yes' : 'No'}</Pill>
+  if (!si || !vencidas) return pill
+  /* Debajo del Yes, el aviso de CON-4085: no se lo puede asignar a turnos hasta renovarlas (employees.md, 2026-11-20). */
+  return (
+    <span className="flex flex-col items-start gap-1">
+      {pill}
+      <span className="flex items-center gap-1 text-[11px] font-medium text-warn-fg">
+        <TriangleAlert className="size-3.5 shrink-0" aria-hidden /> Credentials expired
+      </span>
+    </span>
+  )
 }
 
 /* `nuevo`: la ruta /settings/team/new abre la lista con el drawer de New Employee ya abierto. */
@@ -95,7 +105,7 @@ export function SettingsEmployees({ nuevo = false }: { nuevo?: boolean }) {
             { key: 'cumple', header: 'Date of birth', width: 120, cell: (e) => <TextCell>{e.cumpleanos}</TextCell> },
             { key: 'email', header: 'Email', cell: (e) => <TextCell>{e.email}</TextCell> },
             /* "Clinical practitioner", como CON-4085 y CON-3542 (employees.md, 2026-11-20). */
-            { key: 'provider', header: 'Clinical practitioner', width: 160, cell: (e) => <ProviderPill si={e.esProvider} /> },
+            { key: 'provider', header: 'Clinical practitioner', width: 160, cell: (e) => <ProviderPill si={e.esProvider} vencidas={e.credencialesVencidas} /> },
             { key: 'estado', header: 'Status', width: 100, cell: (e) => <EstadoPill estado={e.estado} /> },
           ]}
           rows={visibles}

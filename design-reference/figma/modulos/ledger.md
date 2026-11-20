@@ -1171,3 +1171,14 @@ alineado al design system.
 Julián: el ícono de descargar de la barra de la tabla no va. Sale *Export statement*, que estaba por CON-3755 pero no está
 en red.dev; la barra queda con Expand / Collapse all (con una fila abierta) y *Columns*. Mismo criterio que en Billing,
 donde ya había salido.
+
+## Al lado del título, sólo las acciones; los ajustes en secundario (2026-11-20)
+
+Sin historia de Jira (pedido de Julián después del análisis de botones de acción).
+
+1. *Patient view / Guarantor view* sale de la fila del título (no es una acción, cambia qué se ve) y va a la barra de la
+   tabla, en la punta derecha, después de Columns, en `sm` como el resto de esa barra. Es la misma regla que Ledger
+   options: la vista va a la altura de las herramientas de la tabla, en la otra punta.
+2. Tres botones azules juntos no dejaban ver cuál es el principal. *Patient payment* queda en primario; *Credit
+   adjustment* y *Charge adjustment* pasan a secundario (blanco con borde). Los textos e íconos no cambian. Lo mismo en
+   Billing con un paciente elegido.

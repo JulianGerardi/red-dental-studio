@@ -1,8 +1,9 @@
 import { useId, useState, type KeyboardEvent, type ReactNode } from 'react'
-import { ChevronDown, Search, SearchX, X } from 'lucide-react'
+import { Search, SearchX, X } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { aviso } from '@/components/ui/toaster'
-import { Button, buttonClasses } from '@/components/ui/button'
+import { Button } from '@/components/ui/button'
+import { FilterTrigger } from '@/components/ui/filter-menu'
 import { EmptyState } from '@/components/ui/empty-state'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { ICONO_SUELTO } from '@/lib/estilos'
@@ -297,20 +298,16 @@ export function ViewFiltersPanel({
   )
 }
 
-/* El botón View de la barra de Scheduling con su panel. Se despliega debajo, alineado a su borde derecho y sin fondo
-   oscuro; el popover (Radix) lo corre para que entre en pantalla y cierra con Escape o un clic afuera. */
+/* El filtro de la barra de Scheduling con su panel: el botón es el Filter de la app (ícono, "Filter" y cuántos aplicados),
+   el panel sigue siendo el de View, con Save (scheduling.md, 2026-11-20). Se despliega debajo, alineado a su borde
+   derecho y sin fondo oscuro; el popover (Radix) lo corre para que entre en pantalla y cierra con Escape o un clic afuera. */
 export function ViewMenu({ valor, onGuardar }: { valor: VistaCalendario; onGuardar: (v: VistaCalendario) => void }) {
   const [abierto, setAbierto] = useState(false)
   return (
     <Popover open={abierto} onOpenChange={setAbierto}>
       <PopoverTrigger asChild>
-        <button
-          type="button"
-          className={buttonClasses({ size: 'md' })}
-        >
-          View
-          <ChevronDown aria-hidden className={cn('size-3.5 transition-transform', abierto && 'rotate-180')} />
-        </button>
+        {/* Sin contador: la grilla todavía no se filtra con lo elegido (scheduling.md, 2026-11-20). */}
+        <FilterTrigger label="Filter calendar" />
       </PopoverTrigger>
       <PopoverContent
         align="end"

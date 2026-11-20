@@ -822,3 +822,10 @@ Sin historia de Jira (pedido de Julián: *"al lado del título van los botones d
 2. En el celular la barra se parte en dos renglones: fecha y *Status legend* arriba, la vista y *View* abajo.
 3. Queda para decidir (análisis de filtros, misma fecha): *View* es un filtro (providers, estados y salas) pero se ve
    como un botón primario sin ícono y aplica con *Save*, distinto del `FilterMenu` del resto de la app.
+
+### *View* con la cara del Filter (2026-11-20)
+
+Análisis de filtros, pedido por Julián: el botón *View* (azul, sin ícono) pasa a ser el `FilterTrigger` de la app (blanco,
+ícono y "Filter"). El panel no cambia: sigue con sus tres grupos y Save. **Sin contador**: la grilla todavía no se filtra
+con lo elegido (es mock); mostrar "Filter 3" en azul diría que hay filtros aplicados que no se ven. Cuando la grilla
+filtre, se pasa `count`.

@@ -321,7 +321,7 @@ export function BuscarPaciente({ busqueda, onBusqueda, paciente, saldoDe, onEleg
 }
 
 /* Los pagos y ajustes son de un paciente: con uno elegido, los tres botones van en la fila del título, al lado de Export
-   CSV, como red.dev y el Ledger (billing.md, 2026-11-19). */
+   CSV, como red.dev y el Ledger (billing.md, 2026-11-19). El pago en primario, los ajustes en secundario (2026-11-20). */
 export function AccionesPaciente({ onAccion }: {
   onAccion: (tipo: TipoAjusteBilling) => void
   /** Ya no se usa: Export statement salió de Billing (no está en red.dev). */
@@ -330,8 +330,8 @@ export function AccionesPaciente({ onAccion }: {
   return (
     <div className={cn('flex flex-wrap items-center gap-2', ENTRADA)}>
       <Button size="md" onClick={() => onAccion('Patient Payment')}><Wallet /> Patient payment (-)</Button>
-      <Button size="md" onClick={() => onAccion('Credit Adjustment')}><MinusCircle /> Credit adjustment (-)</Button>
-      <Button size="md" onClick={() => onAccion('Charge Adjustment')}><PlusCircle /> Charge adjustment (+)</Button>
+      <Button variant="secondary" size="md" onClick={() => onAccion('Credit Adjustment')}><MinusCircle /> Credit adjustment (-)</Button>
+      <Button variant="secondary" size="md" onClick={() => onAccion('Charge Adjustment')}><PlusCircle /> Charge adjustment (+)</Button>
     </div>
   )
 }

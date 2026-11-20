@@ -493,3 +493,8 @@ Payments / Adjustments / Today** de Recent Billing Activity pasan al `FilterMenu
 de Columns: un grupo *Type* de una opción, cada una con su cantidad. Con un paciente elegido siguen las pestañas
 Patient / Guarantor View (cambian de vista, no filtran). `ActividadReciente` suma `todas` para las cantidades. e2e en
 `tests/billing.e2e.ts` (abre el Filter en vez de tocar las pestañas).
+
+## Ajustes en secundario (2026-11-20)
+
+Con un paciente elegido, *Patient payment* queda en primario y *Credit adjustment* / *Charge adjustment* pasan a
+secundario, igual que el Ledger (ledger.md, misma fecha).

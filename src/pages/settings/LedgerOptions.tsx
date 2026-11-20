@@ -110,18 +110,20 @@ export function SettingsLedgerOptions() {
     <div className={PADDING_PAGINA}>
       <SettingsPageHeader titulo="Ledger options" />
 
-      {/* Qué lista se ve, en pestañas como las fichas de Settings; el Filter queda para el tipo (settings-ledger.md, 2026-11-20). */}
-      <Tabs size="sm" className="mt-4" aria-label="Ledger options" tabs={TABS} value={tab} onChange={cambiarTab} />
-
-      <div className="mt-4 flex flex-wrap items-center gap-3">
-        <SettingsSearch value={q} onChange={(v) => { setQ(v); setPagina(1) }} placeholder={tab === 'Adjustment types' ? 'Search adjustment types' : 'Search payment methods'} onSearch={() => setPagina(1)} />
-        <FilterMenu
-          label={tab === 'Adjustment types' ? 'Filter adjustment types' : 'Filter payment methods'}
-          groups={[{
-            type: 'single', title: 'Type', defaultValue: 'All', value: filtro, onChange: (f) => { setFiltro(f); setPagina(1) },
-            options: filtros.map((f) => ({ value: f, count: (tab === 'Adjustment types' ? AJUSTES : METODOS).filter((x) => coincide(x, f)).length })),
-          }]}
-        />
+      {/* Buscador y Filter a la izquierda; qué lista se ve, en pestañas a la derecha, en el borde de la tabla
+          (settings-ledger.md, 2026-11-20). */}
+      <div className="mt-5 flex flex-wrap items-center justify-between gap-3">
+        <div className="flex flex-wrap items-center gap-3">
+          <SettingsSearch value={q} onChange={(v) => { setQ(v); setPagina(1) }} placeholder={tab === 'Adjustment types' ? 'Search adjustment types' : 'Search payment methods'} onSearch={() => setPagina(1)} />
+          <FilterMenu
+            label={tab === 'Adjustment types' ? 'Filter adjustment types' : 'Filter payment methods'}
+            groups={[{
+              type: 'single', title: 'Type', defaultValue: 'All', value: filtro, onChange: (f) => { setFiltro(f); setPagina(1) },
+              options: filtros.map((f) => ({ value: f, count: (tab === 'Adjustment types' ? AJUSTES : METODOS).filter((x) => coincide(x, f)).length })),
+            }]}
+          />
+        </div>
+        <Tabs aria-label="Ledger options" tabs={TABS} value={tab} onChange={cambiarTab} />
       </div>
 
       <div className="mt-4 w-full overflow-x-auto rounded-lg border border-line-row bg-white">
