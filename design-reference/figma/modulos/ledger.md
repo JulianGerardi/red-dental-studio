@@ -1165,3 +1165,9 @@ alineado al design system.
    fondo `info-bg` y ✓. Colores, radios y letra del design system; los textos siguen siendo los nuestros (*Whole
    household*, *Self*, *Dependent*).
 4. El pie de *Ledger Transactions* ya no parte "Amount not applied" en dos renglones.
+
+### Sin Export statement en la tabla (2026-11-20)
+
+Julián: el ícono de descargar de la barra de la tabla no va. Sale *Export statement*, que estaba por CON-3755 pero no está
+en red.dev; la barra queda con Expand / Collapse all (con una fila abierta) y *Columns*. Mismo criterio que en Billing,
+donde ya había salido.
