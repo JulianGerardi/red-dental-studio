@@ -5,7 +5,7 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-11-20
 
-### Settings con los tamaños del Ledger y Billing
+### Settings con los tamaños del Ledger y Billing ([#175](https://github.com/JulianGerardi/red-dental-studio/pull/175))
 - **Edit Account › Subscription:** *Subscription Summary* y *Subscription History* pasan de 16 a 15px bold, como los
   títulos de Billing. Las cards ya eran `ui/stat-card`, iguales a las del Ledger y Billing.
 - **Pestañas de las pantallas de edición de Settings** (Account, Location, Employee, Carriers, Insurance
