@@ -16,19 +16,25 @@ test('Sin encuentro abierto las opciones del ⋮ quedan deshabilitadas y un tool
   await expect(screen.getByRole('tooltip')).toContainText(SIN_ENCUENTRO)
 })
 
-test('Request pasa la orden a Requested y Cancel la saca de la lista', async ({ app, screen }) => {
+test('Request y Cancel preguntan antes; la orden queda en la lista con su estado nuevo', async ({ app, screen }) => {
   await app.open('/')
   await screen.getByRole('tab', /^Lab orders/).tap()
   /* Olivia Brooks está en el sillón: su encuentro está abierto. */
   await screen.getByRole('button', 'Actions for Lab order for Olivia Brooks').tap()
   await screen.getByRole('menuitem', 'Request').tap()
-  await expect(screen.getByText('Lab order for Olivia Brooks requested.')).toBeVisible()
+  await screen.getByRole('dialog', 'Request lab order').getByRole('button', 'Confirm').tap()
+  await expect(screen.getByText('Lab order requested')).toBeVisible()
   await expect(screen.getByRole('button', 'Open PDF of the lab order for Olivia Brooks')).toBeVisible()
 
+  /* Requested: Edit queda apagado (sólo se edita en Pending) y aparecen Reject, Deliver y Delay. */
   await screen.getByRole('button', 'Actions for Lab order for Olivia Brooks').tap()
+  await expect(screen.getByRole('menuitem', 'Edit')).toHaveAttribute('aria-disabled', 'true')
+  await expect(screen.getByRole('menuitem', 'Delay')).toBeVisible()
   await screen.getByRole('menuitem', 'Cancel').tap()
-  await screen.getByRole('dialog', 'Cancel this lab order?').getByRole('button', 'Cancel lab order').tap()
-  await expect(screen.getByRole('tab', 'Lab orders (1)')).toBeVisible()
+  await screen.getByRole('dialog', 'Cancel lab order').getByRole('button', 'Confirm').tap()
+  await expect(screen.getByText('Lab order cancelled')).toBeVisible()
+  await expect(screen.getByRole('tab', 'Lab orders (2)')).toBeVisible()
+  await expect(screen.getByText('Cancelled')).toBeVisible()
 })
 
 test('Complete this Task abre el detalle de la orden, en sólo lectura sin encuentro', async ({ app, screen }) => {

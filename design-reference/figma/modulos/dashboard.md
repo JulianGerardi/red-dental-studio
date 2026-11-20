@@ -1085,3 +1085,26 @@ note*, *Login to sign document*); el contenido del documento (vista y PDF) queda
 Note*, *Medical History*…), igual que los demás nombres de documentos.
 
 `tests/pending-tasks.e2e.ts`.
+
+## CON-2641 · CON-2643 · El ⋮ según el estado y el PDF de la Lab Order (2026-11-20, segunda tanda)
+
+**Jira:** CON-2641, CON-2643. Tres videos más de red.dev de Julián, con el encuentro abierto.
+
+- **Cada cambio de estado pregunta antes** (`ui/confirm-dialog`, *Cancel* y *Confirm*) y **avisa después** con título y
+  detalle, con los textos de red.dev: *Request lab order — Are you sure you want to mark this order as Requested? Once
+  marked as Requested, you will no longer be able to edit this order.* → *Lab order requested · The lab order has been
+  successfully marked as Requested.* Igual para Cancel, Reject y Delay. Se saca el *Undo* de la tanda anterior.
+- **El ⋮ según el estado:** Pending → Edit, Request, Cancel, Delete. Requested → Edit, Reject, Deliver, Delay, Cancel; Edit
+  apagado con el tooltip *This lab order can only be edited while Pending.* Reject y Cancel en rojo.
+- **La tarea se queda en la lista con su estado nuevo** (en el video, la cancelada sigue con *Cancelled* en negro). Sólo
+  Delete y la firma de la Clinical Note la sacan.
+- **PDF de la Lab Order**, dos páginas como red.dev: encabezado (logo, Red Dental Studio en azul; provider, *Lab Order ID*,
+  *Patient Phone*, *Email*, *Expiration Date* a la derecha), *Patient Information*, *Receiving Laboratory*, *Provider
+  Information*, *Dental Work Request* y, en la segunda, *Teeth & Surface Specifications* con el odontograma (los dientes
+  de la orden en azul) y *Tooth 3: O*… (`ordenDeLab`, `pdfOrdenLab`).
+- **El detalle** (clinical-mode.md) arranca con los datos de esa orden, los mismos del PDF, y se edita sólo con el
+  encuentro abierto y en Pending.
+
+**Fuera de los videos, en el mismo molde:** las preguntas y avisos de Deliver y Delete, y los de Prescription (Activate
+y Cancel); el ⋮ de una orden Delayed (como Requested sin Delay) y el de una cerrada (sólo Edit, apagado). El filtro *All
+Providers* del video 7 no se trae: el Dashboard filtra por tipo con pestañas (decisión del 2026-10-29).
