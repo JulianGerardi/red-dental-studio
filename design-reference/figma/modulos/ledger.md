@@ -1118,3 +1118,29 @@ tabla en el mismo paso, como Patient Payment (hoy son dos pasos).
 Julián: "en todas las cards de las métricas el número tiene que ser azul". `ui/stat-card` (Billing, Ledger y Edit Account →
 Subscription) pasa del negro de red.dev a `text-dash-blue`, igual que las del Dashboard (`StatStrip`, `dashboard/StatCard`).
 Rótulo y bajada no cambian.
+
+## CON-3738, CON-3739, CON-3735 · Los drawers contra el video de red.dev, input por input (2026-11-20)
+
+Julián: revisar contra el video todos los inputs de los drawers y cómo se comporta cada uno, y sacar el ícono del título.
+Están todos los inputs del video; cambia cómo se comportan algunos:
+
+1. **Sin ícono en el título de la card** (*Payment Information*, *Credit Adjustment Information*, *Adjustment
+   Information*). Con el ícono se va el plegado, que era lo que hacía. Crédito y cargo no tenían el título: ahora llevan
+   la misma card que el pago (`SeccionLedger`, sin la prop `caja`).
+2. **Sin transacciones abiertas** (Apply to con alguien sin cargos): el pago no muestra los métodos de pago y Save se
+   apaga; en el crédito también se apaga Save. Antes se podía guardar todo como crédito sin aplicar, y eso no está en
+   red.dev. La tabla dice *No open transactions.*
+3. **Cambiar Apply to en el pago** pone en el importe lo abierto del nuevo alcance, si hay un solo método. En el video, al
+   pasar a "(Guarantor)" aparece el 88,00.
+4. **El método que suma el +** arranca con Check Payment y 0.00, como el video. Antes arrancaba vacío.
+5. **Credit Adjustment en una sola página**, como el pago: los datos y Ledger Transactions debajo, sin Adjustment →
+   Allocation. *Adjustment type* arranca vacío ("Select credit type") y es obligatorio.
+6. **Siguen siendo nuestros** (diseño, no lógica):
+   - Los campos van de a dos. red.dev pone cuatro en fila en el crédito y en el cheque, y tres en el cargo.
+   - Los métodos van en una sola caja gris. red.dev pone una por método.
+   - El selector de fecha es el de la app.
+   - Notes dice "Add a note (optional)".
+   - El pie es el de todos los drawers.
+
+**A validar:** que en recepción no se extrañe poder registrar un pago sin cargos abiertos, por ejemplo un adelanto. red.dev
+no lo deja; si hace falta, es una historia aparte.
