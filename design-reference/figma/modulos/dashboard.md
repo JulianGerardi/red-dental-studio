@@ -1026,3 +1026,12 @@ who checked in and have not checked out yet* · *Encounters started and not clos
 **Waiting room**, el nombre del panel. En celular el bloque va debajo de la fecha, en columnas iguales y sin ícono.
 Es la variante compacta del Metric; la estándar (monto con contexto) es la de Ledger y Billing. Para validar: si alguien
 extraña ver "N completed" sin abrir el ⓘ.
+
+## "Show N more" al pie del panel, alineado entre columnas (2026-11-20)
+
+Sin historia de Jira; pedido de Julián con el Figma *Screens & Flows* `509:81656`. Las tres columnas se estiran a la
+misma altura, pero "Show N more" quedaba pegado a la última fila de cada lista: en Waiting room caía 45 px más arriba
+que en Appointments. Ahora va al pie del panel (`ShowMore alPie`, también en `ListGroup`): los dos botones quedan a la
+misma altura, a 16 px del borde de abajo, aunque cada lista mida distinto. Abierto ("Show less") sigue igual. En tablet
+y celular, con los paneles uno debajo del otro, no cambia nada. Para validar: si el hueco entre la última fila de
+Waiting room y su botón se lee como "hay más", o si conviene llenar ese alto con filas (`llenarAlto`).

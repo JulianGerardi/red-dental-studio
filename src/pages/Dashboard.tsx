@@ -374,7 +374,7 @@ export default function Dashboard() {
               />
             )
           ) : (
-            <ListGroup limit={TOPE.turnos} label="appointments">
+            <ListGroup limit={TOPE.turnos} alPie label="appointments">
               {turnos.map((a) => {
                 const id = `appt-${claveTurno(a)}`
                 return (
