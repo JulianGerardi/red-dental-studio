@@ -5,6 +5,12 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-11-20
 
+### Dashboard: "Show N more" al pie del panel, alineado entre columnas ([#177](https://github.com/JulianGerardi/red-dental-studio/pull/177))
+- Appointments y Waiting room muestran "Show N more" a la misma altura, al pie de cada panel (Figma Flows `509:81656`);
+  antes iba pegado a la última fila y en Waiting room caía 45 px más arriba.
+- **Para el dev:** `ShowMore` y `ListGroup` suman `alPie` (botón al pie con `mt-auto`; el panel tiene que dar alto con
+  `flex-1`). Sin la prop no cambia nada. Decisión en `modulos/dashboard.md` (2026-11-20).
+
 ### Normalización de UI: tamaños, buscador único, sentence case, columnas Name, Account única y métricas compactas ([#176](https://github.com/JulianGerardi/red-dental-studio/pull/176))
 - **Tamaños:** `Button`, `FilterMenu`, `SearchInput` y `SearchButton` comparten sm 28 · md 32 · lg 36. Nivel de página
   en `md` (acción del título, buscador, filtro, fecha); dentro de una card en `sm`; campos de formulario en 36.
