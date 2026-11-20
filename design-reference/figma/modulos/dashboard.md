@@ -1015,3 +1015,56 @@ encounter pasa a Completed o Fulfilled.
 
 Sin historia de Jira (pedido de Julián). *Dashboard* era el único título con `PageTitle size="lg"` (24px bold); pasa al
 tamaño por defecto (20px semibold), el de Patients, Scheduling y Billing.
+
+## CON-2641 · CON-2643 · Pending Task con funcionalidad (2026-11-20)
+
+**Jira:** CON-2641 (Pending Tasks de la secretaria, Dashboard) y CON-2643 (Pending Tasks del paciente), epic CON-2639.
+Julián mandó dos videos de red.dev con cómo reacciona cada botón. La misma pieza (`PendingTaskList` → `TaskRow`) sirve
+al Dashboard y al Patient Dashboard; la lógica vive en `dashboard/tareas.tsx`.
+
+**Qué hace cada botón** (como en los videos):
+
+| Botón | Qué pasa |
+|---|---|
+| **Complete this Task** | Lab Order, Prescription y Referral abren Clinical Mode del paciente en la pestaña del tipo (`?tab=Lab%20Order&task=<id>`). La Lab Order entra directo a su detalle (ver clinical-mode.md, 2026-11-20). La Clinical Note abre *Clinical Note · Review and sign* (`ClinicalNoteDialog`); firmada, sale de la lista. |
+| **⋮ Lab Order** | Pending: Edit, Request, Cancel, Delete (video). Requested y Delayed: Edit y Cancel. |
+| **⋮ Prescription** | Activate y Cancel (video). |
+| **⋮ Referral** | Edit y Cancel (no aparece en los videos; ver *A validar*). |
+| **⋮ Clinical Note** | No lleva (video). |
+| **PDF** | Sólo si la tarea ya tiene documento: Requested, Delayed, Fulfilled; la Lab Order Pending todavía no. Abre el documento en una pestaña nueva (sin backend, el resumen de la tarea listo para imprimir); si el navegador bloquea la ventana, un aviso de error (CON-2643, CA6). |
+
+- **Sin encuentro abierto con el paciente** las opciones del ⋮ se ven deshabilitadas, como en red.dev, con el texto de
+  red.dev: *You do not have permission to perform this action because there is no open encounter for the selected
+  patient.* **Decisión:** en red.dev es un tooltip encima de cada opción deshabilitada; acá va escrito arriba de las
+  opciones, debajo de *Options*. Un tooltip sobre un ítem deshabilitado no se alcanza con el teclado ni con un lector de
+  pantalla, y en táctil no se ve.
+- **Encuentro abierto** = In progress u On hold (el encuentro existe y no se cerró). En el Dashboard sale del día: el
+  paciente en el sillón (`enCurso`) o en pausa en la Waiting Room. En el Patient Dashboard es el encuentro de la ficha
+  (`lib/encuentro`): *Start Encounter* habilita el ⋮.
+- **Request** pasa la orden a Requested y aparece su PDF; **Activate** deja la receta activa y sale de la lista. Los dos
+  se deshacen desde el aviso (*Undo*). **Cancel** y **Delete** preguntan antes (`ui/confirm-dialog`) y sacan la tarea:
+  ya no está pendiente (CON-2643, CA8).
+- Los cambios viven fuera de React, como el encuentro (`tareas.tsx`): lo que se hace en el detalle de Clinical Mode se ve
+  al volver al Dashboard y al revés. Se pierden al recargar (mock).
+- **Datos:** cada tarea tiene id, paciente, provider y un estado real de su tipo (CA3): Lab Orders Pending, Requested o
+  Delayed; Prescriptions Pending; Referrals Requested o Pending; Clinical Note Fulfilled (la nota del encuentro sin firmar,
+  como red.dev). En el día de la demo las tareas son de Olivia Brooks y Charlotte Reed (en el sillón), Henry Richardson
+  (en pausa), Sophia Collins y James Foster (todavía no llegaron): se ven los dos estados del ⋮.
+- **Orden:** dentro de cada tipo, por vencimiento, después por registro y por nombre (CA4).
+- **Expired date** sólo si la fecha ya pasó (antes salía siempre); la fecha va en rojo sólo vencida (V2). En el Dashboard
+  se mide contra el día elegido.
+- El estado lleva el tono de la tabla de Lab Order: Pending y Delayed ámbar, Requested violeta, Fulfilled verde (red.dev
+  pinta Fulfilled en rojo; acá rojo es error o cancelado).
+- La Clinical Note dice *Completed* en lugar de *Register* (video). Sin PDF queda el hueco del botón: *Complete this
+  Task* no se corre de una fila a otra.
+
+**Anomalías / límites del mock:** la barra de Clinical Mode muestra siempre al paciente de prueba (Julio Perez), no el de
+la tarea; el nombre correcto va en la cabecera del detalle. Las pestañas Prescription y Referral de Clinical Mode siguen
+"en construcción". Abrir una tarea desde el Dashboard deja el encuentro compartido en el de ese paciente (hay un solo
+encuentro en el mock).
+
+**A validar con usuarios:** el ⋮ de Referral (no está en los videos ni en las historias); si Requested y Delayed deberían
+ofrecer *Mark as Delivered* (CON-3479 tiene el permiso *Deliver Lab Order*); si On hold cuenta como encuentro abierto;
+y si la secretaria (CON-2641, CA3) debería ver *Complete this Task* en tareas clínicas (hoy no hay roles en la app).
+
+`tests/pending-tasks.e2e.ts`.

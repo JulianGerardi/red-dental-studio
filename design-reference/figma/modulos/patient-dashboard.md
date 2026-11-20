@@ -574,3 +574,10 @@ Julián: "poné algunos con pending signature así no tengo que hacer el flujo".
   `/patients/john-smith/clinical-mode` y volvía al primer paciente, así que la nota pendiente quedaba en otro.
 - Sigue perdiéndose al recargar (vuelve a la semilla). `ClinicalNoteDialog` pide `paciente`.
 - `tests/patient-dashboard.e2e.ts`: `patient-0002` abre con Pending Signature.
+
+## CON-2643 · Pending Task con funcionalidad (2026-11-20)
+
+**Jira:** CON-2643. Los botones de cada tarea (⋮, PDF, Complete this Task) ya hacen lo de red.dev; detalle en
+dashboard.md (2026-11-20). Acá: las nueve tareas pasan a ser **de John Smith**, el paciente de la ficha (antes decían
+Elena Marquez; CA9), con tres Lab Orders (Pending, Requested, Delayed) y dos de cada otro tipo. El ⋮ queda deshabilitado
+hasta *Start Encounter*.

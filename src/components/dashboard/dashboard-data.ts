@@ -54,17 +54,32 @@ export const TASK_KINDS = ['Clinical Note', 'Lab Orders', 'Prescriptions', 'Refe
 
 /* El frame muestra las cuatro cards rotuladas "Referrals" bajo el tab
    "Clinical Note" (anomalía 20). Con el filtro andando el rótulo tiene que
-   coincidir con la categoría, así que se reparten entre las cuatro. */
-const tareas = (porTipo: number, register: string, expiration: string): PendingTask[] =>
-  TASK_KINDS.flatMap((kind) =>
-    Array.from({ length: porTipo }, () => ({
-      kind,
-      state: 'Requested',
-      person: 'Elena Marquez',
-      initials: 'EM',
-      register,
-      expiration,
-    })),
+   coincidir con la categoría, así que se reparten entre las cuatro.
+
+   Cada tarea tiene su id, su paciente y un estado real de su tipo (CON-2643, CA3): Lab Orders Pending, Requested o
+   Delayed; Prescriptions Pending; Referrals Requested o Pending; la Clinical Note, Fulfilled (la nota del encuentro que
+   falta firmar, como red.dev). El PDF existe una vez pedida la orden: las Pending todavía no tienen (dashboard.md,
+   2026-11-20). */
+const ESTADOS_TAREA: Record<string, string[]> = {
+  'Clinical Note': ['Fulfilled'], 'Lab Orders': ['Pending', 'Requested', 'Delayed'], Prescriptions: ['Pending'], Referrals: ['Requested', 'Pending'],
+}
+type Persona = { name: string; provider: string }
+const ELENA: Persona = { name: 'Elena Marquez', provider: 'Dr. Elena Martinez' }
+const inicialesDe = (n: string) => n.split(' ').map((x) => x[0]).slice(0, 2).join('').toUpperCase()
+export const slugPaciente = (n: string) => n.toLowerCase().replace(/\s+/g, '-')
+
+const tareas = (clave: string, porTipo: number, register: string, vence: string | string[], gente: Persona[] = [ELENA]): PendingTask[] =>
+  TASK_KINDS.flatMap((kind, k) =>
+    Array.from({ length: porTipo }, (_, i) => {
+      const p = gente[(k * porTipo + i) % gente.length]!
+      const estados = ESTADOS_TAREA[kind]!
+      const state = estados[i % estados.length]!
+      return {
+        id: `${clave}-${kind.toLowerCase().replace(/\s+/g, '-')}-${i + 1}`,
+        kind, state, person: p.name, initials: inicialesDe(p.name), patientId: slugPaciente(p.name), provider: p.provider,
+        register, expiration: typeof vence === 'string' ? vence : vence[(k * porTipo + i) % vence.length]!, pdf: state !== 'Pending',
+      }
+    }),
   )
 
 /* Las salas de la clínica (Figma 476:66770: Emergency y cinco operatorios). El estado que se ve no sale de acá: el
@@ -133,7 +148,12 @@ export const DIAS: Record<string, DiaDashboard> = {
       espera(LLEGARON.emma, 'Ready to check out'),
     ],
     rooms: salas(),
-    tasks: tareas(2, '03/17/2025', '03/15/2025'),
+    tasks: tareas('28-02', 2, '02/20/2026', ['02/26/2026', '03/06/2026', '03/12/2026'], [
+      /* Olivia y Charlotte están en el sillón y Henry en pausa (encuentro abierto); Sophia y James todavía no llegaron. */
+      { name: 'Henry Richardson', provider: MARTINEZ }, { name: 'Sophia Collins', provider: MARTINEZ },
+      { name: 'Olivia Brooks', provider: MARTINEZ }, { name: 'James Foster', provider: SALGADO },
+      { name: 'Charlotte Reed', provider: SALGADO },
+    ]),
     encuentros: { abiertos: 5, promedio: '18 min avg.' },
   },
 
@@ -147,7 +167,7 @@ export const DIAS: Record<string, DiaDashboard> = {
       espera(turno('Mara Otero', 'MO', 'Dr. Elena Martinez', 'Operatory 1', '09:00'), 'Checked in', 5, true),
     ],
     rooms: salas(),
-    tasks: tareas(1, '03/20/2025', '03/18/2025'),
+    tasks: tareas('03-03', 1, '03/20/2025', '03/18/2025'),
     encuentros: { abiertos: 1, promedio: '22 min avg.' },
   },
 
@@ -158,7 +178,7 @@ export const DIAS: Record<string, DiaDashboard> = {
     ],
     waiting: [],
     rooms: salas(),
-    tasks: tareas(1, '03/24/2025', '03/22/2025').slice(0, 2),
+    tasks: tareas('10-03', 1, '03/24/2025', '03/22/2025').slice(0, 2),
     encuentros: { abiertos: 1, promedio: '12 min avg.' },
   },
 }
@@ -336,6 +356,15 @@ export const DIA_CARGADO: DiaDashboard = {
   waiting: AGENDA_CARGADA.slice(15, 23).map((t, i) =>
     espera(t, ETAPAS_ESPERA[i % 3]!, i % 3 === 0 ? 4 + i * 3 : i % 3 === 1 ? 6 + i : undefined, i % 3 === 0)),
   rooms: salas(),
-  tasks: tareas(7, '03/17/2025', '03/15/2025'),
+  tasks: tareas('cargado', 7, '03/17/2025', '03/15/2025', NOMBRES.slice(0, 15).map((name, i) => ({ name, provider: PROVIDERS[i % 5]! }))),
   encuentros: { abiertos: 6, promedio: '21 min avg.' },
 }
+
+/* Las tareas del Patient Dashboard: todas del paciente de la ficha (CON-2643, CA9). Tres Lab Orders, una por estado, y
+   dos de cada uno de los otros tipos: las mismas nueve de antes. */
+export const TAREAS_PACIENTE: PendingTask[] = tareas('paciente', 3, '10/02/2026', ['11/14/2026', '12/05/2026', '11/28/2026'], [{ name: 'John Smith', provider: MARTINEZ }])
+  .filter((t) => t.kind === 'Lab Orders' || !t.id?.endsWith('-3'))
+
+/* Para Clinical Mode: la tarea que abrió Complete this Task, venga del Dashboard o del Patient Dashboard. */
+export const buscarTarea = (id: string) =>
+  [...Object.values(DIAS).flatMap((d) => d.tasks), ...DIA_CARGADO.tasks, ...TAREAS_PACIENTE].find((t) => t.id === id)

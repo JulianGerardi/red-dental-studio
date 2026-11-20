@@ -9,6 +9,9 @@ import { Pill, type PillTone } from '@/components/ui/pill'
 import { TARJETA_PANEL } from '@/lib/estilos'
 import { ORDENES, type EstadoOrden, type OrdenLab } from '@/data/clinical-mode'
 import { Avatar } from '@/components/ui/avatar'
+import type { PendingTask } from '@/components/dashboard/PendingTaskCard'
+import { tareaViva, useAccionesTarea, useTareasVivas } from '@/components/dashboard/tareas'
+import { LabOrderDetail } from './LabOrderDetail'
 
 /* En el orden del pedido: es también el orden del filtro. */
 export const ORDEN_TONO: Record<EstadoOrden, PillTone> = {
@@ -46,8 +49,30 @@ const COLUMNAS: DataTableColumn<OrdenLab>[] = [
   { key: 'vence', header: 'Expiration Date', width: 120, cell: (o) => <span className={cn(o.urgente && 'font-semibold text-dash-bad-fg')}>{o.vence}</span> },
 ]
 
-export function LabOrderPanel({ ordenes: inicio = ORDENES }: { /** Las órdenes con las que abre; por defecto, las del frame. */ ordenes?: OrdenLab[] }) {
+export function LabOrderPanel({ ordenes: inicio = ORDENES, tarea, encuentroAbierto = false }: {
+  /** Las órdenes con las que abre; por defecto, las del frame. */
+  ordenes?: OrdenLab[]
+  /** La orden de Pending Task que abrió Complete this Task: entra directo a su detalle (dashboard.md, 2026-11-20). */
+  tarea?: PendingTask
+  encuentroAbierto?: boolean
+}) {
   const [ordenes, setOrdenes] = useState(inicio)
+  const [detalle, setDetalle] = useState(tarea?.id)
+  /* La tarea con sus cambios: Request o Cancel desde el ⋮ del detalle se ven acá y en Pending Task. */
+  useTareasVivas(tarea ? [tarea] : [])
+  const viva = tarea && tareaViva(tarea)
+  const acciones = useAccionesTarea({ paciente: tarea?.patientId })
+
+  if (viva && detalle === viva.id) {
+    /* Cancelada o borrada desde su ⋮, ya no hay detalle que mostrar: vuelve a la lista. */
+    if (viva.fuera) { setDetalle(undefined); return null }
+    return (
+      <>
+        <LabOrderDetail tarea={viva} abierto={encuentroAbierto} onVolver={() => setDetalle(undefined)} onAccion={acciones.hacer} />
+        {acciones.dialogo}
+      </>
+    )
+  }
 
   const cancelar = (o: OrdenLab) => {
     const antes = ordenes

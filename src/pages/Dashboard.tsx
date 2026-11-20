@@ -13,6 +13,9 @@ import { DatePicker, sameDay } from '@/components/ui/date-picker'
 import { OperatoryList } from '@/components/dashboard/OperatoryList'
 import { AppointmentRow } from '@/components/dashboard/DashboardRows'
 import { PendingTaskList } from '@/components/dashboard/PendingTaskList'
+import { useAccionesTarea, useTareasVivas } from '@/components/dashboard/tareas'
+import type { PendingTask } from '@/components/dashboard/PendingTaskCard'
+import { setEstadoEncuentro } from '@/lib/encuentro'
 import { WaitingRoomList } from '@/components/dashboard/WaitingRoomList'
 import { ListGroup } from '@/components/ui/list-group'
 import { Tabs } from '@/components/ui/tabs'
@@ -320,7 +323,15 @@ export default function Dashboard() {
     [...new Set(porLlegar.map((a) => a[campo]))].sort().map((v) => ({ value: v, count: porLlegar.filter((a) => a[campo] === v).length }))
   const turnos = porLlegar.filter((a) =>
     (providers.length === 0 || providers.includes(a.provider)) && (salas.length === 0 || salas.includes(a.operatory)))
-  const tareas = tipoTarea === 'All' ? dia.tasks : dia.tasks.filter((t) => t.kind === tipoTarea)
+  /* Las tareas con sus cambios (Request, Cancel…); las que ya no están pendientes salen. Un paciente tiene el encuentro
+     abierto si está en el sillón (In progress) o en pausa (On hold) ese día (dashboard.md, 2026-11-20). */
+  const todasLasTareas = useTareasVivas(dia.tasks)
+  const encuentroDe = (t: PendingTask) =>
+    dia.appointments.some((a) => a.name === t.person && a.enCurso) ? 'enCurso' as const
+      : dia.waiting.some((w) => w.name === t.person && w.etapa === 'On hold') ? 'enPausa' as const : undefined
+  /* Clinical Mode lee el encuentro compartido: antes de abrir la tarea se deja el de ese paciente. */
+  const accionesTarea = useAccionesTarea({ alAbrir: (t) => setEstadoEncuentro(encuentroDe(t) ?? 'sinEmpezar') })
+  const tareas = tipoTarea === 'All' ? todasLasTareas : todasLasTareas.filter((t) => t.kind === tipoTarea)
   const enEspera = dia.waiting.filter((w) => etapas.length === 0 || etapas.includes(w.etapa))
 
   return (
@@ -425,8 +436,8 @@ export default function Dashboard() {
           <Tabs
             size="sm" aria-label="Filter tasks"
             tabs={[
-              { value: 'All', count: dia.tasks.length },
-              ...TASK_KINDS.map((k) => ({ value: k, count: dia.tasks.filter((t) => t.kind === k).length })),
+              { value: 'All', count: todasLasTareas.length },
+              ...TASK_KINDS.map((k) => ({ value: k, count: todasLasTareas.filter((t) => t.kind === k).length })),
             ]}
             value={tipoTarea} onChange={setTipoTarea}
           />
@@ -437,14 +448,15 @@ export default function Dashboard() {
             icon={Activity}
             title="Nothing pending"
             detail={
-              dia.tasks.length === 0
+              todasLasTareas.length === 0
                 ? 'There are no tasks waiting on this day.'
                 : 'No pending tasks of this type today.'
             }
           />
         ) : (
-          <PendingTaskList tasks={tareas} limit={TOPE.tareas} />
+          <PendingTaskList tasks={tareas} limit={TOPE.tareas} hoy={date} encuentroAbierto={(t) => !!encuentroDe(t)} onAccion={accionesTarea.hacer} />
         )}
+        {accionesTarea.dialogo}
       </Panel>
 
       {editando && (

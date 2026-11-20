@@ -4,6 +4,7 @@ import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { ACCION_TURNO, MenuCard, accionTurno, type AccionMenu, type Appointment } from './AppointmentCard'
 import { completarTarea, type PendingTask } from './PendingTaskCard'
+import { MenuTarea, TONO_ESTADO, nombreTarea, type AccionUI } from './tareas'
 import { Avatar } from '@/components/ui/avatar'
 import { Pill as PillTag } from '@/components/ui/pill'
 
@@ -126,12 +127,30 @@ const ICONO_TAREA: Record<string, LucideIcon> = {
   'Clinical Note': ClipboardList, 'Lab Orders': FlaskConical, Prescriptions: Pill, Referrals: Send,
 }
 
+/* Vencida si la fecha ya pasó (CON-2643, V2): el chip Expired date y la fecha en rojo, y sigue en la lista. */
+const vencida = (t: PendingTask, hoy: Date) => {
+  const f = new Date(t.expiration)
+  return !Number.isNaN(f.getTime()) && f < new Date(hoy.getFullYear(), hoy.getMonth(), hoy.getDate())
+}
+
+type PropsTarea = {
+  task: PendingTask
+  /** Hay un encuentro abierto con el paciente: el ⋮ deja hacer sus acciones. */
+  encuentroAbierto?: boolean
+  /** Lo que hacen el ⋮, el PDF y Complete this Task (`useAccionesTarea`). Sin esto, el botón sólo avisa. */
+  onAccion?: (t: PendingTask, a: AccionUI) => void
+  /** El día contra el que se mide el vencimiento (el del Dashboard); por defecto, hoy. */
+  hoy?: Date
+}
+
 /* Una tarea con el diseño de Pending documents (Julián, 2026-10-19): el ícono del tipo en su cuadrado, el tipo con su
-   estado en pills, quién y cuándo se registró abajo, el vencimiento a la derecha, el documento y Complete this Task.
-   Son las mismas partes que la card (tipo, Requested, paciente, documento, Expired date, Register, Expiration date,
-   botón). Va adentro de la lista con divisores de PendingTaskList. Ver design-reference/figma/modulos/dashboard.md. */
-export function TaskRow({ task }: { task: PendingTask }) {
+   estado en pills, quién y cuándo se registró abajo, el vencimiento a la derecha, el PDF, Complete this Task y el ⋮.
+   El PDF sólo si ya hay documento y Expired date sólo si venció (dashboard.md, 2026-11-20). Va adentro de la lista
+   con divisores de PendingTaskList. Ver design-reference/figma/modulos/dashboard.md. */
+export function TaskRow({ task, encuentroAbierto = false, onAccion, hoy = new Date() }: PropsTarea) {
   const Icono = ICONO_TAREA[task.kind] ?? ClipboardList
+  const expirada = vencida(task, hoy)
+  const fecha = task.kind === 'Clinical Note' ? 'Completed' : 'Register'
   return (
     <div className="flex flex-wrap items-center gap-x-3 gap-y-2 px-3 py-2.5">
       <span className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-info-bg text-dash-busy-fg"><Icono className="size-4" /></span>
@@ -139,23 +158,30 @@ export function TaskRow({ task }: { task: PendingTask }) {
       <span className="min-w-0 flex-1 basis-56">
         <span className="flex flex-wrap items-center gap-2">
           <span className="text-[13px] font-semibold text-ink">{task.kind}</span>
-          <PillTag tone="info" size="sm">{task.state}</PillTag>
-          <PillTag tone="warning" size="sm"><TriangleAlert className="mr-1 size-2.5" />Expired date</PillTag>
+          <PillTag tone={TONO_ESTADO[task.state] ?? 'info'} size="sm">{task.state}</PillTag>
+          {expirada && <PillTag tone="warning" size="sm"><TriangleAlert className="mr-1 size-2.5" />Expired date</PillTag>}
         </span>
-        <span className="block truncate text-[12px] text-ink-muted" title={task.person}>{task.person} · Register {task.register}</span>
+        <span className="block truncate text-[12px] text-ink-muted" title={task.person}>
+          {task.person}{task.provider ? ` · ${task.provider}` : ''} · {fecha} {task.register}
+        </span>
       </span>
       <span className="ml-auto flex shrink-0 items-center gap-3">
         <span className="flex flex-col items-end gap-0.5 text-right">
-          <span className="text-dash-bad-fg text-[12px] font-semibold tabular-nums">{task.expiration}</span>
+          <span className={cn('text-[12px] font-semibold tabular-nums', expirada ? 'text-dash-bad-fg' : 'text-ink')}>{task.expiration}</span>
           <span className="text-[11px] text-ink-muted">Expiration date</span>
         </span>
-        <button
-          type="button" aria-label="Open document"
-          className="bg-dash-bad-chip border-dash-bad-fg flex size-7 shrink-0 items-center justify-center rounded-md border focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-dash-blue"
-        >
-          <FileText className="text-dash-bad-fg size-3.5" />
-        </button>
-        <Button size="sm" className="shrink-0" onClick={() => completarTarea(task)}>Complete this Task <ArrowRight /></Button>
+        {/* Sin documento queda el hueco: Complete this Task no se corre de una fila a otra. */}
+        {task.pdf === false ? <span className="size-7 shrink-0" aria-hidden /> : (
+          <button
+            type="button" aria-label={`Open PDF of the ${nombreTarea(task).toLowerCase()} for ${task.person}`} title="Open PDF"
+            onClick={() => onAccion?.(task, 'PDF')}
+            className="bg-dash-bad-chip border-dash-bad-fg flex size-7 shrink-0 items-center justify-center rounded-md border focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-dash-blue"
+          >
+            <FileText className="text-dash-bad-fg size-3.5" />
+          </button>
+        )}
+        <Button size="sm" className="shrink-0" onClick={() => (onAccion ? onAccion(task, 'Complete') : completarTarea(task))}>Complete this Task <ArrowRight /></Button>
+        {onAccion && <MenuTarea task={task} abierto={encuentroAbierto} onAccion={onAccion} />}
       </span>
     </div>
   )
