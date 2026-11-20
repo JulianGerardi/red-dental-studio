@@ -624,3 +624,9 @@ aviso. `EditPatientModal` (drawer viejo con pestañas) sigue sólo en el Storybo
 **A validar con usuarios:** si Gender obligatorio frena el alta en recepción cuando el paciente no lo dice (hay *Prefer
 not to say*); y si pedir teléfono y dirección completos para guardar cualquier cambio en Edit traba correcciones rápidas
 (por ejemplo, sólo el email) en fichas viejas.
+
+## Buscador de la tabla de 36 px (2026-11-20)
+
+Pedido de Julián de un solo diseño de filtro (detalle en `settings-accounts.md`, misma fecha): el buscador de la tabla
+de Patients medía 32 px de alto; ahora es `SettingsSearch`, el de Accounts (36 px, con Search). Los buscadores chicos de
+las cards de la derecha (Today Appointments, Recent Patients) no cambian: van dentro de un panel.

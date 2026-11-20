@@ -229,7 +229,7 @@ export function ProblemList({ procedimientoInicial }: {
                 label="Filter problems by status"
                 groups={[{
                   type: 'single', title: 'Status', defaultValue: 'Active', value: filtroProblema, onChange: (v) => setFiltroProblema(v as EstadoProblema),
-                  options: ESTADOS_PROBLEMA.map((e) => ({ value: e, count: cuenta(problemas, e), tone: TONO_PROBLEMA[e] })),
+                  options: ESTADOS_PROBLEMA.map((e) => ({ value: e, count: cuenta(problemas, e) })),
                 }]}
               />
             ) : (
@@ -237,7 +237,7 @@ export function ProblemList({ procedimientoInicial }: {
                 label="Filter procedures by status"
                 groups={[{
                   type: 'single', title: 'Status', defaultValue: 'All', value: filtroProcedimiento, onChange: (v) => setFiltroProcedimiento(v as EstadoProcedimiento | 'All'),
-                  options: [{ value: 'All', count: procedimientos.length }, ...ESTADOS_PROCEDIMIENTO.map((e) => ({ value: e, count: cuenta(procedimientos, e), tone: TONO_PROCEDIMIENTO[e] }))],
+                  options: [{ value: 'All', count: procedimientos.length }, ...ESTADOS_PROCEDIMIENTO.map((e) => ({ value: e, count: cuenta(procedimientos, e) }))],
                 }]}
               />
             )}

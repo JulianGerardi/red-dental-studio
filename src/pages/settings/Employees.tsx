@@ -1,11 +1,11 @@
-import { useCallback, useMemo, useRef, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import { PageTitle } from '@/components/ui/page-title'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import {
-  Search, CirclePlus, Trash2, FileText, Pencil, Ban, UserMinus,
+  CirclePlus, Trash2, FileText, Pencil, Ban, UserMinus,
 } from 'lucide-react'
 import { EmptyState } from '@/components/ui/empty-state'
-import { SearchButton } from '@/components/ui/search-button'
+import { SettingsSearch } from '@/components/settings/SettingsSearch'
 import { EditableAvatar } from '@/components/ui/editable-avatar'
 import { aviso } from '@/components/ui/toaster'
 import { SettingsPageHeader } from '@/components/settings/SettingsPageHeader'
@@ -55,7 +55,6 @@ export function SettingsEmployees({ nuevo = false }: { nuevo?: boolean }) {
   const [q, setQ] = useState('')
   const [filas, setFilas] = useState(EMPLEADOS)
   const [seleccion, setSeleccion] = useState<string[]>([])
-  const inputRef = useRef<HTMLInputElement>(null)
 
   const visibles = useMemo(
     () => filas.filter((e) => `${e.nombre} ${e.email} ${e.cargo}`.toLowerCase().includes(q.trim().toLowerCase())),
@@ -89,17 +88,7 @@ export function SettingsEmployees({ nuevo = false }: { nuevo?: boolean }) {
           </Button>
         )}
       >
-        <div className="relative min-w-0 flex-1 sm:max-w-[320px]">
-          <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-ink-faint" />
-          <input
-            ref={inputRef}
-            value={q}
-            onChange={(e) => setQ(e.target.value)}
-            placeholder="Search employees"
-            className="focus:border-dash-blue h-9 w-full rounded-md border border-line bg-white pr-3 pl-9 text-[13px] shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] placeholder:text-ink-faint focus:outline-none"
-          />
-        </div>
-        <SearchButton onClick={() => inputRef.current?.focus()} className="h-9" />
+        <SettingsSearch value={q} onChange={setQ} placeholder="Search employees" />
         {seleccion.length > 0 && (
           <span className="bg-dash-count-bg text-dash-blue-hover flex h-9 items-center rounded-md px-3 text-[13px] font-semibold">
             {seleccion.length} selected

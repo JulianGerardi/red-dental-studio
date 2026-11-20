@@ -5,7 +5,7 @@ import { PatientsTable, type PatientRow } from '@/components/patients/PatientsTa
 import { PatientCard } from '@/components/patients/PatientCard'
 import { usePatients } from '@/data/patientsStore'
 import { PageTitle } from '@/components/ui/page-title'
-import { SearchButton } from '@/components/ui/search-button'
+import { SettingsSearch } from '@/components/settings/SettingsSearch'
 import { Button } from '@/components/ui/button'
 import { EmptyState } from '@/components/ui/empty-state'
 import { ShowMore } from '@/components/ui/show-more'
@@ -49,7 +49,6 @@ export default function Patients() {
   const [buscarTurno, setBuscarTurno] = useState('')
   const [buscarReciente, setBuscarReciente] = useState('')
   const [turnoEditando, setTurnoEditando] = useState<DatosTurno | null>(null)
-  const inputRef = useRef<HTMLInputElement>(null)
 
   /* Alto de la columna de la tabla, para que la barra lateral termine a esa misma altura (más abajo). Se mide ésta,
      no al revés: si en cambio las dos columnas se estiran entre sí (`items-stretch`), cuántas filas entran en la
@@ -129,17 +128,7 @@ export default function Patients() {
           </div>
 
           <div className="mt-5 flex flex-wrap items-center gap-3">
-            <div className="relative w-full sm:w-[320px]" data-tour="pat-search">
-              <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-ink-faint" />
-              <input
-                ref={inputRef}
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                placeholder="Search by Name or Last Name"
-                className="focus:border-dash-blue h-8 w-full rounded-md border border-line bg-white pr-3 pl-9 text-[13px] font-medium shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] placeholder:text-ink-faint focus:outline-none"
-              />
-            </div>
-            <SearchButton onClick={() => inputRef.current?.focus()} className="h-8" />
+            <SettingsSearch value={query} onChange={setQuery} placeholder="Search by Name or Last Name" tour="pat-search" />
           </div>
 
           <div className="mt-4">

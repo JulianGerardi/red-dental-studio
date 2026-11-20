@@ -56,3 +56,14 @@ Dos pedidos de Julián, los dos se apartan del frame a propósito:
    `PILL` de colores por categoría; Category, Direction, Impact, Method Type y
    Status se muestran como texto plano (`text-[#3f3f46]`), igual que cualquier
    otra celda de la tabla.
+
+## La lista y su filtro, en el Filter de Accounts (2026-11-20)
+
+Pedido de Julián de un solo diseño de filtro (detalle en `settings-accounts.md`, misma fecha). Es lo que se había pedido
+el 2026-09-12 (*"pondría los filtros como tenemos en accounts"*): Accounts tenía entonces un `<select>`; hoy tiene el
+menú Filter.
+
+1. El `<select>` **Adjustments Types / Payment Method** y la tira **All · Charge · Credit · Production · Collections**
+   (o **All · Patient · Insurance**) pasan a un solo `FilterMenu` con dos grupos de una opción: *View* y *Type*, cada
+   tipo con su cantidad. Cambiar de *View* vuelve *Type* a All, como antes. Clear all vuelve a Adjustments Types y All.
+2. El buscador pasa a `SettingsSearch` (sigue diciendo "Search patients", anomalía 2).

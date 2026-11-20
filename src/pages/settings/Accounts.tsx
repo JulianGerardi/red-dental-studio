@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Search, Plus, Building2, Pencil, KeyRound, Ban } from 'lucide-react'
-import { SearchButton } from '@/components/ui/search-button'
+import { Plus, Building2, Pencil, KeyRound, Ban } from 'lucide-react'
+import { SettingsSearch } from '@/components/settings/SettingsSearch'
 import { FilterMenu } from '@/components/ui/filter-menu'
 import { aviso } from '@/components/ui/toaster'
 import { SettingsPageHeader } from '@/components/settings/SettingsPageHeader'
@@ -98,21 +98,12 @@ export function SettingsAccounts() {
         titulo="Accounts overview"
         accion={<Button onClick={() => setNueva(true)}><Plus /> New Account</Button>}
       >
-        <div className="relative min-w-0 flex-1 sm:max-w-[300px]">
-          <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-ink-faint" />
-          <input
-            value={q}
-            onChange={(e) => setQ(e.target.value)}
-            placeholder="Search..."
-            className="focus:border-dash-blue h-9 w-full rounded-md border border-line bg-white pr-3 pl-9 text-[13px] shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] placeholder:text-ink-faint focus:outline-none"
-          />
-        </div>
-        <SearchButton onClick={() => setQ((v) => v.trim())} className="h-9" />
+        <SettingsSearch value={q} onChange={setQ} />
         <FilterMenu
           label="Filter by status"
           groups={[{
             type: 'single', title: 'Status', defaultValue: 'All', value: filtro, onChange: (v) => setFiltro(v as typeof filtro),
-            options: FILTROS.map((f) => ({ value: f, count: f === 'All' ? filas.length : filas.filter((c) => c.estado === f).length, tone: f === 'All' ? undefined : ESTADO_TONO[f] })),
+            options: FILTROS.map((f) => ({ value: f, count: f === 'All' ? filas.length : filas.filter((c) => c.estado === f).length })),
           }]}
         />
       </SettingsPageHeader>
