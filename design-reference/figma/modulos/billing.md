@@ -479,9 +479,9 @@ la misma lógica para billing".
 4. **Los cargos abiertos salen de lo posteado en la sesión** (`actividad` + `APLICACIONES_BILLING`), no del mock fijo
    (`cargosAbiertos` de `data/billing.ts` se borró). Lo que aplica cada pago se suma a las aplicaciones con
    `registrarAplicaciones` para que ese cargo deje de figurar como abierto y baje su *Trans. Bal.* (mock sin backend).
-5. **Patient Payment pasa a un solo paso** (el video de red.dev lo muestra todo junto: se ve el reparto mientras se tipea el
-   importe); Credit Adjustment sigue en dos (*Adjustment* → *Allocation*) y Charge en una sección.
+5. **Patient Payment y Credit Adjustment, en un solo paso** (el video de red.dev lo muestra todo junto: se ve el reparto
+   mientras se tipea el importe); Charge en una sola sección.
 6. Listas (`METODOS_PAGO`, `TIPOS_AJUSTE_CREDITO`, `TIPOS_AJUSTE_CARGO`) pasan a `data/ledger.ts`; `data/billing.ts` las
    reexporta. `METODOS_PAGO` ya no trae los de seguro (CON-3738).
 
-**A validar con usuarios:** si Credit Adjustment también conviene en un solo paso, como Patient Payment.
+**A validar con usuarios:** si el drawer de 1000 px con la tabla debajo alcanza en una pantalla chica.

@@ -115,15 +115,18 @@ test('Un pago de más queda como crédito sin aplicar y Apply to recarga los car
   await expect(screen.getByText('$842.00')).toBeVisible()
 })
 
-test('Credit Adjustment (-) pide el monto, reparte y avisa', async ({ app, screen }) => {
+test('Credit Adjustment (-) reparte el monto en la misma pantalla y avisa', async ({ app, screen }) => {
   await app.open('/patients/john-smith/ledger')
   await screen.getByRole('button', /^Credit Adjustment \(-\)/).tap()
   const drawer = screen.getByRole('dialog')
-  await drawer.getByRole('button', /Next Step/).tap()
+  /* Un solo paso: la tabla ya está y sin importe no hay nada aplicado. */
+  await expect(drawer.getByText('Ledger Transactions')).toBeVisible()
+  await expect(drawer.getByRole('textbox', 'Applied to Bitewings – four radiographic images')).toHaveValue('')
+  await drawer.getByRole('button', /^Save/).tap()
   await expect(drawer.getByText('This field is required.')).toBeVisible()
   await drawer.getByRole('textbox', /^Amount/).fill('50')
-  await drawer.getByRole('button', /Next Step/).tap()
-  await expect(drawer.getByText('Ledger Transactions')).toBeVisible()
+  await expect(drawer.getByRole('textbox', 'Applied to Bitewings – four radiographic images')).toHaveValue('35.00')
+  await expect(drawer.getByRole('textbox', 'Applied to Crown – porcelain/ceramic')).toHaveValue('15.00')
   await drawer.getByRole('button', /^Save/).tap()
   await expect(screen.getByText(/Credit Adjustment of \$50\.00 posted for John Smith/)).toBeVisible()
 })

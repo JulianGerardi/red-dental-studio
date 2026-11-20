@@ -14,7 +14,8 @@ import { OBLIGATORIO } from '@/lib/validacion'
 
 /* Credit Adjustment (CON-3739): la misma lógica que el pago -Apply to, el reparto del más viejo al más nuevo, lo que no
    se aplica queda como crédito- con un tipo de ajuste de crédito en lugar del método. Sólo los tipos de crédito (los de
-   cargo van en Charge Adjustment). Empieza vacío: el importe lo pone quien lo registra. Ver ledger.md (2026-11-19). */
+   cargo van en Charge Adjustment). Empieza vacío: el importe lo pone quien lo registra. Un solo paso, como el video de red.dev:
+   la tabla se reparte mientras se tipea el importe. Ver ledger.md (2026-11-19). */
 
 export function CreditAdjustmentPanel({
   movs, aplicaciones, garante, dependientes, alcanceInicial = ALCANCE_GUARANTOR, hoy, onGuardar, onCancelar,
@@ -33,7 +34,6 @@ export function CreditAdjustmentPanel({
 
   const errorMonto = !monto.trim() ? OBLIGATORIO : total <= 0 ? MENSAJES.monto : undefined
   const errorFecha = !fecha ? OBLIGATORIO : esFutura(fecha, ahora) ? MENSAJES.futura : undefined
-  const validarPrimero = () => { setIntentado(true); return !errorMonto && !errorFecha && !!tipo }
 
   const guardar = () => {
     setIntentado(true)
@@ -57,7 +57,7 @@ export function CreditAdjustmentPanel({
 
   const grilla = 'grid gap-4 sm:grid-cols-2'
   const primero = (
-    <SeccionLedger titulo="Credit Adjustment Information">
+    <SeccionLedger titulo="Credit Adjustment Information" caja>
       <div className={grilla}>
         <CampoFecha value={fecha} onChange={setFecha} error={intentado ? errorFecha : undefined} />
         <ApplyToSelect opciones={opciones} value={aplicaA} onChange={setAplicaA} titulo="Apply credit to" />
@@ -79,10 +79,6 @@ export function CreditAdjustmentPanel({
   )
 
   return (
-    <ShellLedger
-      titulo="Credit Adjustment (-)" pasos={['Adjustment', 'Allocation']}
-      primero={primero} segundo={tabla} validarPrimero={validarPrimero}
-      onGuardar={guardar} onCancelar={onCancelar} guardando={ap.cargando}
-    />
+    <ShellLedger titulo="Credit Adjustment (-)" primero={primero} segundo={tabla} onGuardar={guardar} onCancelar={onCancelar} guardando={ap.cargando} />
   )
 }

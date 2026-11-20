@@ -1098,8 +1098,10 @@ Transactions* con sus **10 columnas** (Txn date, Patient, Provider, Code, Descri
 Applied, Balance), el resumen y "Showing N open transactions", y el pie Cancel / Save. Se ve el efecto del importe sobre la
 tabla mientras se tipea. `LedgerAllocationTable` se reescribió (es controlada) y **pierde** la flecha de fila, el detalle,
 Columns, el resize y el paginado de la tabla de 12 columnas del Figma 4582:29618: red.dev no los tiene aquí. Los campos
-siguen de a dos y del mismo ancho (regla de los drawers; en el video van de a cuatro). **Credit y Charge Adjustment** conservan
-su diseño (Julián: "la lógica, no el diseño"): Credit en dos pasos (*Adjustment* → *Allocation*), Charge en una sola sección.
+siguen de a dos y del mismo ancho (regla de los drawers; en el video van de a cuatro). **Credit Adjustment** (video: "la
+lógica, no el diseño") toma la misma estructura que Patient Payment: un solo paso, con la card *Credit Adjustment Information* y la
+tabla debajo, porque la lógica es ver el reparto mientras se tipea el monto (en la primera versión era un segundo paso y no
+se veía; Julián: "no tiene nada que ver con la lógica"). **Charge Adjustment** es una sola sección, sin tabla.
 
 **Anomalías / diferencias con el video**
 - La lista de métodos del video incluye *Insurance Payment - …* y métodos de QA; la historia pide sólo los de tipo patient.
@@ -1110,8 +1112,8 @@ su diseño (Julián: "la lógica, no el diseño"): Credit en dos pasos (*Adjustm
 - La fecha de hoy y el límite de fechas futuras son los del reloj (en Billing, `HOY_BILLING`).
 
 **A validar con usuarios:** si abrir el pago con el total y Save habilitado hace fácil cobrar de más por un clic (red.dev
-lo hace igual); si recepción espera que Apply to abra en el guarantor en Patient View; y si Credit Adjustment gana con la
-tabla en el mismo paso, como Patient Payment (hoy son dos pasos).
+lo hace igual); si recepción espera que Apply to abra en el guarantor en Patient View; y si recepción necesita el reparto de
+Credit Adjustment en la misma pantalla (hoy sí, como en el video).
 
 ### Números de las métricas en azul (2026-11-19)
 
