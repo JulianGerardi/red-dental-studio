@@ -12,7 +12,7 @@ import { EmptyState } from '@/components/ui/empty-state'
 import { aviso } from '@/components/ui/toaster'
 import { ConsentDocument, textoPlano } from '@/components/settings/ConsentDocument'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
-import { Tabs } from '@/components/ui/tabs'
+import { FilterMenu } from '@/components/ui/filter-menu'
 import { OBLIGATORIO } from '@/lib/validacion'
 
 /* Settings → Consents. Figma 4106:170620 ("New Consent Template"): lista de
@@ -107,7 +107,7 @@ const TITULOS_SUGERIDOS = [
   'Crown & Bridge Consent', 'Implant Consent', 'HIPAA Acknowledgment',
 ]
 
-const FILTROS = ['Active', 'Inactive', 'System', 'All'] as const
+const FILTROS = ['All', 'Active', 'Inactive', 'System'] as const
 export type Filtro = (typeof FILTROS)[number]
 
 const coincideFiltro = (t: ConsentTemplate, f: Filtro) =>
@@ -207,7 +207,7 @@ export function TarjetaTemplate({ t, elegida, onElegir, onAlternar }: {
 }
 
 /* El panel de la izquierda: New template, buscador, filtros (Active, Inactive, System, All) y la lista. */
-export function ListaTemplates({ templates, elegidoId, q, onQ, filtro, onFiltro, onElegir, onAlternar, onNuevo }: {
+export function ListaTemplates({ templates, elegidoId, q, onQ, filtro, onFiltro, onElegir, onAlternar, onNuevo, todos }: {
   templates: ConsentTemplate[]
   elegidoId: string | null
   q: string
@@ -217,6 +217,8 @@ export function ListaTemplates({ templates, elegidoId, q, onQ, filtro, onFiltro,
   onElegir: (t: ConsentTemplate) => void
   onAlternar: (id: string) => void
   onNuevo: () => void
+  /** Todos los templates, para la cantidad de cada opción del filtro. */
+  todos?: ConsentTemplate[]
 }) {
   return (
     <section aria-label="Templates" className="flex flex-col gap-3 self-start rounded-lg bg-white shadow-panel p-4">
@@ -224,17 +226,26 @@ export function ListaTemplates({ templates, elegidoId, q, onQ, filtro, onFiltro,
         <h2 className="text-sm font-bold text-ink">Templates</h2>
         <Button size="sm" onClick={onNuevo}><Plus /> New template</Button>
       </div>
-      <div className="relative">
-        <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-ink-faint" />
-        <input
-          value={q}
-          onChange={(e) => onQ(e.target.value)}
-          placeholder="Search templates..."
-          aria-label="Search templates"
-          className="focus:border-dash-blue h-9 w-full rounded-md border border-line bg-white pr-3 pl-9 text-[13px] shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] placeholder:text-ink-faint focus:outline-none"
+      {/* Buscador y después Filter, como Accounts: el filtro de estado es el menú de la app, no pestañas (consents.md, 2026-11-20). */}
+      <div className="flex items-center gap-2">
+        <div className="relative min-w-0 flex-1">
+          <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-ink-faint" />
+          <input
+            value={q}
+            onChange={(e) => onQ(e.target.value)}
+            placeholder="Search templates..."
+            aria-label="Search templates"
+            className="focus:border-dash-blue h-9 w-full rounded-md border border-line bg-white pr-3 pl-9 text-[13px] shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] placeholder:text-ink-faint focus:outline-none"
+          />
+        </div>
+        <FilterMenu
+          label="Filter templates by status"
+          groups={[{
+            type: 'single', title: 'Status', defaultValue: 'Active', value: filtro, onChange: (v) => onFiltro(v as Filtro),
+            options: FILTROS.map((f) => ({ value: f, count: todos?.filter((t) => coincideFiltro(t, f)).length })),
+          }]}
         />
       </div>
-      <Tabs size="sm" fullWidth aria-label="Filter templates" tabs={FILTROS} value={filtro} onChange={onFiltro} />
       <div className="flex max-h-[520px] flex-col gap-2 overflow-y-auto">
         {templates.length === 0 ? (
           <EmptyState icon={Search} title="No templates" detail="Nothing matches this search or filter." className="py-6" />
@@ -570,10 +581,10 @@ export function SettingsConsents() {
     <div className="@container px-4 py-6 sm:px-8">
       <SettingsPageHeader titulo="Consent Templates" />
 
-      {/* La lista es de 288px: con 240/260 la cuarta pestaña ("All") no entraba y quedaba cortada. */}
       <div className="mt-4 grid grid-cols-1 gap-4 @3xl:grid-cols-[288px_minmax(0,1fr)]">
         <ListaTemplates
           templates={visibles}
+          todos={templates}
           elegidoId={actualId}
           q={q}
           onQ={(v) => { setQ(v); setFijados([]) }}

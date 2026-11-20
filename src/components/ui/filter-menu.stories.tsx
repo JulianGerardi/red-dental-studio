@@ -19,7 +19,7 @@ const meta = {
         component: [
           'El filtro de la app (`@/components/ui/filter-menu`), uno solo para todas las pantallas: Dashboard, Ledger, Accounts overview, la tabla estándar, la Problem List, Workflows y el buscador de procedimientos.',
           '',
-          '**El botón** es siempre el mismo: ícono, "Filter" y, con filtros aplicados, azul con la cantidad. **El menú** tiene grupos de varias opciones (casillas) o de una (radio), cada opción con su cantidad y, si es un estado, el punto de su color; búsqueda opcional y Clear all. Se aplica al tocar.',
+          '**El botón** es siempre el mismo: ícono, "Filter" y, con filtros aplicados, azul con la cantidad. **El menú** tiene grupos de varias opciones (casillas) o de una (radio), cada opción con su cantidad (y su ícono si es una categoría), sin puntos de color; búsqueda opcional y Clear all. Se aplica al tocar.',
           '',
           '**Tamaños:** md (36px) junto a buscadores; sm (28px) en encabezados de cards y paneles.',
           '',
@@ -44,10 +44,10 @@ type Story = StoryObj<Args>
 
 const OPERATORIOS = ['Operatory 1', 'Operatory 2', 'Operatory 3']
 const ESTADOS = [
-  { value: 'Active', tone: 'success' as const, count: 6 },
-  { value: 'In treatment', tone: 'info' as const, count: 1 },
-  { value: 'Monitoring', tone: 'warning' as const, count: 1 },
-  { value: 'Discarded', tone: 'danger' as const, count: 1 },
+  { value: 'Active', count: 6 },
+  { value: 'In treatment', count: 1 },
+  { value: 'Monitoring', count: 1 },
+  { value: 'Discarded', count: 1 },
 ]
 const TIPOS = [
   { value: 'Procedure', icon: Stethoscope, count: 1 },
@@ -97,7 +97,7 @@ export const Parts: Story = {
           <ConRotulo rotulo="sm · 1 applied"><FilterTrigger size="sm" count={1} /></ConRotulo>
         </Muestras>
       </Bloque>
-      <Bloque titulo="Option" nota="Nombre y cantidad; un estado lleva el punto de su color, una categoría su ícono.">
+      <Bloque titulo="Option" nota="Nombre y cantidad; una categoría lleva su ícono. Sin puntos de color.">
         <div className="flex w-[240px] flex-col gap-1 rounded-lg border border-line p-1 text-[13px]">
           {[ESTADOS[0]!, TIPOS[3]!, { value: 'Operatory 1', count: 3 }, { value: 'No results', count: 0 }].map((o) => (
             <div key={o.value} className="flex items-center gap-2 rounded-md px-2 py-1"><FilterOptionLabel o={o} /></div>

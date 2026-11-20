@@ -180,7 +180,28 @@ Julián: la pestaña Subscription de Edit Account no estaba alineada en tamaños
   15px bold, como *Recent Billing Activity* de Billing.
 - **Pestañas y pie, en todo Settings** (Julián: "hacelo"):
   - Las pestañas de las pantallas de edición pasan a `Tabs size="sm"` (28px), como el Ledger y Billing: Account,
-    Location, Employee, Ledger options, Carriers e Insurance Plan.
+    Location, Employee, Carriers e Insurance Plan (Ledger options ya no tiene pestañas: pasaron al Filter, settings-ledger.md).
   - `FormFooter` (Cancel / Save) pasa a 32px en una pantalla, como los botones de acción del Ledger. Vale también para
     Edit Patient e Insurance del paciente, que lo comparten.
   - Adentro de un drawer el pie sigue en 36px, como `DrawerActions`: lo fija `ModalShell`.
+
+## Un solo diseño de filtro, el de Accounts (2026-11-20)
+
+Sin historia en Jira: es un pedido de diseño de Julián (*"que los filtros de accounts tengan el mismo diseño para todos
+los filtros"*). Accounts es la referencia: **buscador → Search → Filter** (`ui/filter-menu`, md de 36 px).
+
+1. **Buscador único:** Accounts, Locations, Employees, Ledger Options y Patients escribían el campo a mano (Accounts en
+   300 px, Patients en 32 px de alto); ahora usan `settings/SettingsSearch` (36 px, hasta 320 px, con su Search), el de
+   Carriers, Fee Schedules y Documents. `SettingsSearch` suma `tour` para el ancla del tour de Patients.
+2. **Sin pestañas ni selects para filtrar:** Ledger Options (select de lista + pestañas de tipo), Billing (pestañas All
+   / Payments / Adjustments / Today) y Consents (pestañas Active / Inactive / System / All) pasan al menú Filter. Mismas
+   opciones y textos; cada una con su cantidad. Ver el `.md` de cada módulo.
+3. **Sin puntos de color en ningún filtro** (Julián, mismo día): el estado se lee por el nombre, y el color queda para la
+   pill de la fila. `FilterOption` ya no acepta `tone`; salen de Accounts, Consents, Fee Schedules, Problem List y Lab
+   Orders. Las categorías de Workflows siguen con su ícono.
+4. **Quedan como están, a propósito:** las pestañas que cambian de vista y no filtran (Inbox / Unread en Notifications,
+   Problem List / Procedures, Patient / Guarantor View), el `DateFilter` de fechas (Notifications, Dashboard) y el Filter
+   chico (`sm`, 28 px) en los encabezados de cards y paneles (Dashboard, Workflows, Billing), que es el mismo menú.
+
+**A validar con usuarios:** que en Ledger Options se note qué lista se está viendo con la elección adentro del Filter
+(la pista es el encabezado de la tabla); y que en Billing nadie extrañe ver los cuatro tipos a la vista.

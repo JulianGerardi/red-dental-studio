@@ -1,7 +1,7 @@
-import { useMemo, useRef, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Search, Pencil, Trash2, Plus, MapPin } from 'lucide-react'
-import { SearchButton } from '@/components/ui/search-button'
+import { Pencil, Trash2, Plus, MapPin } from 'lucide-react'
+import { SettingsSearch } from '@/components/settings/SettingsSearch'
 import { aviso } from '@/components/ui/toaster'
 import { SettingsPageHeader } from '@/components/settings/SettingsPageHeader'
 import { DropdownMenuItem } from '@/components/ui/dropdown-menu'
@@ -30,7 +30,6 @@ export function SettingsLocations({ nuevo = false }: { nuevo?: boolean }) {
   const cerrar = () => { setCreando(false); if (nuevo) navigate('/settings/locations', { replace: true }) }
   const [q, setQ] = useState('')
   const [filas, setFilas] = useState(LOCACIONES)
-  const inputRef = useRef<HTMLInputElement>(null)
 
   const visibles = useMemo(
     () => filas.filter((l) => `${l.nombre} ${l.info}`.toLowerCase().includes(q.trim().toLowerCase())),
@@ -56,17 +55,7 @@ export function SettingsLocations({ nuevo = false }: { nuevo?: boolean }) {
           </Button>
         )}
       >
-        <div className="relative min-w-0 flex-1 sm:max-w-[320px]">
-          <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-ink-faint" />
-          <input
-            ref={inputRef}
-            value={q}
-            onChange={(e) => setQ(e.target.value)}
-            placeholder="Search locations"
-            className="focus:border-dash-blue h-9 w-full rounded-md border border-line bg-white pr-3 pl-9 text-[13px] shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] placeholder:text-ink-faint focus:outline-none"
-          />
-        </div>
-        <SearchButton onClick={() => inputRef.current?.focus()} className="h-9" />
+        <SettingsSearch value={q} onChange={setQ} placeholder="Search locations" />
       </SettingsPageHeader>
 
       <div className="mt-4">

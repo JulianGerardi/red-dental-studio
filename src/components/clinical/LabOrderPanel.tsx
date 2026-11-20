@@ -65,7 +65,7 @@ export function LabOrderPanel({ ordenes: inicio = ORDENES }: { /** Las órdenes 
         search={{ placeholder: 'Search...', match: (o, q) => `${o.proveedor} ${o.paciente} ${o.estado}`.toLowerCase().includes(q.toLowerCase()) }}
         filter={{
           label: 'Filter lab orders by status',
-          options: ESTADOS.map((e) => ({ value: e, count: ordenes.filter((o) => o.estado === e).length, tone: ORDEN_TONO[e] })),
+          options: ESTADOS.map((e) => ({ value: e, count: ordenes.filter((o) => o.estado === e).length })),
           match: (o, sel) => sel.includes(o.estado),
         }}
         actions={(

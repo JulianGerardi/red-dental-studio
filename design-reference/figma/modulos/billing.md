@@ -485,3 +485,11 @@ la misma lógica para billing".
    reexporta. `METODOS_PAGO` ya no trae los de seguro (CON-3738).
 
 **A validar con usuarios:** si Credit Adjustment también conviene en un solo paso, como Patient Payment.
+
+## El tipo de actividad, en el Filter (2026-11-20)
+
+Pedido de Julián de un solo diseño de filtro (detalle en `settings-accounts.md`, misma fecha). Las pestañas **All /
+Payments / Adjustments / Today** de Recent Billing Activity pasan al `FilterMenu` chico (`sm`) del encabezado, al lado
+de Columns: un grupo *Type* de una opción, cada una con su cantidad. Con un paciente elegido siguen las pestañas
+Patient / Guarantor View (cambian de vista, no filtran). `ActividadReciente` suma `todas` para las cantidades. e2e en
+`tests/billing.e2e.ts` (abre el Filter en vez de tocar las pestañas).

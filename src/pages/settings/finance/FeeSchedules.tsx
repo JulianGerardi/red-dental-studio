@@ -296,7 +296,7 @@ export function SettingsFeeSchedules() {
           label="Filters"
           groups={[{
             title: 'States', value: estados, onChange: setEstados,
-            options: ESTADOS_ARANCEL.map((e) => ({ value: e, count: aranceles.filter((a) => a.estado === e).length, tone: TONO_ARANCEL[e] })),
+            options: ESTADOS_ARANCEL.map((e) => ({ value: e, count: aranceles.filter((a) => a.estado === e).length })),
           }]}
         />
       </SettingsPageHeader>
@@ -364,7 +364,7 @@ export function SettingsFeeScheduleEdit() {
               label="Filters" align="start"
               groups={[{
                 title: 'States', value: estados, onChange: setEstados,
-                options: ESTADOS_ARANCEL.map((e) => ({ value: e, count: aranceles.filter((a) => a.estado === e).length, tone: TONO_ARANCEL[e] })),
+                options: ESTADOS_ARANCEL.map((e) => ({ value: e, count: aranceles.filter((a) => a.estado === e).length })),
               }]}
             />
           )}
