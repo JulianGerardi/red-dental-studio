@@ -3,7 +3,7 @@ import { TextField, SelectField, TextArea } from '@/components/patients/form'
 import { LedgerAllocationTable } from '@/components/patients/ledger/LedgerAllocationTable'
 import { ApplyToSelect } from '@/components/patients/ledger/ApplyToSelect'
 import {
-  CampoFecha, SeccionLedger, ShellLedger, useAplicacion, type FormularioLedger,
+  CampoFecha, FILA, SeccionLedger, ShellLedger, useAplicacion, type FormularioLedger,
 } from '@/components/patients/ledger/formulario'
 import { TIPOS_AJUSTE_CREDITO, type Movimiento } from '@/data/ledger'
 import {
@@ -57,7 +57,8 @@ export function CreditAdjustmentPanel({
     onGuardar(m, soloAplicado(ap.aplicado))
   }
 
-  const grilla = 'grid gap-4 sm:grid-cols-2'
+  /* En una sola fila, como red.dev (ledger.md, 2026-11-20). */
+  const grilla = FILA[4]
   const primero = (
     <SeccionLedger titulo="Credit Adjustment Information">
       <div className={grilla}>

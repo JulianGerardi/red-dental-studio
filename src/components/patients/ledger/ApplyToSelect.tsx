@@ -1,8 +1,8 @@
-import { Check, ChevronDown } from 'lucide-react'
+import { Building2, Check, ChevronDown, User } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { FieldError, FieldLabel, control } from '@/components/patients/form'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
-import type { OpcionAplicaA } from '@/lib/ledgerAplicacion'
+import { ALCANCE_GUARANTOR, type OpcionAplicaA } from '@/lib/ledgerAplicacion'
 
 /* Apply to de Patient Payment, Credit y Charge Adjustment, como red.dev: la lista dice "Apply payment to" y cada opción
    lleva su nombre y, abajo, quién es (Whole household, Self, Dependent). Elegir otra recarga los cargos abiertos
@@ -31,17 +31,40 @@ export function ApplyToSelect({
           <span className="min-w-0 truncate">{elegida?.etiqueta ?? 'Select'}</span>
           <ChevronDown aria-hidden className="size-4 shrink-0 text-black" />
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="start" style={{ width: 'var(--radix-dropdown-menu-trigger-width)', minWidth: 220 }}>
+        <DropdownMenuContent align="start" style={{ width: 'max(var(--radix-dropdown-menu-trigger-width), 280px)' }}>
           <DropdownMenuLabel className="text-[11px] font-semibold tracking-wide text-ink-muted uppercase">{titulo}</DropdownMenuLabel>
-          {opciones.map((o) => (
-            <DropdownMenuItem key={o.clave} onSelect={() => onChange(o.clave)} className="items-start gap-2 py-1.5">
-              <span className="flex min-w-0 flex-1 flex-col">
-                <span className={cn('truncate text-[13px]', o.clave === value ? 'font-medium text-dash-blue' : 'text-ink')}>{o.etiqueta}</span>
-                <span className="text-[11px] text-ink-muted">{o.sub}</span>
-              </span>
-              {o.clave === value && <Check aria-hidden className="mt-0.5 size-3.5 shrink-0 text-dash-blue" />}
-            </DropdownMenuItem>
-          ))}
+          {/* Como red.dev (video de Julián, 2026-11-20): cada opción con su cuadradito -la cuenta del guarantor, un edificio;
+              una persona, la silueta- y la elegida en una caja azul con ✓. Colores y radios del design system. */}
+          <div className="flex flex-col gap-1 p-1">
+            {opciones.map((o) => {
+              const elegida = o.clave === value
+              const Icono = o.clave === ALCANCE_GUARANTOR ? Building2 : User
+              return (
+                <DropdownMenuItem
+                  key={o.clave} onSelect={() => onChange(o.clave)}
+                  className={cn(
+                    'gap-3 rounded-lg border px-2.5 py-2',
+                    elegida ? 'border-dash-blue bg-info-bg focus:bg-info-bg' : 'border-transparent focus:bg-surface-muted',
+                  )}
+                >
+                  <span
+                    aria-hidden
+                    className={cn(
+                      'flex size-8 shrink-0 items-center justify-center rounded-md border',
+                      elegida ? 'border-dash-blue/30 bg-white text-dash-blue' : 'border-line bg-surface-muted text-ink-muted',
+                    )}
+                  >
+                    <Icono className="size-4" strokeWidth={1.75} />
+                  </span>
+                  <span className="flex min-w-0 flex-1 flex-col">
+                    <span className={cn('truncate text-[13px] font-medium', elegida ? 'text-dash-blue' : 'text-ink')}>{o.etiqueta}</span>
+                    <span className="text-[11px] text-ink-muted">{o.sub}</span>
+                  </span>
+                  {elegida && <Check aria-hidden className="size-4 shrink-0 text-dash-blue" />}
+                </DropdownMenuItem>
+              )
+            })}
+          </div>
         </DropdownMenuContent>
       </DropdownMenu>
       <FieldError>{error}</FieldError>

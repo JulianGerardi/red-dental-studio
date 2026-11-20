@@ -5,6 +5,20 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-11-20
 
+### Drawers del Ledger y Billing: campos en fila y el desplegable de Apply to como red.dev (CON-3738, CON-3739, CON-3735) ([#172](https://github.com/JulianGerardi/red-dental-studio/pull/172))
+- **Campos en fila:**
+  - **Crédito:** fecha, Apply to, Adjustment type y Amount en una fila.
+  - **Charge:** tres por fila.
+  - **Pago:** fecha y Apply to en dos de cuatro columnas; cada método en su caja gris, con todos sus campos en fila.
+  - De a dos en una card angosta y de a uno en el celular.
+- **Apply to:** cada opción con su cuadradito de ícono (`Building2` para la cuenta del guarantor, `User` para una
+  persona), nombre y rol; la elegida con borde `dash-blue`, fondo `info-bg` y ✓.
+- **Para el dev:**
+  - `FILA` en `ledger/formulario` da la grilla según la cantidad de campos, con container queries sobre la card
+    (`@container`).
+  - Excepción a los campos de a dos de los drawers: `ds:campos` saltea los que tienen `data-campos="fila"`.
+  - Decisiones en `modulos/ledger.md` (2026-11-20).
+
 ### Drawers del Ledger y Billing contra el video de red.dev (CON-3738, CON-3739, CON-3735) ([#171](https://github.com/JulianGerardi/red-dental-studio/pull/171))
 - **Sin ícono ni plegado** en el título de la card. `SeccionLedger` pierde la prop `caja`: siempre es una card con
   título, también en Credit y Charge Adjustment, que antes no lo mostraban.

@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react'
 import { TextField, SelectField, TextArea } from '@/components/patients/form'
 import { ApplyToSelect } from '@/components/patients/ledger/ApplyToSelect'
-import { CampoFecha, SeccionLedger, ShellLedger, type FormularioLedger } from '@/components/patients/ledger/formulario'
+import { CampoFecha, FILA, SeccionLedger, ShellLedger, type FormularioLedger } from '@/components/patients/ledger/formulario'
 import { TIPOS_AJUSTE_CARGO, type Movimiento } from '@/data/ledger'
 import { ALCANCE_GUARANTOR, MENSAJES, esFutura, limpiarImporte, numero, opcionesAplicaA, pacienteDeAlcance } from '@/lib/ledgerAplicacion'
 import { formatMDY } from '@/lib/fecha'
@@ -58,7 +58,8 @@ export function ChargeAdjustmentPanel({
     onGuardar(m, {})
   }
 
-  const grilla = 'grid gap-4 sm:grid-cols-2'
+  /* En una sola fila, como red.dev (ledger.md, 2026-11-20). */
+  const grilla = FILA[3]
   const primero = (
     <SeccionLedger titulo="Adjustment Information">
       <div className={grilla}>

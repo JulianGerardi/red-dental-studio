@@ -56,6 +56,13 @@ export function useAplicacion({ movs, aplicaciones, aplicaA, total, mensajeExces
   return { cargos, cargando, aplicado, setLinea: (id: string, v: string) => setAplicado((p) => ({ ...p, [id]: v })), ...resumen }
 }
 
+/** Los campos en una sola fila, como red.dev (ledger.md, 2026-11-20): de a dos en una card angosta y en fila desde 672px. */
+export const FILA: Record<2 | 3 | 4, string> = {
+  2: 'grid gap-4 @md:grid-cols-2',
+  3: 'grid gap-4 @md:grid-cols-2 @xl:grid-cols-3',
+  4: 'grid gap-4 @md:grid-cols-2 @2xl:grid-cols-4',
+}
+
 /** Transaction date: la de hoy de entrada. */
 export function CampoFecha({ value, onChange, error }: { value: Date | null; onChange: (d: Date | null) => void; error?: string }) {
   return (
@@ -71,7 +78,7 @@ export function CampoFecha({ value, onChange, error }: { value: Date | null; onC
     Adjustment Information), sin el ícono ni el plegado de red.dev (pedido de Julián, ledger.md 2026-11-20). */
 export function SeccionLedger({ titulo, children }: { titulo: string; children: ReactNode }) {
   return (
-    <section aria-label={titulo} className="flex flex-col gap-4 rounded-lg border border-line bg-white p-4 sm:p-5">
+    <section aria-label={titulo} data-campos="fila" className="@container flex flex-col gap-4 rounded-lg border border-line bg-white p-4 sm:p-5">
       <h3 className="text-sm font-bold text-ink">{titulo}</h3>
       {children}
     </section>
