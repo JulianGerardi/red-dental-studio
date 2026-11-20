@@ -168,3 +168,17 @@ valor en negro y bajada. Mismos textos y datos; 2 + 2 en angosto, cuatro en fila
    Login y de las páginas vacías (son tarjetas, no títulos de pantalla) y la página de mails para el backend.
 3. El menú de Settings del rail también saca Parameters, Libraries, Patient Portal y Security, y sus rutas
    (Julián, mismo día). Quedan como "Coming soon" Roles y Preferences.
+
+## Subscription con los tamaños del Ledger y Billing (2026-11-20)
+
+Julián: la pestaña Subscription de Edit Account no estaba alineada en tamaños con el Ledger y Billing. Medido a 1440px:
+
+- **Las cards ya eran iguales** (`ui/stat-card`): rótulo de 11px en mayúsculas, valor de 20px en azul, padding de 12px y
+  12px entre cards. Se ven más grandes porque son cuatro a todo el ancho (315px), sin la columna de Find Patient ni la
+  ficha del paciente al lado; en Billing y el Ledger miden 252–259px.
+- **Los títulos de sección eran los distintos:** *Subscription Summary* y *Subscription History* estaban en 16px. Pasan a
+  15px bold, como *Recent Billing Activity* de Billing.
+- **Sin cambiar, para decidir:** las pestañas (Information / Subscription / Owner) miden 32px y Cancel / Save 36px. En el
+  Ledger y Billing las pestañas son de 28px y los botones de 32px, pero estas son las de todas las pantallas de edición
+  de Settings (Location, Employee, Ledger options, Carriers, Insurance Plan) y el pie es `FormFooter`, compartido.
+  Si se achican, conviene hacerlo en todo Settings a la vez.

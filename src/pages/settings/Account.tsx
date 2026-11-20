@@ -137,7 +137,7 @@ export function SettingsAccount() {
         {tab === 'Subscription' && (
           <>
             <div>
-              <h2 className="text-base font-bold text-ink">Subscription Summary</h2>
+              <h2 className="text-[15px] font-bold text-ink">Subscription Summary</h2>
               {/* Las métricas con la card de la app (`ui/stat-card`), como el Ledger y Billing (ledger.md, 2026-11-19). */}
               <div className="mt-3 grid grid-cols-2 gap-3 lg:grid-cols-4">
                 <StatCard enFila label="Current Plan" value={cuenta ? cuenta.plan : 'Prueba Red'} caption="Plan currently assigned to the account" />
@@ -148,7 +148,7 @@ export function SettingsAccount() {
             </div>
 
             <div>
-              <h2 className="text-base font-bold text-ink">Subscription History</h2>
+              <h2 className="text-[15px] font-bold text-ink">Subscription History</h2>
               <div className="mt-3 overflow-x-auto rounded-lg border border-line-row bg-white">
                 {cuenta ? (
                   <EmptyState icon={CreditCard} title="No billing history" detail="This account doesn't have a subscription history yet." className="border-0" />
