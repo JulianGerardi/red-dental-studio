@@ -144,7 +144,7 @@ for (const modulo of modulos) {
           }
         }
         const r = await page.evaluate(serializar, { nombres, titulo })
-        capturas.push({ ...r, flujo: flujo.nombre, titulo, ruta: new URL(page.url()).pathname + new URL(page.url()).search })
+        capturas.push({ ...r, flujo: flujo.nombre, titulo, ruta: new URL(page.url()).pathname + new URL(page.url()).search + new URL(page.url()).hash })
         process.stdout.write(`  ✓ ${modulo} · ${flujo.nombre} · ${titulo} (${r.ancho}×${r.alto}, ${Math.round(r.html.length / 1024)} KB)\n`)
       } catch (e) {
         process.stdout.write(`  ✗ ${modulo} · ${flujo.nombre} · ${titulo}: ${String(e.message).split('\n')[0]}\n`)

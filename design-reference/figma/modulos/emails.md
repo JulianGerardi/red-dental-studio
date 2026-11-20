@@ -157,3 +157,16 @@ Pedido de Julián: publicar los mails en un link aparte, porque no son parte de 
 - **Design system:** `emails/Vista.tsx` y `emails/main.tsx` quedan exentos en `exentos.json`. Es una página de
   referencia para el backend, no una pantalla de la plataforma.
 
+
+## 2026-11-20 · Documentación en Figma (CON-3325)
+
+Pedido de Julián: documentar los mails en Figma. Página **📧 Email** del archivo *Screens & Flows* (`138:4`), con el
+flujo en `scripts/figma/flujos/emails.mjs`.
+
+- **Seis flujos y 19 pantallas:** *Template & preview* (la página de referencia en escritorio, en celular y con las
+  variables) y un flujo por grupo de mails: Onboarding & accounts, Scheduling, Treatment plan & documents, Subscription
+  y Guardian. Cada pantalla es la página `/emails/#<id>` y su nota dice cuándo se manda, quién lo recibe, el asunto y si
+  el texto es del documento o propuesta. Las historias de Jira salen de cada mail.
+- **Los diseños originales quedan al pie** de la misma página, sin cambios, como fuente.
+- **Anomalía:** la pantalla *Variables* quedó en la vista de celular, porque la anterior del flujo dejó elegido *Mobile*.
+  Es un estado real de la página.
