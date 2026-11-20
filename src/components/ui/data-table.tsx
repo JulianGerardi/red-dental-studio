@@ -49,7 +49,7 @@ const PADDING = 32
 
 export function DataTable<T>({
   columns, rows, rowKey, rowLabel, selectable, rowActions, onRowClick, rowDetail, defaultExpanded, reorder,
-  search, filter, columnPicker, hiddenColumns, resizable, actions,
+  search, filter, columnPicker, hiddenColumns, resizable, actions, toolbarStart,
   llenar, pageSize: pageSizeInicial = 10, pageSizeOptions, pageSizeLabel = 'Rows per page:',
   itemLabel = 'results', density = 'regular', selected, onSelectedChange,
   loading, error, disabled, isRowDisabled,
@@ -88,6 +88,8 @@ export function DataTable<T>({
   resizable?: boolean
   /** A la derecha de la barra: acción principal, exportar… */
   actions?: ReactNode
+  /** Al principio de la barra, a la izquierda: pestañas o el filtro de afuera (Billing). Una sola barra arriba de la tabla. */
+  toolbarStart?: ReactNode
   /** Con el alto que le sobra a la pantalla (junto a un menú más alto): la tabla se estira y el pie queda abajo. */
   llenar?: boolean
   pageSize?: number
@@ -185,13 +187,14 @@ export function DataTable<T>({
 
   const idsAbribles = rowDetail ? ids : []
   const todasAbiertas = idsAbribles.length > 0 && idsAbribles.every((id) => abiertas.includes(id))
-  const hayBarra = !!(search || filter || columnPicker || actions || rowDetail)
+  const hayBarra = !!(search || filter || columnPicker || actions || rowDetail || toolbarStart)
   const reiniciar = () => setPagina(1)
 
   return (
     <div className={cn('flex flex-col gap-3', llenar && 'lg:min-h-0 lg:flex-1')}>
       {hayBarra && (
         <div className={cn('flex flex-wrap items-center gap-2', inactiva && 'pointer-events-none opacity-50')} aria-disabled={inactiva || undefined}>
+          {toolbarStart}
           {search && (
             <div className="relative w-[260px] max-w-full">
               <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-ink-faint" />

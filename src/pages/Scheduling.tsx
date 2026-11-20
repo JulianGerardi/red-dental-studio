@@ -198,9 +198,11 @@ export default function Scheduling() {
         </div>
       </div>
 
-      {/* La fecha con el selector de la app, igual que el Dashboard (sin flechas); al lado, Status legend. A la derecha,
-          Day / Week / Month y View: cambian qué se ve, como la fecha (scheduling.md, 2026-11-20). */}
+      {/* Day / Week / Month a la izquierda, como las pestañas de toda la app. En la otra punta, juntos: la fecha (el selector
+          del Dashboard, sin flechas), Today, Status legend y Filter (scheduling.md, 2026-11-20). */}
       <div className="mt-4 flex flex-wrap items-center justify-between gap-2">
+        {/* El Figma marca "Month" activo aunque la vista sea semanal. */}
+        <Tabs aria-label="Calendar view" tabs={['Day', 'Week', 'Month'] as const} value={view} onChange={setView} />
         <div className="flex flex-wrap items-center gap-2">
           <DatePicker variant="toolbar" value={fecha} onChange={setFecha} />
           {/* Volver a hoy; desaparece cuando ya estás en hoy, como en el Dashboard. */}
@@ -210,10 +212,6 @@ export default function Scheduling() {
             </Button>
           )}
           <StatusLegend />
-        </div>
-        <div className="flex flex-wrap items-center gap-2">
-          {/* El Figma marca "Month" activo aunque la vista sea semanal. */}
-          <Tabs aria-label="Calendar view" tabs={['Day', 'Week', 'Month'] as const} value={view} onChange={setView} />
           <ViewMenu valor={vista} onGuardar={setVista} />
         </div>
       </div>

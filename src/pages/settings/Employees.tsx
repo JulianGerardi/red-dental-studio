@@ -18,7 +18,7 @@ import { RolesLocation } from '@/components/settings/RolesLocation'
 import { NewHoursModal } from '@/components/settings/NewHoursModal'
 import { Pill } from '@/components/ui/pill'
 import { DropdownMenuItem } from '@/components/ui/dropdown-menu'
-import { Button } from '@/components/ui/button'
+import { Button, buttonClasses } from '@/components/ui/button'
 import { NewEmployeeDrawer } from '@/components/settings/NewEmployeeDrawer'
 import { DataTable, PersonCell, TextCell } from '@/components/ui/data-table'
 import { Tabs } from '@/components/ui/tabs'
@@ -371,13 +371,9 @@ export function SettingsEmployeeDetail() {
                       </button>
                     </div>
                   ))}
-                  <button
-                    type="button"
-                    onClick={() => setCredenciales((p) => [...p, Math.max(0, ...p) + 1])}
-                    className="text-dash-blue flex items-center gap-1.5 self-start text-[13px] font-semibold hover:underline"
-                  >
-                    <Plus className="size-4" /> Add credential
-                  </button>
+                  <Button variant="secondary" className="self-start" onClick={() => setCredenciales((p) => [...p, Math.max(0, ...p) + 1])}>
+                    <Plus /> Add credential
+                  </Button>
                 </div>
               )}
             </Card>
@@ -392,7 +388,7 @@ export function SettingsEmployeeDetail() {
                 <FileText className="text-dash-blue size-8" strokeWidth={1.5} />
                 <span className="text-sm font-bold text-ink">Drag and drop your files</span>
                 <span className="text-[11px] text-ink-faint">JPEG, PND, PDF, and MP4 formats, up to 50MB</span>
-                <span className="bg-dash-blue mt-2 rounded-md px-4 py-2 text-[13px] font-medium text-white">
+                <span className={buttonClasses({ size: 'md', className: 'mt-2' })}>
                   Select file
                 </span>
               </button>
@@ -404,13 +400,8 @@ export function SettingsEmployeeDetail() {
           <Card>
             <div className="flex flex-wrap items-center justify-between gap-3">
               <h2 className="text-sm font-bold text-ink">Coordinated Universal Time (UTC)</h2>
-              <button
-                type="button"
-                onClick={() => setNuevaHora(true)}
-                className="text-dash-blue flex items-center gap-1.5 text-[13px] font-semibold hover:underline"
-              >
-                <Plus className="size-4" /> Add new hour
-              </button>
+              {/* Botón de la app, no link (employees.md, 2026-11-20). */}
+              <Button onClick={() => setNuevaHora(true)}><Plus /> Add new hour</Button>
             </div>
 
             {/* Misma grilla que el calendario de Scheduling: cabecera con el

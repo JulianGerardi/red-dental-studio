@@ -110,3 +110,12 @@ Debajo del *Yes* de *Clinical practitioner*, un ícono de advertencia y "Credent
 persona tiene al menos una credencial requerida vencida (`credencialesVencidas` en `data/employees.ts`; en el mock, Julio
 Perez). Sin link: a la ficha se entra por el ⋮ (2026-11-18). Que desaparezca al renovar la credencial depende del
 backend; acá no hay vencimientos calculados.
+
+### Botones de la app en vez de links (2026-11-20)
+
+Pedido de Julián: los "Add" escritos como link azul pasan a `ui/button`. *Add new hour* (Working hours) y *Add role*
+(Roles & location) en primario, como *New room*; *Add credential* en secundario, porque suma una fila adentro del
+formulario. *Select file* del drop de Documents usa `buttonClasses` (era un span pintado a mano). Lo mismo en el resto:
+*Add exception* (Location), *Add another time range* (New hours y Location hours), *Add new subscription* (Insurance) y
+*Add new* (dependientes de Manage subscription). Los links que navegan (*All images*, *Go to procedure ›*) siguen siendo
+links.

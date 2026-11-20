@@ -656,3 +656,14 @@ Sin historia de Jira: devolución de diseño de Julián sobre Locations, Employe
 
 **A validar:** que recepción y administración no extrañen el clic en el nombre (es el patrón de Patients, que sí lo
 conserva). Si lo extrañan, la salida es la fila entera clickeable, no volver al link.
+
+## Exceptions con la estructura de Roles & location (2026-11-20)
+
+Pedido de Julián: *Add exception* y *Add role* tenían diseños distintos (uno adentro de una caja blanca, el otro no).
+Se saca la caja: botón primario arriba a la derecha y cada excepción como card suelta (blanca, borde, `rounded-xl`, el
+mismo padding que la card de un rol), con 12 px entre cards. *Add exception* era un link azul; ahora es `ui/button`.
+
+### Sin puntos de estado (2026-11-20)
+
+Pedido de Julián: el punto verde o gris de cada excepción no existe en el resto de la app. El estado pasa a `ui/pill`
+con su nombre (Active en verde; Expired y los demás en neutro), al lado de la fecha, como el Status de Employees.

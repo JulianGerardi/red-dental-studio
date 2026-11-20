@@ -210,10 +210,23 @@ export function ActividadReciente({
   return (
     <Panel
       title={paciente ? `${paciente.nombre} — Recent billing activity` : 'Recent billing activity'}
-      className={cn('min-w-0', className)}
-      controls={
-        <div className="flex flex-wrap items-center gap-2">
-          {paciente
+      /* Título pegado y sin padding arriba del cuerpo, como Find patient y Today (billing.md, 2026-11-20). */
+      className={cn('min-w-0', TITULO_PEGADO, className)}
+      bodyClassName="pt-0"
+    >
+      {/* En el resumen, clic en una fila abre la vista de ese paciente. */}
+      <DataTable
+        columns={columnas}
+        hiddenColumns={ocultas}
+        rows={filas}
+        rowKey={(m) => m.id}
+        rowLabel={(m) => m.paciente}
+        onRowClick={paciente ? undefined : (m) => onElegir(m.paciente)}
+        defaultExpanded={paciente && abierta ? [abierta] : undefined}
+        /* Una sola barra arriba de la tabla: pestañas (o Filter, sin paciente) a la izquierda y Columns en la otra punta, como
+           el Ledger. Dos barras dejaban un hueco entre las pestañas y la tabla (billing.md, 2026-11-20). */
+        toolbarStart={
+          paciente
             ? <Tabs size="sm" aria-label="Whose activity" tabs={VISTAS_PACIENTE} value={vista} onChange={onVista} />
             /* El tipo se filtra con el Filter de la app, como Accounts; antes era una tira de pestañas (billing.md, 2026-11-20). */
             : (
@@ -225,7 +238,9 @@ export function ActividadReciente({
                   options: FILTROS_ACTIVIDAD.map((f) => ({ value: f, count: todas?.filter((m) => coincideFiltro(m, f)).length })),
                 }]}
               />
-            )}
+            )
+        }
+        actions={
           <ColumnPicker
             size="sm"
             columnas={elegibles.map((c) => ({ id: c.key, label: c.header }))}
@@ -233,18 +248,7 @@ export function ActividadReciente({
             onToggle={(k) => setOcultas((p) => (p.includes(k) ? p.filter((x) => x !== k) : [...p, k]))}
             onReset={() => setOcultas([])}
           />
-        </div>
-      }
-    >
-      {/* En el resumen, clic en una fila abre la vista de ese paciente. */}
-      <DataTable
-        columns={columnas}
-        hiddenColumns={ocultas}
-        rows={filas}
-        rowKey={(m) => m.id}
-        rowLabel={(m) => m.paciente}
-        onRowClick={paciente ? undefined : (m) => onElegir(m.paciente)}
-        defaultExpanded={paciente && abierta ? [abierta] : undefined}
+        }
         rowDetail={paciente ? (m) => (
           <DetalleMovimiento m={{ ...m, saldo: undefined }} aplicaciones={APLICACIONES_BILLING} movimientos={ACTIVIDAD_RECIENTE} onVerTransaccion={ver} />
         ) : undefined}
@@ -321,7 +325,7 @@ export function BuscarPaciente({ busqueda, onBusqueda, paciente, saldoDe, onEleg
 }
 
 /* Los pagos y ajustes son de un paciente: con uno elegido, los tres botones van en la fila del título, al lado de Export
-   CSV, como red.dev y el Ledger (billing.md, 2026-11-19). El pago en primario, los ajustes en secundario (2026-11-20). */
+   CSV, como red.dev y el Ledger (billing.md, 2026-11-19). */
 export function AccionesPaciente({ onAccion }: {
   onAccion: (tipo: TipoAjusteBilling) => void
   /** Ya no se usa: Export statement salió de Billing (no está en red.dev). */
@@ -330,8 +334,8 @@ export function AccionesPaciente({ onAccion }: {
   return (
     <div className={cn('flex flex-wrap items-center gap-2', ENTRADA)}>
       <Button size="md" onClick={() => onAccion('Patient Payment')}><Wallet /> Patient payment (-)</Button>
-      <Button variant="secondary" size="md" onClick={() => onAccion('Credit Adjustment')}><MinusCircle /> Credit adjustment (-)</Button>
-      <Button variant="secondary" size="md" onClick={() => onAccion('Charge Adjustment')}><PlusCircle /> Charge adjustment (+)</Button>
+      <Button size="md" onClick={() => onAccion('Credit Adjustment')}><MinusCircle /> Credit adjustment (-)</Button>
+      <Button size="md" onClick={() => onAccion('Charge Adjustment')}><PlusCircle /> Charge adjustment (+)</Button>
     </div>
   )
 }

@@ -88,3 +88,8 @@ Pedido de Julián. Corrige el 2026-11-20 anterior: qué lista se ve no es un fil
 Pedido de Julián: las pestañas van a la altura del buscador, en la otra punta de la tabla. Buscador y Filter a la
 izquierda, *Adjustment types / Payment methods* a la derecha, alineadas al borde derecho de la tabla, en `md` (32, el alto
 del buscador). En el celular bajan a su propio renglón.
+
+### Las pestañas, a la izquierda y debajo del buscador (2026-11-20, corrige la anterior)
+
+Pedido de Julián: en toda la app las pestañas van a la izquierda. Buscador y Filter en su fila; debajo, *Adjustment
+types / Payment methods* a la izquierda (`md`); después la tabla.

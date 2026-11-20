@@ -829,3 +829,14 @@ Análisis de filtros, pedido por Julián: el botón *View* (azul, sin ícono) pa
 ícono y "Filter"). El panel no cambia: sigue con sus tres grupos y Save. **Sin contador**: la grilla todavía no se filtra
 con lo elegido (es mock); mostrar "Filter 3" en azul diría que hay filtros aplicados que no se ven. Cuando la grilla
 filtre, se pasa `count`.
+
+### La barra: pestañas a la izquierda; Status legend y Filter a la derecha (2026-11-20)
+
+Pedido de Julián. Corrige lo anterior del mismo día: **Day / Week / Month** a la izquierda (en toda la app las pestañas
+van a la izquierda), después la fecha y *Today*. **Status legend** y **Filter** juntos en la otra punta. En el celular
+la barra se parte en dos renglones: pestañas y fecha arriba, Status legend y Filter abajo.
+
+### La fecha también a la derecha (2026-11-20, corrige la anterior)
+
+Pedido de Julián: el selector de fecha va del lado derecho. Queda **Day / Week / Month** sola a la izquierda y, juntos en
+la otra punta, fecha, *Today* (fuera de hoy), *Status legend* y Filter. En el celular, pestañas arriba y el resto abajo.

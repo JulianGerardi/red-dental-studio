@@ -1182,3 +1182,9 @@ Sin historia de Jira (pedido de Julián después del análisis de botones de acc
 2. Tres botones azules juntos no dejaban ver cuál es el principal. *Patient payment* queda en primario; *Credit
    adjustment* y *Charge adjustment* pasan a secundario (blanco con borde). Los textos e íconos no cambian. Lo mismo en
    Billing con un paciente elegido.
+
+### Corrección: los tres botones en azul y las pestañas a la izquierda (2026-11-20)
+
+Pedido de Julián: *Credit adjustment* y *Charge adjustment* vuelven a azul, como estaban (se deshace el punto 2 de
+arriba). En la barra de la tabla, *Patient view / Guarantor view* va a la izquierda y Expand all / Columns en la otra punta:
+en toda la app las pestañas van a la izquierda.

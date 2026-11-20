@@ -1,4 +1,5 @@
 import { DrawerActions } from '@/components/ui/drawer'
+import { Button } from '@/components/ui/button'
 import { useState } from 'react'
 import { X, Plus } from 'lucide-react'
 import { cn } from '@/lib/utils'
@@ -157,13 +158,9 @@ export function LocationHoursModal({
           </div>
         ))}
 
-        <button
-          type="button"
-          onClick={() => setRangos((p) => [...p, { inicio: '', fin: '' }])}
-          className="text-dash-blue -mt-2 flex items-center gap-1.5 self-start text-[13px] font-semibold hover:underline"
-        >
-          <Plus className="size-4" /> Add another time range
-        </button>
+        <Button variant="secondary" className="self-start" onClick={() => setRangos((p) => [...p, { inicio: '', fin: '' }])}>
+          <Plus /> Add another time range
+        </Button>
 
         <div className="border-t border-line pt-4">
           <p className="text-sm font-bold text-ink">Repeat on days</p>

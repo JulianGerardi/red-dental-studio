@@ -307,7 +307,8 @@ export function ContractedWith({
                   onClick={() => setLetra(l === 'All' ? '' : l)}
                   className={cn(
                     'focus-visible:outline-dash-blue flex h-7 min-w-7 items-center justify-center rounded-md px-1.5 text-[12px] font-medium transition-colors',
-                    activa ? 'bg-dash-blue text-white' : 'text-dash-blue hover:bg-info-bg',
+                    /* Como Tabs: gris y azul sólo la activa; en azul suelto parecían links (billing-profile.md, 2026-11-20). */
+                    activa ? 'bg-dash-blue text-white' : 'text-ink-slate hover:bg-surface-muted hover:text-ink-soft',
                     'disabled:pointer-events-none disabled:text-ink-faint/60',
                   )}
                 >

@@ -1,4 +1,5 @@
 import { Tabs } from '@/components/ui/tabs'
+import { Pill } from '@/components/ui/pill'
 import { PageTitle } from '@/components/ui/page-title'
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { Chip } from '@/components/ui/chip'
@@ -567,25 +568,21 @@ export function ExceptionsTab() {
   const [modal, setModal] = useState<'nueva' | Excepcion | null>(null)
 
   return (
-    <div className="rounded-xl border border-line bg-white p-4 sm:p-5">
-      <div className="flex items-center justify-end">
-        <button
-          type="button"
-          onClick={() => setModal('nueva')}
-          className="text-dash-blue flex items-center gap-1.5 text-[13px] font-semibold hover:underline"
-        >
-          <Plus className="size-4" /> Add exception
-        </button>
+    /* Misma estructura que Roles & location del empleado: botón arriba a la derecha y cada excepción como card suelta,
+       sin caja blanca alrededor (locations.md, 2026-11-20). */
+    <div className="flex flex-col gap-4">
+      <div className="flex justify-end">
+        <Button onClick={() => setModal('nueva')}><Plus /> Add exception</Button>
       </div>
-
       {excepciones.length === 0 ? (
-        <EmptyState title="No exceptions" detail="Add a day that breaks from the regular schedule." className="border-0 py-16" />
+        <EmptyState title="No exceptions" detail="Add a day that breaks from the regular schedule." />
       ) : (
-        <div className="mt-4 flex flex-col gap-2">
+        <div className="flex flex-col gap-3">
           {excepciones.map((e) => (
-            <div key={e.id} className="flex items-center gap-3 rounded-lg border border-line px-3 py-2.5">
-              <span className={cn('size-2 shrink-0 rounded-full', e.estado === 'Active' ? 'bg-green' : 'bg-ink-faint')} />
+            <div key={e.id} className="flex items-center gap-3 rounded-xl border border-line bg-white px-4 py-3.5">
               <span className="min-w-0 flex-1 truncate text-[13px] font-medium text-ink">{e.nombre}</span>
+              {/* El estado con su nombre, como en el resto de la app; sin punto de color (locations.md, 2026-11-20). */}
+              <Pill tone={e.estado === 'Active' ? 'success' : 'neutral'}>{e.estado}</Pill>
               <span className="flex shrink-0 items-center gap-1.5 text-[12px] text-ink-muted">
                 <CalendarDays className="size-3.5" />
                 {formatMDY(e.fecha)}
