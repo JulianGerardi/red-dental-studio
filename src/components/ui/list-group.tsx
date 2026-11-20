@@ -16,7 +16,7 @@ export const LIST_GROUP_TONES = {
 export type ListGroupTone = keyof typeof LIST_GROUP_TONES
 
 export function ListGroup({
-  title, tone = 'default', collapsible, defaultOpen = true, limit, maxHeight, label, className, children,
+  title, tone = 'default', collapsible, defaultOpen = true, limit, maxHeight, alPie, label, className, children,
 }: {
   /** Nombre del grupo; va en versalitas con la cuenta. Sin título, es sólo la lista. */
   title?: string
@@ -29,6 +29,8 @@ export function ListGroup({
   limit?: number
   /** Alto máximo de la lista abierta (ver ShowMore). */
   maxHeight?: string
+  /** "Show N more" al pie del panel (ver ShowMore). */
+  alPie?: boolean
   /** Nombre de lo que se lista, para el lector de pantalla. */
   label?: string
   className?: string
@@ -46,7 +48,7 @@ export function ListGroup({
   const claseRotulo = cn('flex items-center gap-1 rounded text-[11px] font-semibold tracking-wide uppercase', LIST_GROUP_TONES[tone])
 
   return (
-    <section aria-label={title} className={cn('flex flex-col gap-1.5', className)}>
+    <section aria-label={title} className={cn('flex flex-col gap-1.5', alPie && 'min-h-0 flex-1', className)}>
       {title && (
         <div className="flex min-h-6 items-center">
           {collapsible ? (
@@ -63,7 +65,7 @@ export function ListGroup({
       )}
 
       {abierto && (
-        <ShowMore total={items.length} limit={limit ?? items.length} maxHeight={maxHeight} label={label ?? title}>
+        <ShowMore total={items.length} limit={limit ?? items.length} maxHeight={maxHeight} alPie={alPie} label={label ?? title}>
           {(cuantos) => (
             <ul className="flex flex-col gap-3">
               {items.slice(0, cuantos).map((it) => <li key={it.key} className={TARJETA_INTERNA}>{it}</li>)}

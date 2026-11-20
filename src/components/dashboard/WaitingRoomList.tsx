@@ -52,7 +52,7 @@ export function WaitingRoomList({ pacientes, ahora, limit, seleccionada, onSelec
   if (grupos.length === 0) return null
   const total = pacientes.length
   return (
-    <ShowMore total={total} limit={limit ?? total} label="patients in the waiting room" className="flex flex-col gap-4">
+    <ShowMore total={total} limit={limit ?? total} alPie label="patients in the waiting room" className="flex flex-col gap-4">
       {(n) => {
         const cuantos = n >= total ? grupos.map((g) => g.filas.length) : repartir(grupos.map((g) => g.filas.length), n)
         return grupos.map((g, gi) => (

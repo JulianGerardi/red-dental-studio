@@ -9,7 +9,7 @@ import { cn } from '@/lib/utils'
 export const SHOW_MORE_ALTO = 'min(70vh, 640px)'
 
 export function ShowMore({
-  total, limit, maxHeight = SHOW_MORE_ALTO, enCaja, llenarAlto, filas, cargarAlScroll, label = 'items', fade = 'from-white', className, children,
+  total, limit, maxHeight = SHOW_MORE_ALTO, enCaja, llenarAlto, filas, cargarAlScroll, alPie, label = 'items', fade = 'from-white', className, children,
 }: {
   /** Cuántos ítems hay en total. */
   total: number
@@ -39,6 +39,10 @@ export function ShowMore({
       al acercarse al final, suma otra tanda de `limiteEfectivo` ítems, hasta mostrarlas todas (Pending Task del
       Patient Dashboard, Julián 2026-10-28, sobre el video de referencia). */
   cargarAlScroll?: boolean
+  /** "Show N more" va al pie del panel, no pegado a la última fila: en paneles que comparten fila (las columnas del
+      Dashboard) los botones quedan a la misma altura aunque cada lista mida distinto (Figma Flows 509:81656,
+      dashboard.md 2026-11-20). El panel tiene que dar alto con `flex-1`. */
+  alPie?: boolean
   /** Nombre de lo que se lista, para el lector de pantalla ("appointments"). */
   label?: string
   /** Color del fondo de abajo, para el degradé que avisa que hay más: el de la card (blanco) o el de la página. */
@@ -127,7 +131,7 @@ export function ShowMore({
   }
 
   return (
-    <div className={cn('flex flex-col gap-2', llenarAlto && 'min-h-0 flex-1')}>
+    <div className={cn('flex flex-col gap-2', (llenarAlto || alPie) && 'min-h-0 flex-1')}>
       {/* -m-1 p-1: aire para que el scroll no corte la sombra de las cards. */}
       <div
         ref={ref}
@@ -156,7 +160,10 @@ export function ShowMore({
       {conTope && !cargarAlScroll && (
         <button
           type="button" data-show-more aria-expanded={abierto} onClick={alternar}
-          className="flex items-center gap-1 self-start rounded text-[12px] font-medium text-dash-blue hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-dash-blue"
+          className={cn(
+            'flex items-center gap-1 self-start rounded text-[12px] font-medium text-dash-blue hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-dash-blue',
+            alPie && 'mt-auto',
+          )}
         >
           {abierto ? 'Show less' : `Show ${sobran} more`}
           <ChevronDown aria-hidden className={cn('size-3.5 transition-transform', abierto && 'rotate-180')} />
