@@ -1085,3 +1085,8 @@ note*, *Login to sign document*); el contenido del documento (vista y PDF) queda
 Note*, *Medical History*…), igual que los demás nombres de documentos.
 
 `tests/pending-tasks.e2e.ts`.
+
+## Pending task: pestañas debajo del título (2026-11-20)
+
+Pedido de Julián. Las pestañas de Pending task salen del encabezado del panel (estaban a la derecha del título) y van
+debajo, a la izquierda, con el cuerpo del panel sin padding arriba (`bodyClassName="pt-0"`), como Billing.

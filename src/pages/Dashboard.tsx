@@ -433,19 +433,16 @@ export default function Dashboard() {
       </div>
 
       {/* Pending Task va abajo, a todo el ancho: arriba queda la fila de tres (Julián, 2026-10-19). */}
-      <Panel
-        title="Pending task" className="mt-4"
-        controls={
-          <Tabs
-            size="sm" aria-label="Filter tasks"
-            tabs={[
-              { value: 'All', count: todasLasTareas.length },
-              ...TASK_KINDS.map((k) => ({ value: k, count: todasLasTareas.filter((t) => t.kind === k).length })),
-            ]}
-            value={tipoTarea} onChange={setTipoTarea}
-          />
-        }
-      >
+      {/* Pestañas debajo del título, a la izquierda, como en toda la app (dashboard.md, 2026-11-20). */}
+      <Panel title="Pending task" className="mt-4" bodyClassName="pt-0">
+        <Tabs
+          size="sm" className="self-start" aria-label="Filter tasks"
+          tabs={[
+            { value: 'All', count: todasLasTareas.length },
+            ...TASK_KINDS.map((k) => ({ value: k, count: todasLasTareas.filter((t) => t.kind === k).length })),
+          ]}
+          value={tipoTarea} onChange={setTipoTarea}
+        />
         {tareas.length === 0 ? (
           <EmptyState
             icon={Activity}
