@@ -5,6 +5,22 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-11-20
 
+### Filtros: un solo diseño, el de Accounts, y sin puntos de color ([#174](https://github.com/JulianGerardi/red-dental-studio/pull/174))
+- **Patrón:** buscador → Search → Filter.
+  - El buscador es `settings/SettingsSearch` (36 px): Accounts, Locations, Employees, Ledger Options y Patients ya no lo
+    escriben a mano.
+  - El Filter es `ui/filter-menu`.
+- **Pestañas y select pasan al Filter:**
+  - **Ledger Options:** grupos *View* y *Type*.
+  - **Billing:** *Type*, `sm`, al lado de Columns.
+  - **Consents:** *Status*, con Active por defecto.
+- **Para el dev:**
+  - `FilterOption` ya no acepta `tone`: ningún filtro lleva puntos de color.
+  - `SettingsSearch` suma `tour`.
+  - `ActividadReciente` suma `todas` y `ListaTemplates` suma `todos`, para las cantidades.
+  - Las pestañas que cambian de vista y el `DateFilter` no cambian.
+  - Decisiones en `modulos/settings-accounts.md` (2026-11-20).
+
 ### Ledger: sin Export statement en la barra de la tabla ([#173](https://github.com/JulianGerardi/red-dental-studio/pull/173))
 - Sale el botón de descargar (*Export statement*) de la barra de la tabla del Ledger: no está en red.dev (en Billing ya
   había salido). La barra queda con Expand / Collapse all y Columns. Decisión en `modulos/ledger.md` (2026-11-20).
