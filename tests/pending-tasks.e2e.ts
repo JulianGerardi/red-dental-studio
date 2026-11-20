@@ -6,12 +6,14 @@ import { expect } from 'e2e'
 
 const SIN_ENCUENTRO = /no open encounter for the selected patient/
 
-test('Sin encuentro abierto el ⋮ explica por qué y no deja hacer nada', async ({ app, screen }) => {
+test('Sin encuentro abierto las opciones del ⋮ quedan deshabilitadas y un tooltip dice por qué', async ({ app, screen }) => {
   await app.open('/')
   await screen.getByRole('tab', /^Lab Orders/).tap()
   await screen.getByRole('button', 'Actions for Lab order for James Foster').tap()
-  await expect(screen.getByText(SIN_ENCUENTRO)).toBeVisible()
-  await expect(screen.getByRole('menuitem', 'Cancel')).toBeDisabled()
+  await expect(screen.getByRole('menuitem', 'Cancel')).toHaveAttribute('aria-disabled', 'true')
+  /* El tooltip abre también con el foco del teclado. */
+  await screen.getByRole('menuitem', 'Cancel').focus()
+  await expect(screen.getByRole('tooltip')).toContainText(SIN_ENCUENTRO)
 })
 
 test('Request pasa la orden a Requested y Cancel la saca de la lista', async ({ app, screen }) => {
@@ -40,10 +42,22 @@ test('Complete this Task abre el detalle de la orden, en sólo lectura sin encue
   await expect(screen.getByRole('button', 'View History')).toBeVisible()
 })
 
-test('La Clinical Note se firma desde Complete this Task y sale de la lista', async ({ app, screen }) => {
+test('Complete this Task abre la Clinical Note; se firma con el login y Back to History va a Patient Summary', async ({ app, screen }) => {
   await app.open('/patients/1')
   await screen.getByRole('tab', /^Clinical Note/).tap()
   await screen.getByRole('button', /Complete this Task/).first().tap()
-  await screen.getByRole('button', 'Review and sign').tap()
-  await expect(screen.getByRole('tab', 'Clinical Note (1)')).toBeVisible()
+  await expect(screen.getByRole('heading', 'Clinical Note - John Smith')).toBeVisible()
+  await expect(screen.getByText('Dental Clinical Note').first()).toBeVisible()
+
+  await screen.getByRole('button', 'Sign Clinical Note').tap()
+  const login = screen.getByRole('dialog', 'Login to Sign Document')
+  await expect(login.getByRole('button', 'Sign')).toBeDisabled()
+  await login.getByPlaceholder('example@example.com').fill('sarah@example.com')
+  await login.getByPlaceholder('Enter password').fill('secret')
+  await login.getByRole('button', 'Sign').tap()
+  await expect(screen.getByText('Clinical Note signed.')).toBeVisible()
+  await expect(screen.getByRole('button', 'Sign Clinical Note')).toHaveCount(0)
+
+  await screen.getByRole('button', 'Back to History').tap()
+  await expect(screen.getByRole('button', 'Patient Summary')).toBeVisible()
 })

@@ -136,7 +136,7 @@ export function ResumenWorkflow({ k, progreso, onAbrir }: { k: TipoBadge; progre
    como el resto de la app (antes rearmaba Dialog a mano, clinical-mode.md 2026-10-19); cerrarlo con Esc o el fondo
    cuenta como Remind me later, igual que en cualquier otro ConfirmDialog. Sin firmar, el panel del paciente muestra
    Pending Signature (lib/notaClinica). */
-export function ClinicalNoteDialog({ open, onClose, paciente, onFirmar }: { open: boolean; onClose: () => void; paciente: string; /** En lugar del aviso: la tarea de Pending Task que se firma (dashboard.md, 2026-11-20). */ onFirmar?: () => void }) {
+export function ClinicalNoteDialog({ open, onClose, paciente }: { open: boolean; onClose: () => void; paciente: string }) {
   if (!open) return null
   return (
     <ConfirmDialog
@@ -144,7 +144,7 @@ export function ClinicalNoteDialog({ open, onClose, paciente, onFirmar }: { open
       confirmLabel="Review and sign"
       cancelLabel="Remind me later"
       onCancel={() => { onClose(); setNotaPendiente(paciente, true); aviso.info('We will remind you to sign the Clinical Note.') }}
-      onConfirm={() => { onClose(); setNotaPendiente(paciente, false); if (onFirmar) onFirmar(); else aviso.ok('Clinical Note signed.') }}
+      onConfirm={() => { onClose(); setNotaPendiente(paciente, false); aviso.ok('Clinical Note signed.') }}
     >
       <p>The clinical encounter has been completed.<br />You can sign the Clinical Note now or defer the signature and complete it later.</p>
     </ConfirmDialog>

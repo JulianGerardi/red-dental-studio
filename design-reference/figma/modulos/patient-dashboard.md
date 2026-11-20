@@ -579,5 +579,5 @@ Julián: "poné algunos con pending signature así no tengo que hacer el flujo".
 
 **Jira:** CON-2643. Los botones de cada tarea (⋮, PDF, Complete this Task) ya hacen lo de red.dev; detalle en
 dashboard.md (2026-11-20). Acá: las nueve tareas pasan a ser **de John Smith**, el paciente de la ficha (antes decían
-Elena Marquez; CA9), con tres Lab Orders (Pending, Requested, Delayed) y dos de cada otro tipo. El ⋮ queda deshabilitado
-hasta *Start Encounter*.
+Elena Marquez; CA9), con tres Lab Orders (Pending, Requested, Delayed) y dos de cada otro tipo. Las opciones del ⋮ quedan
+deshabilitadas (con su tooltip) hasta *Start Encounter*.

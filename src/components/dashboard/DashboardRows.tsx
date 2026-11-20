@@ -127,10 +127,10 @@ const ICONO_TAREA: Record<string, LucideIcon> = {
   'Clinical Note': ClipboardList, 'Lab Orders': FlaskConical, Prescriptions: Pill, Referrals: Send,
 }
 
-/* Vencida si la fecha ya pasó (CON-2643, V2): el chip Expired date y la fecha en rojo, y sigue en la lista. */
+/* Expired date si la fecha ya pasó, como red.dev; la Clinical Note no lo lleva (dashboard.md, 2026-11-20). */
 const vencida = (t: PendingTask, hoy: Date) => {
   const f = new Date(t.expiration)
-  return !Number.isNaN(f.getTime()) && f < new Date(hoy.getFullYear(), hoy.getMonth(), hoy.getDate())
+  return t.kind !== 'Clinical Note' && !Number.isNaN(f.getTime()) && f < new Date(hoy.getFullYear(), hoy.getMonth(), hoy.getDate())
 }
 
 type PropsTarea = {
@@ -145,7 +145,7 @@ type PropsTarea = {
 
 /* Una tarea con el diseño de Pending documents (Julián, 2026-10-19): el ícono del tipo en su cuadrado, el tipo con su
    estado en pills, quién y cuándo se registró abajo, el vencimiento a la derecha, el PDF, Complete this Task y el ⋮.
-   El PDF sólo si ya hay documento y Expired date sólo si venció (dashboard.md, 2026-11-20). Va adentro de la lista
+   El PDF sólo si ya hay documento y Expired date sólo si venció, como red.dev (dashboard.md, 2026-11-20). Va adentro de la lista
    con divisores de PendingTaskList. Ver design-reference/figma/modulos/dashboard.md. */
 export function TaskRow({ task, encuentroAbierto = false, onAccion, hoy = new Date() }: PropsTarea) {
   const Icono = ICONO_TAREA[task.kind] ?? ClipboardList
@@ -167,7 +167,7 @@ export function TaskRow({ task, encuentroAbierto = false, onAccion, hoy = new Da
       </span>
       <span className="ml-auto flex shrink-0 items-center gap-3">
         <span className="flex flex-col items-end gap-0.5 text-right">
-          <span className={cn('text-[12px] font-semibold tabular-nums', expirada ? 'text-dash-bad-fg' : 'text-ink')}>{task.expiration}</span>
+          <span className="text-dash-bad-fg text-[12px] font-semibold tabular-nums">{task.expiration}</span>
           <span className="text-[11px] text-ink-muted">Expiration date</span>
         </span>
         {/* Sin documento queda el hueco: Complete this Task no se corre de una fila a otra. */}
