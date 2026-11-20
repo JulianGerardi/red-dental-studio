@@ -840,3 +840,10 @@ la barra se parte en dos renglones: pestañas y fecha arriba, Status legend y Fi
 
 Pedido de Julián: el selector de fecha va del lado derecho. Queda **Day / Week / Month** sola a la izquierda y, juntos en
 la otra punta, fecha, *Today* (fuera de hoy), *Status legend* y Filter. En el celular, pestañas arriba y el resto abajo.
+
+### Texto del calendario en negro (2026-11-20)
+
+Pedido de Julián (no todo el texto estaba en negro). Pasan a `ink`: las horas de la columna izquierda, los días de la
+semana (SUN, MON… en Day, Week y Month), los números de día (eran azules; el de hoy sigue en el círculo azul) y el texto de
+*Status legend* (era `ink-soft`, más claro que Filter y la fecha). Quedan en gris sólo los días de otro mes en Month y
+el "No appointments on this day." del panel del día, que son estados.

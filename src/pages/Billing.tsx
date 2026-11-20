@@ -223,13 +223,13 @@ export function ActividadReciente({
         rowLabel={(m) => m.paciente}
         onRowClick={paciente ? undefined : (m) => onElegir(m.paciente)}
         defaultExpanded={paciente && abierta ? [abierta] : undefined}
-        /* Una sola barra arriba de la tabla: pestañas (o Filter, sin paciente) a la izquierda y Columns en la otra punta, como
-           el Ledger. Dos barras dejaban un hueco entre las pestañas y la tabla (billing.md, 2026-11-20). */
-        toolbarStart={
-          paciente
-            ? <Tabs size="sm" aria-label="Whose activity" tabs={VISTAS_PACIENTE} value={vista} onChange={onVista} />
-            /* El tipo se filtra con el Filter de la app, como Accounts; antes era una tira de pestañas (billing.md, 2026-11-20). */
-            : (
+        /* Una sola barra arriba de la tabla: con paciente, sus pestañas a la izquierda; Filter (sin paciente) y Columns juntos
+           en la otra punta (billing.md, 2026-11-20). */
+        toolbarStart={paciente && <Tabs size="sm" aria-label="Whose activity" tabs={VISTAS_PACIENTE} value={vista} onChange={onVista} />}
+        actions={
+          <>
+            {/* El tipo se filtra con el Filter de la app, como Accounts (billing.md, 2026-11-20). */}
+            {!paciente && (
               <FilterMenu
                 size="sm"
                 label="Filter activity"
@@ -238,16 +238,15 @@ export function ActividadReciente({
                   options: FILTROS_ACTIVIDAD.map((f) => ({ value: f, count: todas?.filter((m) => coincideFiltro(m, f)).length })),
                 }]}
               />
-            )
-        }
-        actions={
-          <ColumnPicker
-            size="sm"
-            columnas={elegibles.map((c) => ({ id: c.key, label: c.header }))}
-            ocultas={ocultas.filter((k) => elegibles.some((c) => c.key === k))}
-            onToggle={(k) => setOcultas((p) => (p.includes(k) ? p.filter((x) => x !== k) : [...p, k]))}
-            onReset={() => setOcultas([])}
-          />
+            )}
+            <ColumnPicker
+              size="sm"
+              columnas={elegibles.map((c) => ({ id: c.key, label: c.header }))}
+              ocultas={ocultas.filter((k) => elegibles.some((c) => c.key === k))}
+              onToggle={(k) => setOcultas((p) => (p.includes(k) ? p.filter((x) => x !== k) : [...p, k]))}
+              onReset={() => setOcultas([])}
+            />
+          </>
         }
         rowDetail={paciente ? (m) => (
           <DetalleMovimiento m={{ ...m, saldo: undefined }} aplicaciones={APLICACIONES_BILLING} movimientos={ACTIVIDAD_RECIENTE} onVerTransaccion={ver} />

@@ -5,6 +5,26 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-11-20
 
+### Acciones al lado del título, pestañas a la izquierda, botones "Add" y Clinical practitioner (PR_PENDIENTE)
+- **Regla:** al lado del título van sólo las acciones; las pestañas van a la izquierda de su barra y filtros, fecha y
+  Columns en la otra punta. Scheduling: Day / Week / Month a la izquierda; fecha, Today, Status legend y Filter juntos a
+  la derecha. Ledger del paciente: Patient view / Guarantor view en la barra de la tabla, a la izquierda. Billing: igual
+  con paciente; sin paciente, Filter al lado de Columns. Ledger options: Adjustment types / Payment methods en pestañas
+  debajo del buscador (salieron del Filter).
+- **Scheduling:** *View* usa `FilterTrigger` (blanco, ícono y "Filter"), sin contador porque la grilla todavía no filtra.
+  Texto del calendario en `ink` (horas, días, números; hoy sigue en azul) y Status legend en `ink`.
+- **Employees (CON-4085, CON-3542):** sin casillas; *Provider* pasa a *Clinical practitioner* (columna, interruptor
+  *Is clinical practitioner* y *Disable clinical practitioner* en el ⋮). "Credentials expired" debajo del Yes
+  (`Empleado.credencialesVencidas`).
+- **Botones:** los "Add" que eran links azules pasan a `ui/button` (Add new hour, Add role, Add exception en primario;
+  Add credential, Add another time range, Add new subscription, Add new en secundario). Consent templates: *New
+  template* en la fila del título (`ListaTemplates` ya no recibe `onNuevo`). El salto por letra de Billing profile con el
+  color de `Tabs`.
+- **Exceptions (Location):** mismo diseño que Rooms: caja con encabezado, filas, estado en `Pill`, *Edit exception*.
+- **Para el dev:** `DataTable` suma `toolbarStart` (al principio de su barra; Billing pone ahí las pestañas para no
+  tener dos barras). Decisiones en `modulos/scheduling.md`, `employees.md`, `settings-ledger.md`, `ledger.md`,
+  `billing.md`, `consents.md`, `locations.md` y `billing-profile.md` (2026-11-20).
+
 ### Pending Task con funcionalidad, como red.dev ([#178](https://github.com/JulianGerardi/red-dental-studio/pull/178))
 - **Complete this task:** Lab order, Prescription y Referral abren Clinical Mode en su pestaña (`?tab=…&task=<id>`); la
   Lab order entra a `clinical/LabOrderDetail`, en *Read-only mode* sin encuentro abierto. La Clinical note abre

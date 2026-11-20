@@ -506,3 +506,8 @@ secundario, igual que el Ledger (ledger.md, misma fecha).
    de la tabla, a la izquierda; *Columns* en la otra punta. Van por `DataTable` (`toolbarStart` y `actions`, prop nueva
    `toolbarStart`): con una barra propia arriba, la tabla dibujaba la suya debajo y quedaban ~25 px entre las pestañas y
    la tabla. Ahora: título, 12 px, barra, 12 px, tabla (el panel con el título pegado, como Find patient y Today).
+
+### Filter al lado de Columns (2026-11-20)
+
+Pedido de Julián. Sin paciente, Filter va a la derecha, al lado de *Columns* (los dos en `actions` de `DataTable`); con
+paciente, *Patient view / Guarantor view* sigue a la izquierda.
