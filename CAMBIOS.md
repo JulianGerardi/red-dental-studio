@@ -5,6 +5,19 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-11-20
 
+### Pending Task con funcionalidad, como red.dev ([#178](https://github.com/JulianGerardi/red-dental-studio/pull/178))
+- **Complete this task:** Lab order, Prescription y Referral abren Clinical Mode en su pestaña (`?tab=…&task=<id>`); la
+  Lab order entra a `clinical/LabOrderDetail`, en *Read-only mode* sin encuentro abierto. La Clinical note abre
+  `pages/ClinicalNote` (`/patients/:id/clinical-note/:noteId`): Back to history, View PDF y Sign clinical note con login.
+- **⋮:** Lab order con Edit, Request, Cancel, Delete; Prescription con Activate, Cancel. Sin encuentro abierto (In
+  progress u On hold), apagadas con tooltip.
+- **PDF:** formato de red.dev (Dental Clinical Note), en otra pestaña. `dashboard/documentoTarea.ts` arma el contenido y
+  el PDF a mano; con backend lo genera el servidor.
+- **Para el dev:** lógica en `dashboard/tareas.tsx` (`useAccionesTarea`, `useTareasVivas`, `MenuTarea`). `PendingTask`
+  suma `id`, `patientId`, `provider`, `pdf`; `TaskRow` y `PendingTaskList` suman `encuentroAbierto`, `onAccion`, `hoy`;
+  `LabOrderPanel` suma `tarea` y `encuentroAbierto`. Decisiones en `modulos/dashboard.md` y `clinical-mode.md`
+  (2026-11-20).
+
 ### Dashboard: "Show N more" al pie del panel, alineado entre columnas ([#177](https://github.com/JulianGerardi/red-dental-studio/pull/177))
 - Appointments y Waiting room muestran "Show N more" a la misma altura, al pie de cada panel (Figma Flows `509:81656`);
   antes iba pegado a la última fila y en Waiting room caía 45 px más arriba.
