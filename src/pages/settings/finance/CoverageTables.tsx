@@ -129,7 +129,7 @@ export function SettingsCoverageTables() {
     <div className={PADDING_PAGINA}>
       <SettingsPageHeader
         titulo="Search Coverage Table"
-        accion={<Button onClick={() => navigate(`${LISTA_COBERTURAS}/new`)}><Plus /> New Coverage Table</Button>}
+        accion={<Button size="md" onClick={() => navigate(`${LISTA_COBERTURAS}/new`)}><Plus /> New Coverage Table</Button>}
       />
       <div className={cn(TARJETA_PANEL, 'mt-5 grid gap-6 p-4 sm:p-5 lg:grid-cols-[260px_minmax(0,1fr)] lg:items-start')}>
         <MasterList

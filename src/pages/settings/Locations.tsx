@@ -51,7 +51,7 @@ export function SettingsLocations({ nuevo = false }: { nuevo?: boolean }) {
       <SettingsPageHeader
         titulo="Locations"
         accion={(
-          <Button data-tour="set-locations" onClick={() => setCreando(true)}>
+          <Button size="md" data-tour="set-locations" onClick={() => setCreando(true)}>
             <Plus /> New location
           </Button>
         )}

@@ -129,7 +129,7 @@ export default function Notifications() {
       <div className="flex flex-wrap items-start justify-between gap-3">
         <PageTitle>Notifications</PageTitle>
         {/* Sin menú ⋮: sólo tenía acciones de archivar (notifications.md, 2026-10-13). */}
-        <Button variant="secondary" disabled={!sinLeer.length} onClick={marcarTodas}>
+        <Button variant="secondary" size="md" disabled={!sinLeer.length} onClick={marcarTodas}>
           <CheckCheck /> Mark all as read
         </Button>
       </div>

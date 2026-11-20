@@ -115,7 +115,7 @@ export default function Patients() {
             {/* Sin bajada: la del Figma era el texto de Locations (patients.md, 2026-11-06). */}
             <PageTitle>Patients</PageTitle>
 
-            <Button onClick={() => setModal('new')} data-tour="pat-new">
+            <Button size="md" onClick={() => setModal('new')} data-tour="pat-new">
               <Plus /> New Patient
             </Button>
           </div>

@@ -316,9 +316,9 @@ export function AccionesPaciente({ onAccion }: {
 }) {
   return (
     <div className={cn('flex flex-wrap items-center gap-2', ENTRADA)}>
-      <Button onClick={() => onAccion('Patient Payment')}><Wallet /> Patient Payment (-)</Button>
-      <Button onClick={() => onAccion('Credit Adjustment')}><MinusCircle /> Credit Adjustment (-)</Button>
-      <Button onClick={() => onAccion('Charge Adjustment')}><PlusCircle /> Charge Adjustment (+)</Button>
+      <Button size="md" onClick={() => onAccion('Patient Payment')}><Wallet /> Patient Payment (-)</Button>
+      <Button size="md" onClick={() => onAccion('Credit Adjustment')}><MinusCircle /> Credit Adjustment (-)</Button>
+      <Button size="md" onClick={() => onAccion('Charge Adjustment')}><PlusCircle /> Charge Adjustment (+)</Button>
     </div>
   )
 }
@@ -394,6 +394,7 @@ export default function Billing({ inicial }: {
           {pacienteSeleccionado && <AccionesPaciente key={pacienteSeleccionado.nombre} onAccion={setModal} />}
           <Button
             variant="secondary"
+            size="md"
             disabled={!!seleccionado}
             title={seleccionado ? 'Clear the selected patient to export all activity' : undefined}
             onClick={() => { exportarCsv(filas); aviso.ok(`${filas.length} transactions exported.`) }}

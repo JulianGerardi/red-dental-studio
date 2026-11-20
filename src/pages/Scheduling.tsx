@@ -195,7 +195,7 @@ export default function Scheduling() {
               </button>
             </>
           )}
-          <Button onClick={() => setPanel('new')} data-tour="sched-new">
+          <Button size="md" onClick={() => setPanel('new')} data-tour="sched-new">
             <Plus /> New appointment
           </Button>
         </div>
@@ -207,7 +207,7 @@ export default function Scheduling() {
         <DatePicker variant="toolbar" value={fecha} onChange={setFecha} />
         {/* Volver a hoy; desaparece cuando ya estás en hoy, como en el Dashboard. */}
         {!sameDay(fecha, FECHA_ANCLA) && (
-          <Button variant="secondary" onClick={() => setFecha(FECHA_ANCLA)} title="Go to today">
+          <Button variant="secondary" size="md" onClick={() => setFecha(FECHA_ANCLA)} title="Go to today">
             <CalendarClock /> Today
           </Button>
         )}

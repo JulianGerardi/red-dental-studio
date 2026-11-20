@@ -2,7 +2,7 @@ import { useRef } from 'react'
 import { SearchInput } from '@/components/ui/search-input'
 import { SearchButton } from '@/components/ui/search-button'
 
-/* El buscador de las listas: SearchInput lg con el botón Search al lado, en la fila de abajo del título. Filtra mientras
+/* El buscador de las listas: SearchInput md con el botón Search al lado, en la fila de abajo del título. Filtra mientras
    se escribe; Search lleva el foco al campo. Lo usan las listas de Settings, Patients y Documents. */
 export function SettingsSearch({
   value, onChange, placeholder = 'Search...', className, disabled, onSearch,

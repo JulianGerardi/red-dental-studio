@@ -81,6 +81,7 @@ export default function Documents() {
             accion={(
               <Button
                 variant="secondary"
+                size="md"
                 iconOnly
                 aria-label="Download selected"
                 onClick={() =>

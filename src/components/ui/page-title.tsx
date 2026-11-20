@@ -17,8 +17,8 @@ export function PageTitle({
   return (
     <h1
       className={cn(
-        /* Siempre del alto de un botón lg: con o sin acción al lado, el título cae a la misma altura en todas las pantallas. */
-        'flex min-h-9 items-center leading-[1.3] text-ink',
+        /* Siempre del alto de un botón md (el de la fila del título): con o sin acción al lado, el título cae a la misma altura. */
+        'flex min-h-8 items-center leading-[1.3] text-ink',
         size === 'lg' ? 'text-2xl font-bold' : 'text-xl font-semibold',
       )}
     >

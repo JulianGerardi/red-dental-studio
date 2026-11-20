@@ -606,19 +606,22 @@ placeholders y mayúsculas que vienen del Figma o de red.dev quedan como están 
 Reglas que quedan:
 
 1. **Tamaños con un mismo nombre.** `Button`, `FilterMenu`, `SearchInput` y `SearchButton` usan sm 28 · md 32 · lg 36.
-   Antes `FilterMenu` "md" medía 36 y `Button` "md" 32. El default de `FilterMenu` pasa a `lg` (las pantallas que lo
-   usaban sin tamaño no cambian); `ColumnPicker` sigue con `sm | md` y su `md` es el `lg` del filtro.
-2. **Nivel de página = 36; dentro de una card = 28.** La acción de la fila del título (New Patient, New appointment, los
-   pagos del Ledger y de Billing, Export CSV, Mark all as read) y la barra de abajo (buscador, filtro, fecha, Today,
-   Status legend, View) van en `lg`. Adentro de una card, todo en `sm`: el buscador de Today Appointments y Recent
-   Patients, Find Patient de Billing, el de Templates en Consents, los filtros del Dashboard. Las pestañas siguen su regla
-   (`md` 32 en la pantalla, `sm` 28 en una card): Patient View / Guarantor View del Ledger pasa a `md`, y Day / Week /
-   Month de Scheduling deja de ser botones sueltos y usa `Tabs`.
+   Antes `FilterMenu` "md" medía 36 y `Button` "md" 32. El default de `FilterMenu`, `SearchInput` y `SearchButton` es
+   `md`.
+2. **Nivel de página = 32 (md); dentro de una card = 28 (sm).** Pedido de Julián: a 36 los botones del Ledger y de
+   Billing quedaban grandes. La acción de la fila del título (New Patient, New location, New Fee Schedule, Add
+   Relationship, los pagos del Ledger y de Billing, Export CSV, Mark all as read, New appointment) y la barra de abajo
+   (buscador, Search, filtro, fecha, Today, Status legend, View) van en `md`, la misma altura que las pestañas de
+   pantalla. `PageTitle` mide 32 de alto (`min-h-8`): con o sin botón al lado, el título cae a la misma altura.
+   Adentro de una card, todo en `sm`: el buscador de Today Appointments y Recent Patients, Find Patient de Billing, el de
+   Templates en Consents, los filtros del Dashboard. Los botones dentro de un formulario (Save y Cancel del pie, Bulk
+   Edit, Add Range, Deactivate template) siguen en `lg`, a la altura de los campos (36). Las pestañas siguen su regla
+   (`md` en la pantalla, `sm` en una card): Patient View / Guarantor View del Ledger pasa a `md`, y Day / Week / Month de
+   Scheduling deja de ser botones sueltos y usa `Tabs`.
 3. **`ui/search-input`** (nuevo): lupa, tamaños de Button, 320 px por defecto, `clearable` opcional. `SettingsSearch`
    (buscador + Search) lo usa y ahora también lo usan Locations, Employees, Accounts y Ledger Options, que lo escribían a
    mano. `SearchButton` es un `Button` primario con `size`. Story pendiente para cuando se documente.
-4. **Encabezado de página.** `PageTitle` mide siempre 36 de alto (`min-h-9`): con o sin botón al lado, el título cae a la
-   misma altura. Settings y Help usan el padding de `CONTENEDOR_PAGINA` (`PADDING_PAGINA`, 24 en vez de 32), así el
+4. **Encabezado de página.** Settings y Help usan el padding de `CONTENEDOR_PAGINA` (`PADDING_PAGINA`, 24 en vez de 32), así el
    contenido arranca en el mismo borde que el resto. El breadcrumb de Settings deja 24 arriba y 16 hasta el título, como
    `PatientBreadcrumb`: los títulos con breadcrumb caen todos a la misma altura. Insurance usa `PageTitle` (tenía su h1).
    Patient Dashboard y Clinical Mode suman un `h1` `sr-only`.
@@ -651,5 +654,5 @@ Search Coverage Table…), las cuatro fórmulas de título de ficha, los placeho
 Patients): hay que confirmarlo en Jira. Los paneles viejos de Clinical Mode (`clinical/panels.tsx`, `RecordRow`) siguen
 con los tokens de shadcn.
 
-Para validar con usuarios: si 36 px en la barra del Ledger (tres botones y las pestañas) se siente pesado en tablet; si
-recepción encuentra "Patient information" plegado en el celular.
+Para validar con usuarios: si 32 px alcanza como área de toque para las acciones de página en tablet; si recepción
+encuentra "Patient information" plegado en el celular.

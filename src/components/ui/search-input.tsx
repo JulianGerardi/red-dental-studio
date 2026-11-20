@@ -3,7 +3,7 @@ import { Search, X } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 /* El campo de búsqueda de la app: lupa a la izquierda, mismos tamaños que Button (sm 28 · md 32 · lg 36). Regla
-   (auditoría de normalización, 2026-11-20, figma/README.md): `lg` en la barra de una página, debajo del título, con
+   (auditoría de normalización, 2026-11-20, figma/README.md): `md` en la barra de una página, debajo del título, con
    SearchButton al lado; `sm` dentro de una card. Filtra mientras se escribe. */
 const TAMANO = {
   sm: { caja: 'h-7 pl-8 text-[12px]', lupa: 'left-2.5 size-3.5' },
@@ -24,7 +24,7 @@ export interface SearchInputProps extends Omit<React.InputHTMLAttributes<HTMLInp
 }
 
 export const SearchInput = React.forwardRef<HTMLInputElement, SearchInputProps>(
-  ({ value, onChange, size = 'lg', className, clearable, placeholder, 'aria-label': ariaLabel, disabled, ...props }, ref) => {
+  ({ value, onChange, size = 'md', className, clearable, placeholder, 'aria-label': ariaLabel, disabled, ...props }, ref) => {
     const t = TAMANO[size]
     return (
       <div className={cn('relative min-w-0 flex-1 sm:max-w-[320px]', className)}>

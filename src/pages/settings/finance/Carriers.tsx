@@ -70,7 +70,7 @@ export function SettingsCarriers({ nuevo = false }: { nuevo?: boolean }) {
     <div className={PADDING_PAGINA}>
       <SettingsPageHeader
         titulo="Carriers"
-        accion={<Button onClick={() => setCreando(true)}><Plus /> New Carrier</Button>}
+        accion={<Button size="md" onClick={() => setCreando(true)}><Plus /> New Carrier</Button>}
       >
         <SettingsSearch value={q} onChange={setQ} placeholder="Search carrier by name or payer ID..." />
       </SettingsPageHeader>
@@ -245,7 +245,7 @@ export function SettingsCarrierEdit({ tab, nuevoPlan = false }: { tab: 'carrier'
     <div className={PADDING_PAGINA}>
       <SettingsPageHeader
         titulo="Edit Carrier"
-        accion={<Button onClick={() => setPlan(true)}><Plus /> New Insurance Plan</Button>}
+        accion={<Button size="md" onClick={() => setPlan(true)}><Plus /> New Insurance Plan</Button>}
       />
       <Tabs
         className="mt-5" aria-label="Carrier sections" value={actual}

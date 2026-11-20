@@ -306,7 +306,7 @@ export function ViewMenu({ valor, onGuardar }: { valor: VistaCalendario; onGuard
       <PopoverTrigger asChild>
         <button
           type="button"
-          className={buttonClasses()}
+          className={buttonClasses({ size: 'md' })}
         >
           View
           <ChevronDown aria-hidden className={cn('size-3.5 transition-transform', abierto && 'rotate-180')} />

@@ -97,7 +97,7 @@ export function SettingsAccounts() {
     <div className={PADDING_PAGINA}>
       <SettingsPageHeader
         titulo="Accounts overview"
-        accion={<Button onClick={() => setNueva(true)}><Plus /> New Account</Button>}
+        accion={<Button size="md" onClick={() => setNueva(true)}><Plus /> New Account</Button>}
       >
         <SettingsSearch value={q} onChange={setQ} placeholder="Search..." onSearch={() => setQ((v) => v.trim())} />
         <FilterMenu

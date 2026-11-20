@@ -289,7 +289,7 @@ export function SettingsFeeSchedules() {
     <div className={PADDING_PAGINA}>
       <SettingsPageHeader
         titulo="Fee Schedules"
-        accion={<Button onClick={() => navigate(`${LISTA_ARANCELES}/new`)}><Plus /> New Fee Schedule</Button>}
+        accion={<Button size="md" onClick={() => navigate(`${LISTA_ARANCELES}/new`)}><Plus /> New Fee Schedule</Button>}
       >
         <SettingsSearch value={q} onChange={setQ} placeholder="Search a Fee Schedule Here..." />
         <FilterMenu
@@ -353,7 +353,7 @@ export function SettingsFeeScheduleEdit() {
     <div className={PADDING_PAGINA}>
       <SettingsPageHeader
         titulo="Edit Fee Schedule"
-        accion={<Button onClick={() => navigate(`${LISTA_ARANCELES}/new`)}><Plus /> New Fee Schedule</Button>}
+        accion={<Button size="md" onClick={() => navigate(`${LISTA_ARANCELES}/new`)}><Plus /> New Fee Schedule</Button>}
       />
       <div className={cn(TARJETA_PANEL, 'mt-5 grid gap-6 p-4 sm:p-5 lg:grid-cols-[260px_minmax(0,1fr)] lg:items-start')}>
         <MasterList

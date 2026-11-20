@@ -118,7 +118,7 @@ export function SettingsLedgerOptions() {
           value={tab}
           onChange={(e) => cambiarTab(e.target.value as Tab)}
           aria-label="View"
-          className="focus:border-dash-blue h-9 shrink-0 rounded-md border border-line bg-white px-3 text-[13px] shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] focus:outline-none"
+          className="focus:border-dash-blue h-8 shrink-0 rounded-md border border-line bg-white px-3 text-[13px] shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] focus:outline-none"
         >
           {TABS.map((t) => <option key={t} value={t}>{t}</option>)}
         </select>

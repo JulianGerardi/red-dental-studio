@@ -82,14 +82,14 @@ export function SettingsEmployees({ nuevo = false }: { nuevo?: boolean }) {
       <SettingsPageHeader
         titulo="Employees"
         accion={(
-          <Button data-tour="set-team" onClick={() => setCreando(true)}>
+          <Button size="md" data-tour="set-team" onClick={() => setCreando(true)}>
             <Plus /> New Employee
           </Button>
         )}
       >
         <SettingsSearch value={q} onChange={setQ} placeholder="Search employees" />
         {seleccion.length > 0 && (
-          <span className="bg-dash-count-bg text-dash-blue-hover flex h-9 items-center rounded-md px-3 text-[13px] font-semibold">
+          <span className="bg-dash-count-bg text-dash-blue-hover flex h-8 items-center rounded-md px-3 text-[13px] font-semibold">
             {seleccion.length} selected
           </span>
         )}

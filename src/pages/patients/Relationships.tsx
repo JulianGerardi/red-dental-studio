@@ -191,7 +191,7 @@ export default function Relationships({ nuevo = false }: { nuevo?: boolean }) {
             <PageTitle>Relationships &amp; Billing</PageTitle>
             {/* El Figma diseña "Add Relationship" pero no dibuja de dónde se
                 entra. Este botón es una decisión propia — anomalía 42. */}
-            <Button data-tour="pat-add-relationship" onClick={() => setAgregando(true)}>
+            <Button size="md" data-tour="pat-add-relationship" onClick={() => setAgregando(true)}>
               <Plus /> Add Relationship
             </Button>
           </div>
