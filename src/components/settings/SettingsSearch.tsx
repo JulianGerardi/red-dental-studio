@@ -4,21 +4,23 @@ import { cn } from '@/lib/utils'
 import { SearchButton } from '@/components/ui/search-button'
 
 /* El buscador de las listas de Settings: campo con lupa y el botón Search al lado, en la fila de abajo del
-   SettingsPageHeader. Filtra mientras se escribe; Search lleva el foco al campo. Antes cada lista lo escribía a mano
-   (Locations, Accounts, Ledger); Billing es la primera que lo usa. */
+   SettingsPageHeader. Filtra mientras se escribe; Search lleva el foco al campo. Es el de todas las barras con buscador
+   (Accounts, Locations, Employees, Ledger Options, Patients, Carriers, Fee Schedules…), seguido del Filter si hay. */
 export function SettingsSearch({
-  value, onChange, placeholder = 'Search...', className, disabled,
+  value, onChange, placeholder = 'Search...', className, disabled, tour,
 }: {
   value: string
   onChange: (v: string) => void
   placeholder?: string
   className?: string
   disabled?: boolean
+  /** Ancla del tour de ayuda. */
+  tour?: string
 }) {
   const ref = useRef<HTMLInputElement>(null)
   return (
     <>
-      <div className={cn('relative min-w-0 flex-1 sm:max-w-[320px]', className)}>
+      <div className={cn('relative min-w-0 flex-1 sm:max-w-[320px]', className)} data-tour={tour}>
         <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-ink-faint" />
         <input
           ref={ref}

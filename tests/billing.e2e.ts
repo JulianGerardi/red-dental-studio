@@ -83,11 +83,16 @@ test('Find Patient muestra algunos pacientes y Show more abre el resto', async (
 
 test('Filtros, Columns y Export CSV como red.dev', async ({ app, screen }) => {
   await app.open('/billing')
-  await screen.getByRole('tab', 'Payments').tap()
+  /* El tipo se elige en el Filter de la app (billing.md, 2026-11-20). */
+  const filtrar = async (tipo: string) => {
+    await screen.getByRole('button', /Filter activity/).tap()
+    await screen.getByRole('menuitemradio', new RegExp(`^${tipo}`)).tap()
+  }
+  await filtrar('Payments')
   await expect(screen.getByText(/Showing 1 to 8 of 9 results/)).toBeVisible()
-  await screen.getByRole('tab', 'Adjustments').tap()
+  await filtrar('Adjustments')
   await expect(screen.getByText(/Showing 1 to 4 of 4 results/)).toBeVisible()
-  await screen.getByRole('tab', 'Today').tap()
+  await filtrar('Today')
   await expect(screen.getByText(/Showing 1 to 2 of 2 results/)).toBeVisible()
   await expect(screen.getByText(/Credit available · \$100\.00/)).toBeVisible()
 
