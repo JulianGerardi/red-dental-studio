@@ -5,6 +5,10 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-11-19
 
+### Dashboard: el título con el tamaño de las demás pantallas ([#170](https://github.com/JulianGerardi/red-dental-studio/pull/170))
+- *Dashboard* deja `PageTitle size="lg"` y usa el tamaño por defecto (20px semibold), como Patients, Scheduling y
+  Billing. Ninguna pantalla usa `size="lg"` ahora; la variante sigue en `ui/page-title`.
+
 ### Patient Payment, Credit y Charge Adjustment con la lógica de red.dev, en el Ledger y en Billing; métricas en azul ([#169](https://github.com/JulianGerardi/red-dental-studio/pull/169))
 - **Un solo formulario para el Ledger y Billing** (CON-3738, CON-3739, CON-3735): los tres drawers comparten la lógica y
   `PostPaymentDialog` sólo elige cuál abrir.

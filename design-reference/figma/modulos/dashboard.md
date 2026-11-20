@@ -1010,3 +1010,8 @@ encounter pasa a Completed o Fulfilled.
 
 **A validar:** la regla de elegibilidad de No Show. CON-4177 la muestra "sólo si ya existe una regla"; la réplica usa
 "ya pasó la hora de la cita". Falta que el negocio la defina (¿tolerancia de minutos?, ¿configurable por clínica?).
+
+## El título con el tamaño de las demás pantallas (2026-11-19)
+
+Sin historia de Jira (pedido de Julián). *Dashboard* era el único título con `PageTitle size="lg"` (24px bold); pasa al
+tamaño por defecto (20px semibold), el de Patients, Scheduling y Billing.
