@@ -21,7 +21,7 @@ const ABIERTAS: EstadoOrden[] = ['Requested', 'Pending', 'Delayed']
 
 /* Figma 4070:148911 "Lab Order — Section (List, Detail & New Laboratory Modal)": el listado, sobre la tabla estándar
    (DataTable) con buscador, filtro de estado y botones de la app, como la Problem List. El detalle y el modal "New
-   Laboratory" quedan pendientes. "active prescriptions" y "New Prescription" son texto de Prescription que quedó pegado
+   Laboratory" quedan pendientes. "active prescriptions" y "New prescription" son texto de Prescription que quedó pegado
    en el frame (anomalía 85). Ver design-reference/figma/modulos/clinical-mode.md. */
 
 function iniciales(nombre: string) {
@@ -43,7 +43,7 @@ const COLUMNAS: DataTableColumn<OrdenLab>[] = [
   { key: 'actualizado', header: 'Updated', width: 110, cell: (o) => o.actualizado },
   { key: 'creado', header: 'Created', width: 110, cell: (o) => o.creado },
   /* El frame pinta de rojo las que vencen pronto. */
-  { key: 'vence', header: 'Expiration Date', width: 120, cell: (o) => <span className={cn(o.urgente && 'font-semibold text-dash-bad-fg')}>{o.vence}</span> },
+  { key: 'vence', header: 'Expiration date', width: 120, cell: (o) => <span className={cn(o.urgente && 'font-semibold text-dash-bad-fg')}>{o.vence}</span> },
 ]
 
 export function LabOrderPanel({ ordenes: inicio = ORDENES }: { /** Las órdenes con las que abre; por defecto, las del frame. */ ordenes?: OrdenLab[] }) {
@@ -71,10 +71,10 @@ export function LabOrderPanel({ ordenes: inicio = ORDENES }: { /** Las órdenes 
         actions={(
           <>
             <Button variant="secondary" onClick={() => aviso.info('History is not available in this release.')}>
-              <History /> View History
+              <History /> View history
             </Button>
-            <Button onClick={() => aviso.info('New Prescription is not available in this release.')}>
-              <Plus /> New Prescription
+            <Button onClick={() => aviso.info('New prescription is not available in this release.')}>
+              <Plus /> New prescription
             </Button>
           </>
         )}

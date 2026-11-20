@@ -4,8 +4,8 @@ import { MAXILLARY, MANDIBULAR } from '@/data/odontogram'
    design-reference/figma/modulos/clinical-mode.md. */
 
 export type FindingStatus =
-  | 'Active' | 'Monitoring' | 'In Treatment' | 'Treated' | 'Externally Treated'
-  | 'No Treatment Needed' | 'Patient Declined' | 'Clinic Declined' | 'Discarded'
+  | 'Active' | 'Monitoring' | 'In treatment' | 'Treated' | 'Externally treated'
+  | 'No treatment needed' | 'Patient declined' | 'Clinic declined' | 'Discarded'
 
 const GREEN = { badge: 'bg-dash-ok-bg text-dash-ok-fg', rail: 'border-l-dash-ok-fg', dot: 'bg-dash-ok-fg', text: 'text-dash-ok-fg', good: true }
 const BLUE = { badge: 'bg-dash-count-bg text-dash-blue', rail: 'border-l-dash-blue', dot: 'bg-dash-blue', text: 'text-dash-blue', good: true }
@@ -13,8 +13,8 @@ const RED = { badge: 'bg-[#fef2f2] text-field-error', rail: 'border-l-field-erro
 const AMBER = { badge: 'bg-warn-bg text-warn-fg', rail: 'border-l-warn-fg', dot: 'bg-warn-fg', text: 'text-warn-fg', good: false }
 
 export const STATUS_STYLE: Record<FindingStatus, { badge: string; rail: string; dot: string; text: string; good: boolean }> = {
-  Active: GREEN, Monitoring: AMBER, 'In Treatment': BLUE, Treated: GREEN, 'Externally Treated': GREEN,
-  'No Treatment Needed': RED, 'Patient Declined': RED, 'Clinic Declined': RED, Discarded: RED,
+  Active: GREEN, Monitoring: AMBER, 'In treatment': BLUE, Treated: GREEN, 'Externally treated': GREEN,
+  'No treatment needed': RED, 'Patient declined': RED, 'Clinic declined': RED, Discarded: RED,
 }
 
 /* Las categorías y el catálogo como en la app real (red.dev, New Procedure): cada procedimiento con su área de tratamiento,
@@ -169,16 +169,16 @@ export const DESCRIPTOR_ROWS: DescriptorRow[] = [
    Confirmado en grabaciones de pantalla de red.dev (Julián, 2026-10-24); seguro hay más de las siete que aparecieron
    ahí -quedan pendientes hasta verlas-. Mismo catálogo e interacción que Intraoral, pero con otro gráfico. */
 export const EXTRAORAL_REGIONS = [
-  'Scalp', 'Right Forehead', 'Left Forehead', 'Right Eye', 'Left Eye', 'Right Posterior Head', 'Left Posterior Head',
+  'Scalp', 'Right forehead', 'Left forehead', 'Right eye', 'Left eye', 'Right posterior head', 'Left posterior head',
 ] as const
 export type ExtraOralRegion = (typeof EXTRAORAL_REGIONS)[number]
 
 /* Intra Oral: sólo las zonas con nombre confirmado (CON-882 da "Right Hard Palate, Right Middle Dorsal Tongue, etc."; el
-   Figma usa "Soft Palate", "Upper Arch", "Lower Lip"); el resto de las zonas del gráfico espera su lista, no se inventa. */
-export const INTRAORAL_REGIONS = ['Right Hard Palate', 'Left Hard Palate', 'Soft Palate'] as const
+   Figma usa "Soft palate", "Upper arch", "Lower lip"); el resto de las zonas del gráfico espera su lista, no se inventa. */
+export const INTRAORAL_REGIONS = ['Right hard palate', 'Left hard palate', 'Soft palate'] as const
 export type IntraOralRegion = (typeof INTRAORAL_REGIONS)[number]
 
-/* El catálogo de "New Condition" en Extraoral/Intraoral es propio, no el de procedimientos (D-codes): condiciones
+/* El catálogo de "New condition" en Extraoral/Intraoral es propio, no el de procedimientos (D-codes): condiciones
    morfológicas con su búsqueda y filtro aparte. Sólo estas tres aparecieron en las grabaciones; el buscador de la app
    real sugiere que hay más -no se inventan sin verlas-. */
 export type RegionCondition = { code: string; label: string; group: string }

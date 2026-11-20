@@ -9,7 +9,7 @@ import { ModalShell, SectionCard, SelectField, FieldLabel } from '@/components/p
 import { OBLIGATORIO } from '@/lib/validacion'
 
 /* Figma 3864:270946 "Settings — Employee (Roles & Location)" y el modal
-   "Assign Role".
+   "Assign role".
 
    Las locaciones son las del frame, tal cual —incluido "Naples Detal"—.
 
@@ -21,7 +21,7 @@ import { OBLIGATORIO } from '@/lib/validacion'
 export const SEDES = ['Buenos Aires Medical 1', 'Naples Detal', 'Sede Olivos', 'Sede Pruebas 1']
 
 export const ROLES_DISPONIBLES = [
-  'Practice Administrator', 'Administrator', 'Dentist', 'Hygienist', 'Receptionist', 'Assistant',
+  'Practice administrator', 'Administrator', 'Dentist', 'Hygienist', 'Receptionist', 'Assistant',
 ]
 
 export type RolAsignado = { id: string; nombre: string; sedes: string[] }
@@ -150,7 +150,7 @@ export function AssignRoleModal({
        las secciones en SectionCard con la misma jerarquía de títulos que New
        Patient o New Appointment. */
     <ModalShell
-      title="Assign Role"
+      title="Assign role"
       width="max-w-[780px]"
       onClose={onClose}
       actions={<DrawerActions onCancel={onClose} onSave={guardar} />}
@@ -212,7 +212,7 @@ export function RolesLocation() {
           onClick={() => setModal(true)}
           className="text-dash-blue flex items-center gap-1.5 text-[13px] font-semibold hover:underline"
         >
-          <Plus className="size-4" /> Add Role
+          <Plus className="size-4" /> Add role
         </button>
       </div>
 
@@ -221,7 +221,7 @@ export function RolesLocation() {
           icon={CirclePlus}
           title="No roles assigned"
           detail="Assign a role and choose the locations so this employee can work in the practice."
-          accion={{ label: 'Add Role', onClick: () => setModal(true) }}
+          accion={{ label: 'Add role', onClick: () => setModal(true) }}
         />
       ) : (
         <div className="flex flex-col gap-3">

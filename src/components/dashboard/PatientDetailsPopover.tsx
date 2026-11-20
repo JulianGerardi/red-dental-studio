@@ -14,13 +14,13 @@ import { Avatar } from '@/components/ui/avatar'
 
 /* Figma 4430:57474 — rediseño del popup del paciente (357×488).
    Ya no es la tarjeta con barra azul y avatar montado: ahora es una card
-   clara con el avatar y el botón verde "Start Encounter" arriba, el plan de
+   clara con el avatar y el botón verde "Start encounter" arriba, el plan de
    tratamiento en un panel celeste y las filas de datos abajo.
 
    Sigue sin ser un modal centrado: se ancla a la card que lo abrió, con
    volteo automático si no entra a la derecha.
 
-   Textos tal cual el Figma, incluida la fecha en español. Excepciones pedidas por Julián: "Start Encounter" con la u
+   Textos tal cual el Figma, incluida la fecha en español. Excepciones pedidas por Julián: "Start encounter" con la u
    (2026-11-13), el motivo de la visita ("Rsn" se
    escribe completo) y Weight en vez del "Height" repetido (dashboard.md, 2026-11-06). */
 
@@ -31,9 +31,9 @@ const FILAS_DOBLES: Fila[] = [
   { icon: AArrowUp, label: 'Height', value: '5 ft 8 in' },
 ]
 const FILAS: Fila[] = [
-  { icon: Smartphone, label: 'Mobile Number', value: '+1 (555) 123-4567' },
-  { icon: Eye, label: 'Last Visit Date', value: '17 Marzo, 2024' },
-  { icon: FileCheck2, label: 'Primary Insurance Plan', value: 'Osde' },
+  { icon: Smartphone, label: 'Mobile number', value: '+1 (555) 123-4567' },
+  { icon: Eye, label: 'Last visit date', value: '17 Marzo, 2024' },
+  { icon: FileCheck2, label: 'Primary insurance plan', value: 'Osde' },
 ]
 
 /* Los ocho del plan. La tabla los muestra todos, con scroll: no hay "+N". */
@@ -70,7 +70,7 @@ export function FilaDato({
 const W_MAX = 360
 
 /* El color del estado del encounter, con los tonos de ui/pill. */
-const TONO_ENCOUNTER: Record<string, PillTone> = { Planned: 'success', 'On Hold': 'warning' }
+const TONO_ENCOUNTER: Record<string, PillTone> = { Planned: 'success', 'On hold': 'warning' }
 
 export function PatientDetailsPopover({
   name,
@@ -137,7 +137,7 @@ export function PatientDetailsPopover({
             type="button"
             className="flex h-9 shrink-0 items-center justify-center gap-1.5 rounded-lg bg-green px-4 text-[13px] font-semibold text-white transition-colors hover:bg-green-deep"
           >
-            <Play className="size-3.5 shrink-0" /> Start Encounter
+            <Play className="size-3.5 shrink-0" /> Start encounter
             <ChevronDown className="size-3.5 shrink-0" />
           </button>
         )}
@@ -181,7 +181,7 @@ export function PatientDetailsPopover({
           separado por un hairline, y los procedimientos dejaron de ser chips
           para ser una tabla CODE / PROCEDURE con el total abajo a la derecha.
 
-          Se mantiene "Reason for Visit" escrito completo y el icono de
+          Se mantiene "Reason for visit" escrito completo y el icono de
           historia clínica, que Julián pidió al mejorar este bloque; el frame
           sigue diciendo "Rsn for Visit" con el icono de tamaño de texto. */}
       <div className="border-l-dash-blue mt-3 overflow-hidden rounded-lg border border-line border-l-[3px] bg-white">
@@ -190,7 +190,7 @@ export function PatientDetailsPopover({
             arreglar acá. */}
         <div className="flex items-start gap-2 border-b border-surface-muted px-3 py-2.5">
           <ClipboardList className="mt-px size-4 shrink-0 text-ink" strokeWidth={1.8} />
-          <span className="shrink-0 text-[13px] font-semibold text-ink">Reason for Visit</span>
+          <span className="shrink-0 text-[13px] font-semibold text-ink">Reason for visit</span>
           <span className="ml-auto min-w-0 text-right text-[11px] leading-[1.4] text-ink-faint">
             Routine dental check-up appointment
           </span>

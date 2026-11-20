@@ -116,12 +116,12 @@ export default function Patients() {
             <PageTitle>Patients</PageTitle>
 
             <Button size="md" onClick={() => setModal('new')} data-tour="pat-new">
-              <Plus /> New Patient
+              <Plus /> New patient
             </Button>
           </div>
 
           <div className="mt-5 flex flex-wrap items-center gap-3">
-            <SearchInput ref={inputRef} value={query} onChange={setQuery} placeholder="Search by Name or Last Name" data-tour="pat-search" />
+            <SearchInput ref={inputRef} value={query} onChange={setQuery} placeholder="Search patients by name" data-tour="pat-search" />
             <SearchButton onClick={() => inputRef.current?.focus()} />
           </div>
 
@@ -135,7 +135,7 @@ export default function Patients() {
             2026-10-10); el scroll va adentro de cada panel, en ShowMore. lg:h-[var(--alto-tabla)]: el alto de la
             tabla, medido arriba. */}
         <div className="flex w-full flex-col gap-4 lg:h-[var(--alto-tabla,auto)] lg:w-[336px] lg:shrink-0">
-          <Panel title={<>Today Appointments <Globo n={TURNOS_PATIENTS.length} /></>} bodyClassName="gap-2 pt-0" className="shrink-0 [&>header]:min-h-10">
+          <Panel title={<>Today appointments <Globo n={TURNOS_PATIENTS.length} /></>} bodyClassName="gap-2 pt-0" className="shrink-0 [&>header]:min-h-10">
             {buscador(buscarTurno, setBuscarTurno, "Search today's appointments")}
             {turnosFiltrados.length === 0 ? (
               <EmptyState
@@ -155,7 +155,7 @@ export default function Patients() {
               que no se niegue a achicarse por debajo de su contenido. min-h-[220px]: una tabla muy corta (la última
               página, con un solo paciente) deja a Today Appointments -shrink-0- de igual pidiendo más alto que toda la
               barra; sin este piso, Recent Patients quedaba en 0 y desaparecía entera. */}
-          <Panel title={<>Recent Patients <Globo n={recientes.length} /></>} bodyClassName="gap-2 pt-0" className="min-h-[220px] flex-1 [&>header]:min-h-10">
+          <Panel title={<>Recent patients <Globo n={recientes.length} /></>} bodyClassName="gap-2 pt-0" className="min-h-[220px] flex-1 [&>header]:min-h-10">
             {buscador(buscarReciente, setBuscarReciente, 'Search recent patients')}
             {recientesFiltrados.length === 0 ? (
               <EmptyState

@@ -75,8 +75,8 @@ function Campos() {
   return (
     <Lienzo>
       <Bloque titulo="General description"><PlanGeneralFields d={d} set={set} falta={falta} /></Bloque>
-      <Bloque titulo="Contact Information"><PlanContactFields d={d} set={set} falta={falta} codigo={codigo} onCodigo={setCodigo} /></Bloque>
-      <Bloque titulo="Address Information"><PlanAddressFields d={d} set={set} falta={falta} /></Bloque>
+      <Bloque titulo="Contact information"><PlanContactFields d={d} set={set} falta={falta} codigo={codigo} onCodigo={setCodigo} /></Bloque>
+      <Bloque titulo="Address information"><PlanAddressFields d={d} set={set} falta={falta} /></Bloque>
       <Bloque titulo="Configurations"><PlanConfigurationFields d={d} set={set} falta={falta} aranceles={ARANCELES} /></Bloque>
     </Lienzo>
   )

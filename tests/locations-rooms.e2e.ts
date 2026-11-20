@@ -3,10 +3,10 @@ import { expect } from 'e2e'
 
 /* Settings → Locations → Rooms (CON-404, CON-1520). Ver design-reference/figma/modulos/locations.md. */
 
-test('New Room pide Name y Type, y no deja repetir el nombre', async ({ app, screen }) => {
+test('New room pide Name y Type, y no deja repetir el nombre', async ({ app, screen }) => {
   await app.open('/settings/locations/abril?type=rooms')
-  await screen.getByRole('button', 'New Room').tap()
-  const drawer = screen.getByRole('dialog', 'New Room')
+  await screen.getByRole('button', 'New room').tap()
+  const drawer = screen.getByRole('dialog', 'New room')
   await drawer.getByRole('button', /^Save/).tap()
   await expect(drawer.getByText('This field is required.')).toHaveCount(2)
 
@@ -39,10 +39,10 @@ test('Desde el aviso, un turno se pasa a otra sala y deja de estar entre los afe
   await app.open('/settings/locations/abril?type=rooms')
   await screen.getByRole('switch', 'Operatory 1 active').tap()
   await screen.getByRole('button', 'Edit appointment for John Smith').tap()
-  const drawer = screen.getByRole('dialog', 'Edit Appointment')
+  const drawer = screen.getByRole('dialog', 'Edit appointment')
   await drawer.getByRole('button', 'Operatory 1').tap()
   await drawer.getByRole('button', 'Operatory 3').tap()
-  await drawer.getByRole('button', /Save Changes/).tap()
+  await drawer.getByRole('button', /Save changes/).tap()
   await expect(screen.getByText('Appointment for John Smith moved to Operatory 3.')).toBeVisible()
 
   const aviso = screen.getByRole('dialog', 'This room has scheduled appointments')

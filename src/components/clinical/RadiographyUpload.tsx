@@ -49,7 +49,7 @@ export function RadiographyUpload({ onCancel, onSave }: { onCancel: () => void; 
           </span>
         </span>
         <label className="h-9 cursor-pointer rounded-md border border-line bg-white px-4 text-[13px] leading-9 font-medium hover:bg-surface-subtle">
-          Select File
+          Select file
           <input
             type="file"
             className="sr-only"

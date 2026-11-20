@@ -4,7 +4,7 @@ import { LinkPersonCheckbox, FieldLabel } from '@/components/patients/form'
 import { EMPLEADOS, type Empleado } from '@/data/employees'
 import { Avatar } from '@/components/ui/avatar'
 
-/* Compartido por la ficha de empleado y "New Employee". Ver
+/* Compartido por la ficha de empleado y "New employee". Ver
    design-reference/figma/modulos/employees.md. */
 export function LinkExistingPerson({
   vincular, onVincular, excluirId, vinculado, onSeleccionar,

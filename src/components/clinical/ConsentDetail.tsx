@@ -176,7 +176,7 @@ export function ConsentDetail({ procedimiento: p, pendiente, onVolver, onFirmar 
           <ConAyuda texto={reconocido ? 'Present the consent to the patient for signature' : 'The patient checks every acknowledgment in the document first.'}>
             <span>
               <Button variant="secondary" size="md" disabled={!reconocido} onClick={() => setFirmando('Patient')}>
-                <PenLine /> Patient Signature
+                <PenLine /> Patient signature
               </Button>
             </span>
           </ConAyuda>
@@ -188,14 +188,14 @@ export function ConsentDetail({ procedimiento: p, pendiente, onVolver, onFirmar 
           {firmas.Provider ? (
             <Firmado rol="Provider" fecha={firmas.Provider} />
           ) : (
-            <Button size="md" onClick={() => setFirmando('Provider')}><PenLine /> Provider Signature</Button>
+            <Button size="md" onClick={() => setFirmando('Provider')}><PenLine /> Provider signature</Button>
           )}
         </span>
         </>}
       </div>
 
       {firmando === 'Patient' && (
-        <FirmaPaciente nombre={PACIENTE} descripcion={`Procedure Consent - ${p.codigo} ${p.nombre}`} onClose={() => setFirmando(null)} onFirmar={(r) => { onFirmar('Patient', r); setFirmando(null) }} />
+        <FirmaPaciente nombre={PACIENTE} descripcion={`Procedure consent - ${p.codigo} ${p.nombre}`} onClose={() => setFirmando(null)} onFirmar={(r) => { onFirmar('Patient', r); setFirmando(null) }} />
       )}
       {firmando === 'Provider' && (
         <FirmaProveedor nombre={p.proveedor} onClose={() => setFirmando(null)} onFirmar={(r) => { onFirmar('Provider', r); setFirmando(null) }} />
@@ -261,7 +261,7 @@ export function FirmaPaciente({ nombre, descripcion, onClose, onFirmar }: {
   const [impreso, setImpreso] = useState(nombre)
   const [ini, setIni] = useState(iniciales(nombre))
   const [iniTocadas, setIniTocadas] = useState(false)
-  const [modo, setModo] = useState<'Adopt Signature' | 'Draw'>('Adopt Signature')
+  const [modo, setModo] = useState<'Adopt signature' | 'Draw'>('Adopt signature')
   const [dibujada, setDibujada] = useState<string | null>(null)
   const [pad, setPad] = useState(0)
   const firmada = modo === 'Draw' ? !!dibujada : impreso.trim().length > 1
@@ -273,7 +273,7 @@ export function FirmaPaciente({ nombre, descripcion, onClose, onFirmar }: {
 
   return (
     <VentanaFirma
-      titulo="Patient Signature"
+      titulo="Patient signature"
       descripcion={descripcion}
       guardar="Adopt and Sign"
       guardarDeshabilitado={!!falta}
@@ -282,10 +282,10 @@ export function FirmaPaciente({ nombre, descripcion, onClose, onFirmar }: {
     >
       <div className="flex flex-col gap-5">
         <div className="grid grid-cols-2 gap-4">
-          <TextField label="Printed Name" value={impreso} onChange={(v) => { setImpreso(v); if (!iniTocadas) setIni(iniciales(v)) }} />
+          <TextField label="Printed name" value={impreso} onChange={(v) => { setImpreso(v); if (!iniTocadas) setIni(iniciales(v)) }} />
           <TextField label="Initials" value={ini} onChange={(v) => { setIni(v.toUpperCase().slice(0, 4)); setIniTocadas(true) }} />
         </div>
-        <Tabs tabs={['Adopt Signature', 'Draw'] as const} value={modo} onChange={setModo} size="sm" aria-label="Signature method" className="self-start" />
+        <Tabs tabs={['Adopt signature', 'Draw'] as const} value={modo} onChange={setModo} size="sm" aria-label="Signature method" className="self-start" />
         <div className="flex flex-col gap-1.5">
           <div className="flex items-center justify-between">
             <span className="text-xs font-medium text-ink">Preview</span>
@@ -320,7 +320,7 @@ export function FirmaProveedor({ nombre, onClose, onFirmar }: { nombre: string; 
   const listo = /\S+@\S+\.\S+/.test(email) && clave.length > 0
   return (
     <VentanaFirma
-      titulo="Provider Signature"
+      titulo="Provider signature"
       descripcion="For security and legal purposes, please re-enter your credentials to sign this document electronically."
       guardar="Sign"
       guardarDeshabilitado={!listo}

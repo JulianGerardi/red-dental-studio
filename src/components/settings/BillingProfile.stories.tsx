@@ -87,7 +87,7 @@ export const Parts: Story = {
           ['Contact card', 'Dirección o teléfono de billing. Replace elige otro del titular o abre el drawer para cargar uno nuevo; el anterior no se borra.', 'ContactoCard'],
           ['Replace drawer', 'Carga una dirección o un teléfono nuevo.', 'ReplaceContactDrawer'],
           ['Credentials', 'NPI (10 dígitos) y Tax ID (TIN o SSN, 9 dígitos), en la pantalla o en su drawer.', 'CamposCredenciales · CredentialsDrawer'],
-          ['Contracted With', 'Los carriers, con buscador, filtro e índice por letra. Se tilda con cuáles hay contrato (CON-4027, CON-4006).', 'ContractedWith'],
+          ['Contracted with', 'Los carriers, con buscador, filtro e índice por letra. Se tilda con cuáles hay contrato (CON-4027, CON-4006).', 'ContractedWith'],
           ['Save bar', 'Cancel y Save; avisa si hay cambios sin guardar.', 'AccionesGuardado'],
           ['Location identity', 'Nombre, dirección, teléfono y credenciales de la Location.', 'IdentidadLocacion'],
           ['Provider contacts', 'Dirección y teléfono de billing del provider.', 'ContactosProvider'],
@@ -95,7 +95,7 @@ export const Parts: Story = {
       </Bloque>
       <Bloque titulo="Location identity"><Identidad /></Bloque>
       <Bloque titulo="Provider contacts"><ContactosDelProvider editable /></Bloque>
-      <Bloque titulo="Contracted With"><ContractedWith guardados={{ aetna: true }} editable onGuardar={() => true} /></Bloque>
+      <Bloque titulo="Contracted with"><ContractedWith guardados={{ aetna: true }} editable onGuardar={() => true} /></Bloque>
     </Lienzo>
   ),
 }
@@ -124,7 +124,7 @@ export const States: Story = {
           <Muestra titulo="With validation errors" nota="Save and enable con datos inválidos."><CamposCredenciales valor={{ npi: '123', tipoFiscal: 'TIN', fiscal: '' }} onChange={nada} errores={{ npi: 'NPI must have 10 digits.', fiscal: 'Tax ID is required.' }} /></Muestra>
         </div>
       </Bloque>
-      <Bloque titulo="Contracted With">
+      <Bloque titulo="Contracted with">
         <div className="grid gap-4">
           <Muestra titulo="Editable" nota="Perfil activo."><ContractedWith guardados={{ aetna: true, cigna: true }} editable onGuardar={() => true} /></Muestra>
           <Muestra titulo="Read only" nota="Perfil deshabilitado: se ve, no se cambia."><ContractedWith guardados={{ aetna: true }} editable={false} onGuardar={() => true} /></Muestra>

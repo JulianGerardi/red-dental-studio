@@ -5,7 +5,7 @@ import { EstadosDelDrawer, SpecsDelDrawer } from '@/design-system/kit-drawer'
 import { Bloque, Lienzo, Tabla, TablaPartes } from '@/design-system/kit'
 import { dinero } from '@/data/finanzas'
 
-type Args = { herramienta: 'Copy form' | 'Increase All'; seleccionados: number }
+type Args = { herramienta: 'Copy form' | 'Increase all'; seleccionados: number }
 
 const meta = {
   title: 'Components/Finance/FeeScheduleTools',
@@ -28,9 +28,9 @@ const meta = {
       },
     },
   },
-  args: { herramienta: 'Increase All', seleccionados: 0 },
+  args: { herramienta: 'Increase all', seleccionados: 0 },
   argTypes: {
-    herramienta: { control: 'inline-radio', options: ['Copy form', 'Increase All'], description: 'Qué drawer abrir.' },
+    herramienta: { control: 'inline-radio', options: ['Copy form', 'Increase all'], description: 'Qué drawer abrir.' },
     seleccionados: { control: { type: 'number', min: 0, max: 26 }, description: 'Increase All: filas tildadas en la tabla (0 = todas).' },
   },
   render: ({ herramienta, seleccionados }) => herramienta === 'Copy form'
@@ -57,7 +57,7 @@ export const Parts: Story = {
       </Bloque>
       <Bloque titulo="Increase All / Increase Selected">
         <TablaPartes partes={[
-          ['Increase All Fees By', 'Monto o porcentaje; distinto de 0. Con selección: Increase Selected Fees By.', 'TextField'],
+          ['Increase all fees by', 'Monto o porcentaje; distinto de 0. Con selección: Increase Selected Fees By.', 'TextField'],
           ['By', '$ o %.', 'SelectField'],
           ['Exclude $0.0 fees from the increase', 'Los que valen $0 quedan igual.', 'OptionCheckbox'],
           ['Round up the value to the nearest dollar', 'Redondea para arriba.', 'OptionCheckbox'],
@@ -72,8 +72,8 @@ export const States: Story = {
   parameters: { layout: 'padded', controls: { disable: true }, docs: { story: { inline: true } } },
   render: () => (
     <EstadosDelDrawer estados={[
-      { estado: 'Increase All', cuando: 'Sin filas tildadas: cambia todos los New Fee.', story: 'Playground' },
-      { estado: 'Increase Selected', cuando: 'Con filas tildadas: título, bajada y rótulo dicen cuántas.', story: 'Increase Selected' },
+      { estado: 'Increase all', cuando: 'Sin filas tildadas: cambia todos los New Fee.', story: 'Playground' },
+      { estado: 'Increase selected', cuando: 'Con filas tildadas: título, bajada y rótulo dicen cuántas.', story: 'Increase selected' },
       { estado: 'Validation error', cuando: 'Confirm con el monto vacío o en 0: “Enter an amount other than 0.”.', story: 'With Validation Error' },
       { estado: 'Copy form error', cuando: 'Confirm sin elegir: “Select the fee schedule to copy.”.', story: 'Copy Form Error' },
     ]} />
@@ -93,7 +93,7 @@ export const Specs: Story = {
         ['aumentar()', '% multiplica, $ suma; Round up usa Math.ceil; si no, 2 decimales.'],
       ]} />
       <Bloque titulo="Ejemplos de aumentar()">
-        <Tabla encabezado={['Fee', 'Increase', 'New Fee']}>
+        <Tabla encabezado={['Fee', 'Increase', 'New fee']}>
           <tr><td className="tabular-nums">{dinero(92)}</td><td>10 %</td><td className="tabular-nums">{dinero(aumentar(92, { monto: 10, por: '%', excluirCeros: false, redondear: false }))}</td></tr>
           <tr><td className="tabular-nums">{dinero(92)}</td><td>10 % · Round up</td><td className="tabular-nums">{dinero(aumentar(92, { monto: 10, por: '%', excluirCeros: false, redondear: true }))}</td></tr>
           <tr><td className="tabular-nums">{dinero(0)}</td><td>$5 · Exclude $0.0</td><td className="tabular-nums">{dinero(aumentar(0, { monto: 5, por: '$', excluirCeros: true, redondear: false }))}</td></tr>

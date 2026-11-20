@@ -12,13 +12,13 @@ import { TarjetaTurno } from '@/components/scheduling/TarjetaTurno'
    - Cancel sólo en los turnos que todavía se pueden cancelar: en uno cumplido o ya cancelado no hay
      nada que cancelar. */
 
-export type PatientAppointmentStatus = 'Booked' | 'Cancelled' | 'Fulfilled' | 'No Show'
+export type PatientAppointmentStatus = 'Booked' | 'Cancelled' | 'Fulfilled' | 'No show'
 
 export const PATIENT_APPOINTMENT_TONES: Record<PatientAppointmentStatus, PillTone> = {
   Booked: 'info',
   Cancelled: 'danger',
   Fulfilled: 'success',
-  'No Show': 'warning',
+  'No show': 'warning',
 }
 
 export function PatientAppointmentCard({

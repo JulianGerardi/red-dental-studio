@@ -34,12 +34,12 @@ import {
 
 export const SECCIONES_PLAN = [
   { nombre: 'Information', clave: '' },
-  { nombre: 'Coverage Table', clave: 'coverage-table' },
+  { nombre: 'Coverage table', clave: 'coverage-table' },
   { nombre: 'Predeterminations', clave: 'predeterminations' },
-  { nombre: 'Payment Table', clave: 'payment-table' },
-  { nombre: 'Deductibles And Benefits', clave: 'deductibles-and-benefits' },
-  { nombre: 'Coordination Of Benefits', clave: 'coordination-of-benefits' },
-  { nombre: 'Fee Schedule By Location', clave: 'fee-schedule-by-location' },
+  { nombre: 'Payment table', clave: 'payment-table' },
+  { nombre: 'Deductibles and benefits', clave: 'deductibles-and-benefits' },
+  { nombre: 'Coordination of benefits', clave: 'coordination-of-benefits' },
+  { nombre: 'Fee schedule by location', clave: 'fee-schedule-by-location' },
 ] as const
 
 type PropsSeccion = { plan: PlanSeguro; onGuardar: (p: PlanSeguro) => void; onSucio?: (sucio: boolean) => void }
@@ -87,8 +87,8 @@ export function PlanDetail({ plan, onGuardar, onSucio }: PropsSeccion) {
     <div className="flex flex-col gap-4">
       {intentado && avisoIncompleto}
       <Card title="General description"><PlanGeneralFields {...props} /></Card>
-      <Card title="Contact Information"><PlanContactFields {...props} codigo={codigo} onCodigo={setCodigo} /></Card>
-      <Card title="Address Information"><PlanAddressFields {...props} /></Card>
+      <Card title="Contact information"><PlanContactFields {...props} codigo={codigo} onCodigo={setCodigo} /></Card>
+      <Card title="Address information"><PlanAddressFields {...props} /></Card>
       <Card title="Configurations"><PlanConfigurationFields {...props} aranceles={aranceles} /></Card>
       {pie(cambiado, () => navigate(rutaPlanes(plan.aseguradoraId)), guardar)}
     </div>
@@ -117,13 +117,13 @@ export function PlanCoverage({ plan, onGuardar, onSucio }: PropsSeccion) {
   return (
     <>
       {intentado && <div className="mb-4">{avisoIncompleto}</div>}
-      <Card title="Coverage Table">
+      <Card title="Coverage table">
         <div className="flex flex-col gap-4">
           <div className="flex flex-wrap items-end justify-between gap-3">
             <SelectField label="Type" options={[...TIPOS_COBERTURA]} value={d.tipo} onChange={(v) => setD({ ...d, tipo: v as TipoCobertura })} className="w-full sm:w-[220px]" />
             <div className="flex gap-2">
               <Button variant="secondary" onClick={() => setCopiando(true)}><Copy /> Copy from</Button>
-              <Button onClick={agregarRango}><Plus /> Add Range</Button>
+              <Button onClick={agregarRango}><Plus /> Add range</Button>
             </div>
           </div>
           <RangesTable tipo={d.tipo} rangos={d.rangos} onChange={(rangos) => setD({ ...d, rangos })} intentado={intentado} nuevo={nuevo} />
@@ -141,7 +141,7 @@ export function PlanCoverage({ plan, onGuardar, onSucio }: PropsSeccion) {
   )
 }
 
-/* El buscador de una lista de códigos, como los de red.dev ("Search for CDT Code o Description"). */
+/* El buscador de una lista de códigos, como los de red.dev ("Search for CDT code o description"). */
 function buscador(q: string, setQ: (v: string) => void, placeholder: string, Icono = Search) {
   return (
     <span className="relative block w-full sm:max-w-[320px]">
@@ -162,7 +162,7 @@ export function PlanPredeterminations({ plan, onGuardar, onSucio }: PropsSeccion
       <Card title="Predetermination">
         <div className="flex flex-col gap-4">
           <p className="text-[13px] text-ink-muted">By selecting procedures from this list, you will be warned to generate a predetermination claim and submit it to the payer while planning the patient's treatment in the Treatment Planner.</p>
-          {buscador(q, setQ, 'Search for CDT Code o Description..')}
+          {buscador(q, setQ, 'Search for CDT code o description..')}
           <div role="table" aria-label="Predeterminations" className={cn(TABLA_MARCO, 'max-h-[480px] overflow-y-auto')}>
             <div role="row" className={cn('sticky top-0 z-10 grid grid-cols-[90px_80px_1fr] gap-3', TABLA_ENCABEZADO)}>
               <span role="columnheader">Requierd</span><span role="columnheader">Code</span><span role="columnheader">Description</span>
@@ -203,13 +203,13 @@ export function PlanPaymentTable({ plan, onGuardar, onSucio }: PropsSeccion) {
   }
   return (
     <>
-      <Card title="Payment Table">
+      <Card title="Payment table">
         <div className="flex flex-col gap-4">
           <div className="flex flex-wrap items-end justify-between gap-3">
-            <SearchField label="Add Procedure" placeholder="Search for CDT Code o Description" options={OPCIONES_PROCEDIMIENTO.filter((o) => !d.some((f) => f.codigo === codigoDeOpcion(o)))} value={agregar} onChange={elegir} className="w-full sm:max-w-[320px]" />
+            <SearchField label="Add procedure" placeholder="Search for CDT code o description" options={OPCIONES_PROCEDIMIENTO.filter((o) => !d.some((f) => f.codigo === codigoDeOpcion(o)))} value={agregar} onChange={elegir} className="w-full sm:max-w-[320px]" />
             <label className="flex w-full flex-col gap-2 sm:w-auto">
               <span className="text-xs font-medium text-ink">Filter procedures</span>
-              {buscador(q, setQ, 'Filter for CDT Code o Description', Filter)}
+              {buscador(q, setQ, 'Filter for CDT code o description', Filter)}
             </label>
           </div>
           <div role="table" aria-label="Payment table" className={TABLA_MARCO}>
@@ -253,8 +253,8 @@ function filaMontos(nombre: string, montos: Montos, columnas: readonly string[],
 export function PlanDeductibles({ plan, onGuardar, onSucio }: PropsSeccion) {
   const navigate = useNavigate()
   const { d, setD, cambiado, guardado } = useBorrador({ deducibles: plan.deducibles, beneficios: plan.beneficios }, onSucio)
-  const DEDUCIBLES = ['Annual Individual', 'Annual Family', 'Lifetime Individual'] as const
-  const BENEFICIOS = ['Annual Individual', 'Annual Family', 'Lifetime Ortho'] as const
+  const DEDUCIBLES = ['Annual individual', 'Annual family', 'Lifetime individual'] as const
+  const BENEFICIOS = ['Annual individual', 'Annual family', 'Lifetime ortho'] as const
   const encabezado = (cols: readonly string[]) => (
     <div role="row" className={cn('grid grid-cols-[90px_repeat(3,minmax(0,1fr))] gap-3', TABLA_ENCABEZADO)}>
       <span role="columnheader"><span className="sr-only">Type</span></span>
@@ -263,7 +263,7 @@ export function PlanDeductibles({ plan, onGuardar, onSucio }: PropsSeccion) {
   )
   return (
     <>
-      <Card title="Deductibles and Benefits">
+      <Card title="Deductibles and benefits">
         <div className="flex flex-col gap-4 overflow-x-auto">
           <section className={cn(TARJETA_INTERNA, 'flex min-w-[520px] flex-col gap-3 p-4')}>
             <h3 className="text-[13px] font-semibold text-ink">Deductibles</h3>
@@ -291,12 +291,12 @@ export function PlanCoordination({ plan, onGuardar, onSucio }: PropsSeccion) {
   const { d, setD, cambiado, guardado } = useBorrador(plan.coordinacion, onSucio)
   return (
     <>
-      <Card title="Coordination of Benefits">
+      <Card title="Coordination of benefits">
         <div className="flex flex-col gap-4">
           <p className="text-[13px] text-ink-muted">Choose the method for coordinating benefits between the primary and secondary insurance when this plan is used as the patient's secondary coverage.</p>
           <div role="table" aria-label="Coordination of benefits" className={TABLA_MARCO}>
             <div role="row" className={cn('grid grid-cols-[1fr_minmax(0,240px)] gap-4', TABLA_ENCABEZADO)}>
-              <span role="columnheader">Source of Payment for Primary Insurance Plan</span><span role="columnheader">Method for Coordination of Benefits</span>
+              <span role="columnheader">Source of payment for primary insurance plan</span><span role="columnheader">Method for coordination of benefits</span>
             </div>
             {FUENTES_PAGO.map((f) => (
               <div key={f} role="row" className={cn('grid grid-cols-[1fr_minmax(0,240px)] gap-4', TABLA_FILA)}>
@@ -327,12 +327,12 @@ export function PlanFeeByLocation({ plan, onGuardar, onSucio }: PropsSeccion) {
   }
   return (
     <>
-      <Card title="Max Allowable Amount Fee Schedule By Location">
+      <Card title="Max allowable amount fee schedule by location">
         <div className="flex flex-col gap-4">
-          <p className="text-[13px] text-ink-muted">Select a fee schedule for a specific location. If none is selected, the default from 'Max Allowable Amount Fee Schedule' will be used.</p>
+          <p className="text-[13px] text-ink-muted">Select a fee schedule for a specific location. If none is selected, the default from 'Max allowable amount fee schedule' will be used.</p>
           <div role="table" aria-label="Fee schedule by location" className={TABLA_MARCO}>
             <div role="row" className={cn('grid grid-cols-[1fr_minmax(0,280px)] gap-4', TABLA_ENCABEZADO)}>
-              <span role="columnheader">Location Name</span><span role="columnheader">Max Allowable Amount Fee Schedule by Location</span>
+              <span role="columnheader">Location name</span><span role="columnheader">Max allowable amount fee schedule by location</span>
             </div>
             {LOCACIONES.map((l) => (
               <div key={l.id} role="row" className={cn('grid grid-cols-[1fr_minmax(0,280px)] gap-4', TABLA_FILA)}>
@@ -378,7 +378,7 @@ export function SettingsInsurancePlan() {
   return (
     <div className={PADDING_PAGINA}>
       <SettingsPageHeader
-        titulo="Edit Insurance Plan"
+        titulo="Edit insurance plan"
         etiquetas={<Pill tone={TONO_ESTADO[p.estado]}>{p.estado}</Pill>}
       />
       <Tabs

@@ -26,11 +26,11 @@ export function ProblemListFlotante({ procedimientoInicial }: {
             <PopoverTrigger asChild>
               <button
                 type="button"
-                aria-label="View Problem List"
+                aria-label="View problem list"
                 className={cn(BOTON_ACCION, abierta && 'border-dash-blue bg-dash-count-bg text-dash-blue-hover hover:bg-dash-count-bg')}
               >
                 <Table2 className="size-[18px] shrink-0" />
-                <span className={ETIQUETA_EXPANDIBLE}>View Problem List</span>
+                <span className={ETIQUETA_EXPANDIBLE}>View problem list</span>
               </button>
             </PopoverTrigger>
           </TooltipTrigger>

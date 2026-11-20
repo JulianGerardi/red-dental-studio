@@ -49,7 +49,7 @@ export function RecordRow({
 
       <div className="ml-auto flex shrink-0 gap-6 text-center text-xs">
         <span><span className="text-muted-foreground block">Created</span><span className="text-primary font-medium">{created}</span></span>
-        <span><span className="text-muted-foreground block">Last Updated</span><span className="text-primary font-medium">{updated}</span></span>
+        <span><span className="text-muted-foreground block">Last updated</span><span className="text-primary font-medium">{updated}</span></span>
         <span><span className="text-muted-foreground block">Expiration date</span><span className="text-destructive font-medium">{expires}</span></span>
       </div>
 

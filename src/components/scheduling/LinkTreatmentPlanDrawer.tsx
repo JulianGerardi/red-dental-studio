@@ -52,7 +52,7 @@ export function LinkTreatmentPlanDrawer({ onClose }: { onClose: () => void }) {
               >
                 <div className="flex items-center justify-between gap-2">
                   <span className="rounded-full border border-dash-ok-fg bg-white px-2 py-[2px] text-[11px] font-semibold text-dash-ok-fg">
-                    Check In
+                    Check in
                   </span>
                   <span className="text-[13px] font-bold text-ink">{p.date}</span>
                 </div>

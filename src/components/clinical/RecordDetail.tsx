@@ -49,7 +49,7 @@ export function useIr() {
 
 /* El examen del problema, con el nombre de su pestaña. */
 const PESTANA_EXAMEN: Record<string, Pestana> = {
-  Intraoral: 'Intraoral', Extraoral: 'Extraoral', Physical: 'Physical', ROS: 'ROS', 'Dental Assessment': 'Dental assessment',
+  Intraoral: 'Intraoral', Extraoral: 'Extraoral', Physical: 'Physical', ROS: 'ROS', 'Dental assessment': 'Dental assessment',
   Periodontal: 'Periodontal', Radiography: 'Radiographic',
 }
 
@@ -96,7 +96,7 @@ export function ContenidoTratamiento({ t, visitas, completo }: { t?: Tratamiento
   const ir = useIr()
   if (!t) return <Vacio>No treatment linked.</Vacio>
   const { caso, grupo, visita } = t
-  const abrir = (id: string) => ir({ pestana: 'Treatment Plan', caso: id })
+  const abrir = (id: string) => ir({ pestana: 'Treatment plan', caso: id })
   const historicos = grupo.filter((c) => c.id !== caso.id && c.estado === 'Discarded')
   /* Antes de aceptar no hay turno (la misma regla que la visita en Treatment Plan). */
   const conTurno = !SIN_CONSENTIMIENTO_NI_TURNO.includes(caso.estado)
@@ -142,7 +142,7 @@ export function ContenidoOrdenes({ ordenes }: { ordenes: OrdenConProc[] }) {
   if (ordenes.length === 0) return <Vacio>No lab orders linked.</Vacio>
   return ordenes.map((o) => (
     <Entrada key={o.id} estado={pill(ORDEN_TONO[o.estado], o.estado)} sub={`Requested ${o.pedida}${relacionado(o.proc)}`}>
-      <EnlaceRegistro onClick={() => ir({ pestana: 'Lab Order' })}>{o.laboratorio} · {o.trabajo}</EnlaceRegistro>
+      <EnlaceRegistro onClick={() => ir({ pestana: 'Lab order' })}>{o.laboratorio} · {o.trabajo}</EnlaceRegistro>
     </Entrada>
   ))
 }
@@ -189,7 +189,7 @@ export function ContenidoConsentimiento({ t }: { t?: Tratamiento }) {
   const enviado = CONSENTIMIENTO.historial.find((h) => h.evento === 'Sent to patient')?.fecha
   return (
     <Entrada estado={<EstadoConsentimiento estado={estado} />} sub={enviado && `Sent ${enviado}`}>
-      <EnlaceRegistro onClick={() => ir({ pestana: 'Treatment Plan', caso: t.caso.id, consentimiento: t.procCaso!.id })}>Procedure Consent - {t.procCaso.codigo} {t.procCaso.nombre}</EnlaceRegistro>
+      <EnlaceRegistro onClick={() => ir({ pestana: 'Treatment plan', caso: t.caso.id, consentimiento: t.procCaso!.id })}>Procedure Consent - {t.procCaso.codigo} {t.procCaso.nombre}</EnlaceRegistro>
     </Entrada>
   )
 }
@@ -385,8 +385,8 @@ export function SeccionesProblema({ r, c }: { r: Problema; c: ContextoDetalle })
    Plan (cada fila se despliega). Ver clinical-mode.md. */
 
 const ESTADO_HALLAZGO: Record<FindingStatus, EstadoProblema> = {
-  Active: 'Active', Monitoring: 'Monitoring', 'In Treatment': 'In treatment', Treated: 'Treated', 'Externally Treated': 'Externally treated',
-  'No Treatment Needed': 'No treatment needed', 'Patient Declined': 'Patient declined', 'Clinic Declined': 'Clinic declined', Discarded: 'Discarded',
+  Active: 'Active', Monitoring: 'Monitoring', 'In treatment': 'In treatment', Treated: 'Treated', 'Externally treated': 'Externally treated',
+  'No treatment needed': 'No treatment needed', 'Patient declined': 'Patient declined', 'Clinic declined': 'Clinic declined', Discarded: 'Discarded',
 }
 
 /** Un finding del panel de un examen como registro: sus datos y, si es una fila de la Problem List, lo vinculado a ella. */

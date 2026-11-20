@@ -28,7 +28,7 @@ import {
    (Active y All por defecto), buscador, nota en tooltip y el menú de acciones según el estado. Cada fila se despliega
    como en el Ledger con lo que cuelga del registro (RecordDetail). Ver design-reference/figma/modulos/clinical-mode.md. */
 
-type Pestana = 'Problem List' | 'Procedures'
+type Pestana = 'Problem list' | 'Procedures'
 
 type Accion<E extends string> = { label: string; icono: LucideIcon; a?: E; peligro?: boolean; borrar?: boolean }
 
@@ -38,13 +38,13 @@ const BORRAR = { label: 'Delete', icono: Trash2, peligro: true, borrar: true } a
 
 /* Las de Active son las de red.dev; las demás, inferidas: lo abierto ofrece los pasos que faltan y lo cerrado, Rollback. */
 const ABIERTO_PROBLEMA: Accion<EstadoProblema>[] = [
-  { label: 'Start Monitoring', icono: Eye, a: 'Monitoring' },
-  { label: 'Start Treatment', icono: Play, a: 'In treatment' },
-  { label: 'Mark as Treated', icono: Check, a: 'Treated' },
-  { label: 'Mark as Externally Treated', icono: CheckCheck, a: 'Externally treated' },
-  { label: 'Mark as No Treat. Needed', icono: CircleSlash, a: 'No treatment needed', peligro: true },
-  { label: 'Mark as Patient Declined', icono: UserX, a: 'Patient declined', peligro: true },
-  { label: 'Mark as Clinic Declined', icono: Ban, a: 'Clinic declined', peligro: true },
+  { label: 'Start monitoring', icono: Eye, a: 'Monitoring' },
+  { label: 'Start treatment', icono: Play, a: 'In treatment' },
+  { label: 'Mark as treated', icono: Check, a: 'Treated' },
+  { label: 'Mark as externally treated', icono: CheckCheck, a: 'Externally treated' },
+  { label: 'Mark as no treat. needed', icono: CircleSlash, a: 'No treatment needed', peligro: true },
+  { label: 'Mark as patient declined', icono: UserX, a: 'Patient declined', peligro: true },
+  { label: 'Mark as clinic declined', icono: Ban, a: 'Clinic declined', peligro: true },
   { label: 'Discard', icono: XCircle, a: 'Discarded', peligro: true },
 ]
 export function accionesProblema(e: EstadoProblema): Accion<EstadoProblema>[][] {
@@ -82,7 +82,7 @@ export function ProblemList({ procedimientoInicial }: {
   /** Abre en Procedures con esa fila desplegada (View procedure del detalle del Ledger). */
   procedimientoInicial?: string
 } = {}) {
-  const [pestana, setPestana] = useState<Pestana>(procedimientoInicial ? 'Procedures' : 'Problem List')
+  const [pestana, setPestana] = useState<Pestana>(procedimientoInicial ? 'Procedures' : 'Problem list')
   const [problemas, setProblemas] = useState(PROBLEMAS)
   const [procedimientos, setProcedimientos] = useState(PROCEDIMIENTOS)
   const [filtroProblema, setFiltroProblema] = useState<EstadoProblema>('Active')
@@ -125,7 +125,7 @@ export function ProblemList({ procedimientoInicial }: {
     onFirmar: ([id], verbo) => {
       const fila = procedimientos.find((p) => p.id === id)
       const tr = fila && tratamientoDe(fila, consentimientos)
-      if (tr?.procCaso) ir({ pestana: 'Treatment Plan', caso: tr.caso.id, consentimiento: tr.procCaso.id, accion: verbo })
+      if (tr?.procCaso) ir({ pestana: 'Treatment plan', caso: tr.caso.id, consentimiento: tr.procCaso.id, accion: verbo })
     },
     onGenerar: ([id]) => {
       const fila = procedimientos.find((p) => p.id === id)
@@ -149,7 +149,7 @@ export function ProblemList({ procedimientoInicial }: {
   }
   /* Con documento lleva al detalle en Treatment Plan; sin documento dice qué pasa. */
   const tocarConsentimiento = (c: NonNullable<ReturnType<typeof consentimientoDe>>) => {
-    if (tieneDocumento(c.estado)) return ir({ pestana: 'Treatment Plan', caso: c.tr.caso.id, consentimiento: c.tr.procCaso!.id })
+    if (tieneDocumento(c.estado)) return ir({ pestana: 'Treatment plan', caso: c.tr.caso.id, consentimiento: c.tr.procCaso!.id })
     const texto = AYUDA_CONSENTIMIENTO[c.estado]
     if (texto) aviso.info(texto)
   }
@@ -175,7 +175,7 @@ export function ProblemList({ procedimientoInicial }: {
   /* Un link del detalle a un registro de la otra pestaña: cambia de pestaña, deja el filtro donde se ve y lo abre. */
   const contexto: ContextoDetalle = {
     problemas, procedimientos, consentimientos,
-    onAbrirProblema: (p) => { setQ(''); setFiltroProblema(p.estado); setEnfoque(p.id); setPestana('Problem List') },
+    onAbrirProblema: (p) => { setQ(''); setFiltroProblema(p.estado); setEnfoque(p.id); setPestana('Problem list') },
     onAbrirProcedimiento: (p) => { setQ(''); setFiltroProcedimiento('All'); setEnfoque(p.id); setPestana('Procedures') },
   }
 
@@ -214,17 +214,17 @@ export function ProblemList({ procedimientoInicial }: {
     <TooltipProvider delayDuration={200}>
       <div className="flex flex-col gap-3 rounded-lg bg-white shadow-panel p-4">
         <div className="flex flex-wrap items-center gap-2">
-          <Tabs tabs={['Problem List', 'Procedures'] as const} value={pestana} onChange={(v) => { setEnfoque(undefined); setPestana(v) }} aria-label="Clinical records" />
+          <Tabs tabs={['Problem list', 'Procedures'] as const} value={pestana} onChange={(v) => { setEnfoque(undefined); setPestana(v) }} aria-label="Clinical records" />
           <div className="ml-auto flex flex-wrap items-center gap-2">
             {/* El buscador va siempre primero y después el filtro (Julián, 2026-10-06). */}
             <div className="relative w-[200px] max-w-full">
               <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-ink-faint" />
               <input
-                value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search..." aria-label="Search"
+                value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search problem list" aria-label="Search problem list"
                 className="focus:border-dash-blue h-9 w-full rounded-md border border-line bg-white pr-3 pl-9 text-[13px] shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] placeholder:text-ink-faint focus:outline-none"
               />
             </div>
-            {pestana === 'Problem List' ? (
+            {pestana === 'Problem list' ? (
               <FilterMenu
                 label="Filter problems by status"
                 groups={[{
@@ -244,7 +244,7 @@ export function ProblemList({ procedimientoInicial }: {
           </div>
         </div>
 
-        {pestana === 'Problem List' ? (
+        {pestana === 'Problem list' ? (
           <DataTable
             key="problemas"
             columns={colsProblema} rows={filasProblema} rowKey={(r) => r.id} rowLabel={(r) => r.condicion}

@@ -111,7 +111,7 @@ export function Topbar({
    diseño, y acá el contenido se replica tal cual-. */
 const CUENTA = [
   { label: 'Profile', icon: CircleUserRound, to: '/settings/account' },
-  { label: 'Suscription', icon: CreditCard, to: '/billing' },
+  { label: 'Subscription', icon: CreditCard, to: '/billing' },
   { label: 'Support', icon: CircleHelp, to: '/help' },
 ]
 
@@ -133,7 +133,7 @@ export function MenuCuenta() {
       </DropdownMenuTrigger>
 
       <DropdownMenuContent align="end" className="w-[248px]">
-        <DropdownMenuLabel className="text-[15px] font-bold text-ink">My Account</DropdownMenuLabel>
+        <DropdownMenuLabel className="text-[15px] font-bold text-ink">My account</DropdownMenuLabel>
         <DropdownMenuSeparator />
         {CUENTA.map(({ label, icon: Icon, to }) => (
           <DropdownMenuItem key={label} onSelect={() => navigate(to)} className="gap-2.5 py-2 text-[13px]">

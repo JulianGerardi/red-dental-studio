@@ -4,7 +4,7 @@ import { PendingTaskCard } from './PendingTaskCard'
 const meta = {
   title: 'Components/Dashboard/PendingTaskCard',
   component: PendingTaskCard,
-  args: { task: { kind: 'Lab Orders', state: 'Requested', person: 'Elena Marquez', initials: 'EM', register: '02/28/2026', expiration: '03/07/2026' } },
+  args: { task: { kind: 'Lab orders', state: 'Requested', person: 'Elena Marquez', initials: 'EM', register: '02/28/2026', expiration: '03/07/2026' } },
   decorators: [(Story) => <div className="w-[320px]"><Story /></div>],
 } satisfies Meta<typeof PendingTaskCard>
 

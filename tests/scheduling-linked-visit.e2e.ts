@@ -1,27 +1,27 @@
 import { test } from '@e2e-dev/web'
 import { expect } from 'e2e'
 
-/* New Appointment con una visita linkeada a otro turno: se ve en la fila y Save pregunta si se mueve
+/* New appointment con una visita linkeada a otro turno: se ve en la fila y Save pregunta si se mueve
    (design-reference/figma/modulos/scheduling.md, 2026-10-17). */
 
 async function hastaElPlan(app: any, screen: any) {
   await app.open('/scheduling')
   await screen.getByRole('button', 'New appointment').first().tap()
-  const drawer = screen.getByRole('dialog', 'New Appointment')
+  const drawer = screen.getByRole('dialog', 'New appointment')
   await drawer.getByRole('combobox', 'Patient').fill('John')
   await drawer.getByRole('option', /^John Smith/).tap()
-  await drawer.getByRole('combobox', 'Primary Provider').fill('Emily')
+  await drawer.getByRole('combobox', 'Primary provider').fill('Emily')
   await drawer.getByRole('option', /^Dr. Emily Chen/).tap()
-  // Con "Select": Status, Reason for Visit, Start Time, End Time y Operatory (orden de CON-4090).
-  // Tocar Start Time despliega el calendario del día: elegir una franja completa la fecha y las dos horas.
+  // Con "Select": Status, Reason for visit, Start time, End time y Operatory (orden de CON-4090).
+  // Tocar Start time despliega el calendario del día: elegir una franja completa la fecha y las dos horas.
   await drawer.getByRole('button', /^Select$/).nth(2).tap()
   await screen.getByRole('button', 'Schedule at 10 AM').tap()
-  // Quedan Status, Reason for Visit y Operatory.
+  // Quedan Status, Reason for visit y Operatory.
   await drawer.getByRole('button', /^Select$/).nth(2).tap()
   await drawer.getByRole('button', 'Operatory 1').tap()
   await drawer.getByRole('button', /^Select$/).nth(0).tap()
   await drawer.getByRole('button', 'Booked').tap()
-  await drawer.getByRole('button', /Next Step/).tap()
+  await drawer.getByRole('button', /Next step/).tap()
   return drawer
 }
 

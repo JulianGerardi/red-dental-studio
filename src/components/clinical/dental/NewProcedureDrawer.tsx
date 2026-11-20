@@ -165,7 +165,7 @@ export function NewProcedureDrawer({
   )
 
   return (
-    <Drawer open={open} onClose={onClose} title={mode === 'condition' ? 'New Condition' : 'New Procedure'} steps={pasos} step={paso} footer={footer}>
+    <Drawer open={open} onClose={onClose} title={mode === 'condition' ? 'New condition' : 'New procedure'} steps={pasos} step={paso} footer={footer}>
       <DrawerStep key={actual} index={paso} step={paso}>
         {actual === 'Procedure' && (
           <div className="flex w-full flex-col items-start gap-4">
@@ -196,7 +196,7 @@ export function NewProcedureDrawer({
                   emptyText="No procedure matches that search."
                 />
                 {/* Sin áreas tildadas se ve todo ("Show all treatment"): Clear all vuelve a eso. */}
-                <FilterMenu label="Filter by treatment area" groups={[{ title: 'Treatment Area', options: [...TREATMENT_AREAS], value: areas, onChange: (v) => setAreas(v as TreatmentArea[]) }]} />
+                <FilterMenu label="Filter by treatment area" groups={[{ title: 'Treatment area', options: [...TREATMENT_AREAS], value: areas, onChange: (v) => setAreas(v as TreatmentArea[]) }]} />
               </div>
             </div>
 

@@ -21,7 +21,7 @@ import { OBLIGATORIO } from '@/lib/validacion'
    asistente de cuatro pasos en el mismo drawer. Título y bajada ya no repiten el texto de red.dev (pedido de Julián). Cancel del asistente vuelve a la lista, como en red.dev. Cada excepción se
    guarda al terminar el asistente, sin esperar al Save de la tabla. Ver settings-billing.md. */
 
-const PASOS = ['Exceptions Type', 'Select Procedure', 'Specify Options', 'Reason For Exception'] as const
+const PASOS = ['Exceptions type', 'Select procedure', 'Specify options', 'Reason for exception'] as const
 const COLUMNAS_LISTA = 'grid-cols-[150px_minmax(0,1fr)_minmax(0,1fr)_56px]'
 
 /* La columna Description: lo que hace la excepción, en una línea. */
@@ -101,7 +101,7 @@ export function ExceptionsDrawer({ excepciones, onClose, onGuardar, agregando = 
   if (modo === 'lista') {
     return (
       <ModalShell
-        title="Manage Exceptions"
+        title="Manage exceptions"
         description={bajada}
         onClose={onClose}
         width="max-w-[720px]"
@@ -110,14 +110,14 @@ export function ExceptionsDrawer({ excepciones, onClose, onGuardar, agregando = 
         <div className="flex flex-col gap-4">
           <div className="flex flex-wrap items-center gap-3">
             <div className="flex min-w-0 flex-1 gap-2 sm:max-w-[400px]">
-              <SettingsSearch value={q} onChange={setQ} placeholder="Search..." className="min-w-0 flex-1 sm:max-w-none" />
+              <SettingsSearch value={q} onChange={setQ} placeholder="Search exceptions" className="min-w-0 flex-1 sm:max-w-none" />
             </div>
             <Button variant="secondary" className="ml-auto" onClick={() => setModo('asistente')}><Plus /> Add new exception</Button>
           </div>
           <div className="overflow-x-auto">
             <div role="table" aria-label="Exceptions" className={cn(TABLA_MARCO, 'min-w-[560px]')}>
               <div role="row" className={cn('grid gap-3', COLUMNAS_LISTA, TABLA_ENCABEZADO)}>
-                <span role="columnheader">Code, Exception</span>
+                <span role="columnheader">Code, exception</span>
                 <span role="columnheader">Description</span>
                 <span role="columnheader">Reason</span>
                 <span role="columnheader" className="text-center">Actions</span>
@@ -148,7 +148,7 @@ export function ExceptionsDrawer({ excepciones, onClose, onGuardar, agregando = 
 
   return (
     <ModalShell
-      title="Manage Exceptions"
+      title="Manage exceptions"
       description={tabla ? `New exception for ${tabla}.` : 'New exception.'}
       onClose={onClose}
       width="max-w-[720px]"
@@ -159,16 +159,16 @@ export function ExceptionsDrawer({ excepciones, onClose, onGuardar, agregando = 
       <DrawerStep index={0} step={paso}>
         <div className="flex flex-col gap-3">
           <p className="text-[12px] text-ink-muted">Select the type of exception you want to create.</p>
-          <div role="radiogroup" aria-label="Exception Type" className="flex flex-col gap-2">
+          <div role="radiogroup" aria-label="Exception type" className="flex flex-col gap-2">
             {TIPOS_EXCEPCION.map((t) => <OpcionDireccion key={t} texto={t} elegida={b.tipo === t} onElegir={() => set('tipo', t as TipoExcepcion)} />)}
           </div>
         </div>
       </DrawerStep>
 
       <DrawerStep index={1} step={paso}>
-        <DrawerSection title={`Add Procedures (${b.procedimientos.length})`} description={`Selected Exception Types: ${b.tipo}`}>
+        <DrawerSection title={`Add procedures (${b.procedimientos.length})`} description={`Selected exception types: ${b.tipo}`}>
           <SearchField
-            label="Add Procedure" placeholder="Search for CDT Code o Description" options={OPCIONES_PROCEDIMIENTO}
+            label="Add procedure" placeholder="Search for CDT code o description" options={OPCIONES_PROCEDIMIENTO}
             value={busqueda} onChange={agregarProcedimiento}
             error={falta('procedimientos') ? OBLIGATORIO : undefined}
           />
@@ -184,7 +184,7 @@ export function ExceptionsDrawer({ excepciones, onClose, onGuardar, agregando = 
 
       <DrawerStep index={2} step={paso}>
         {b.tipo === 'Age limitation' && (
-          <DrawerSection title="Age Limitation">
+          <DrawerSection title="Age limitation">
             <div className="grid gap-4 sm:grid-cols-2">
               <UnitField label="Minimum age" unit="years" value={b.edadMin ?? 0} onChange={(n) => set('edadMin', n)} />
               <UnitField label="Maximum age" unit="years" value={b.edadMax ?? 0} onChange={(n) => set('edadMax', n)} error={falta('edad') ? 'The maximum age can’t be lower than the minimum.' : undefined} />
@@ -196,14 +196,14 @@ export function ExceptionsDrawer({ excepciones, onClose, onGuardar, agregando = 
             {b.opcionEdad === 'Coverage' ? (
               <TextField label="Coverage, %" placeholder="0" value={String(b.cobertura ?? 0)} onChange={(v) => set('cobertura', Math.min(100, Number(v.replace(/\D/g, '')) || 0))} />
             ) : (
-              <SearchField label="Downgrade to" placeholder="Search for CDT Code o Description" options={OPCIONES_PROCEDIMIENTO} value={rebaja} onChange={elegirRebaja} error={falta('rebajaA') ? OBLIGATORIO : undefined} />
+              <SearchField label="Downgrade to" placeholder="Search for CDT code o description" options={OPCIONES_PROCEDIMIENTO} value={rebaja} onChange={elegirRebaja} error={falta('rebajaA') ? OBLIGATORIO : undefined} />
             )}
-            <SelectField label="Deductible Type" options={[...TIPOS_DEDUCIBLE]} value={b.deducible} onChange={(v) => set('deducible', v as TipoDeducible)} />
+            <SelectField label="Deductible type" options={[...TIPOS_DEDUCIBLE]} value={b.deducible} onChange={(v) => set('deducible', v as TipoDeducible)} />
           </DrawerSection>
         )}
         {b.tipo === 'Downgrade' && (
           <DrawerSection title="Downgrade">
-            <SearchField label="Downgrade to" required placeholder="Search for CDT Code o Description" options={OPCIONES_PROCEDIMIENTO} value={rebaja} onChange={elegirRebaja} error={falta('rebajaA') ? OBLIGATORIO : undefined} />
+            <SearchField label="Downgrade to" required placeholder="Search for CDT code o description" options={OPCIONES_PROCEDIMIENTO} value={rebaja} onChange={elegirRebaja} error={falta('rebajaA') ? OBLIGATORIO : undefined} />
           </DrawerSection>
         )}
         {b.tipo === 'Frequency' && (

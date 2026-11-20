@@ -103,7 +103,7 @@ export function NewSubscriptionModal({
 
   return (
     <ModalShell
-      title="New Subscription" description="Subscriber and coverage" onClose={onClose} width="max-w-[560px]" steps={['Subscriber', 'Subscription']} step={paso}
+      title="New subscription" description="Subscriber and coverage" onClose={onClose} width="max-w-[560px]" steps={['Subscriber', 'Subscription']} step={paso}
       actions={<DrawerActions step={paso} total={2} onNext={siguiente} onBack={() => { setIntentado(false); setPaso(0) }} onCancel={onClose} onSave={guardar} />}
     >
       <div className="flex flex-col gap-6">
@@ -128,9 +128,9 @@ export function NewSubscriptionModal({
           </SectionCard>
 
           {modo === 'existente' && (
-            <SectionCard title="Select Subscriber">
+            <SectionCard title="Select subscriber">
               <PersonSearchField
-                label="Select person" required placeholder="Search by Name or Last Name"
+                label="Select person" required placeholder="Search patients by name"
                 personas={DIRECTORIO.map((p) => p.name)}
                 value={d.persona}
                 onChange={set('persona')}
@@ -142,13 +142,13 @@ export function NewSubscriptionModal({
           )}
 
           {modo === 'nuevo' && (
-            <SectionCard title="New Subscriber">
+            <SectionCard title="New subscriber">
               {/* De a dos, como New Patient: nunca tres por fila (Components / UI / Drawer → Specs → Fields). */}
               <div className="grid gap-4 sm:grid-cols-2">
                 {/* "Loremp" es el placeholder del Figma. */}
                 <TextField label="Name" required placeholder="Loremp" value={d.nombre} onChange={set('nombre')} error={req('nombre')} />
-                <TextField label="Middle Name" placeholder="Loremp" value={d.medio} onChange={set('medio')} />
-                <TextField label="Last Name" required placeholder="Loremp" value={d.apellido} onChange={set('apellido')} error={req('apellido')} />
+                <TextField label="Middle name" placeholder="Loremp" value={d.medio} onChange={set('medio')} />
+                <TextField label="Last name" required placeholder="Loremp" value={d.apellido} onChange={set('apellido')} error={req('apellido')} />
                 <DateTextField label="Birthday" required value={d.cumple} onChange={set('cumple')} error={req('cumple')} />
                 <TextField label="Email" placeholder="abril@gmai.com" value={d.email} onChange={set('email')} />
               </div>
@@ -158,18 +158,18 @@ export function NewSubscriptionModal({
 
         <DrawerStep index={1} step={paso}>
           {/* Los campos de CON-3284, todos obligatorios menos Coverage End. */}
-          <SectionCard title="Subscription Information">
+          <SectionCard title="Subscription information">
             <div className="grid gap-4 sm:grid-cols-2">
-              <SearchField label="Carrier Name" required placeholder="Select carrier" options={CARRIERS} value={d.carrier} onChange={cambiarCarrier} error={errorCarrier} emptyText="Carrier not found." clearable />
+              <SearchField label="Carrier name" required placeholder="Select carrier" options={CARRIERS} value={d.carrier} onChange={cambiarCarrier} error={errorCarrier} emptyText="Carrier not found." clearable />
               <SearchField
-                label="Plan Name" required placeholder="Select plan" options={planes} value={d.plan} onChange={set('plan')} error={errorPlan}
+                label="Plan name" required placeholder="Select plan" options={planes} value={d.plan} onChange={set('plan')} error={errorPlan}
                 disabled={!carrierValido} emptyText="Plan not found." clearable hint={carrierValido ? undefined : 'Select a carrier first.'}
               />
               <TextField label="Subscriber ID" required placeholder="123456" value={d.subId} onChange={set('subId')} error={req('subId')} />
             </div>
             <div className="grid gap-4 sm:grid-cols-2">
-              <DateTextField label="Coverage Start" required value={d.inicio} onChange={set('inicio')} error={errorInicio} />
-              <DateTextField label="Coverage End" value={d.fin} onChange={set('fin')} error={errorFin} />
+              <DateTextField label="Coverage start" required value={d.inicio} onChange={set('inicio')} error={errorInicio} />
+              <DateTextField label="Coverage end" value={d.fin} onChange={set('fin')} error={errorFin} />
             </div>
           </SectionCard>
         </DrawerStep>
@@ -219,7 +219,7 @@ export function ManageSubscriptionModal({
   return (
     /* "Suscription" sin la b es del Figma. Dos pasos: quiénes (suscriptor y dependientes) y la cobertura. */
     <ModalShell
-      title="Manage Suscription" description="Subscriber, dependers and coverage" onClose={onClose} width="max-w-[560px]" steps={['Subscriber', 'Subscription']} step={paso}
+      title="Manage subscription" description="Subscriber, dependers and coverage" onClose={onClose} width="max-w-[560px]" steps={['Subscriber', 'Subscription']} step={paso}
       actions={<DrawerActions step={paso} total={2} onNext={() => setPaso(1)} onBack={() => setPaso(0)} onCancel={onClose} onSave={guardar} />}
     >
       <div className="flex flex-col gap-6">
@@ -246,22 +246,22 @@ export function ManageSubscriptionModal({
               onClick={onNuevoDependiente}
               className="text-dash-blue flex items-center gap-1.5 self-end text-[13px] font-semibold hover:underline"
             >
-              <Plus className="size-4" /> Add New
+              <Plus className="size-4" /> Add new
             </button>
           </SectionCard>
         </DrawerStep>
 
         <DrawerStep index={1} step={paso}>
-        <SectionCard title="Subscription Information">
+        <SectionCard title="Subscription information">
           <FilaLectura icon={ShieldHalf} label="Carrier" value={s.carrier} />
           <FilaLectura icon={Hospital} label="Plan" value={s.plan} />
-          <FilaLectura icon={AArrowUp} label="Coverage Period" value={s.cobertura} />
+          <FilaLectura icon={AArrowUp} label="Coverage period" value={s.cobertura} />
           <div className="grid gap-4 sm:grid-cols-2">
             <TextField
               label="Subcriber ID" required value={subId} onChange={setSubId}
               error={intentado && !subId.trim() ? OBLIGATORIO : undefined}
             />
-            <TextField label="Coverage End" value={fin} onChange={setFin} />
+            <TextField label="Coverage end" value={fin} onChange={setFin} />
           </div>
           <TextArea label="Notes" placeholder="Add notes" value={notas} onChange={setNotas} />
         </SectionCard>
@@ -289,22 +289,22 @@ export function NewDependerModal({ onClose }: { onClose: () => void }) {
   return (
     /* "Depender" es del Figma; también es el único lugar donde "Coordination"
        está bien escrito. */
-    <ModalShell title="New Depender" onClose={onClose} width="max-w-[420px]" actions={<DrawerActions onCancel={onClose} onSave={guardar} />}>
+    <ModalShell title="New depender" onClose={onClose} width="max-w-[420px]" actions={<DrawerActions onCancel={onClose} onSave={guardar} />}>
       <div className="flex flex-col gap-4">
         <PersonSearchField
-          label="Dependent Patient" placeholder="Search by Name or Last Name" personas={DIRECTORIO.map((p) => p.name)}
+          label="Dependent patient" placeholder="Search patients by name" personas={DIRECTORIO.map((p) => p.name)}
           value={d.paciente} onChange={set('paciente')} chips={personaChips}
         />
         <div className="grid gap-4 sm:grid-cols-2">
           <SearchField label="Subcriber ID" options={[SUSCRIPCION.subscriberId]} value={d.subId} onChange={set('subId')} />
           <SearchField label="Carrier name" required options={CARRIERS} value={d.carrier} onChange={set('carrier')} error={req('carrier')} />
-          <SelectField label="Coordination Order" required options={ORDENES} value={d.orden} onChange={set('orden')} error={req('orden')} />
+          <SelectField label="Coordination order" required options={ORDENES} value={d.orden} onChange={set('orden')} error={req('orden')} />
         </div>
         <div className="grid gap-4 sm:grid-cols-2">
-          <DateTextField label="Coverage Start" value={d.inicio} onChange={set('inicio')} />
-          <DateTextField label="Coverage End" value={d.fin} onChange={set('fin')} />
+          <DateTextField label="Coverage start" value={d.inicio} onChange={set('inicio')} />
+          <DateTextField label="Coverage end" value={d.fin} onChange={set('fin')} />
           <DateTextField label="Eligibility" value={d.elegibilidad} onChange={set('elegibilidad')} />
-          <DateTextField label="Verification Date" value={d.verificacion} onChange={set('verificacion')} />
+          <DateTextField label="Verification date" value={d.verificacion} onChange={set('verificacion')} />
         </div>
       </div>
     </ModalShell>

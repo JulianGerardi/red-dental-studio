@@ -80,7 +80,7 @@ export const PIEZAS: Pieza[] = [
       <div className="flex max-w-[220px] flex-wrap justify-center gap-1.5">
         <Pill tone="success">Active</Pill>
         <Pill tone="info">Booked</Pill>
-        <Pill tone="warning">No Show</Pill>
+        <Pill tone="warning">No show</Pill>
         <Pill tone="danger">Overdue</Pill>
         <Pill tone="purple">In progress</Pill>
       </div>

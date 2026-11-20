@@ -64,7 +64,7 @@ export function CoverageTableEditor({ tabla, abrirExcepciones = false }: { tabla
             <ShieldAlert /> Manage Exceptions{tabla.excepciones.length ? ` (${tabla.excepciones.length})` : ''}
           </Button>
         )}
-        <Button onClick={agregarRango}><Plus /> Add Range</Button>
+        <Button onClick={agregarRango}><Plus /> Add range</Button>
       </div>
       <div className="grid gap-4 sm:grid-cols-2 lg:max-w-[560px]">
         <TextField
@@ -128,19 +128,19 @@ export function SettingsCoverageTables() {
   return (
     <div className={PADDING_PAGINA}>
       <SettingsPageHeader
-        titulo="Search Coverage Table"
-        accion={<Button size="md" onClick={() => navigate(`${LISTA_COBERTURAS}/new`)}><Plus /> New Coverage Table</Button>}
+        titulo="Coverage tables"
+        accion={<Button size="md" onClick={() => navigate(`${LISTA_COBERTURAS}/new`)}><Plus /> New coverage table</Button>}
       />
       <div className={cn(TARJETA_PANEL, 'mt-5 grid gap-6 p-4 sm:p-5 lg:grid-cols-[260px_minmax(0,1fr)] lg:items-start')}>
         <MasterList
-          items={items} elegido={tableId} q={q} onQ={setQ} placeholder="Search a Coverage Table Here..."
+          items={items} elegido={tableId} q={q} onQ={setQ} placeholder="Search coverage tables"
           vacio={`No ${tipo.toLowerCase()} coverage tables match.`}
           filtro={<SelectField hideLabel label="Type" options={[...TIPOS_COBERTURA]} value={tipo} onChange={(v) => setTipo(v as TipoCobertura)} />}
         />
         <div className="min-w-0">
           {elegida
             ? <CoverageTableEditor key={elegida.id} tabla={elegida} />
-            : <EmptyState icon={ListChecks} title="No Coverage Table Found" detail="Select an existing Coverage Table from the list on the left or create a new one by clicking the Create New button" className="py-16" />}
+            : <EmptyState icon={ListChecks} title="No coverage table found" detail="Select a coverage table from the list on the left or create one with New coverage table." className="py-16" />}
         </div>
       </div>
     </div>
@@ -150,7 +150,7 @@ export function SettingsCoverageTables() {
 export function SettingsNewCoverageTable() {
   return (
     <div className={PADDING_PAGINA}>
-      <SettingsPageHeader titulo="Coverage Table" />
+      <SettingsPageHeader titulo="New coverage table" />
       <div className={cn(TARJETA_PANEL, 'mt-5 p-4 sm:p-5')}>
         <CoverageTableEditor />
       </div>

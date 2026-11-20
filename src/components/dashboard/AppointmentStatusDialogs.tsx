@@ -34,7 +34,7 @@ export function NoShowDialog({ nombre, hora, onConfirm, onCancel }: {
   onCancel: () => void
 }) {
   return (
-    <ConfirmDialog title="Mark as No Show?" icon="warning" confirmLabel="Mark as No Show" onConfirm={onConfirm} onCancel={onCancel}>
+    <ConfirmDialog title="Mark as no show?" icon="warning" confirmLabel="Mark as no show" onConfirm={onConfirm} onCancel={onCancel}>
       {nombre} didn't arrive for the {hora} appointment. The appointment status changes to No Show and the time slot stays booked.
     </ConfirmDialog>
   )

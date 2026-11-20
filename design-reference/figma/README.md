@@ -656,3 +656,55 @@ con los tokens de shadcn.
 
 Para validar con usuarios: si 32 px alcanza como área de toque para las acciones de página en tablet; si recepción
 encuentra "Patient information" plegado en el celular.
+
+## Sentence case, columnas Name y formularios de a dos (2026-11-20)
+
+**Jira:** no hay historia; segunda tanda de normalización, a partir de la propuesta de consistencia que pasó Julián
+(`Confidentally_UI_review.html`) y de sus notas. Decisión de Julián: **sentence case en toda la app**.
+
+1. **Sentence case.** Títulos, botones, pestañas, columnas, labels, menús, drawers, estados y placeholders llevan
+   mayúscula sólo en la primera palabra: "Location hours", "New patient", "Date of birth", "In progress", "No show",
+   "Check in". Quedan con mayúscula: siglas (CDT, PPO, DOB, ZIP, UTC), nombres propios (personas, clínicas, carriers,
+   estados de EE. UU., días, meses) y **Clinical Mode**, que es el nombre de la función. Se reemplazó por literal exacto
+   en `src/` y `tests/` con un mapa revisado a mano (~1.400 textos), así que las comparaciones del código siguen
+   coincidiendo. **No se tocan los datos de catálogo**, que son contenido configurable de la clínica: tipos de ajuste y
+   de pago (Insurance Adjustment, Cash Payment…), los tipos de transacción (Patient Payment, Charge Adjustment), los
+   lugares de servicio oficiales de CMS, las categorías de etnia del censo, nombres de templates, casos y planes, y las
+   secciones de los workflows clínicos. Las frases que citan un elemento de la interfaz lo escriben como se ve
+   ("Tick Add new person", "in Check in or In progress status"). Los mails para el backend (`emails/`) no se tocaron.
+2. **Errores de tipeo del Figma corregidos** (antes se copiaban): Adress → Address, Lasr name → Last name, Suscription →
+   Subscription, Abreviattion → Abbreviation, Overwiev → Overview, "Fee Schedule's Name" → Fee schedule name.
+3. **Títulos con un mismo criterio.** El título de una lista es el ítem del menú: Coverage tables (antes "Search Coverage
+   Table", también en la ficha); New coverage table; Consent templates; Ledger options.
+4. **Placeholders "Search <lo que lista>".** Search patients by name, Search fee schedules, Search carriers by name or
+   payer ID, Search plans, Search coverage tables, Search adjustment types / Search payment methods (Ledger options
+   decía "Search patients"), Search exceptions, Search radiographs, Search problem list, Search procedures.
+5. **Tablas.** La columna que identifica cada fila se llama **Name** (Patients, Employees, Locations, Carriers, planes,
+   Adjustment types); Birthday/Birthdate → Date of birth; Is provider → Provider; Room → Rooms; Information → Address. Un
+   switch es un estado editable, no una acción: la columna de Ledger options se llama **Enabled** en las dos pestañas.
+   Un dato que navega va con `TABLA_LINK` (el Subscriber de Insurance).
+6. **Formularios de a dos.** La regla de los drawers ("campos de a dos, nunca tres por fila") vale también para las
+   pantallas. Se corrigieron: el nombre del paciente en Edit Patient y New patient (eran tres por fila), el teléfono de
+   Account y del dueño (tres por fila), Extension de Employee (iba sola a todo el ancho), Location name (sola a todo el
+   ancho) y Carrier name en New carrier. Medición en `forms.cjs` del scratchpad de la sesión: todos los campos a 36 de
+   alto y labels 12/500. Quedan a propósito: los drawers del Ledger con los campos en fila (ledger.md, 2026-11-20) y los
+   buscadores de persona de New appointment a todo el ancho (muestran resultados).
+7. **Métrica compacta (Dashboard).** El componente Metric tiene dos variantes: **compacta** (Dashboard: rótulo y número
+   en una línea, ícono, sin bajada; lo que cuenta cada número va en un ⓘ) y **estándar** (Ledger y Billing: monto
+   destacado con su contexto). Comparten tipografía, color, formato numérico y bordes. Ver dashboard.md.
+8. **Settings → Account.** Una clínica ve sólo su cuenta: el menú dice Account y abre Edit Account; la lista de cuentas
+   (Accounts overview) se fue. Ver settings-accounts.md.
+
+Propuestas funcionales de la misma revisión, **no implementadas** (cambian comportamiento; esperan el ok de Julián):
+
+- **Consents: sacar Deactivate template y los switches de la lista, y que Active sea un campo que se guarda con Save.**
+  Contradice CON-3719 (Desactivar Procedure Consent Template) y CON-3725 (Activar): desactivar es una acción propia,
+  con una confirmación que lista los procedimientos afectados, y se aplica en el momento, en una transacción con sus
+  mappings. No conviene juntarlo con el guardado del texto. Sí se puede sumar el aviso "Unsaved changes" del editor sin
+  tocar eso.
+- **Ledger options: filtros separados por Direction, Impact y Category, y una tabla mínima de Payment methods.** Las
+  historias de Ledger (CON-3877 List Ledger Payment Methods, CON-3878 List Ledger Adjustment Types) están en análisis:
+  conviene definirlo ahí.
+- **Employees: sacar los checkboxes de selección.** No hay historia de acciones masivas; la selección hoy no hace nada
+  más que contar. Decidir si se saca o si se define la acción.
+- **Fecha con formato en el encabezado ("Date of birth (MM/DD/YYYY)")**: no se aplicó; el formato ya se ve en los datos.

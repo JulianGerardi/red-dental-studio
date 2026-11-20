@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite'
 import { PatientBreadcrumb, migasPaciente } from './PatientBreadcrumb'
 import { Bloque, Lienzo, Muestra, Tabla, TablaPartes } from '@/design-system/kit'
 
-const SECCIONES = ['Overview', 'Treatments', 'Insurance', 'Ledger', 'Documents', 'Relationships & Billing', 'Edit Patient'] as const
+const SECCIONES = ['Overview', 'Treatments', 'Insurance', 'Ledger', 'Documents', 'Relationships & billing', 'Edit patient'] as const
 type Args = { name: string; section: (typeof SECCIONES)[number] }
 const seccionDe = (s: Args['section']) => (s === 'Overview' ? undefined : s)
 
@@ -62,13 +62,13 @@ export const States: Story = {
           <PatientBreadcrumb className="mb-0" name="John Smith" />
         </Muestra>
         <Muestra titulo="Section" nota="El paciente lleva al Overview.">
-          <PatientBreadcrumb className="mb-0" name="John Smith" section="Relationships & Billing" />
+          <PatientBreadcrumb className="mb-0" name="John Smith" section="Relationships & billing" />
         </Muestra>
-        <Muestra titulo="Edit Patient" nota="El formulario completo cuelga del paciente.">
-          <PatientBreadcrumb className="mb-0" name="John Smith" section="Edit Patient" />
+        <Muestra titulo="Edit patient" nota="El formulario completo cuelga del paciente.">
+          <PatientBreadcrumb className="mb-0" name="John Smith" section="Edit patient" />
         </Muestra>
         <Muestra titulo="Long name, phone" nota="Baja de renglón entre tramos; el nombre no se corta." ancho={240}>
-          <PatientBreadcrumb className="mb-0" name="Maria Abril Viola Fernández" section="Relationships & Billing" />
+          <PatientBreadcrumb className="mb-0" name="Maria Abril Viola Fernández" section="Relationships & billing" />
         </Muestra>
       </div>
     </Lienzo>
@@ -84,7 +84,7 @@ export const Specs: Story = {
           {SECCIONES.map((s) => (
             <tr key={s}>
               <td className="font-semibold">{s}</td>
-              <td className="font-mono text-[12px] text-ink-muted">{s === 'Edit Patient' ? '/patients/:id/edit' : `/patients/:id${s === 'Overview' ? '' : `/${s.split(' ')[0].toLowerCase()}`}`}</td>
+              <td className="font-mono text-[12px] text-ink-muted">{s === 'Edit patient' ? '/patients/:id/edit' : `/patients/:id${s === 'Overview' ? '' : `/${s.split(' ')[0].toLowerCase()}`}`}</td>
               <td className="text-ink-medium">{migasPaciente('John Smith', '/patients/john-smith', seccionDe(s)).map((m) => (m.to ? `${m.label} →` : m.label)).join(' / ')}</td>
             </tr>
           ))}

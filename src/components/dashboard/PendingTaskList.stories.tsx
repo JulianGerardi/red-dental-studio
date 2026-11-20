@@ -5,7 +5,7 @@ import { Bloque, Lienzo, Muestra, Tabla, TablaPartes } from '@/design-system/kit
 import { TARJETA_PANEL } from '@/lib/estilos'
 import { cn } from '@/lib/utils'
 
-const KINDS = ['Clinical Note', 'Lab Orders', 'Prescriptions', 'Referrals']
+const KINDS = ['Clinical note', 'Lab orders', 'Prescriptions', 'Referrals']
 const tareas = (n: number, kinds = KINDS): PendingTask[] =>
   Array.from({ length: n }, (_, i) => ({
     kind: kinds[i % kinds.length]!, state: 'Requested', person: 'Elena Marquez', initials: 'EM',
@@ -55,7 +55,7 @@ export const Parts: Story = {
   render: () => (
     <Lienzo>
       <Bloque nota="Dos grupos con sus filas en una caja y los divisores finos entre una y otra.">
-        <Caja ancho={900}><PendingTaskList tasks={tareas(4, ['Clinical Note', 'Lab Orders'])} /></Caja>
+        <Caja ancho={900}><PendingTaskList tasks={tareas(4, ['Clinical note', 'Lab orders'])} /></Caja>
       </Bloque>
       <TablaPartes partes={[
         ['Group label', 'El tipo y la cuenta, 11px Semibold en versalitas y gris, como Overdue / Due this week en Pending documents.', 'PendingTaskList'],
@@ -79,7 +79,7 @@ export const States: Story = {
           <Caja ancho={900}><PendingTaskList tasks={tareas(3, ['Referrals'])} /></Caja>
         </Muestra>
         <Muestra titulo="Narrow (360px)" nota="El vencimiento y el botón bajan a su renglón; el paciente se corta con elipsis.">
-          <Caja ancho={360}><PendingTaskList tasks={tareas(2, ['Lab Orders'])} /></Caja>
+          <Caja ancho={360}><PendingTaskList tasks={tareas(2, ['Lab orders'])} /></Caja>
         </Muestra>
         <Muestra titulo="Empty" nota="Sin tareas no dibuja nada: el panel muestra su EmptyState.">
           <Caja ancho={600}><PendingTaskList tasks={[]} /><p className="text-[12px] text-ink-muted">(nothing drawn)</p></Caja>

@@ -52,7 +52,7 @@ const meta = {
     tags: false,
     description: 'View and manage all accounts across the platform.',
     action: true,
-    actionLabel: 'New Account',
+    actionLabel: 'New account',
     search: true,
     searchButton: true,
     filter: true,
@@ -154,7 +154,7 @@ export const Anatomy: Story = {
             <Marca n={2} className="w-fit"><h1 className="text-2xl font-bold text-ink">Accounts overview</h1></Marca>
             <Marca n={3} className="w-fit"><p className="text-sm text-ink-muted">View and manage all accounts across the platform.</p></Marca>
           </div>
-          <Marca n={4}><Button><Plus /> New Account</Button></Marca>
+          <Marca n={4}><Button><Plus /> New account</Button></Marca>
         </div>
         <Marca n={5} className="w-fit">
           <div className="flex flex-wrap items-center gap-3 p-1"><Buscador /><SearchButton onClick={() => {}} className="h-9" /><Filtro /></div>

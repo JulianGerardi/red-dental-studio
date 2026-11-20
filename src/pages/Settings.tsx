@@ -29,8 +29,8 @@ export const SETTINGS_ICONS: Record<string, LucideIcon> = {
    de otro modo obliga a abrir el menú flotante del rail. */
 /* Settings → Billing lleva el breadcrumb de red.dev: Settings › Finance › Carriers › Aetna Dental Plans › Edit ›
    Insurance plans › Acme Corp › Edit. Un /new que abre un drawer sobre la lista termina en la lista. */
-const TITULOS_FINANZAS: Record<string, string> = { 'fee-schedule': 'Fee Schedules', carriers: 'Carriers', 'coverage-table': 'Coverage Table' }
-const NUEVO_FINANZAS: Record<string, string> = { 'fee-schedule': 'New Fee Schedule', 'coverage-table': 'New Coverage Table' }
+const TITULOS_FINANZAS: Record<string, string> = { 'fee-schedule': 'Fee schedules', carriers: 'Carriers', 'coverage-table': 'Coverage tables' }
+const NUEVO_FINANZAS: Record<string, string> = { 'fee-schedule': 'New fee schedule', 'coverage-table': 'New coverage table' }
 
 /* Billing sigue la regla del resto de Settings (Julián, 2026-10-09): Settings › Billing › sección › ítem, con el nombre del
    menú y sin un tramo "Edit"; el último no es link. El plan cuelga de su carrier. Ver settings-billing.md. */
@@ -90,7 +90,6 @@ function migasDe(pathname: string, nombreFinanzas: (seccion: string, id: string)
     const cuenta = CUENTAS.find((c) => c.id === detalleCuenta[1])
     migas.push({ label: cuenta?.nombre ?? detalleCuenta[1] })
   }
-  /* Sin tramo propio (Profile, /settings/account, se abre desde el menú de la cuenta) es de primer nivel: sin rastro. */
   return migas.length > 1 ? migas : []
 }
 

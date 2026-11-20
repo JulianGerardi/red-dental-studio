@@ -65,7 +65,7 @@ const METODOS: Metodo[] = [
   { id: 'm7', nombre: 'Insurance Payment - EFT', tipo: 'Insurance' },
 ]
 
-const TABS = ['Adjustments Types', 'Payment Method'] as const
+const TABS = ['Adjustment types', 'Payment methods'] as const
 type Tab = (typeof TABS)[number]
 
 const FILTROS_AJUSTE = ['All', 'Charge', 'Credit', 'Production', 'Collections'] as const
@@ -74,7 +74,7 @@ const FILTROS_METODO = ['All', 'Patient', 'Insurance'] as const
 const TAM_PAGINA = 6
 
 export function SettingsLedgerOptions() {
-  const [tab, setTab] = useState<Tab>('Adjustments Types')
+  const [tab, setTab] = useState<Tab>('Adjustment types')
   const [q, setQ] = useState('')
   const [filtro, setFiltro] = useState<string>('All')
   const [pagina, setPagina] = useState(1)
@@ -85,11 +85,11 @@ export function SettingsLedgerOptions() {
 
   const cambiarTab = (t: Tab) => { setTab(t); setFiltro('All'); setQ(''); setPagina(1) }
 
-  const filtros = tab === 'Adjustments Types' ? FILTROS_AJUSTE : FILTROS_METODO
+  const filtros = tab === 'Adjustment types' ? FILTROS_AJUSTE : FILTROS_METODO
 
   const filas = useMemo(() => {
     const texto = q.trim().toLowerCase()
-    if (tab === 'Adjustments Types') {
+    if (tab === 'Adjustment types') {
       return AJUSTES.filter(
         (a) =>
           (filtro === 'All' || a.direccion === filtro || a.impacto === filtro) &&
@@ -108,12 +108,12 @@ export function SettingsLedgerOptions() {
   return (
     <div className={PADDING_PAGINA}>
       <SettingsPageHeader
-        titulo="Ledger Options"
+        titulo="Ledger options"
         /* La bajada del frame es la de Locations, copiada tal cual. Se
            replica: el contenido va como está. */
       >
-        {/* El frame dice "Search patients" en las dos pestañas, donde no hay pacientes. Se replica. */}
-        <SettingsSearch value={q} onChange={(v) => { setQ(v); setPagina(1) }} placeholder="Search patients" onSearch={() => setPagina(1)} />
+        {/* "Search <lo que lista>": el frame decía "Search patients" en las dos pestañas (corregido 2026-11-20). */}
+        <SettingsSearch value={q} onChange={(v) => { setQ(v); setPagina(1) }} placeholder={tab === 'Adjustment types' ? 'Search adjustment types' : 'Search payment methods'} onSearch={() => setPagina(1)} />
         <select
           value={tab}
           onChange={(e) => cambiarTab(e.target.value as Tab)}
@@ -127,31 +127,30 @@ export function SettingsLedgerOptions() {
       <Tabs className="mt-4" aria-label="Filter options" tabs={filtros} value={filtro} onChange={(f) => { setFiltro(f); setPagina(1) }} />
 
       <div className="mt-4 w-full overflow-x-auto rounded-lg border border-line-row bg-white">
-        <div className={tab === 'Adjustments Types' ? 'min-w-[820px]' : 'min-w-[620px]'}>
-          {tab === 'Adjustments Types' ? (
+        <div className={tab === 'Adjustment types' ? 'min-w-[820px]' : 'min-w-[620px]'}>
+          {tab === 'Adjustment types' ? (
             <div className="flex items-center gap-3 bg-surface-alt px-3 py-3 text-[11px] font-semibold text-ink-muted">
-              <span className="w-[160px] shrink-0">Adjustment Type</span>
+              <span className="w-[160px] shrink-0">Name</span>
               <span className="min-w-[180px] flex-1">Description</span>
               <span className="w-[100px] shrink-0">Category</span>
               <span className="w-[90px] shrink-0">Direction</span>
               <span className="w-[100px] shrink-0">Impact</span>
-              <span className="w-[70px] shrink-0 text-right">Actions</span>
+              <span className="w-[70px] shrink-0 text-right">Enabled</span>
             </div>
           ) : (
             <div className="flex items-center gap-3 bg-surface-alt px-3 py-3 text-[11px] font-semibold text-ink-muted">
               <span className="min-w-[200px] flex-1">Name</span>
-              <span className="w-[110px] shrink-0">Method Type</span>
+              <span className="w-[110px] shrink-0">Method type</span>
               <span className="w-[90px] shrink-0">Status</span>
-              {/* El frame rotula esta columna "Status" otra vez; se usa
-                  "Actions", que es como la llama la otra pestaña para la
-                  misma columna de toggle. */}
-              <span className="w-[70px] shrink-0 text-right">Actions</span>
+              {/* El switch es un estado editable, no una acción: la columna se llama Enabled en las dos pestañas
+                  (propuesta de consistencia, 2026-11-20). */}
+              <span className="w-[70px] shrink-0 text-right">Enabled</span>
             </div>
           )}
 
           {visibles.length === 0 ? (
             <EmptyState icon={SlidersHorizontal} title="Nothing here" detail="Nothing matches the current search or filter." />
-          ) : tab === 'Adjustments Types' ? (
+          ) : tab === 'Adjustment types' ? (
             (visibles as Ajuste[]).map((a) => (
               <div key={a.id} className="flex items-center gap-3 border-t border-line-row px-3 py-3 text-[13px] text-ink-soft">
                 <span className="w-[160px] shrink-0 truncate text-ink" title={a.tipo}>{a.tipo}</span>
@@ -179,7 +178,7 @@ export function SettingsLedgerOptions() {
 
           <div className="flex flex-wrap items-center justify-between gap-3 border-t border-line-row px-3 py-3">
             <span className="text-xs font-semibold text-ink-muted">
-              Showing {filas.length ? (actual - 1) * TAM_PAGINA + 1 : 0} to {(actual - 1) * TAM_PAGINA + visibles.length} of {filas.length} {tab === 'Adjustments Types' ? 'adjustment types' : 'payment methods'}
+              Showing {filas.length ? (actual - 1) * TAM_PAGINA + 1 : 0} to {(actual - 1) * TAM_PAGINA + visibles.length} of {filas.length} {tab === 'Adjustment types' ? 'adjustment types' : 'payment methods'}
             </span>
             <Pagination pagina={actual} paginas={paginas} onChange={setPagina} />
           </div>

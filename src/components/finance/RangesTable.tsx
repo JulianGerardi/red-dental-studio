@@ -46,9 +46,9 @@ export function RangesTable({
   return (
     <div ref={tabla} role="table" aria-label="Coverage ranges" className={TABLA_MARCO}>
       <div role="row" className={cn('hidden gap-3 sm:grid', TABLA_ENCABEZADO, COLUMNAS)}>
-        <span role="columnheader">Code Ranges<span className="text-required">*</span></span>
+        <span role="columnheader">Code ranges<span className="text-required">*</span></span>
         <span role="columnheader">Category<span className="text-required">*</span></span>
-        <span role="columnheader">Deductible Type<span className="text-required">*</span></span>
+        <span role="columnheader">Deductible type<span className="text-required">*</span></span>
         <span role="columnheader">{porcentaje ? 'Coverage %' : 'Copayment'}<span className="text-required">*</span></span>
         <span role="columnheader" title="Exceptions">Exc</span>
         <span role="columnheader"><span className="sr-only">Actions</span></span>
@@ -63,9 +63,9 @@ export function RangesTable({
             className={cn('grid grid-cols-2 gap-3', TABLA_FILA, 'items-start', COLUMNAS, r.id === nuevo && 'motion-safe:animate-[rango-nuevo_1.6s_ease-out]')}
           >
             <div role="cell" className="col-span-2 flex items-start gap-2 sm:col-span-1">
-              <TextField hideLabel label={`Range ${i + 1} from`} placeholder="R. Min" value={r.desde} onChange={(v) => cambiar(r.id, { desde: codigo(v) })} error={falta(r.desde)} className="min-w-0 flex-1" />
+              <TextField hideLabel label={`Range ${i + 1} from`} placeholder="R. min" value={r.desde} onChange={(v) => cambiar(r.id, { desde: codigo(v) })} error={falta(r.desde)} className="min-w-0 flex-1" />
               <span className="pt-2 text-ink-faint">-</span>
-              <TextField hideLabel label={`Range ${i + 1} to`} placeholder="R. Max" value={r.hasta} onChange={(v) => cambiar(r.id, { hasta: codigo(v) })} error={falta(r.hasta)} className="min-w-0 flex-1" />
+              <TextField hideLabel label={`Range ${i + 1} to`} placeholder="R. max" value={r.hasta} onChange={(v) => cambiar(r.id, { hasta: codigo(v) })} error={falta(r.hasta)} className="min-w-0 flex-1" />
             </div>
             <div role="cell" className="col-span-2 sm:col-span-1">
               <TextField hideLabel label={`Range ${i + 1} category`} placeholder="Category" value={r.categoria} onChange={(v) => cambiar(r.id, { categoria: v })} error={falta(r.categoria)} />

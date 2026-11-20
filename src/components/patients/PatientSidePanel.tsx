@@ -29,7 +29,7 @@ const NAV: { key: string; icon: LucideIcon; to?: string }[] = [
   { key: 'Documents', icon: ClipboardList, to: '/documents' },
   /* Handshake: la relación con otras personas y quién se hace cargo de pagar. Antes era Ban, el de "prohibido"
      (patient-dashboard.md, 2026-11-06). */
-  { key: 'Relationships & Billing', icon: Handshake, to: '/relationships' },
+  { key: 'Relationships & billing', icon: Handshake, to: '/relationships' },
 ]
 
 const GENERAL = [
@@ -238,7 +238,7 @@ export function PatientSidePanel({
       {colapsado && (
         <div className="mt-2 hidden flex-col items-center gap-1 lg:flex">
           {/* Un pendiente no se pierde al colapsar: queda como ícono, igual que Clinical Mode. */}
-          {notaPendiente && conTooltip('Pending Signature', <PendingSignatureButton soloIcono onClick={() => setFirmar(true)} />)}
+          {notaPendiente && conTooltip('Pending signature', <PendingSignatureButton soloIcono onClick={() => setFirmar(true)} />)}
           {conTooltip('Clinical Mode', (
             <Link
               to={`${basePath}/clinical-mode`}
@@ -354,7 +354,7 @@ export function PendingSignatureButton({ soloIcono, className, ...props }: React
   return (
     <button
       type="button"
-      aria-label={soloIcono ? 'Pending Signature' : undefined}
+      aria-label={soloIcono ? 'Pending signature' : undefined}
       {...props}
       className={cn(
         'flex items-center justify-center gap-2 bg-purple-bg text-[13px] font-semibold text-purple-fg hover:bg-purple-fg/15',
@@ -364,15 +364,15 @@ export function PendingSignatureButton({ soloIcono, className, ...props }: React
       )}
     >
       <Signature className={cn('shrink-0', soloIcono ? 'size-4' : 'size-3.5')} />
-      {!soloIcono && 'Pending Signature'}
+      {!soloIcono && 'Pending signature'}
     </button>
   )
 }
 
 
 /* Figma (Design System) 7740:12244, con los estados de CON-1612 y las mismas opciones que la barra de Clinical Mode
-   (clinical-mode.md, 2026-11-13): sin empezar "Start Encounter" (lleva a Clinical Mode, CON-2994), en curso "Complete
-   Encounter" y en pausa "Pending Encounter" en ámbar. El estado es uno solo para la ficha y Clinical Mode.
+   (clinical-mode.md, 2026-11-13): sin empezar "Start encounter" (lleva a Clinical Mode, CON-2994), en curso "Complete
+   Encounter" y en pausa "Pending encounter" en ámbar. El estado es uno solo para la ficha y Clinical Mode.
 
    El verde queda en #1e9850, el de la plataforma, y no en el #28c563 del
    design system: es el mismo botón que el popup del paciente, que Julián pidió
@@ -380,9 +380,9 @@ export function PendingSignatureButton({ soloIcono, className, ...props }: React
    frame lo pone en blanco y sobre ese fondo no se lee. */
 const VERDE = 'bg-green text-white hover:bg-green-deep'
 const ENCUENTRO: Record<EstadoEncuentro, { label: string; clase: string; icono: React.ReactNode }> = {
-  sinEmpezar: { label: 'Start Encounter', clase: VERDE, icono: <Play className="size-3.5 shrink-0" /> },
-  enCurso: { label: 'Complete Encounter', clase: VERDE, icono: <CircleCheck className="size-3.5 shrink-0" /> },
-  enPausa: { label: 'Pending Encounter', clase: 'bg-amber text-amber-fg hover:bg-amber-hover', icono: <Pause className="size-3.5 shrink-0" /> },
+  sinEmpezar: { label: 'Start encounter', clase: VERDE, icono: <Play className="size-3.5 shrink-0" /> },
+  enCurso: { label: 'Complete encounter', clase: VERDE, icono: <CircleCheck className="size-3.5 shrink-0" /> },
+  enPausa: { label: 'Pending encounter', clase: 'bg-amber text-amber-fg hover:bg-amber-hover', icono: <Pause className="size-3.5 shrink-0" /> },
 }
 
 /** Deja el botón de encuentro en un estado desde afuera (Storybook). */

@@ -40,13 +40,13 @@ export function NewRoomModal({
 
   return (
     <ModalShell
-      title={inicial ? 'Edit Room' : 'New Room'}
+      title={inicial ? 'Edit room' : 'New room'}
       description="Rooms can be booked for appointments during the location's working hours."
       onClose={onClose}
       width="max-w-[560px]"
       actions={<DrawerActions onCancel={onClose} onSave={guardar} />}
     >
-      <DrawerSection title="General Information">
+      <DrawerSection title="General information">
         <div className="grid gap-4 sm:grid-cols-2">
           <TextField label="Name" required placeholder="Operatory 1" value={nombre} onChange={setNombre} error={errorNombre} />
           <TextField label="Abbreviation" placeholder="OP1" value={abrev} onChange={setAbrev} />

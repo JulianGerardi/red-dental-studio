@@ -40,7 +40,7 @@ type Story = StoryObj<Args>
 
 function Unidad({ unit, error, disabled }: { unit: string; error?: boolean; disabled?: boolean }) {
   const [v, setV] = useState(30)
-  return <UnitField label="Expected Period of Insurance Claim Resolution" required unit={unit} value={v} onChange={setV} disabled={disabled} error={error ? 'This field is required.' : undefined} />
+  return <UnitField label="Expected period of insurance claim resolution" required unit={unit} value={v} onChange={setV} disabled={disabled} error={error ? 'This field is required.' : undefined} />
 }
 function Telefonos({ codigo, error }: { codigo: string; error?: boolean }) {
   const [t, setT] = useState<Telefono>({ ...TELEFONO_VACIO, codigo, area: '800', numero: '4517715' })

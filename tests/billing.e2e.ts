@@ -3,7 +3,7 @@ import { expect } from 'e2e'
 
 /* Billing: resumen de la clínica y vista de un paciente. Ver design-reference/figma/modulos/billing.md. */
 
-test('Elegir un paciente muestra sólo lo suyo, Patient / Guarantor View y los botones; la X vuelve al resumen', async ({ app, screen }) => {
+test('Elegir un paciente muestra sólo lo suyo, Patient / Guarantor view y los botones; la X vuelve al resumen', async ({ app, screen }) => {
   await app.open('/billing')
   await expect(screen.getByRole('button', /Patient Payment/)).toHaveCount(0)
   await expect(screen.getByText(/Showing 1 to 8 of 21 results/)).toBeVisible()
@@ -11,33 +11,33 @@ test('Elegir un paciente muestra sólo lo suyo, Patient / Guarantor View y los b
   const maria = screen.getByRole('button', /Maria Abril Viola/)
   await maria.tap()
   await expect(maria).toHaveAttribute('aria-current', 'true')
-  await expect(screen.getByRole('heading', 'Maria Abril Viola — Recent Billing Activity')).toBeVisible()
+  await expect(screen.getByRole('heading', 'Maria Abril Viola — Recent billing activity')).toBeVisible()
   await expect(screen.getByText(/Patient · Guarantor: John Hayes/)).toBeVisible()
   await expect(screen.getByRole('button', /Patient Payment/)).toBeVisible()
   await expect(screen.getByText(/Showing 1 to 2 of 2 results/)).toBeVisible()
 
-  await screen.getByRole('tab', 'Guarantor View').tap()
+  await screen.getByRole('tab', 'Guarantor view').tap()
   await expect(screen.getByText(/Showing 1 to 8 of 8 results/)).toBeVisible()
 
   await screen.getByRole('button', 'Clear selected patient').tap()
-  await expect(screen.getByRole('heading', 'Recent Billing Activity')).toBeVisible()
+  await expect(screen.getByRole('heading', 'Recent billing activity')).toBeVisible()
   await expect(screen.getByRole('button', /Patient Payment/)).toHaveCount(0)
   await expect(screen.getByText(/Showing 1 to 8 of 21 results/)).toBeVisible()
   await expect(maria).not.toHaveAttribute('aria-current')
 })
 
-test('En el resumen, una fila abre la vista de ese paciente en Patient View', async ({ app, screen }) => {
+test('En el resumen, una fila abre la vista de ese paciente en Patient view', async ({ app, screen }) => {
   await app.open('/billing')
   await screen.getByRole('row', /Lucía Paz/).first().tap()
-  await expect(screen.getByRole('heading', 'Lucía Paz — Recent Billing Activity')).toBeVisible()
-  await expect(screen.getByRole('tab', 'Patient View')).toHaveAttribute('aria-selected', 'true')
+  await expect(screen.getByRole('heading', 'Lucía Paz — Recent billing activity')).toBeVisible()
+  await expect(screen.getByRole('tab', 'Patient view')).toHaveAttribute('aria-selected', 'true')
   await expect(screen.getByText(/Showing 1 to 2 of 2 results/)).toBeVisible()
 })
 
 test('El círculo de info de un número explica qué cuenta', async ({ app, screen }) => {
   await app.open('/billing')
   await expect(screen.getByText(/Open charge balances older than 30 days/)).toHaveCount(0)
-  await screen.getByRole('button', /^Overdue Balance:/).hover()
+  await screen.getByRole('button', /^Overdue balance:/).hover()
   await expect(screen.getByText(/^Open charge balances older than 30 days\.$/)).toBeVisible()
 })
 
@@ -58,7 +58,7 @@ test('Billing en el menú lateral va directo a su pantalla; sus tablas están s�
   await app.open('/')
   await expect(screen.getByRole('button', 'Billing menu')).toHaveCount(0)
   await screen.getByRole('link', 'Billing').first().hover()
-  await expect(screen.getByRole('link', 'Fee Schedules')).toHaveCount(0)
+  await expect(screen.getByRole('link', 'Fee schedules')).toHaveCount(0)
   await screen.getByRole('link', 'Billing').first().tap()
   await expect(screen.getByRole('heading', 'Billing')).toBeVisible()
 
@@ -68,9 +68,9 @@ test('Billing en el menú lateral va directo a su pantalla; sus tablas están s�
   await expect(screen.getByRole('heading', 'Carriers')).toBeVisible()
 })
 
-/* Find Patient mide cuántas filas enteras entran en el alto de Recent Billing Activity (llenarAlto, no un número
+/* Find patient mide cuántas filas enteras entran en el alto de Recent billing activity (llenarAlto, no un número
    fijo: billing.md, 2026-10-19) y "Show N more" abre el resto con scroll adentro. */
-test('Find Patient muestra algunos pacientes y Show more abre el resto', async ({ app, screen }) => {
+test('Find patient muestra algunos pacientes y Show more abre el resto', async ({ app, screen }) => {
   await app.open('/billing')
   const filas = screen.getByRole('button', /Las payment/)
   const antes = await filas.count()
@@ -108,7 +108,7 @@ test('Cada botón abre su drawer, como red.dev, y lo posteado aparece en la tabl
 
   await screen.getByRole('button', /Charge Adjustment \(\+\)/).tap()
   let drawer = screen.getByRole('dialog')
-  await expect(drawer.getByRole('heading', 'Enter Charge (+) Adjustment')).toBeVisible()
+  await expect(drawer.getByRole('heading', 'Enter charge (+) adjustment')).toBeVisible()
   await drawer.getByRole('button', /^Save/).tap()
   await expect(drawer.getByText(/This field is required/)).toBeVisible()
   await drawer.getByRole('textbox', /Amount/).fill('25')
@@ -117,14 +117,14 @@ test('Cada botón abre su drawer, como red.dev, y lo posteado aparece en la tabl
 
   await screen.getByRole('button', /Patient Payment \(-\)/).tap()
   drawer = screen.getByRole('dialog')
-  await expect(drawer.getByRole('heading', 'New Patient Payment (-)')).toBeVisible()
+  await expect(drawer.getByRole('heading', 'New patient payment (-)')).toBeVisible()
   await drawer.getByRole('button', 'Add another payment method').tap()
   /* Con dos métodos, los dos llevan − (como red.dev). */
   await expect(drawer.getByRole('button', 'Remove this payment method')).toHaveCount(2)
   await drawer.getByRole('button', 'Remove this payment method').last().tap()
   await drawer.getByRole('textbox', /Amount/).fill('40')
   /* Patient Payment es un solo paso: el reparto se ve junto al importe (ledger.md, 2026-11-19). */
-  await expect(drawer.getByText('Ledger Transactions')).toBeVisible()
+  await expect(drawer.getByText('Ledger transactions')).toBeVisible()
   await drawer.getByRole('button', /^Save/).tap()
   await expect(screen.getByText(/Cash Payment of \$40\.00 posted for Maria Abril Viola/)).toBeVisible()
   await expect(screen.getByText(/Showing 1 to 4 of 4 results/)).toBeVisible()

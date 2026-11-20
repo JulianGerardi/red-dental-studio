@@ -7,7 +7,7 @@ import type { PendingTask } from './PendingTaskCard'
    rótulo en versalitas y la cuenta, y las filas en una sola caja con divisores finos. Los primeros `limit` y "Show N
    more" abre el resto con scroll adentro (ui/show-more). La usan Pending Task del Dashboard y del Patient Dashboard.
    Ver design-reference/figma/modulos/dashboard.md. */
-const ORDEN = ['Clinical Note', 'Lab Orders', 'Prescriptions', 'Referrals']
+const ORDEN = ['Clinical note', 'Lab orders', 'Prescriptions', 'Referrals']
 
 export function PendingTaskList({ tasks, limit, enCaja, llenarAlto, cargarAlScroll }: { tasks: PendingTask[]; limit?: number; enCaja?: boolean; llenarAlto?: boolean; cargarAlScroll?: boolean }) {
   const tipos = [...new Set([...ORDEN.filter((k) => tasks.some((t) => t.kind === k)), ...tasks.map((t) => t.kind)])]

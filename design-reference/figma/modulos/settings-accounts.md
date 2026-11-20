@@ -168,3 +168,13 @@ valor en negro y bajada. Mismos textos y datos; 2 + 2 en angosto, cuatro en fila
    Login y de las páginas vacías (son tarjetas, no títulos de pantalla) y la página de mails para el backend.
 3. El menú de Settings del rail también saca Parameters, Libraries, Patient Portal y Security, y sus rutas
    (Julián, mismo día). Quedan como "Coming soon" Roles y Preferences.
+
+## Una clínica ve sólo su cuenta: Account abre Edit Account (2026-11-20)
+
+Julián, con un video de la app real: *"Lo de accounts overview está mal: sólo se puede ver la info de una sola"* cuenta.
+En la app real Settings › Account abre directo **Edit Account** (Information / Subscription / Owner) con el rastro
+Settings › Account. Cambios: el ítem del menú y la card del overview dicen **Account** y van a `/settings/account`; esa
+pantalla tiene breadcrumb; `/settings/accounts` y `/settings/accounts/:id` redirigen a `/settings/account`.
+`SettingsAccounts` (la lista) queda sin ruta en `Accounts.tsx`, que sigue exportando los datos y lo que usan
+NewAccountDrawer y ManageLicensesDrawer. El flujo de Figma `scripts/figma/flujos/settings-accounts.mjs` todavía captura
+la lista: actualizarlo al documentar.

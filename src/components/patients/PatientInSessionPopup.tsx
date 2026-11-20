@@ -65,7 +65,7 @@ const slug = (s: string) => s.toLowerCase().trim().replace(/\s+/g, '-')
    2. Era una card fija abajo a la derecha que tapaba filas de la tabla o de
       Recent Patients, y cerrarla con la X la perdía hasta recargar.
    3. Moverla debajo de la campana (arriba a la derecha) no alcanzaba: ahí
-      arriba empieza el panel "Today Appointments", así que una card fija de
+      arriba empieza el panel "Today appointments", así que una card fija de
       este tamaño terminaba tapándole el encabezado igual -no hay hueco
       vacío ahí, sólo se corre el problema unos px-, y además competía con el
       botón "+ New Patient", que vive en esa misma esquina.

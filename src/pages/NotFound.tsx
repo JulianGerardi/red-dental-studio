@@ -12,7 +12,7 @@ export default function NotFound() {
         to="/"
         className={buttonClasses({ className: 'mt-6' })}
       >
-        Go to Homepage
+        Go to homepage
       </Link>
     </div>
   )

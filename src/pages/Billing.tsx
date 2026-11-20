@@ -65,9 +65,9 @@ type ColBilling = 'fecha' | 'codigo' | 'paciente' | 'tipo' | 'desc' | 'provider'
 /* Trans. Bal.: lo que falta del cargo, como el Ledger; un pago o crédito no tiene saldo propio (—). */
 const esCargo = (m: Movimiento) => m.tipo !== 'Insurance' && m.monto > 0
 const TODAS: Record<ColBilling, DataTableColumn<FilaBilling>> = {
-  fecha: { key: 'fecha', header: 'Trans. Date', width: 92, locked: true, cell: (m) => m.fecha },
-  codigo: { key: 'codigo', header: 'CDT Code', width: 64, cell: (m) => <span className="text-[12px] font-medium">{m.tipo === 'Charge' ? m.codigo : '—'}</span> },
-  paciente: { key: 'paciente', header: 'Patient / Account', width: 120, cell: (m) => <TextCell>{m.paciente}</TextCell> },
+  fecha: { key: 'fecha', header: 'Trans. date', width: 92, locked: true, cell: (m) => m.fecha },
+  codigo: { key: 'codigo', header: 'CDT code', width: 64, cell: (m) => <span className="text-[12px] font-medium">{m.tipo === 'Charge' ? m.codigo : '—'}</span> },
+  paciente: { key: 'paciente', header: 'Patient / account', width: 120, cell: (m) => <TextCell>{m.paciente}</TextCell> },
   tipo: {
     key: 'tipo', header: 'Type', width: 92, cell: (m) => {
       const t = detalleTipo(m)
@@ -86,7 +86,7 @@ const TODAS: Record<ColBilling, DataTableColumn<FilaBilling>> = {
   provider: { key: 'provider', header: 'Provider', width: 104, cell: (m) => <TextCell>{m.provider}</TextCell> },
   monto: { key: 'monto', header: 'Amount', width: 84, align: 'right', locked: true, cell: (m) => <AmountCell value={m.monto} /> },
   pendiente: {
-    key: 'pendiente', header: 'Trans. Bal.', width: 80, align: 'right',
+    key: 'pendiente', header: 'Trans. bal.', width: 80, align: 'right',
     cell: (m) => (esCargo(m) ? <span className="tabular-nums">{moneda(pendienteDe(m, APLICACIONES_BILLING))}</span> : <span className="text-ink-faint">—</span>),
   },
   estado: { key: 'estado', header: 'Status', width: 72, cell: (m) => <Pill tone={m.estado === 'Pending' ? 'warning' : 'neutral'} size="sm">{m.estado}</Pill> },
@@ -105,7 +105,7 @@ const columnasDe = (vistaPaciente: boolean) =>
 function exportarCsv(filas: Movimiento[]) {
   const celda = (v: string) => `"${v.replaceAll('"', '""')}"`
   const lineas = [
-    ['Trans. Date', 'Patient / Account', 'Type', 'Description', 'Provider', 'Amount', 'Trans. Bal.', 'Status'],
+    ['Trans. date', 'Patient / account', 'Type', 'Description', 'Provider', 'Amount', 'Trans. bal.', 'Status'],
     ...filas.map((m) => [
       m.fecha, m.paciente, detalleTipo(m).texto, m.descripcion, m.provider, moneda(m.monto),
       esCargo(m) ? moneda(pendienteDe(m, APLICACIONES_BILLING)) : '', m.estado,
@@ -201,12 +201,12 @@ export function ActividadReciente({
   const [enModal, setEnModal] = useState<(Movimiento & { saldo: number }) | null>(null)
   /* Columns va en el encabezado, al lado de las Tabs, como red.dev: la tabla recibe las ocultas de afuera. */
   const [ocultas, setOcultas] = useState<string[]>([])
-  const columnas = columnasDe(!!paciente && vista === 'Patient View')
+  const columnas = columnasDe(!!paciente && vista === 'Patient view')
   const elegibles = columnas.filter((c) => !c.locked)
   const ver = (x: Movimiento) => setEnModal(filas.find((f) => f.id === x.id) ?? ACTIVIDAD_RECIENTE.find((f) => f.id === x.id) ?? null)
   return (
     <Panel
-      title={paciente ? `${paciente.nombre} — Recent Billing Activity` : 'Recent Billing Activity'}
+      title={paciente ? `${paciente.nombre} — Recent billing activity` : 'Recent billing activity'}
       className={cn('min-w-0', className)}
       controls={
         <div className="flex flex-wrap items-center gap-2">
@@ -275,14 +275,14 @@ export function BuscarPaciente({ busqueda, onBusqueda, paciente, saldoDe, onEleg
   const resultados = buscarPacientes(busqueda)
   return (
     <Panel
-      title="Find Patient"
+      title="Find patient"
       className={cn(TITULO_PEGADO, className)}
       bodyClassName="min-h-0 gap-2 pt-0"
       top={<div aria-live="polite">{paciente && <PacienteElegido key={paciente.nombre} paciente={paciente} onCerrar={onCerrar} />}</div>}
     >
       <SearchInput
         size="sm" clearable value={busqueda} onChange={onBusqueda}
-        placeholder="Search by Name, Last Name, Email or DOB" aria-label="Find patient"
+        placeholder="Search by name, last name, email or DOB" aria-label="Find patient"
         className="flex-none shrink-0 sm:max-w-none"
       />
 
@@ -316,9 +316,9 @@ export function AccionesPaciente({ onAccion }: {
 }) {
   return (
     <div className={cn('flex flex-wrap items-center gap-2', ENTRADA)}>
-      <Button size="md" onClick={() => onAccion('Patient Payment')}><Wallet /> Patient Payment (-)</Button>
-      <Button size="md" onClick={() => onAccion('Credit Adjustment')}><MinusCircle /> Credit Adjustment (-)</Button>
-      <Button size="md" onClick={() => onAccion('Charge Adjustment')}><PlusCircle /> Charge Adjustment (+)</Button>
+      <Button size="md" onClick={() => onAccion('Patient Payment')}><Wallet /> Patient payment (-)</Button>
+      <Button size="md" onClick={() => onAccion('Credit Adjustment')}><MinusCircle /> Credit adjustment (-)</Button>
+      <Button size="md" onClick={() => onAccion('Charge Adjustment')}><PlusCircle /> Charge adjustment (+)</Button>
     </div>
   )
 }
@@ -335,7 +335,7 @@ export default function Billing({ inicial }: {
   const [filtro, setFiltro] = useState<FiltroActividad>(inicial?.filtro ?? 'All')
   const [busqueda, setBusqueda] = useState(inicial?.busqueda ?? '')
   const [seleccionado, setSeleccionado] = useState<string | null>(inicial?.seleccionado ?? null)
-  const [vista, setVista] = useState<VistaPaciente>(inicial?.vista ?? 'Patient View')
+  const [vista, setVista] = useState<VistaPaciente>(inicial?.vista ?? 'Patient view')
   const [modal, setModal] = useState<TipoAjusteBilling | null>(null)
   const refElegido = useRef<HTMLDivElement>(null)
   const subir = useRef(false)
@@ -347,14 +347,14 @@ export default function Billing({ inicial }: {
   /* Resumen: por tipo. Paciente: lo suyo (Patient View) o todo lo de su garante (Guarantor View). */
   const filas = useMemo(() => {
     if (!seleccionado) return actividad.filter((m) => coincideFiltro(m, filtro))
-    const quienes = vista === 'Guarantor View' ? grupo.map((p) => p.nombre) : [seleccionado]
+    const quienes = vista === 'Guarantor view' ? grupo.map((p) => p.nombre) : [seleccionado]
     return actividad.filter((m) => quienes.includes(m.paciente))
   }, [actividad, filtro, seleccionado, vista, grupo])
 
   /* Cada paciente nuevo arranca en Patient View. */
   const elegir = (nombre: string) => {
     setSeleccionado(nombre)
-    setVista('Patient View')
+    setVista('Patient view')
   }
   /* En el celular Find Patient queda debajo de la tabla: al elegir ahí se sube hasta sus botones (billing.md). */
   const elegirDeLaLista = (nombre: string) => {
@@ -451,7 +451,7 @@ export default function Billing({ inicial }: {
           aplicaciones={APLICACIONES_BILLING}
           garante={garanteDe}
           dependientes={grupo.filter((p) => p.nombre !== garanteDe).map((p) => p.nombre)}
-          alcanceInicial={vista === 'Guarantor View' ? ALCANCE_GUARANTOR : seleccionado}
+          alcanceInicial={vista === 'Guarantor view' ? ALCANCE_GUARANTOR : seleccionado}
           hoy={HOY}
           providers={[...PROVIDERS_BILLING]}
           onClose={() => setModal(null)}

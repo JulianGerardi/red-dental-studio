@@ -40,7 +40,7 @@ export default function Scheduling() {
     () => (typeof window !== 'undefined' && window.innerWidth < 768 ? 'Day' : 'Week'),
   )
   const [fecha, setFecha] = useState(FECHA_ANCLA)
-  const [reqTab, setReqTab] = useState<'ASAP' | 'Waiting List'>('ASAP')
+  const [reqTab, setReqTab] = useState<'ASAP' | 'Waiting list'>('ASAP')
   /* Arranca cerrado: el panel de solicitudes es el estado desplegado del FAB
      y aparecía solo al entrar a Scheduling. */
   const [reqOpen, setReqOpen] = useState(false)
@@ -235,7 +235,7 @@ export default function Scheduling() {
             fullWidth
             className="mt-3 shrink-0"
             aria-label="Request type"
-            tabs={(['ASAP', 'Waiting List'] as const).map((t) => ({ value: t, count: solicitudes.filter((x) => x.tipo === t).length }))}
+            tabs={(['ASAP', 'Waiting list'] as const).map((t) => ({ value: t, count: solicitudes.filter((x) => x.tipo === t).length }))}
             value={reqTab}
             onChange={setReqTab}
           />
@@ -338,7 +338,7 @@ export function SolicitudCard({
   return (
     <TarjetaTurno
       tono={urgente ? 'danger' : 'info'}
-      etiqueta={urgente ? 'ASAP' : (s.espera ?? 'Waiting List')}
+      etiqueta={urgente ? 'ASAP' : (s.espera ?? 'Waiting list')}
       nombre={s.patient}
       motivo={s.reason}
       cuando={`${fechaLegible(s.date)} · ${s.start} - ${s.end}`}

@@ -63,10 +63,10 @@ export function SettingsLocations({ nuevo = false }: { nuevo?: boolean }) {
         <DataTable
           columns={[
             /* El nombre es el acceso, como en la tabla de pacientes. */
-            { key: 'nombre', header: 'Location name', width: 180, cell: (l) => <TextCell>{l.nombre}</TextCell> },
+            { key: 'nombre', header: 'Name', width: 180, cell: (l) => <TextCell>{l.nombre}</TextCell> },
             { key: 'empleados', header: 'Employees', width: 100, cell: (l) => l.empleados },
-            { key: 'salas', header: 'Room', width: 80, cell: (l) => l.salas },
-            { key: 'info', header: 'Information', cell: (l) => <TextCell>{l.info}</TextCell> },
+            { key: 'salas', header: 'Rooms', width: 80, cell: (l) => l.salas },
+            { key: 'info', header: 'Address', cell: (l) => <TextCell>{l.info}</TextCell> },
           ]}
           rows={visibles}
           rowKey={(l) => l.id}

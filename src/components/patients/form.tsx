@@ -94,11 +94,11 @@ const OPCIONES: Record<string, string[]> = {
   Relationship: ['Parent', 'Legal guardian', 'Sibling', 'Spouse'],
   Guardian: ['Mara Otero', 'Elias Aguirre', 'Nadia Duarte'],
   Requestor: ['Front desk', 'Provider', 'Patient', 'Referral'],
-  'Reason for Visit': ['Consultation', 'Routine cleaning', 'Emergency', 'Follow-up'],
+  'Reason for visit': ['Consultation', 'Routine cleaning', 'Emergency', 'Follow-up'],
   Operatory: ['Operatory 1', 'Operatory 2', 'Operatory 3'],
   Status: ['Proposed', 'Check-in', 'Booked', 'In progress', 'Fulfilled'],
-  'Start Time': ['08:00 AM', '09:00 AM', '10:00 AM', '11:00 AM', '12:00 PM'],
-  'End Time': ['09:00 AM', '10:00 AM', '11:00 AM', '12:00 PM', '01:00 PM'],
+  'Start time': ['08:00 AM', '09:00 AM', '10:00 AM', '11:00 AM', '12:00 PM'],
+  'End time': ['09:00 AM', '10:00 AM', '11:00 AM', '12:00 PM', '01:00 PM'],
 }
 const OPCIONES_GENERICAS = ['Option A', 'Option B', 'Option C']
 
@@ -253,7 +253,7 @@ export function SelectField({
 
 /* El código de país de un teléfono: los 245 países, con su bandera y un buscador por nombre o código (Julián,
    2026-11-04; patients.md). Un valor viejo ("+1", "(+1) United States of America (the)") se muestra como su país. */
-export function CountryCodeField({ label = 'Country Code', value, ...props }: Omit<React.ComponentProps<typeof SelectField>, 'icono' | 'label' | 'options' | 'buscable'> & { label?: string }) {
+export function CountryCodeField({ label = 'Country code', value, ...props }: Omit<React.ComponentProps<typeof SelectField>, 'icono' | 'label' | 'options' | 'buscable'> & { label?: string }) {
   return (
     <SelectField
       {...props} label={label} options={OPCIONES_CODIGO} buscable buscarPlaceholder="Search country or code"
@@ -563,7 +563,7 @@ const normalizar = (t: string) => t.normalize('NFD').replace(/[\u0300-\u036f]/g,
    en el input y la card debajo, repitiendo lo mismo. Sin resultados mientras no se escribe nada.
    "Elegida" sale sólo de comparar `value` contra `personas` (no hay estado propio). Ver design-reference/design-system.md. */
 export function PersonSearchField({
-  label, required, className, personas = [], value = '', onChange, error, placeholder = 'Search by Name', hint, disabled, emptyText,
+  label, required, className, personas = [], value = '', onChange, error, placeholder = 'Search by name', hint, disabled, emptyText,
   nombre: nombreDe = (v) => v, texto, subtitulo, chips,
 }: {
   label: string

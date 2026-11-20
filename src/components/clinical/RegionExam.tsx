@@ -8,7 +8,7 @@ const HOY = '05/14/2026'
 
 /* Estados que cuentan como "la región tiene una condition activa" en el gráfico: lo mismo que marca una FindingCard
    en cualquier otro examen. */
-const ACTIVOS = new Set(['Active', 'Monitoring', 'In Treatment'])
+const ACTIVOS = new Set(['Active', 'Monitoring', 'In treatment'])
 
 /* Extraoral e Intraoral: un gráfico de regiones reemplaza el odontograma. Clickear una región la agrega a "pending"
    -se puede elegir más de una antes de cargar la condition-; Add Condition abre el drawer propio (RegionConditionDrawer,

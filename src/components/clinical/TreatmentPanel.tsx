@@ -126,7 +126,7 @@ export function WorkflowCard({
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-[180px]">
           <DropdownMenuLabel className="text-[12px] font-semibold text-ink">Workflow</DropdownMenuLabel>
-          <DropdownMenuItem onSelect={onElegir} className="gap-2 text-[13px]"><Eye className="size-4 text-ink-muted" /> View Workflow</DropdownMenuItem>
+          <DropdownMenuItem onSelect={onElegir} className="gap-2 text-[13px]"><Eye className="size-4 text-ink-muted" /> View workflow</DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
     </div>
@@ -218,7 +218,7 @@ const procedimientosDe = (c: Caso) => c.visitas.flatMap((v) => v.procedimientos)
 function MenuProcedimiento({ p, onTreatmentPlan }: { p: Procedimiento; onTreatmentPlan?: () => void }) {
   return (
     <RowActionsMenu label={`${p.codigo} ${p.nombre}`}>
-      <DropdownMenuItem onSelect={() => onTreatmentPlan?.()} className="text-[13px]">Open in Treatment Plan</DropdownMenuItem>
+      <DropdownMenuItem onSelect={() => onTreatmentPlan?.()} className="text-[13px]">Open in treatment plan</DropdownMenuItem>
     </RowActionsMenu>
   )
 }
@@ -314,7 +314,7 @@ export function TreatmentPanel({ onTreatmentPlan }: { onTreatmentPlan?: () => vo
             <div className="relative">
               <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-ink-faint" />
               <input
-                value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search a section by Name" aria-label="Search a section by Name"
+                value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search a section by name" aria-label="Search a section by name"
                 className="focus:border-dash-blue h-9 w-full rounded-md border border-line bg-white pr-3 pl-9 text-[13px] shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] placeholder:text-ink-faint focus:outline-none"
               />
             </div>
@@ -366,11 +366,11 @@ export function TreatmentPanel({ onTreatmentPlan }: { onTreatmentPlan?: () => vo
 
           <footer className="mt-auto flex flex-wrap justify-end gap-2 px-4 pb-4">
             <Button variant="secondary" size="md" onClick={() => setEditor(true)} className="bg-dash-count-bg text-dash-blue border-transparent hover:bg-info-bg">
-              <Sparkles /> {estado.narrativa ? 'Edit Narrative' : 'Generate Narrative'}
+              <Sparkles /> {estado.narrativa ? 'Edit narrative' : 'Generate narrative'}
             </Button>
             <ConAyuda texto={!pasoAbierto ? 'Open a step to save it' : pasoListo(pasoAbierto, r) ? `Save ${pasoAbierto.nombre}` : 'Answer the required questions to save this step'}>
               <span className="inline-flex">
-                <Button size="md" disabled={!pasoAbierto || !pasoListo(pasoAbierto, r)} onClick={guardar}>Save Step</Button>
+                <Button size="md" disabled={!pasoAbierto || !pasoListo(pasoAbierto, r)} onClick={guardar}>Save step</Button>
               </span>
             </ConAyuda>
           </footer>

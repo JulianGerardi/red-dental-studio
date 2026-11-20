@@ -12,7 +12,7 @@ export type PacienteBilling = {
 }
 
 /* El Figma repite "Maria Abril Viola" 5 veces con el mismo balance en
-   "Find Patient": acá cada resultado es distinto -ver billing.md, anomalía
+   "Find patient": acá cada resultado es distinto -ver billing.md, anomalía
    documentada. "John Hayes" y "Brent Crosby" se mantienen porque son los
    nombres que ya aparecen en el resto del frame (tabla y modal). */
 export const PACIENTES_BILLING: PacienteBilling[] = [
@@ -132,20 +132,20 @@ export const FILTROS_ACTIVIDAD = ['All', 'Payments', 'Adjustments', 'Today'] as 
 export type FiltroActividad = (typeof FILTROS_ACTIVIDAD)[number]
 
 /* Con un paciente elegido, las Tabs de Recent Billing Activity pasan a elegir de quién se ven los movimientos (red.dev). */
-export const VISTAS_PACIENTE = ['Patient View', 'Guarantor View'] as const
+export const VISTAS_PACIENTE = ['Patient view', 'Guarantor view'] as const
 export type VistaPaciente = (typeof VISTAS_PACIENTE)[number]
 
 /** `info`: el texto del círculo de info (InfoTip). Los de arriba son los de red.dev (billing.md, 2026-10-09). */
 export type StatBilling = { label: string; value: string; caption: string; info?: string }
 
-/* "Overdue Balance" repetía el valor exacto de "Insurance A/R" en el Figma
+/* "Overdue balance" repetía el valor exacto de "Insurance A/R" en el Figma
    -ver billing.md, anomalía documentada y corregida acá. */
 export const STATS_BILLING: StatBilling[] = [
   { label: 'Total A/R', value: '$2,131.86', caption: 'Across patient and insurance balances', info: "Sum of the remaining total balance of the location's open charges." },
   { label: 'Guarantor A/R', value: '$7,411.30', caption: 'Outstanding guarantor responsibility', info: "Sum of the remaining guarantor balance of the location's open charges." },
   { label: 'Insurance A/R', value: '$9,896.66', caption: 'Carrier receivables not yet resolved', info: "Sum of the remaining insurance balance of the location's open charges." },
-  { label: 'Overdue Balance', value: '$1,845.20', caption: 'Accounts past due needing follow-up', info: 'Open charge balances older than 30 days.' },
-  { label: 'Guarantors with Open Charges', value: '128', caption: 'Guarantors with a remaining balance', info: 'Ledgers whose charges at this location still carry a positive guarantor balance.' },
+  { label: 'Overdue balance', value: '$1,845.20', caption: 'Accounts past due needing follow-up', info: 'Open charge balances older than 30 days.' },
+  { label: 'Guarantors with open charges', value: '128', caption: 'Guarantors with a remaining balance', info: 'Ledgers whose charges at this location still carry a positive guarantor balance.' },
 ]
 
 /** El "hoy" de los datos de prueba: el día del último movimiento. Lo usan el filtro Today y la card Today. */
@@ -157,7 +157,7 @@ const plata = (n: number) => `$${n.toLocaleString('en-US', { minimumFractionDigi
 /* Today sale de los movimientos de HOY_BILLING, en plata como red.dev (antes eran números sueltos del Figma). Etiquetas y
    bajadas de red.dev; los mensajes de info de Adjustments y Unapplied siguen siendo propuesta (billing.md, 2026-11-13). */
 export const STATS_HOY: StatBilling[] = [
-  { label: 'Payments Posted Today', value: plata(sumaHoy((m) => (m.tipo === 'Payment' || m.tipo === 'Insurance' ? -m.monto : 0))), caption: 'Patient and insurance posting activity', info: 'Sum of payment transactions posted today (practice timezone).' },
-  { label: 'Adjustments Created Today', value: plata(sumaHoy((m) => (m.tipo === 'Adjustment' ? Math.abs(m.monto) : 0))), caption: 'Charge and credit adjustments', info: 'Credit and charge adjustments created today (practice timezone).' },
-  { label: 'Unapplied Credits', value: plata(sumaHoy((m) => m.creditoDisponible ?? 0)), caption: 'Credits not yet applied to charges', info: 'Payments and credits received that are not applied to a charge yet.' },
+  { label: 'Payments posted today', value: plata(sumaHoy((m) => (m.tipo === 'Payment' || m.tipo === 'Insurance' ? -m.monto : 0))), caption: 'Patient and insurance posting activity', info: 'Sum of payment transactions posted today (practice timezone).' },
+  { label: 'Adjustments created today', value: plata(sumaHoy((m) => (m.tipo === 'Adjustment' ? Math.abs(m.monto) : 0))), caption: 'Charge and credit adjustments', info: 'Credit and charge adjustments created today (practice timezone).' },
+  { label: 'Unapplied credits', value: plata(sumaHoy((m) => m.creditoDisponible ?? 0)), caption: 'Credits not yet applied to charges', info: 'Payments and credits received that are not applied to a charge yet.' },
 ]

@@ -37,12 +37,12 @@ import { formatMDY } from '@/lib/fecha'
    Rooms / Exceptions. Reemplaza lo que había antes en esta ruta —la ficha de
    un empleado, que no correspondía acá y se mudó a Settings → Employees. */
 
-const TABS = ['Information', 'Working Hours', 'Rooms', 'Exceptions', 'Insurance / Billing Profile', 'Insurance Defaults'] as const
+const TABS = ['Information', 'Working hours', 'Rooms', 'Exceptions', 'Insurance / billing profile', 'Insurance defaults'] as const
 type Tab = (typeof TABS)[number]
 /* La pestaña va en la URL como en red.dev (`?type=rooms`), así un link abre la pestaña justa. */
 const TIPO_URL: Record<Tab, string> = {
-  Information: 'information', 'Working Hours': 'working-hours', Rooms: 'rooms', Exceptions: 'exceptions',
-  'Insurance / Billing Profile': 'billing-profile', 'Insurance Defaults': 'insurance-defaults',
+  Information: 'information', 'Working hours': 'working-hours', Rooms: 'rooms', Exceptions: 'exceptions',
+  'Insurance / billing profile': 'billing-profile', 'Insurance defaults': 'insurance-defaults',
 }
 
 const DIAS: [string, string][] = [
@@ -88,15 +88,15 @@ export function InformationTab({ nombreLocacion }: { nombreLocacion: string }) {
 
   return (
     <div className="flex flex-col gap-4">
-      <Card title="General Information">
-        <TextField label="Location Name" required value={d.nombre} onChange={set('nombre')} />
-        <div className="mt-4 grid gap-4 sm:grid-cols-2">
-          <TextField label="Abreviattion" required placeholder="Placeholder" value={d.abrev} onChange={set('abrev')} />
-          <SelectField label="Preferred Location Fee Schedule" options={FEES} value={d.fee} onChange={set('fee')} />
+      <Card title="General information">
+        <div className="grid gap-4 sm:grid-cols-2">
+          <TextField label="Location name" required value={d.nombre} onChange={set('nombre')} />
+          <TextField label="Abbreviation" required placeholder="Placeholder" value={d.abrev} onChange={set('abrev')} />
+          <SelectField label="Preferred location fee schedule" options={FEES} value={d.fee} onChange={set('fee')} />
         </div>
       </Card>
 
-      <Card title="Contact Information">
+      <Card title="Contact information">
         <div className="grid gap-4 sm:grid-cols-2">
           <CountryCodeField required value={d.codigo} onChange={set('codigo')} />
           <TextField label="Number" required placeholder="Placeholder" value={d.numero} onChange={set('numero')} />
@@ -104,17 +104,17 @@ export function InformationTab({ nombreLocacion }: { nombreLocacion: string }) {
         <TextField className="mt-4 sm:w-1/2 sm:pr-2" label="Email" placeholder="Placeholder" value={d.email} onChange={set('email')} />
       </Card>
 
-      {/* "Adress Information" es del Figma. */}
-      <Card title="Adress Information">
+      {/* "Address information" es del Figma. */}
+      <Card title="Address information">
         <div className="grid gap-4 sm:grid-cols-2">
           <TextField label="Address line 1" required placeholder="Select" value={d.linea1} onChange={set('linea1')} />
           <TextField label="Address line 2" required placeholder="Select" value={d.linea2} onChange={set('linea2')} />
           <SelectField label="City" required options={['Los Angeles', 'Miami', 'Seattle']} value={d.ciudad} onChange={set('ciudad')} />
           <SelectField label="State" required options={ESTADOS} value={d.estado} onChange={set('estado')} />
-          <TextField label="Zip Code" required placeholder="Select" value={d.zip} onChange={set('zip')} />
+          <TextField label="ZIP code" required placeholder="Select" value={d.zip} onChange={set('zip')} />
           <SelectField label="Country" required options={PAISES} value={d.pais} onChange={set('pais')} />
         </div>
-        <SelectField className="mt-4 sm:w-1/2 sm:pr-2" label="Time Zone" required options={ZONAS} value={d.zona} onChange={set('zona')} />
+        <SelectField className="mt-4 sm:w-1/2 sm:pr-2" label="Time zone" required options={ZONAS} value={d.zona} onChange={set('zona')} />
       </Card>
 
       <div className="flex justify-end gap-3">
@@ -146,7 +146,7 @@ const pierde = (t: TurnoLocacion, antes: Record<string, EstadoDia>, op: Operacio
   return previo.abierto && cubre(t, previo.rangos) && !cubre(t, op.rangos)
 }
 const pendiente = (t: TurnoLocacion) => t.estado === 'Proposed' || t.estado === 'Booked'
-const enCurso = (t: TurnoLocacion) => t.estado === 'Check In' || t.estado === 'In Progress'
+const enCurso = (t: TurnoLocacion) => t.estado === 'Check in' || t.estado === 'In progress'
 
 /* Las franjas de un día en una línea: entran todas las que caben junto a Edit hours y el resto queda en "+N", que las
    despliega. Se mide en una capa invisible y se recalcula al cambiar el ancho. Ver locations.md, 2026-11-16. */
@@ -261,7 +261,7 @@ export function WorkingHoursTab() {
       }
       return q
     })
-    if (movidos.length) setTurnos((p) => p.map((t) => (movidos.includes(t.id) ? { ...t, estado: 'Waiting List' } : t)))
+    if (movidos.length) setTurnos((p) => p.map((t) => (movidos.includes(t.id) ? { ...t, estado: 'Waiting list' } : t)))
     const espera = movidos.length ? ` ${movidos.length} ${movidos.length === 1 ? 'appointment was' : 'appointments were'} moved to the waiting list.` : ''
     if (op.tipo === 'panel') {
       if (movidos.length) aviso.ok(`${op.dias.length === 1 ? `Hours saved for ${nombre(op.dias[0])}.` : `Hours saved for ${op.dias.length} days.`}${espera}`)
@@ -448,7 +448,7 @@ export function RoomsTab() {
   return (
     <>
       <div className="mb-3 flex justify-end">
-        <Button onClick={() => setModal('nueva')}><Plus /> New Room</Button>
+        <Button onClick={() => setModal('nueva')}><Plus /> New room</Button>
       </div>
       {/* Misma caja que Working Hours: encabezado gris, switch en la fila y la inactiva en gris. */}
       <div className="overflow-hidden rounded-xl border border-line bg-white">
@@ -574,12 +574,12 @@ export function ExceptionsTab() {
           onClick={() => setModal('nueva')}
           className="text-dash-blue flex items-center gap-1.5 text-[13px] font-semibold hover:underline"
         >
-          <Plus className="size-4" /> Add Exception
+          <Plus className="size-4" /> Add exception
         </button>
       </div>
 
       {excepciones.length === 0 ? (
-        <EmptyState title="No Exceptions" detail="Add a day that breaks from the regular schedule." className="border-0 py-16" />
+        <EmptyState title="No exceptions" detail="Add a day that breaks from the regular schedule." className="border-0 py-16" />
       ) : (
         <div className="mt-4 flex flex-col gap-2">
           {excepciones.map((e) => (
@@ -658,13 +658,13 @@ export function SettingsLocationDetail() {
 
       <div className="mt-4">
         {tab === 'Information' && <InformationTab nombreLocacion={loc.nombre} />}
-        {tab === 'Working Hours' && <WorkingHoursTab />}
+        {tab === 'Working hours' && <WorkingHoursTab />}
         {tab === 'Rooms' && <RoomsTab />}
         {tab === 'Exceptions' && <ExceptionsTab />}
-        {tab === 'Insurance / Billing Profile' && (
+        {tab === 'Insurance / billing profile' && (
           <LocationBillingProfile locId={loc.id} nombreLocacion={loc.nombre} onDirtyChange={marcarSucio} />
         )}
-        {tab === 'Insurance Defaults' && <LocationInsuranceDefaults key={loc.id} locId={loc.id} onDirtyChange={marcarSucio} />}
+        {tab === 'Insurance defaults' && <LocationInsuranceDefaults key={loc.id} locId={loc.id} onDirtyChange={marcarSucio} />}
       </div>
 
       {pendiente && (
@@ -676,7 +676,7 @@ export function SettingsLocationDetail() {
           onCancel={() => setPendiente(null)}
           onConfirm={() => { setSucio(false); setTab(pendiente); setPendiente(null) }}
         >
-          {tab === 'Insurance Defaults' ? "Your insurance defaults changes haven't been saved." : "Your billing profile changes haven't been saved."}
+          {tab === 'Insurance defaults' ? "Your insurance defaults changes haven't been saved." : "Your billing profile changes haven't been saved."}
         </ConfirmDialog>
       )}
     </div>

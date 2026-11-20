@@ -64,7 +64,7 @@ export function NombreTurno({ appt, id, activa, onSelect, className }: Pick<Prop
    y el kebab con Edit appointment. Sin el badge Check In: se confundía con el botón (comparativa del 2026-11-19, ver
    dashboard.md). Angosta en dos renglones; ancha en columnas. */
 export function AppointmentRow({ appt, id, activa, onSelect, onEdit, ocultarOperatorio, chips, estado, onAccion, acciones }: PropsTurno) {
-  const accion = appt.accion ?? 'Check Out'
+  const accion = appt.accion ?? 'Check out'
   const iniciales = <Avatar initials={appt.initials} size={28} />
   const fin = estado ?? (
     <Button size="sm" variant={ACCION_TURNO[accion]} className="shrink-0" onClick={(e) => { e.stopPropagation(); accionTurno(appt); onAccion?.(appt) }}>{accion} <ArrowRight /></Button>
@@ -123,7 +123,7 @@ export function AppointmentRow({ appt, id, activa, onSelect, onEdit, ocultarOper
 }
 
 const ICONO_TAREA: Record<string, LucideIcon> = {
-  'Clinical Note': ClipboardList, 'Lab Orders': FlaskConical, Prescriptions: Pill, Referrals: Send,
+  'Clinical note': ClipboardList, 'Lab orders': FlaskConical, Prescriptions: Pill, Referrals: Send,
 }
 
 /* Una tarea con el diseño de Pending documents (Julián, 2026-10-19): el ícono del tipo en su cuadrado, el tipo con su
@@ -155,7 +155,7 @@ export function TaskRow({ task }: { task: PendingTask }) {
         >
           <FileText className="text-dash-bad-fg size-3.5" />
         </button>
-        <Button size="sm" className="shrink-0" onClick={() => completarTarea(task)}>Complete this Task <ArrowRight /></Button>
+        <Button size="sm" className="shrink-0" onClick={() => completarTarea(task)}>Complete this task <ArrowRight /></Button>
       </span>
     </div>
   )

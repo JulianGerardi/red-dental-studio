@@ -67,9 +67,9 @@ export const Default: Story = {
   render: () => (
     <div className="h-64 w-64">
       <DropdownMenu defaultOpen>
-        <DropdownMenuTrigger asChild><Button variant="secondary">My Account</Button></DropdownMenuTrigger>
+        <DropdownMenuTrigger asChild><Button variant="secondary">My account</Button></DropdownMenuTrigger>
         <DropdownMenuContent className="w-52">
-          <DropdownMenuLabel>My Account</DropdownMenuLabel>
+          <DropdownMenuLabel>My account</DropdownMenuLabel>
           <DropdownMenuSeparator />
           <DropdownMenuItem>Profile <DropdownMenuShortcut>⇧P</DropdownMenuShortcut></DropdownMenuItem>
           <DropdownMenuItem>Support</DropdownMenuItem>

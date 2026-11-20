@@ -45,7 +45,7 @@ export const States: Story = {
           <tr><td className="font-semibold">Pending</td><td>Preview</td><td>—</td><td>—</td></tr>
           <tr><td className="font-semibold">Presented</td><td>—</td><td>—</td><td>—</td></tr>
           <tr><td className="font-semibold">Waiting for consent</td><td>—</td><td>Bloque y columna Consent</td><td>Turno de cada visita</td></tr>
-          <tr><td className="font-semibold">Accepted</td><td>Generate Consent</td><td>Bloque y columna Consent</td><td>Turno de cada visita</td></tr>
+          <tr><td className="font-semibold">Accepted</td><td>Generate consent</td><td>Bloque y columna Consent</td><td>Turno de cada visita</td></tr>
         </Tabla>
       </Bloque>
     </Lienzo>
@@ -66,7 +66,7 @@ export const RowOpen: Story = {
    quedan a la vista. */
 export const RowsSelected: Story = { play: pulsar(/select all procedures/i) }
 
-/* Estado de error: "New Alternative Case" abre el diálogo de mover; Save sin
+/* Estado de error: "New alternative case" abre el diálogo de mover; Save sin
    elegir el caso de destino marca el campo como obligatorio. */
 export const MoveDialogWithError: Story = {
   play: secuencia(pulsar(/new alternative case/i), pulsar(/^save$/i), esperar(/required/i)),

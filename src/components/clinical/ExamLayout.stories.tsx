@@ -41,7 +41,7 @@ export const ProblemListOpen: Story = {
   parameters: { docs: { story: { inline: false, iframeHeight: 720 } } },
   render: () => <ExamLayout findings={false}>{contenido}</ExamLayout>,
   play: async (c) => {
-    await userEvent.click(await within(c.canvasElement).findByRole('button', { name: 'View Problem List' }))
+    await userEvent.click(await within(c.canvasElement).findByRole('button', { name: 'View problem list' }))
     await esperar(/Generally unwell/)(c)
   },
 }
@@ -52,7 +52,7 @@ export const ProblemListRowOpen: Story = {
   parameters: { docs: { story: { inline: false, iframeHeight: 720 } } },
   render: () => <ExamLayout findings={false}>{contenido}</ExamLayout>,
   play: async (c) => {
-    await userEvent.click(await within(c.canvasElement).findByRole('button', { name: 'View Problem List' }))
+    await userEvent.click(await within(c.canvasElement).findByRole('button', { name: 'View problem list' }))
     await userEvent.click(await within(document.body).findByText(/Generally unwell/))
     await esperar(/View full record/)(c)
   },
@@ -63,7 +63,7 @@ export const ProblemListRowOpen: Story = {
 export const FindingRecordOpen: Story = {
   name: 'Finding record open',
   parameters: { docs: { story: { inline: false, iframeHeight: 720 } } },
-  render: () => <ExamFindingsProvider><ExamLayout examen="Dental Assessment">{contenido}</ExamLayout></ExamFindingsProvider>,
+  render: () => <ExamFindingsProvider><ExamLayout examen="Dental assessment">{contenido}</ExamLayout></ExamFindingsProvider>,
   play: async (c) => {
     await userEvent.click(await within(c.canvasElement).findByRole('button', { name: 'Actions for Tooth 3' }))
     await userEvent.click(await within(document.body).findByRole('menuitem', { name: 'View full record' }))

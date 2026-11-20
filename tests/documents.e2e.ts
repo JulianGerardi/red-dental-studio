@@ -1,7 +1,7 @@
 import { test } from '@e2e-dev/web'
 import { expect } from 'e2e'
 
-/* Documents Manager: nombres reales, Rows per page y búsqueda (treatments.md, 2026-11-12). */
+/* Documents manager: nombres reales, Rows per page y búsqueda (treatments.md, 2026-11-12). */
 
 test('Documents busca por nombre y avisa cuando no hay nada', async ({ app, screen }) => {
   await app.open('/patients/john-smith/documents')

@@ -101,7 +101,7 @@ export function NewCondition({ onClose }: { onClose: () => void }) {
 
   return (
     <Drawer
-      open onClose={onClose} title="New Condition" steps={['Condition', 'Details']} step={paso - 1}
+      open onClose={onClose} title="New condition" steps={['Condition', 'Details']} step={paso - 1}
       footer={(
         <DrawerActions
           step={paso - 1} total={2} onNext={() => setPaso(2)} onBack={() => setPaso(1)} onCancel={onClose}
@@ -217,16 +217,16 @@ export function RadiographyViewer({
           {/* Los dos botones del componente: el azul apagado para revisar y el
               azul pleno para el alta. */}
           <button
-            onClick={() => aviso.info('Review Exam is not available in this release.')}
+            onClick={() => aviso.info('Review exam is not available in this release.')}
             className="flex h-8 shrink-0 items-center gap-1 rounded-md bg-info-line-strong px-2.5 text-[12px] font-semibold text-white transition-colors hover:bg-info-line-strong"
           >
-            <Plus className="size-3.5" /> Review Exam
+            <Plus className="size-3.5" /> Review exam
           </button>
           <button
             onClick={() => setCondicion(true)}
             className={buttonClasses({ size: 'md' })}
           >
-            <Plus className="size-3.5" /> No Finding
+            <Plus className="size-3.5" /> No finding
           </button>
         </div>
         <div className="flex max-h-[520px] flex-col gap-3 overflow-y-auto p-4">

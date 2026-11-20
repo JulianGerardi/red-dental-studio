@@ -18,7 +18,7 @@ export type Turno = Appointment & {
   completado?: boolean
   enCurso?: boolean
   /** Cerrado sin atenderse: sale de Appointments y de la Waiting Room. Cancelled libera el lugar; No Show no (CON-1827, CON-1828). */
-  cerrado?: 'Cancelled' | 'No Show'
+  cerrado?: 'Cancelled' | 'No show'
 }
 
 /* Las tres etapas de la Waiting Room, según el encounter (CON-1670): Planned → Checked in, On Hold → On hold,
@@ -50,10 +50,10 @@ export type DiaDashboard = {
   encuentros: { abiertos: number; promedio: string }
 }
 
-export const TASK_KINDS = ['Clinical Note', 'Lab Orders', 'Prescriptions', 'Referrals']
+export const TASK_KINDS = ['Clinical note', 'Lab orders', 'Prescriptions', 'Referrals']
 
 /* El frame muestra las cuatro cards rotuladas "Referrals" bajo el tab
-   "Clinical Note" (anomalía 20). Con el filtro andando el rótulo tiene que
+   "Clinical note" (anomalía 20). Con el filtro andando el rótulo tiene que
    coincidir con la categoría, así que se reparten entre las cuatro. */
 const tareas = (porTipo: number, register: string, expiration: string): PendingTask[] =>
   TASK_KINDS.flatMap((kind) =>

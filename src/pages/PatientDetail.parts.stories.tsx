@@ -56,7 +56,7 @@ export const Playground: Story = {
 const PARTES: [string, string, string][] = [
   ['Patient menu', 'Avatar, Start Encounter, Clinical Mode, las seis secciones y los datos General y Contact.', 'PatientSidePanel'],
   ['Clinical cards', 'Allergies, Medical Conditions, Medication y Past Surgery and Hospitalization, de a dos. Cada una abre su listado flotante.', 'Card · ClinicalPopover'],
-  ['Pending Task', 'Abajo de Pending documents, con el mismo diseño: lo que hay que hacer por este paciente, agrupado por tipo y en filas. Se ven 3.', 'Card · PendingTaskList'],
+  ['Pending task', 'Abajo de Pending documents, con el mismo diseño: lo que hay que hacer por este paciente, agrupado por tipo y en filas. Se ven 3.', 'Card · PendingTaskList'],
   ['Pending documents', 'Debajo de Pending Task: los documentos a resolver por urgencia, con quién actúa y la acción. Se ven 4. En una columna angosta el vencimiento y el botón bajan a otro renglón.', 'Card · PendingDocuments'],
   ['Appointments', 'Columna derecha de 280px, del alto de Pending Task + Pending documents. Se ven 7 en la columna y 3 apilado.', 'Card · ShowMore · PatientAppointmentCard'],
 ]
@@ -71,11 +71,11 @@ function Mapa() {
       {caja('Patient menu', 'w-28 shrink-0')}
       <div className="flex min-w-0 flex-1 flex-col gap-3">
         <div className="grid grid-cols-2 gap-2">
-          {['Allergies', 'Medical Conditions', 'Medication', 'Past Surgery…'].map((c) => caja(c, 'py-2 font-medium'))}
+          {['Allergies', 'Medical conditions', 'Medication', 'Past Surgery…'].map((c) => caja(c, 'py-2 font-medium'))}
         </div>
         <div className="grid grid-cols-[minmax(0,1fr)_7rem] gap-3">
           <div className="flex flex-col gap-3">
-            {caja('Pending Task', 'h-24')}
+            {caja('Pending task', 'h-24')}
             {caja('Pending documents', 'h-24')}
           </div>
           {caja('Appointments · 280px')}

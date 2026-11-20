@@ -146,8 +146,8 @@ export function ConsentDocument({ titulo, procedimiento, naturaleza, riesgos, te
       </header>
 
       <div className="mt-4 text-center">
-        <p className={`${ETIQUETA} text-dash-blue`}>Informed Consent</p>
-        <h3 className="mt-1 text-[17px] leading-tight font-bold text-ink">{titulo || 'Untitled Consent'}</h3>
+        <p className={`${ETIQUETA} text-dash-blue`}>Informed consent</p>
+        <h3 className="mt-1 text-[17px] leading-tight font-bold text-ink">{titulo || 'Untitled consent'}</h3>
       </div>
 
       <div className="mt-4 grid grid-cols-2 gap-px border border-line-strong bg-line-strong">
@@ -171,7 +171,7 @@ export function ConsentDocument({ titulo, procedimiento, naturaleza, riesgos, te
       {!vistaPaciente && (
         <>
           <Seccion titulo="Diagnosis"><p>Non-restorable tooth with recurrent infection.</p></Seccion>
-          <Seccion titulo="Clinical Findings"><p>Extensive decay affecting tooth structure and surrounding tissue.</p></Seccion>
+          <Seccion titulo="Clinical findings"><p>Extensive decay affecting tooth structure and surrounding tissue.</p></Seccion>
         </>
       )}
 

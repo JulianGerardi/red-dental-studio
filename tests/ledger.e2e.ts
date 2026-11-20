@@ -10,7 +10,7 @@ test('el detalle de un procedimiento muestra su caso, la plata y lo que recibió
   await expect(screen.getByRole('button', /^Periodontists Recommended/)).toBeVisible()
   await expect(screen.getByText('Northgate Clinic')).toBeVisible()
   await expect(screen.getByText('Outstanding transaction balance')).toBeVisible()
-  // El saldo del cargo: en la columna Trans. Bal. y en el detalle, el mismo número.
+  // El saldo del cargo: en la columna Trans. bal. y en el detalle, el mismo número.
   await expect(screen.getByText('$170.00')).toHaveCount(2)
   // El pago está en otra página de la tabla: el link va a su fila y la despliega.
   await screen.getByRole('button', /^Patient Payment · TX-1027/).tap()
@@ -36,12 +36,12 @@ test('el detalle de una fila del Ledger no tiene View full record', async ({ app
 })
 
 /* Métricas, columnas y ⋮ de CON-3753 / CON-3755 (ledger.md, 2026-11-12). */
-test('las métricas cambian con la vista y Guarantor View muestra el Household', async ({ app, screen }) => {
+test('las métricas cambian con la vista y Guarantor view muestra el Household', async ({ app, screen }) => {
   await app.open('/patients/john-smith/ledger')
   await expect(screen.getByText('Patient responsibility')).toBeVisible()
   await expect(screen.getByText('Open charges')).toBeVisible()
-  await expect(screen.getByText('Trans. Bal.')).toBeVisible()
-  await screen.getByRole('tab', 'Guarantor View').tap()
+  await expect(screen.getByText('Trans. bal.')).toBeVisible()
+  await screen.getByRole('tab', 'Guarantor view').tap()
   await expect(screen.getByText('Guarantor balance')).toBeVisible()
   await expect(screen.getByRole('heading', 'Household')).toBeVisible()
 })
@@ -50,27 +50,27 @@ test('el ⋮ de un procedimiento lleva a su estimación en Clinical Mode', async
   await app.open('/patients/john-smith/ledger')
   await screen.getByRole('button', /^Actions for Periodontal scaling/).tap()
   await screen.getByRole('menuitem', /Periodontists Recommended/).tap()
-  await expect(screen.getByText(/Treatment Plan/).first()).toBeVisible()
+  await expect(screen.getByText(/Treatment plan/).first()).toBeVisible()
 })
 
 /* Los tres botones de red.dev abren los drawers de Billing (ledger.md, 2026-11-19); lo de adentro del drawer se arma aparte. */
-test('Patient Payment (-) abre su drawer y lo guardado entra a la tabla', async ({ app, screen }) => {
+test('Patient payment (-) abre su drawer y lo guardado entra a la tabla', async ({ app, screen }) => {
   await app.open('/patients/john-smith/ledger')
   await expect(screen.getByRole('tab', 'Transactions')).toHaveCount(0)
   await screen.getByRole('button', /^Patient Payment \(-\)/).tap()
   const drawer = screen.getByRole('dialog')
-  await expect(drawer.getByRole('heading', 'New Patient Payment (-)')).toBeVisible()
+  await expect(drawer.getByRole('heading', 'New patient payment (-)')).toBeVisible()
   await drawer.getByRole('textbox', /^Amount/).fill('50')
   await drawer.getByRole('button', /^Save/).tap()
   await expect(screen.getByText(/Cash Payment of \$50\.00 posted for John Smith/)).toBeVisible()
   await expect(screen.getByText('Cash Payment').first()).toBeVisible()
 })
 
-test('Charge Adjustment (+) abre su drawer y pide el monto', async ({ app, screen }) => {
+test('Charge adjustment (+) abre su drawer y pide el monto', async ({ app, screen }) => {
   await app.open('/patients/john-smith/ledger')
   await screen.getByRole('button', /^Charge Adjustment \(\+\)/).tap()
   const drawer = screen.getByRole('dialog')
-  await expect(drawer.getByRole('heading', 'Enter Charge (+) Adjustment')).toBeVisible()
+  await expect(drawer.getByRole('heading', 'Enter charge (+) adjustment')).toBeVisible()
   await drawer.getByRole('button', /^Save/).tap()
   await expect(drawer.getByText(/This field is required/)).toBeVisible()
   await drawer.getByRole('textbox', /^Amount/).fill('75')
@@ -115,14 +115,14 @@ test('Un pago de más queda como crédito sin aplicar y Apply to recarga los car
   await expect(screen.getByText('$842.00')).toBeVisible()
 })
 
-test('Credit Adjustment (-) pide el monto, reparte y avisa', async ({ app, screen }) => {
+test('Credit adjustment (-) pide el monto, reparte y avisa', async ({ app, screen }) => {
   await app.open('/patients/john-smith/ledger')
   await screen.getByRole('button', /^Credit Adjustment \(-\)/).tap()
   const drawer = screen.getByRole('dialog')
   // Una sola página, como red.dev: sin pasos, sin ícono en el título y el tipo arranca vacío (ledger.md, 2026-11-20).
-  await expect(drawer.getByRole('button', /Next Step/)).toHaveCount(0)
-  await expect(drawer.getByRole('heading', 'Credit Adjustment Information')).toBeVisible()
-  await expect(drawer.getByText('Ledger Transactions')).toBeVisible()
+  await expect(drawer.getByRole('button', /Next step/)).toHaveCount(0)
+  await expect(drawer.getByRole('heading', 'Credit adjustment information')).toBeVisible()
+  await expect(drawer.getByText('Ledger transactions')).toBeVisible()
   await drawer.getByRole('button', /^Save/).tap()
   await expect(drawer.getByText('This field is required.').first()).toBeVisible()
   await drawer.getByRole('button', /Select credit type/).tap()

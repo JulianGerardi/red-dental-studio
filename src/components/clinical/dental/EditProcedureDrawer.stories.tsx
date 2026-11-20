@@ -2,8 +2,8 @@ import type { Meta, StoryObj } from '@storybook/react-vite'
 import { EditProcedureDrawer } from './EditProcedureDrawer'
 import type { Finding } from './data'
 
-const CARIES: Finding = { id: 'F-1', area: 'Tooth 19', condition: 'chronic enamel dental caries', descriptor: 'Deep', date: 'May 14, 2026', status: 'Active', tooth: 19, provider: 'Elena Martinez', surfaces: ['O'], notes: '', linked: [], diagnoses: [], kind: 'condition', examen: 'Dental Assessment' }
-const CORONA: Finding = { id: 'F-6', area: 'Tooth 19', condition: 'D2740 - Crown – porcelain/ceramic', descriptor: 'Tooth', date: 'May 14, 2026', status: 'Externally Treated', tooth: 19, provider: 'Emily Chen', surfaces: [], notes: '', linked: ['F-1'], diagnoses: [], kind: 'procedure', fee: 1200 }
+const CARIES: Finding = { id: 'F-1', area: 'Tooth 19', condition: 'chronic enamel dental caries', descriptor: 'Deep', date: 'May 14, 2026', status: 'Active', tooth: 19, provider: 'Elena Martinez', surfaces: ['O'], notes: '', linked: [], diagnoses: [], kind: 'condition', examen: 'Dental assessment' }
+const CORONA: Finding = { id: 'F-6', area: 'Tooth 19', condition: 'D2740 - Crown – porcelain/ceramic', descriptor: 'Tooth', date: 'May 14, 2026', status: 'Externally treated', tooth: 19, provider: 'Emily Chen', surfaces: [], notes: '', linked: ['F-1'], diagnoses: [], kind: 'procedure', fee: 1200 }
 
 const meta = {
   title: 'Components/Clinical/Dental/EditProcedureDrawer',

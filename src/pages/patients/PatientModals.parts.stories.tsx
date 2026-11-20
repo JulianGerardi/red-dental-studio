@@ -83,7 +83,7 @@ export const States: Story = {
       { estado: 'New · Demography', cuando: 'Gender obligatorio; Interpreter Required al lado de Language.', story: 'New Patient — Demography' },
       { estado: 'New · Duplicate', cuando: 'Mismo nombre y email que otro paciente: Alert danger arriba y no guarda.', story: 'New Patient — Duplicate' },
       { estado: 'New · Linked person', cuando: 'La casilla tildada cambia los datos por el buscador.', story: 'Link Person Selected' },
-      { estado: 'Edit · Complete', cuando: 'Abre con los datos del paciente; la cuenta del portal como Linked.', story: 'Edit Patient' },
+      { estado: 'Edit · Complete', cuando: 'Abre con los datos del paciente; la cuenta del portal como Linked.', story: 'Edit patient' },
       { estado: 'Edit · Missing data', cuando: 'Ficha sin teléfono, dirección ni Gender: Save Changes los marca y lleva al primero.', story: 'Edit Patient — Missing data' },
       { estado: 'Edit · No portal account', cuando: 'Ofrece crear la cuenta en vez del estado Linked.', story: 'Edit Patient — Missing data' },
     ]} />
@@ -94,11 +94,11 @@ export const Specs: Story = {
   parameters: DOCS,
   render: () => (
     <SpecsDelDrawer filas={[
-      ['New Patient', 'Drawer lg · 560px, pasos con DrawerStep y DrawerActions'],
-      ['Edit Patient', 'Pantalla: migas Patients / Edit Patient, PageTitle, cards de Settings (Card), FormFooter a la derecha'],
+      ['New patient', 'Drawer lg · 560px, pasos con DrawerStep y DrawerActions'],
+      ['Edit patient', 'Pantalla: migas Patients / Edit Patient, PageTitle, cards de Settings (Card), FormFooter a la derecha'],
       ['Header de Edit', 'EditableAvatar 56px (misma foto que el panel del paciente: clavePacienteFoto) + nombre 20px Bold + Pill de estado'],
       ['Fields', 'De a dos; el nombre completo en una fila de tres. En celular, apilados'],
-      ['Interpreter Required', 'OptionCheckbox a 36px de alto, abajo de su celda: a la altura del select de Language'],
+      ['Interpreter required', 'OptionCheckbox a 36px de alto, abajo de su celda: a la altura del select de Language'],
       ['Duplicate', 'Alert danger · "A patient is already registered with this name and email address."'],
       ['Validation', 'useFormPaciente: errores por sección revisada; enfocar() lleva al campo con scroll'],
     ]} />

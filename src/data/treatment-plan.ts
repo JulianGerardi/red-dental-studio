@@ -60,12 +60,12 @@ const DEL_PACIENTE: Record<string, Partial<Procedimiento>> = {
   c5v2p4: { codigo: 'D2750', nombre: 'Crown – porcelain fused to high noble metal', superficie: '-', pieza: '19', ubicacion: '-' },
   c5v2p5: { codigo: 'D0230', nombre: 'Intraoral – periapical each additional radiographic image', superficie: '-', pieza: '19', ubicacion: '-' },
   c5v2p6: { codigo: 'D9910', nombre: 'Application of desensitizing medicament', superficie: '-', pieza: '19', ubicacion: '-' },
-  c9v1p1: { codigo: 'D9944', nombre: 'Occlusal guard – hard appliance, full arch', superficie: '-', pieza: '-', ubicacion: 'Upper Arch', estado: 'In progress' },
+  c9v1p1: { codigo: 'D9944', nombre: 'Occlusal guard – hard appliance, full arch', superficie: '-', pieza: '-', ubicacion: 'Upper arch', estado: 'In progress' },
   c9v1p2: { codigo: 'D1110', nombre: 'Prophylaxis – adult', superficie: '-', pieza: '-', ubicacion: '-', envioFalla: true },
-  c10v1p1: { codigo: 'D9972', nombre: 'External bleaching – per arch – performed in office', superficie: '-', pieza: '-', ubicacion: 'Upper Arch' },
-  c10v1p2: { codigo: 'D9972', nombre: 'External bleaching – per arch – performed in office', superficie: '-', pieza: '-', ubicacion: 'Lower Arch' },
+  c10v1p1: { codigo: 'D9972', nombre: 'External bleaching – per arch – performed in office', superficie: '-', pieza: '-', ubicacion: 'Upper arch' },
+  c10v1p2: { codigo: 'D9972', nombre: 'External bleaching – per arch – performed in office', superficie: '-', pieza: '-', ubicacion: 'Lower arch' },
   c11v1p1: { codigo: 'D1351', nombre: 'Sealant – per tooth', superficie: 'O', pieza: '30', ubicacion: '-' },
-  c1v2p1: { codigo: 'D4341', nombre: 'Periodontal scaling and root planing – four or more teeth per quadrant', superficie: '-', pieza: '-', ubicacion: 'Upper Arch' },
+  c1v2p1: { codigo: 'D4341', nombre: 'Periodontal scaling and root planing – four or more teeth per quadrant', superficie: '-', pieza: '-', ubicacion: 'Upper arch' },
   c3v1p1: { codigo: 'D2391', nombre: 'Resin-based composite – one surface, posterior', superficie: 'O', pieza: '3', ubicacion: '-' },
   c3v1p2: { codigo: 'D2392', nombre: 'Resin-based composite – two surfaces, posterior', superficie: 'O, D', pieza: '14', ubicacion: '-' },
   /* El mismo estado que en Procedures: la endodoncia se derivó y la extracción ya empezó. */
@@ -101,8 +101,8 @@ const SUELTOS: [Partial<Procedimiento>, ConsentProcedimiento][] = [
   [{ codigo: 'D2330', nombre: 'Resin-based composite – one surface, anterior', pieza: '8', superficie: 'M' }, 'Not generated'],
   [{ codigo: 'D2331', nombre: 'Resin-based composite – two surfaces, anterior', pieza: '9', superficie: 'M, D' }, 'Rejected'],
   [{ codigo: 'D7210', nombre: 'Extraction, erupted tooth requiring removal of bone', pieza: '17', superficie: '-' }, 'Requested'],
-  [{ codigo: 'D4910', nombre: 'Periodontal maintenance', pieza: '-', superficie: '-', ubicacion: 'Full Mouth' }, 'Accepted'],
-  [{ codigo: 'D1206', nombre: 'Topical application of fluoride varnish', pieza: '-', superficie: '-', ubicacion: 'Full Mouth' }, 'Not required'],
+  [{ codigo: 'D4910', nombre: 'Periodontal maintenance', pieza: '-', superficie: '-', ubicacion: 'Full mouth' }, 'Accepted'],
+  [{ codigo: 'D1206', nombre: 'Topical application of fluoride varnish', pieza: '-', superficie: '-', ubicacion: 'Full mouth' }, 'Not required'],
 ]
 export const NO_ASIGNADOS: Procedimiento[] = Array.from({ length: 15 }, (_, i) => {
   const [datos, consentimiento] = SUELTOS[i] ?? [{}, 'Not generated' as const]
@@ -271,35 +271,35 @@ export const CONSENTIMIENTO: Consentimiento = {
 export const DIALOGOS = {
   /* No está en el frame: es el paso que cierra la planificación. */
   finish: {
-    titulo: 'Finish Planning',
+    titulo: 'Finish planning',
     texto: ['Are you sure you want to finish planning this case? It will no longer be editable and will be ready to present to the patient.'],
   },
   present: {
-    titulo: 'Present Case',
+    titulo: 'Present case',
     texto: ['Are you sure you want to present this case to the patient?'],
   },
   accept: {
-    titulo: 'Accept Case',
+    titulo: 'Accept case',
     texto: [
       'Are you sure you want to accept this case? The other options in this group will be automatically discarded.',
       'This will complete the treatment decisions for this group and send the corresponding consent forms to the patient.',
     ],
   },
   discard: {
-    titulo: 'Discard Case',
+    titulo: 'Discard case',
     texto: ['Are you sure you want to discard this case?'],
   },
   /* Del menú del caso en la app real (Actions Treatment): cierran el plan. */
   expire: {
-    titulo: 'Expire Treatment Plan',
+    titulo: 'Expire treatment plan',
     texto: ['Are you sure you want to expire this treatment plan? It will no longer be available to accept.'],
   },
   cancel: {
-    titulo: 'Cancel Treatment Plan',
+    titulo: 'Cancel treatment plan',
     texto: ['Are you sure you want to cancel this treatment plan?'],
   },
   removeProcedure: {
-    titulo: 'Remove Procedure',
+    titulo: 'Remove procedure',
     texto: ['Are you sure you want to remove this procedure from the case?'],
   },
 } as const
@@ -326,7 +326,7 @@ export const CONSENTIMIENTO_REQUERIDO = {
   /* El caso todavía no se aceptó: no hay consentimiento que pedir, el procedimiento no se actualiza. */
   noListo: {
     titulo: 'Procedure cannot be updated',
-    texto: 'The treatment case must be Accepted and its treatment plan must be Accepted or In Progress.',
+    texto: 'The treatment case must be Accepted and its treatment plan must be Accepted or In progress.',
     accion: 'View case',
   },
 } as const
@@ -334,12 +334,12 @@ export const CONSENTIMIENTO_REQUERIDO = {
 export const OPCIONES_BORRAR_CASO = [
   {
     id: 'con-procedimientos',
-    titulo: 'Delete Case and Procedures',
+    titulo: 'Delete case and procedures',
     detalle: 'The procedure will remain in the current treatment plan and also be added to the selected destination plan.',
   },
   {
     id: 'solo-caso',
-    titulo: 'Delete Case',
+    titulo: 'Delete case',
     detalle: 'Only remove the case; the procedures remain available for reuse and are moved to the Unassigned category if they are not linked to another case.',
   },
 ]
@@ -348,7 +348,7 @@ export const OPCIONES_BORRAR_CASO = [
    New Alternative Case **y** desde Move to, con el mismo título "Move
    Procedure to Existing Case" en los dos casos. Ver anomalías. */
 export const MOVER = {
-  titulo: 'Move Procedure to Existing Case',
+  titulo: 'Move procedure to existing case',
   bajada: 'Select the destination case and move option to move the procedure to the selected case.',
   opciones: [
     {
@@ -366,22 +366,22 @@ export const MOVER = {
   ],
 }
 
-/* Modal "New Case Group" (4122:246100): un solo campo. */
-export const NUEVO_GRUPO = { titulo: 'New Case Group', campo: 'Case Name' }
+/* Modal "New case group" (4122:246100): un solo campo. */
+export const NUEVO_GRUPO = { titulo: 'New case group', campo: 'Case name' }
 
-/* Modal "Complete Procedure" (4122:250957). El texto pide **seleccionar** las
+/* Modal "Complete procedure" (4122:250957). El texto pide **seleccionar** las
    condiciones ligadas, pero las tarjetas del frame no tienen con qué: se les
    suma la casilla del sistema para que la instrucción se pueda cumplir. */
 export const COMPLETAR = {
-  titulo: 'Complete Procedure',
+  titulo: 'Complete procedure',
   texto: [
     'You are about to complete this procedure.',
-    'Select any linked conditions you want to mark as Treated.',
+    'Select any linked conditions you want to mark as treated.',
   ],
   condiciones: [
-    { id: 'cc1', estado: 'Active' as const, fecha: '05/18/2026', zona: 'Soft Palate', condicion: 'oral candidiasis', descriptores: 'Red' },
-    { id: 'cc2', estado: 'Active' as const, fecha: '05/18/2026', zona: 'Soft Palate', condicion: 'oral candidiasis', descriptores: 'Red' },
-    { id: 'cc3', estado: 'Active' as const, fecha: '05/18/2026', zona: 'Soft Palate', condicion: 'oral candidiasis', descriptores: 'Red' },
+    { id: 'cc1', estado: 'Active' as const, fecha: '05/18/2026', zona: 'Soft palate', condicion: 'oral candidiasis', descriptores: 'Red' },
+    { id: 'cc2', estado: 'Active' as const, fecha: '05/18/2026', zona: 'Soft palate', condicion: 'oral candidiasis', descriptores: 'Red' },
+    { id: 'cc3', estado: 'Active' as const, fecha: '05/18/2026', zona: 'Soft palate', condicion: 'oral candidiasis', descriptores: 'Red' },
   ],
 }
 
@@ -409,7 +409,7 @@ export const MENU_PROCEDIMIENTO = {
   borrarEnCaso: {
     texto: 'Choose the scope of deletion.',
     tx: { titulo: 'Delete from Tx', texto: 'Remove from this case and keep the clinical record. Move to Unassigned if no associations remain.' },
-    procedimiento: { titulo: 'Delete Procedure', texto: 'Delete the clinical record after existing validations pass.' },
+    procedimiento: { titulo: 'Delete procedure', texto: 'Delete the clinical record after existing validations pass.' },
   },
   /* Sign now del diálogo Consent required: revisar y firmar, y después confirmar el cambio pedido. */
   revisar: { titulo: 'Review and sign consent', texto: 'Opening this view does not sign the document.' },

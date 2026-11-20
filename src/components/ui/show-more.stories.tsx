@@ -163,9 +163,9 @@ export const Specs: Story = {
                     <tr><td>Patient Dashboard</td><td>Pending Task · Appointments</td><td className="tabular-nums">3</td></tr>
           <tr><td>Patient Dashboard</td><td>Pending documents</td><td className="tabular-nums">4</td></tr>
           <tr><td>Treatments</td><td>Treatment plans</td><td className="tabular-nums">4</td></tr>
-          <tr><td>Patients</td><td>Today Appointments</td><td className="tabular-nums">4</td></tr>
-          <tr><td>Patients</td><td>Recent Patients</td><td>medido (llenarAlto), ~4 a 1440px</td></tr>
-          <tr><td>Billing</td><td>Find Patient</td><td>medido (llenarAlto), ~4 a 1440px</td></tr>
+          <tr><td>Patients</td><td>Today appointments</td><td className="tabular-nums">4</td></tr>
+          <tr><td>Patients</td><td>Recent patients</td><td>medido (llenarAlto), ~4 a 1440px</td></tr>
+          <tr><td>Billing</td><td>Find patient</td><td>medido (llenarAlto), ~4 a 1440px</td></tr>
         </Tabla>
       </Bloque>
     </Lienzo>

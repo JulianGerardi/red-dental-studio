@@ -8,7 +8,7 @@ import { RemoveGuardianDialog } from '@/components/patients/RelationshipDialogs'
 import { aviso } from '@/components/ui/toaster'
 import { OBLIGATORIO } from '@/lib/validacion'
 
-/* Figma 3716:81940. A diferencia de "Add Relationship", esta sí es modal y
+/* Figma 3716:81940. A diferencia de "Add relationship", esta sí es modal y
    se abre encima de la pantalla anterior. No trae Direction: el propio
    diseño aclara que esa parte no se puede editar.
 
@@ -56,7 +56,7 @@ export function EditRelationshipModal({
   return (
     /* Como Edit Relationship de Confidentally 2.0: un paso, Person y Relationship sin caja. Mismo ancho que Add (relationships.md, 2026-11-12). */
     <ModalShell
-      title="Edit Relationship"
+      title="Edit relationship"
       description="Update how this person is related to the patient."
       onClose={onClose}
       width="max-w-[560px]"
@@ -78,7 +78,7 @@ export function EditRelationshipModal({
             <FieldError>{sinRol ? 'Choose at least one role.' : undefined}</FieldError>
           </div>
           <SelectField
-            label="Relationship to Patient"
+            label="Relationship to patient"
             required
             options={['Parent', 'Guardian', 'Sibling', 'Spouse', 'Child', 'Other']}
             value={rel}

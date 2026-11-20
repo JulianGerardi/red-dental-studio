@@ -50,7 +50,7 @@ const BOTON_TOTAL = `${CAJA_TOTAL} group/total gap-1 transition-colors hover:bg-
 /* Total Amount del caso: lleva a Estimate details. */
 export function BotonTotal({ total, onClick }: { total: string; onClick?: () => void }) {
   return (
-    <button type="button" onClick={onClick} aria-label={`Total Amount ${total}. View estimate details`} className={BOTON_TOTAL}>
+    <button type="button" onClick={onClick} aria-label={`Total amount ${total}. View estimate details`} className={BOTON_TOTAL}>
       Total Amount: <span className="text-dash-blue ml-1">{total}</span>
       <ChevronRight className="size-4 text-ink-muted transition-transform group-hover/total:translate-x-0.5" aria-hidden />
     </button>
@@ -72,7 +72,7 @@ export function AvisoEstimacion({ onActualizar }: { onActualizar: () => void }) 
       </button>
       {abierto && (
         <ConfirmDialog
-          title="Insurance Estimate Update Available"
+          title="Insurance estimate update available"
           confirmLabel="Update"
           onCancel={() => setAbierto(false)}
           onConfirm={() => { setAbierto(false); onActualizar() }}
@@ -101,12 +101,12 @@ const ESTADO_TRAS: Partial<Record<ClaveDialogo, EstadoCaso>> = {
   finish: 'Pending', present: 'Presented', accept: 'Waiting for consent', discard: 'Discarded', expire: 'Expired', cancel: 'Cancelled',
 }
 
-/* El menú del caso, como en la app real: "Actions Case" y "Actions Treatment", según el estado. Lo que cierra o borra
+/* El menú del caso, como en la app real: "Actions case" y "Actions treatment", según el estado. Lo que cierra o borra
    va en rojo. Ver clinical-mode.md. */
 type AccionMenu = { label: string; clave: ClaveDialogo | 'delete' | 'consent'; icono: LucideIcon; peligro?: boolean }
 const EXPIRAR: AccionMenu = { label: 'Expire', clave: 'expire', icono: TimerOff, peligro: true }
 const CANCELAR: AccionMenu = { label: 'Cancel', clave: 'cancel', icono: Ban, peligro: true }
-const CONSENTIMIENTO: AccionMenu = { label: 'Generate Consent', clave: 'consent', icono: FilePen }
+const CONSENTIMIENTO: AccionMenu = { label: 'Generate consent', clave: 'consent', icono: FilePen }
 /* Antes de aceptar el plan no hay consentimiento ni turno (Julián, 2026-10-06): en Planning, Pending y Presented no se
    muestran el bloque de consentimiento, la columna Consent ni el turno de cada visita. */
 export const SIN_CONSENTIMIENTO_NI_TURNO: EstadoCaso[] = ['Planning', 'Pending', 'Presented']
@@ -115,7 +115,7 @@ const ACCIONES_CASO: Partial<Record<EstadoCaso, AccionMenu[]>> = {
   Planning: [{ label: 'Delete', clave: 'delete', icono: Trash2, peligro: true }],
 }
 const ACCIONES_TRATAMIENTO: Record<EstadoCaso, AccionMenu[]> = {
-  Planning: [{ label: 'Finish Planning', clave: 'finish', icono: CheckCheck }, EXPIRAR, CANCELAR],
+  Planning: [{ label: 'Finish planning', clave: 'finish', icono: CheckCheck }, EXPIRAR, CANCELAR],
   Pending: [{ label: 'Present', clave: 'present', icono: Presentation }, EXPIRAR, CANCELAR],
   Presented: [{ label: 'Accept', clave: 'accept', icono: CircleCheck }, { label: 'Discard', clave: 'discard', icono: CircleX }, EXPIRAR, CANCELAR],
   'Waiting for consent': [EXPIRAR, CANCELAR],
@@ -248,7 +248,7 @@ export function DialogoMover({ onClose }: { onClose: () => void }) {
     >
       <div className="mt-5">
         <SelectField
-          label="Case Name"
+          label="Case name"
           value={caso}
           onChange={setCaso}
           options={CASOS.map((c) => c.nombre)}
@@ -369,7 +369,7 @@ export function DialogoBorrarCaso({ onConfirm, onClose }: { onConfirm: (op: stri
   const [op, setOp] = useState(OPCIONES_BORRAR_CASO[0].id)
   return (
     <Dialogo
-      titulo="Delete Case"
+      titulo="Delete case"
       texto={['Are you sure you want to delete this case?']}
       onConfirm={() => onConfirm(op)}
       onClose={onClose}
@@ -429,7 +429,7 @@ export function Rail({
           vista === 'unassigned' ? 'bg-dash-blue text-white' : 'text-ink hover:bg-surface-muted',
         )}
       >
-        <Captions className="size-4 shrink-0" /> Unassigned Items
+        <Captions className="size-4 shrink-0" /> Unassigned items
       </button>
       <TooltipProvider delayDuration={200}>
       <ul className="mt-1 flex min-h-0 flex-col overflow-y-auto">
@@ -864,7 +864,7 @@ export function VistaCaso({
             <span className="ml-auto flex shrink-0 items-center gap-3">
               {planificando && (
                 <Button onClick={onNuevaAlternativa}>
-                  <Plus /> New Alternative Case
+                  <Plus /> New alternative case
                 </Button>
               )}
               {planificando && (
@@ -891,10 +891,10 @@ export function VistaCaso({
               </button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-[210px]">
-              <DropdownMenuLabel className="text-[12px] font-semibold text-ink">Actions Case</DropdownMenuLabel>
+              <DropdownMenuLabel className="text-[12px] font-semibold text-ink">Actions case</DropdownMenuLabel>
               {accionesCaso.length ? accionesCaso.map(itemMenu) : <p className="px-2 pb-1.5 text-[12px] text-ink-muted italic">No case actions available</p>}
               <DropdownMenuSeparator />
-              <DropdownMenuLabel className="text-[12px] font-semibold text-ink">Actions Treatment</DropdownMenuLabel>
+              <DropdownMenuLabel className="text-[12px] font-semibold text-ink">Actions treatment</DropdownMenuLabel>
               {ACCIONES_TRATAMIENTO[caso.estado].map(itemMenu)}
             </DropdownMenuContent>
           </DropdownMenu>
@@ -927,7 +927,7 @@ export function VistaCaso({
         <div className="mt-4 flex flex-wrap items-start gap-4">
           {planificando ? (
             <SelectField
-              label="Treatment Case Category"
+              label="Treatment case category"
               required
               value={categoria}
               onChange={setCategoria}
@@ -936,13 +936,13 @@ export function VistaCaso({
             />
           ) : (
             <div className="w-[240px] max-w-full">
-              <span className="block text-xs font-medium text-ink">Treatment Case Category</span>
+              <span className="block text-xs font-medium text-ink">Treatment case category</span>
               <p className="mt-2 flex h-9 items-center text-[13px] font-medium text-ink">{categoria || '—'}</p>
             </div>
           )}
           <div className="min-w-[260px] flex-1">
             <span className="block text-xs font-medium text-ink">
-              Additional Discussion Notes<span className="text-required">*</span>
+              Additional discussion notes<span className="text-required">*</span>
             </span>
             <div className="relative mt-2">
               <textarea
@@ -1120,7 +1120,7 @@ export function TreatmentPlanSection({ casoInicial, estimadoInicial, consentimie
       'Up to date': { estado: 'al-dia', visitas: caso.visitas, forzar: 'editable' },
       'Not calculated': { estado: 'sin-calcular', forzar: 'editable' },
       'Update failed': { estado: 'fallo', visitas: foto, forzar: 'editable' },
-      'Presented / Locked': { estado: 'al-dia', visitas: foto, forzar: 'bloqueada' },
+      'Presented / locked': { estado: 'al-dia', visitas: foto, forzar: 'bloqueada' },
     }[e] as Estimacion)
   }
   const simularCambio = () => {
@@ -1141,7 +1141,7 @@ export function TreatmentPlanSection({ casoInicial, estimadoInicial, consentimie
   const abrirConsentimiento = (id: string, desdeHistorial = false) => { setConsentId(id); setHistorial(desdeHistorial); setVista('consentimiento') }
   const fuera = useContext(NavegacionClinica)
   const ir = (d: DestinoClinico) => {
-    if (d.pestana === 'Treatment Plan') {
+    if (d.pestana === 'Treatment plan') {
       if (d.caso) setCasoId(d.caso)
       if (d.consentimiento) {
         if (d.accion) setPendiente({ verbo: d.accion, ids: [d.consentimiento], cola: [d.consentimiento], suelto: false })
@@ -1324,10 +1324,10 @@ export function TreatmentPlanSection({ casoInicial, estimadoInicial, consentimie
           <div className="rounded-lg bg-white shadow-panel p-4 sm:p-5">
             <div className="flex flex-wrap items-center gap-3">
               <p className="min-w-0 flex-1 text-[17px] font-bold text-ink">Unassigned</p>
-              {['New Case Group', 'New Alternative Case'].map((t) => (
+              {['New case group', 'New alternative case'].map((t) => (
                 <button
                   key={t}
-                  onClick={t === 'New Alternative Case' ? () => setMover(true) : () => setGrupo(true)}
+                  onClick={t === 'New alternative case' ? () => setMover(true) : () => setGrupo(true)}
                   className={buttonClasses()}
                 >
                   <Plus className="size-3.5" /> {t}

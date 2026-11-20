@@ -71,7 +71,7 @@ export function PatientPaymentPanel({
       codigo: '—',
       descripcion: componentes.length === 1
         ? `${componentes[0].metodo}${componentes[0].ref ? ` ${componentes[0].ref}` : ''}`
-        : `Patient Payment · ${componentes.length} methods`,
+        : `Patient payment · ${componentes.length} methods`,
       provider: 'Front desk',
       tipo: 'Payment',
       monto: -total,
@@ -86,7 +86,7 @@ export function PatientPaymentPanel({
 
   const botonMetodo = 'mt-7 flex size-9 shrink-0 items-center justify-center rounded-md border border-line bg-white text-ink-muted shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] hover:bg-surface-muted focus-visible:outline-2 focus-visible:outline-dash-blue'
   const primero = (
-    <SeccionLedger titulo="Payment Information">
+    <SeccionLedger titulo="Payment information">
       {/* Fecha y Apply to en las dos primeras columnas de cuatro, como red.dev (ledger.md, 2026-11-20). */}
       <div className={FILA[4]}>
         <CampoFecha value={fecha} onChange={setFecha} error={intentado ? errorFecha : undefined} />
@@ -150,6 +150,6 @@ export function PatientPaymentPanel({
   )
 
   return (
-    <ShellLedger titulo="New Patient Payment (-)" primero={primero} segundo={tabla} onGuardar={guardar} onCancelar={onCancelar} guardando={ap.cargando || sinCargos} />
+    <ShellLedger titulo="New patient payment (-)" primero={primero} segundo={tabla} onGuardar={guardar} onCancelar={onCancelar} guardando={ap.cargando || sinCargos} />
   )
 }

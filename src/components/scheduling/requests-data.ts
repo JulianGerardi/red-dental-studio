@@ -9,7 +9,7 @@ import type { DatosTurno } from './NewAppointmentModal'
    Las dos listas son lo mismo con distinta urgencia, así que comparten forma
    y difieren sólo en el acento y en el rótulo. */
 
-export type TipoSolicitud = 'ASAP' | 'Waiting List'
+export type TipoSolicitud = 'ASAP' | 'Waiting list'
 
 export type Solicitud = {
   id: string
@@ -43,7 +43,7 @@ export const SOLICITUDES: Solicitud[] = [
     provider: 'Dr. Emily Chen', operatory: 'Operatory 1',
   },
   {
-    id: 's3', tipo: 'Waiting List',
+    id: 's3', tipo: 'Waiting list',
     patient: 'Noah James Smith', reason: 'Implant consultation',
     date: '13-03-2025', start: '09 AM', end: '10 AM',
     location: 'Los Angeles - 789 N Sunrise Street',
@@ -51,7 +51,7 @@ export const SOLICITUDES: Solicitud[] = [
     espera: 'Waiting 4 days',
   },
   {
-    id: 's4', tipo: 'Waiting List',
+    id: 's4', tipo: 'Waiting list',
     patient: 'John Smith', reason: 'Prophylaxis - adult',
     date: '14-03-2025', start: '11 AM', end: '12 PM',
     location: 'Los Angeles - 789 N Sunrise Street',
@@ -59,7 +59,7 @@ export const SOLICITUDES: Solicitud[] = [
     espera: 'Waiting 9 days',
   },
   {
-    id: 's5', tipo: 'Waiting List',
+    id: 's5', tipo: 'Waiting list',
     patient: 'Sofia Marin', reason: 'Bitewings - four radiographic images',
     date: '17-03-2025', start: '04 PM', end: '05 PM',
     location: 'Los Angeles - 789 N Sunrise Street',

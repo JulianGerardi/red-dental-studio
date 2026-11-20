@@ -56,3 +56,10 @@ Dos pedidos de Julián, los dos se apartan del frame a propósito:
    `PILL` de colores por categoría; Category, Direction, Impact, Method Type y
    Status se muestran como texto plano (`text-[#3f3f46]`), igual que cualquier
    otra celda de la tabla.
+
+## Enabled, Name y el buscador de cada pestaña (2026-11-20)
+
+Normalización (ver `figma/README.md`, misma fecha): la columna de switches se llama **Enabled** en las dos pestañas (un
+estado editable no es una acción); la primera columna de Adjustment types se llama **Name**; las pestañas son
+**Adjustment types** y **Payment methods**; el buscador dice "Search adjustment types" o "Search payment methods" según
+la pestaña (el frame decía "Search patients", anomalía 2, corregida). El pie dice "Showing X to Y of N …".

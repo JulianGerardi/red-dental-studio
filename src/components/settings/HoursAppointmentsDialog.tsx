@@ -15,8 +15,8 @@ import type { EstadoTurnoLocacion, TurnoLocacion } from '@/data/location-detail'
    figma/modulos/locations.md (2026-11-16). */
 
 const TONO: Record<EstadoTurnoLocacion, PillTone> = {
-  Proposed: 'purple', Booked: 'info', 'Check In': 'success', 'In Progress': 'success',
-  Cancelled: 'danger', 'No Show': 'neutral', 'Waiting List': 'warning',
+  Proposed: 'purple', Booked: 'info', 'Check in': 'success', 'In progress': 'success',
+  Cancelled: 'danger', 'No show': 'neutral', 'Waiting list': 'warning',
 }
 /* "Monday, November 23 · 3:00–4:00 PM": fecha y horario completo del turno (dura una hora). */
 const hora = (d: Date) => d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })
@@ -67,7 +67,7 @@ export function HoursAppointmentsDialog({
 
   const marcar = (t: TurnoLocacion, estado: EstadoTurnoLocacion) => {
     onCambiar({ ...t, estado })
-    aviso.ok(estado === 'Cancelled' ? `Appointment for ${t.paciente} cancelled.` : `Appointment for ${t.paciente} marked as No Show.`)
+    aviso.ok(estado === 'Cancelled' ? `Appointment for ${t.paciente} cancelled.` : `Appointment for ${t.paciente} marked as No show.`)
   }
 
   const guardarTurno = (d: DatosTurno) => {
@@ -116,7 +116,7 @@ export function HoursAppointmentsDialog({
               <RowActionsMenu label={`appointment for ${t.paciente}`}>
                 <DropdownMenuItem onSelect={() => setEditando(t)}>Edit appointment</DropdownMenuItem>
                 <DropdownMenuItem onSelect={() => marcar(t, 'Cancelled')}>Cancel appointment</DropdownMenuItem>
-                <DropdownMenuItem onSelect={() => marcar(t, 'No Show')}>Mark as No Show</DropdownMenuItem>
+                <DropdownMenuItem onSelect={() => marcar(t, 'No show')}>Mark as no show</DropdownMenuItem>
               </RowActionsMenu>
             }
           />
@@ -130,7 +130,7 @@ export function HoursAppointmentsDialog({
 export function HoursBlockedDialog({ turnos, onClose }: { turnos: TurnoLocacion[]; onClose: () => void }) {
   return (
     <ConfirmDialog icon="warning" title="Unable to change working hours" confirmLabel="Close" hideCancel onCancel={onClose} onConfirm={onClose}>
-      <p>Working hours cannot be changed because there are affected appointments in Check In or In Progress status.</p>
+      <p>Working hours cannot be changed because there are affected appointments in Check in or In progress status.</p>
       <ul className="mt-2 flex flex-col divide-y divide-line-soft">
         {turnos.map((t) => <FilaTurno key={t.id} t={t} />)}
       </ul>

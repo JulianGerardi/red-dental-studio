@@ -124,7 +124,7 @@ export const States: Story = {
       ].map(([nombre, clase, texto]) => (
         <tr key={nombre}>
           <td className="font-semibold">{nombre}</td>
-          <td><div className={clase}><Tabs tabs={['Patient View', 'Guarantor View']} value="Patient View" onChange={() => {}} /></div></td>
+          <td><div className={clase}><Tabs tabs={['Patient view', 'Guarantor view']} value="Patient view" onChange={() => {}} /></div></td>
           <td className="text-ink-medium">{texto}</td>
         </tr>
       ))}
@@ -175,7 +175,7 @@ function FilaTamano({ s }: { s: 'sm' | 'md' }) {
   const { ref, m } = useMedidas('[role=tab]')
   return (
     <tr>
-      <td><div ref={ref}><Tabs size={s} tabs={['Patient View', 'Guarantor View']} value="Patient View" onChange={() => {}} /></div></td>
+      <td><div ref={ref}><Tabs size={s} tabs={['Patient view', 'Guarantor view']} value="Patient view" onChange={() => {}} /></div></td>
       <td className="font-semibold">{s}</td>
       <td className="tabular-nums">{m?.alto}</td>
       <td className="tabular-nums">{m?.padding}</td>

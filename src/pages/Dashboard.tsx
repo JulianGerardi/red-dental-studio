@@ -118,7 +118,7 @@ const EDICION_POR_ETAPA: Record<EtapaEspera, { bloqueados: CampoTurno[]; pestana
   },
 }
 
-const ENCOUNTER: Record<EtapaEspera, string> = { 'Checked in': 'Planned', 'On hold': 'On Hold', 'Ready to check out': 'Completed' }
+const ENCOUNTER: Record<EtapaEspera, string> = { 'Checked in': 'Planned', 'On hold': 'On hold', 'Ready to check out': 'Completed' }
 
 /* La acción la dice el panel, no el turno (Julián, 2026-10-18): en Appointments el paciente todavía no llegó (Check In,
    verde) y en Waiting Room ya está adentro (Check Out, azul). Ver dashboard.md. */
@@ -246,7 +246,7 @@ export default function Dashboard() {
   })
 
   /* Cancel y No Show cierran la cita sin atenderla: sale de Appointments o de la Waiting Room (CON-1827, CON-1828). */
-  const cerrar = (t: Appointment, cerrado: 'Cancelled' | 'No Show') => setDias((prev) => {
+  const cerrar = (t: Appointment, cerrado: 'Cancelled' | 'No show') => setDias((prev) => {
     const d = prev[claveFecha(date)] ?? DIA_VACIO
     const k = claveTurno(t)
     return {
@@ -261,10 +261,10 @@ export default function Dashboard() {
   const confirmarCierre = (motivo?: string) => {
     if (!cerrando) return
     const cancelado = cerrando.tipo === 'cancel'
-    cerrar(cerrando.turno, cancelado ? 'Cancelled' : 'No Show')
+    cerrar(cerrando.turno, cancelado ? 'Cancelled' : 'No show')
     aviso.ok(cancelado
       ? `The appointment status has been updated to Canceled.${motivo ? ` Reason: ${motivo}.` : ''}`
-      : 'The appointment status has been updated to No Show.')
+      : 'The appointment status has been updated to No show.')
     setCerrando(null)
   }
 
@@ -289,7 +289,7 @@ export default function Dashboard() {
     const enSala = dia.waiting.find((w) => claveTurno(w) === k)
     if (enSala) return { encounter: ENCOUNTER[enSala.etapa], iniciar: enSala.etapa === 'Checked in' }
     const t = dia.appointments.find((x) => claveTurno(x) === k)
-    return { encounter: t?.enCurso ? 'In Progress' : t?.completado ? 'Fulfilled' : null, iniciar: false }
+    return { encounter: t?.enCurso ? 'In progress' : t?.completado ? 'Fulfilled' : null, iniciar: false }
   }
 
   /* Los números salen de las listas del día, no de un mock aparte. */
@@ -301,14 +301,17 @@ export default function Dashboard() {
         /* Una cancelada ya no es una cita del día; un No Show sí (no libera el lugar). */
         label: 'Appointments', value: String(dia.appointments.filter((a) => a.cerrado !== 'Cancelled').length),
         nota: `${completados} completed`, icon: CalendarDays,
+        info: `Appointments for this day, without cancellations. ${completados} completed.`,
       },
       {
-        label: 'Waiting', value: String(dia.waiting.length),
+        label: 'Waiting room', value: String(dia.waiting.length),
         nota: `${nuevos} new`, icon: Clock,
+        info: 'Patients who checked in and have not checked out yet.',
       },
       {
         label: 'Open encounters', value: String(dia.encuentros.abiertos),
         nota: dia.encuentros.promedio, icon: Activity,
+        info: `Encounters started and not closed yet. ${dia.encuentros.promedio}`,
       },
     ]
   }, [dia])
@@ -376,7 +379,7 @@ export default function Dashboard() {
                 const id = `appt-${claveTurno(a)}`
                 return (
                   <AppointmentRow
-                    key={id} appt={{ ...a, accion: 'Check In' }} id={id} activa={selected?.id === id}
+                    key={id} appt={{ ...a, accion: 'Check in' }} id={id} activa={selected?.id === id}
                     onSelect={pick} onAccion={hacerCheckIn} acciones={accionesReservada(a)}
                   />
                 )
@@ -386,7 +389,7 @@ export default function Dashboard() {
         </Panel>
 
         <Panel
-          title={<>Waiting Room <Globo n={enEspera.length} /></>}
+          title={<>Waiting room <Globo n={enEspera.length} /></>}
           controls={
             <FilterMenu
               label="Filter waiting room" size="sm"
@@ -420,7 +423,7 @@ export default function Dashboard() {
 
       {/* Pending Task va abajo, a todo el ancho: arriba queda la fila de tres (Julián, 2026-10-19). */}
       <Panel
-        title="Pending Task" className="mt-4"
+        title="Pending task" className="mt-4"
         controls={
           <Tabs
             size="sm" aria-label="Filter tasks"

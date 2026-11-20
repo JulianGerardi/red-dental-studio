@@ -162,7 +162,7 @@ function PersonSearchDemo({ inicial = '', disabled, abierto }: { inicial?: strin
   return (
     <div ref={ref}>
       <PersonSearchField
-        label="Select person" required placeholder="Search by Name or Last Name"
+        label="Select person" required placeholder="Search patients by name"
         personas={PERSONAS_DEMO.map((p) => p.name)} chips={chipsDemo}
         value={v} onChange={setV} disabled={disabled}
       />
@@ -206,7 +206,7 @@ export const CheckboxBesideField: Story = {
     <div className="grid w-[560px] max-w-full grid-cols-1 gap-4 sm:grid-cols-2">
       <SelectField label="Language" options={['English', 'Spanish']} value="Spanish" onChange={() => {}} />
       <div className="flex flex-col justify-end">
-        <OptionCheckbox label="Interpreter Required" defaultChecked className="h-9 items-center py-0" />
+        <OptionCheckbox label="Interpreter required" defaultChecked className="h-9 items-center py-0" />
       </div>
     </div>
   ),

@@ -15,8 +15,8 @@ import { PROVIDERS, areaDeTratamiento, type Finding } from './data'
    Un solo Save guarda todo. El
    Fee sólo aparece si el procedimiento lo trae. Arriba: el procedimiento, la fecha, el precio y el área de
    tratamiento con el ícono de su tipo (CON-3700; mockup de Julián, 2026-10-27). Ver design-reference/figma/modulos/clinical-mode.md (2026-10-24). */
-type Pestana = 'General Information' | 'Findings' | 'Diagnostic'
-const PESTANAS = ['General Information', 'Findings', 'Diagnostic'] as const
+type Pestana = 'General information' | 'Findings' | 'Diagnostic'
+const PESTANAS = ['General information', 'Findings', 'Diagnostic'] as const
 
 export function EditProcedureDrawer({
   finding, findings, onClose, onSave,
@@ -26,14 +26,14 @@ export function EditProcedureDrawer({
   onClose: () => void
   onSave: (patch: Partial<Finding>) => void
 }) {
-  const [pestana, setPestana] = useState<Pestana>('General Information')
+  const [pestana, setPestana] = useState<Pestana>('General information')
   const [provider, setProvider] = useState('')
   const [notes, setNotes] = useState('')
   const [linked, setLinked] = useState<string[]>([])
   const [diagnoses, setDiagnoses] = useState<string[]>([])
   useEffect(() => {
     if (!finding) return
-    setPestana('General Information')
+    setPestana('General information')
     setProvider(finding.provider); setNotes(finding.notes); setLinked(finding.linked); setDiagnoses(finding.diagnoses)
   }, [finding])
 
@@ -49,10 +49,10 @@ export function EditProcedureDrawer({
 
   return (
     <Drawer
-      open={!!finding} onClose={onClose} title="Edit Procedure" footer={<DrawerActions onCancel={onClose} onSave={guardar} />}
-      tabs={<Tabs tabs={PESTANAS} value={pestana} onChange={setPestana} fullWidth size="sm" aria-label="Edit Procedure sections" />}
+      open={!!finding} onClose={onClose} title="Edit procedure" footer={<DrawerActions onCancel={onClose} onSave={guardar} />}
+      tabs={<Tabs tabs={PESTANAS} value={pestana} onChange={setPestana} fullWidth size="sm" aria-label="Edit procedure sections" />}
     >
-      {finding && pestana === 'General Information' && (
+      {finding && pestana === 'General information' && (
         <div className="flex flex-col gap-5">
           <div className="flex flex-col gap-4">
             <FilaNombre nombre={mayuscula(finding.condition)} estado={finding.status} tono={TONO_ESTADO[finding.status]} />
@@ -75,7 +75,7 @@ export function EditProcedureDrawer({
       {finding && pestana === 'Findings' && (
         <div className="flex flex-col gap-4">
           <div className="flex flex-col gap-1">
-            <p className="text-sm font-bold text-ink">Link Findings</p>
+            <p className="text-sm font-bold text-ink">Link findings</p>
             <p className="text-[11px] leading-relaxed text-ink-faint">
               You can link clinical findings that may be resolved by this procedure. The system will suggest relevant findings based on the anatomical location and active conditions.
             </p>
@@ -94,7 +94,7 @@ export function EditProcedureDrawer({
       {finding && pestana === 'Diagnostic' && (
         <div className="flex flex-col gap-4">
           <div className="flex flex-col gap-1">
-            <p className="text-sm font-bold text-ink">Link Diagnosis</p>
+            <p className="text-sm font-bold text-ink">Link diagnosis</p>
             <p className="text-[11px] leading-relaxed text-ink-faint">
               You can link diagnoses that may be resolved by this procedure. The system will suggest relevant diagnoses based on the anatomical location and active conditions.
             </p>

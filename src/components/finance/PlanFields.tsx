@@ -89,8 +89,8 @@ export function PlanContactFields({ d, set, falta, codigo, onCodigo }: Props & {
         </button>
       </div>
       <div className="grid gap-4 sm:grid-cols-2">
-        <TextField label="First Name" placeholder="First Name" value={d.contactoNombre} onChange={set('contactoNombre')} />
-        <TextField label="Last Name" placeholder="Last Name" value={d.contactoApellido} onChange={set('contactoApellido')} />
+        <TextField label="First name" placeholder="First name" value={d.contactoNombre} onChange={set('contactoNombre')} />
+        <TextField label="Last name" placeholder="Last name" value={d.contactoApellido} onChange={set('contactoApellido')} />
         <TextField label="Email" placeholder="Email" value={d.contactoEmail} onChange={set('contactoEmail')} />
         <TextField label="Organization" placeholder="Organization" value={d.organizacion} onChange={set('organizacion')} />
       </div>
@@ -101,12 +101,12 @@ export function PlanContactFields({ d, set, falta, codigo, onCodigo }: Props & {
 export function PlanAddressFields({ d, set, falta }: Props) {
   return (
     <div className="grid gap-4 sm:grid-cols-2">
-      <TextField label="Address Line 1" required placeholder="Street name and number" value={d.linea1} onChange={set('linea1')} error={falta('linea1')} />
-      <TextField label="Address Line 2" placeholder="Additional info" value={d.linea2} onChange={set('linea2')} />
+      <TextField label="Address line 1" required placeholder="Street name and number" value={d.linea1} onChange={set('linea1')} error={falta('linea1')} />
+      <TextField label="Address line 2" placeholder="Additional info" value={d.linea2} onChange={set('linea2')} />
       <SelectField label="Country" required options={PAISES} value={d.pais} onChange={set('pais')} error={falta('pais')} />
       <SelectField label="State" required placeholder="Select your region" options={ESTADOS} value={d.estadoUs} onChange={set('estadoUs')} error={falta('estadoUs')} />
       <TextField label="City" required placeholder="Your city" value={d.ciudad} onChange={set('ciudad')} error={falta('ciudad')} />
-      <TextField label="ZIP Code" required placeholder="Postal code (only numbers)" value={d.zip} onChange={(v) => set('zip')(v.replace(/\D/g, ''))} error={falta('zip')} />
+      <TextField label="ZIP code" required placeholder="Postal code (only numbers)" value={d.zip} onChange={(v) => set('zip')(v.replace(/\D/g, ''))} error={falta('zip')} />
     </div>
   )
 }
@@ -115,19 +115,19 @@ export function PlanConfigurationFields({ d, set, falta, aranceles }: Props & { 
   const numero = (k: 'espera' | 'edadMaxima') => (n: number) => set(k)(String(n))
   return (
     <div className="grid gap-4 sm:grid-cols-2">
-      <SelectField label="Benefit Renewal Month" required placeholder="Select benefit renewal month" options={MESES} value={d.mesRenovacion} onChange={set('mesRenovacion')} error={falta('mesRenovacion')} />
-      <SelectField label="Source of Payment" required placeholder="Select source of payment" options={FUENTES_PAGO} value={d.fuentePago} onChange={set('fuentePago')} error={falta('fuentePago')} />
+      <SelectField label="Benefit renewal month" required placeholder="Select benefit renewal month" options={MESES} value={d.mesRenovacion} onChange={set('mesRenovacion')} error={falta('mesRenovacion')} />
+      <SelectField label="Source of payment" required placeholder="Select source of payment" options={FUENTES_PAGO} value={d.fuentePago} onChange={set('fuentePago')} error={falta('fuentePago')} />
       <SelectField label="Type" required placeholder="Select type" options={TIPOS_PLAN} value={d.tipo} onChange={set('tipo')} error={falta('tipo')} />
       <SelectField
-        label="Max Allowable Amount Fee Schedule" placeholder="Select max allowable amount fee schedule"
+        label="Max allowable amount fee schedule" placeholder="Select max allowable amount fee schedule"
         options={aranceles.filter((a) => a.estado === 'Active').map((a) => a.nombre)} value={d.arancelMaximo} onChange={set('arancelMaximo')}
       />
-      <UnitField label="Waiting Period" required unit="months" value={Number(d.espera) || 0} onChange={numero('espera')} error={falta('espera')} />
-      <UnitField label="Dependent Max Age" required unit="years" value={Number(d.edadMaxima) || 0} onChange={numero('edadMaxima')} error={falta('edadMaxima')} />
-      <SelectField label="Missing Tooth Clause" required placeholder="Select missing tooth clause" options={SI_NO} value={d.dienteFaltante} onChange={set('dienteFaltante')} error={falta('dienteFaltante')} />
-      <SelectField label="Crowns/Bridges Paid On" placeholder="Select crowns/bridges paid on" options={CORONAS_PAGADAS} value={d.coronas} onChange={set('coronas')} />
-      <SelectField label="Out of Network Benefits" placeholder="Select out of network benefits" options={SI_NO} value={d.fueraDeRed} onChange={set('fueraDeRed')} />
-      <SelectField label="Out of Network Benefit Assignment" placeholder="Select out of network benefit assignment" options={ASIGNACIONES} value={d.asignacion} onChange={set('asignacion')} />
+      <UnitField label="Waiting period" required unit="months" value={Number(d.espera) || 0} onChange={numero('espera')} error={falta('espera')} />
+      <UnitField label="Dependent max age" required unit="years" value={Number(d.edadMaxima) || 0} onChange={numero('edadMaxima')} error={falta('edadMaxima')} />
+      <SelectField label="Missing tooth clause" required placeholder="Select missing tooth clause" options={SI_NO} value={d.dienteFaltante} onChange={set('dienteFaltante')} error={falta('dienteFaltante')} />
+      <SelectField label="Crowns/bridges paid on" placeholder="Select crowns/bridges paid on" options={CORONAS_PAGADAS} value={d.coronas} onChange={set('coronas')} />
+      <SelectField label="Out of network benefits" placeholder="Select out of network benefits" options={SI_NO} value={d.fueraDeRed} onChange={set('fueraDeRed')} />
+      <SelectField label="Out of network benefit assignment" placeholder="Select out of network benefit assignment" options={ASIGNACIONES} value={d.asignacion} onChange={set('asignacion')} />
     </div>
   )
 }

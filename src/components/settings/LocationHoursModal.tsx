@@ -8,7 +8,7 @@ import { ConfirmDialog } from '@/components/ui/confirm-dialog'
 import type { EstadoDia } from '@/data/location-detail'
 import { OBLIGATORIO } from '@/lib/validacion'
 
-/* Misma grilla de media hora que "New Exception": desplegable, no texto
+/* Misma grilla de media hora que "New exception": desplegable, no texto
    libre con máscara. */
 const HORAS = Array.from({ length: 48 }, (_, i) => {
   const h = Math.floor(i / 2)
@@ -130,12 +130,12 @@ export function LocationHoursModal({
             <div className="flex items-start gap-2">
               <div className="grid flex-1 grid-cols-2 gap-4">
                 <SelectField
-                  label="Start Time" required placeholder="00:00 hs" options={HORAS} value={r.inicio}
+                  label="Start time" required placeholder="00:00 hs" options={HORAS} value={r.inicio}
                   onChange={cambiar(i, 'inicio')}
                   error={intentado && !r.inicio ? OBLIGATORIO : undefined}
                 />
                 <SelectField
-                  label="End Time" required placeholder="00:00 hs" options={HORAS} value={r.fin}
+                  label="End time" required placeholder="00:00 hs" options={HORAS} value={r.fin}
                   onChange={cambiar(i, 'fin')}
                   error={intentado && !r.fin ? OBLIGATORIO : undefined}
                 />

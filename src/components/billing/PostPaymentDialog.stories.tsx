@@ -81,9 +81,9 @@ export const States: Story = {
   parameters: sinControles,
   render: () => (
     <EstadosDelDrawer estados={[
-      { estado: 'New Patient Payment (-)', cuando: 'Patient Payment (-) en Billing o en el Ledger.', story: 'Patient Payment' },
-      { estado: 'Credit Adjustment (-)', cuando: 'Credit Adjustment (-).', story: 'Credit Adjustment' },
-      { estado: 'Enter Charge (+) Adjustment', cuando: 'Charge Adjustment (+): un solo paso, con Provider y Visit date.', story: 'Charge Adjustment' },
+      { estado: 'New patient payment (-)', cuando: 'Patient Payment (-) en Billing o en el Ledger.', story: 'Patient Payment' },
+      { estado: 'Credit adjustment (-)', cuando: 'Credit Adjustment (-).', story: 'Credit Adjustment' },
+      { estado: 'Enter charge (+) adjustment', cuando: 'Charge Adjustment (+): un solo paso, con Provider y Visit date.', story: 'Charge Adjustment' },
       { estado: 'Validation errors', cuando: 'Save o Next Step sin Amount.', story: 'With Validation Errors' },
       { estado: 'Several payment methods', cuando: 'Add another payment method.', story: 'Several Payment Methods' },
     ]} />

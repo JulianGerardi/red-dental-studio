@@ -26,7 +26,7 @@ const OCUPADA = '09 AM'
 
 export function AppointmentSlotPicker({
   provider = 'Sarah Stone',
-  especialidad = 'General Dentistry',
+  especialidad = 'General dentistry',
   /* Sin fecha elegida todavía; el Figma traía "Sábado, 19 de febrero de 2022", en castellano (scheduling.md, 2026-11-12). */
   fecha = 'Select a date',
   paciente,
