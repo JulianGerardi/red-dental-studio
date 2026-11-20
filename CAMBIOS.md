@@ -5,7 +5,7 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-11-20
 
-### Acciones al lado del título, pestañas a la izquierda, botones "Add" y Clinical practitioner (PR_PENDIENTE)
+### Acciones al lado del título, pestañas a la izquierda, botones "Add" y Clinical practitioner ([#179](https://github.com/JulianGerardi/red-dental-studio/pull/179))
 - **Regla:** al lado del título van sólo las acciones; las pestañas van a la izquierda de su barra y filtros, fecha y
   Columns en la otra punta. Scheduling: Day / Week / Month a la izquierda; fecha, Today, Status legend y Filter juntos a
   la derecha. Ledger del paciente: Patient view / Guarantor view en la barra de la tabla, a la izquierda. Billing: igual
