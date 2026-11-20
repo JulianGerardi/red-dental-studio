@@ -5,7 +5,7 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-11-20
 
-### Drawers del Ledger y Billing contra el video de red.dev (CON-3738, CON-3739, CON-3735)
+### Drawers del Ledger y Billing contra el video de red.dev (CON-3738, CON-3739, CON-3735) ([#171](https://github.com/JulianGerardi/red-dental-studio/pull/171))
 - **Sin ícono ni plegado** en el título de la card. `SeccionLedger` pierde la prop `caja`: siempre es una card con
   título, también en Credit y Charge Adjustment, que antes no lo mostraban.
 - **Sin transacciones abiertas:** Patient Payment no muestra los métodos y Save se apaga; Credit Adjustment también
