@@ -60,7 +60,7 @@ export function ChargeAdjustmentPanel({
 
   const grilla = 'grid gap-4 sm:grid-cols-2'
   const primero = (
-    <SeccionLedger titulo="Adjustment Information">
+    <SeccionLedger titulo="Adjustment Information" caja>
       <div className={grilla}>
         <CampoFecha value={fecha} onChange={setFecha} error={intentado ? errorFecha : undefined} />
         <TextField
