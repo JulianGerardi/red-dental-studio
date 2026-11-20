@@ -210,31 +210,9 @@ export function ActividadReciente({
   return (
     <Panel
       title={paciente ? `${paciente.nombre} — Recent billing activity` : 'Recent billing activity'}
-      className={cn('min-w-0', className)}
-      controls={
-        <div className="flex flex-wrap items-center gap-2">
-          {paciente
-            ? <Tabs size="sm" aria-label="Whose activity" tabs={VISTAS_PACIENTE} value={vista} onChange={onVista} />
-            /* El tipo se filtra con el Filter de la app, como Accounts; antes era una tira de pestañas (billing.md, 2026-11-20). */
-            : (
-              <FilterMenu
-                size="sm"
-                label="Filter activity"
-                groups={[{
-                  type: 'single', title: 'Type', defaultValue: 'All', value: filtro, onChange: (v) => onFiltro(v as FiltroActividad),
-                  options: FILTROS_ACTIVIDAD.map((f) => ({ value: f, count: todas?.filter((m) => coincideFiltro(m, f)).length })),
-                }]}
-              />
-            )}
-          <ColumnPicker
-            size="sm"
-            columnas={elegibles.map((c) => ({ id: c.key, label: c.header }))}
-            ocultas={ocultas.filter((k) => elegibles.some((c) => c.key === k))}
-            onToggle={(k) => setOcultas((p) => (p.includes(k) ? p.filter((x) => x !== k) : [...p, k]))}
-            onReset={() => setOcultas([])}
-          />
-        </div>
-      }
+      /* Título pegado y sin padding arriba del cuerpo, como Find patient y Today (billing.md, 2026-11-20). */
+      className={cn('min-w-0', TITULO_PEGADO, className)}
+      bodyClassName="pt-0"
     >
       {/* En el resumen, clic en una fila abre la vista de ese paciente. */}
       <DataTable
@@ -245,6 +223,31 @@ export function ActividadReciente({
         rowLabel={(m) => m.paciente}
         onRowClick={paciente ? undefined : (m) => onElegir(m.paciente)}
         defaultExpanded={paciente && abierta ? [abierta] : undefined}
+        /* Una sola barra arriba de la tabla: con paciente, sus pestañas a la izquierda; Filter (sin paciente) y Columns juntos
+           en la otra punta (billing.md, 2026-11-20). */
+        toolbarStart={paciente && <Tabs size="sm" aria-label="Whose activity" tabs={VISTAS_PACIENTE} value={vista} onChange={onVista} />}
+        actions={
+          <>
+            {/* El tipo se filtra con el Filter de la app, como Accounts (billing.md, 2026-11-20). */}
+            {!paciente && (
+              <FilterMenu
+                size="sm"
+                label="Filter activity"
+                groups={[{
+                  type: 'single', title: 'Type', defaultValue: 'All', value: filtro, onChange: (v) => onFiltro(v as FiltroActividad),
+                  options: FILTROS_ACTIVIDAD.map((f) => ({ value: f, count: todas?.filter((m) => coincideFiltro(m, f)).length })),
+                }]}
+              />
+            )}
+            <ColumnPicker
+              size="sm"
+              columnas={elegibles.map((c) => ({ id: c.key, label: c.header }))}
+              ocultas={ocultas.filter((k) => elegibles.some((c) => c.key === k))}
+              onToggle={(k) => setOcultas((p) => (p.includes(k) ? p.filter((x) => x !== k) : [...p, k]))}
+              onReset={() => setOcultas([])}
+            />
+          </>
+        }
         rowDetail={paciente ? (m) => (
           <DetalleMovimiento m={{ ...m, saldo: undefined }} aplicaciones={APLICACIONES_BILLING} movimientos={ACTIVIDAD_RECIENTE} onVerTransaccion={ver} />
         ) : undefined}

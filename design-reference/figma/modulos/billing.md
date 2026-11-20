@@ -493,3 +493,21 @@ Payments / Adjustments / Today** de Recent Billing Activity pasan al `FilterMenu
 de Columns: un grupo *Type* de una opción, cada una con su cantidad. Con un paciente elegido siguen las pestañas
 Patient / Guarantor View (cambian de vista, no filtran). `ActividadReciente` suma `todas` para las cantidades. e2e en
 `tests/billing.e2e.ts` (abre el Filter en vez de tocar las pestañas).
+
+## Ajustes en secundario (2026-11-20)
+
+Con un paciente elegido, *Patient payment* queda en primario y *Credit adjustment* / *Charge adjustment* pasan a
+secundario, igual que el Ledger (ledger.md, misma fecha).
+
+### Corrección: ajustes en azul; pestañas y Columns en una sola barra (2026-11-20)
+
+1. Los ajustes vuelven a azul, como estaban (pedido de Julián).
+2. *Patient view / Guarantor view* (o Filter, sin paciente) bajan del encabezado de *Recent billing activity* a la barra
+   de la tabla, a la izquierda; *Columns* en la otra punta. Van por `DataTable` (`toolbarStart` y `actions`, prop nueva
+   `toolbarStart`): con una barra propia arriba, la tabla dibujaba la suya debajo y quedaban ~25 px entre las pestañas y
+   la tabla. Ahora: título, 12 px, barra, 12 px, tabla (el panel con el título pegado, como Find patient y Today).
+
+### Filter al lado de Columns (2026-11-20)
+
+Pedido de Julián. Sin paciente, Filter va a la derecha, al lado de *Columns* (los dos en `actions` de `DataTable`); con
+paciente, *Patient view / Guarantor view* sigue a la izquierda.

@@ -656,3 +656,22 @@ Sin historia de Jira: devolución de diseño de Julián sobre Locations, Employe
 
 **A validar:** que recepción y administración no extrañen el clic en el nombre (es el patrón de Patients, que sí lo
 conserva). Si lo extrañan, la salida es la fila entera clickeable, no volver al link.
+
+## Exceptions con la estructura de Roles & location (2026-11-20)
+
+Pedido de Julián: *Add exception* y *Add role* tenían diseños distintos (uno adentro de una caja blanca, el otro no).
+Se saca la caja: botón primario arriba a la derecha y cada excepción como card suelta (blanca, borde, `rounded-xl`, el
+mismo padding que la card de un rol), con 12 px entre cards. *Add exception* era un link azul; ahora es `ui/button`.
+
+### Sin puntos de estado (2026-11-20)
+
+Pedido de Julián: el punto verde o gris de cada excepción no existe en el resto de la app. El estado pasa a `ui/pill`
+con su nombre (Active en verde; Expired y los demás en neutro), al lado de la fecha, como el Status de Employees.
+
+### Exceptions con el diseño de Rooms (2026-11-20, corrige lo anterior)
+
+Pedido de Julián: que Exceptions quede igual a Working hours y Rooms. Botón *Add exception* arriba a la derecha, afuera;
+una caja blanca con encabezado gris (*Exception · Date · Status*) y una fila por excepción (`FILA_EXCEPCION`, misma
+grilla que `FILA_SALA`): nombre en semibold, fecha, estado en `Pill` y, al final, *Edit exception* con el lápiz (como
+*Edit room*) y el tacho. El chevron que abría la edición pasa a ser *Edit exception*: hace lo mismo. En el celular la
+fecha baja debajo del nombre, como el tipo de una sala.

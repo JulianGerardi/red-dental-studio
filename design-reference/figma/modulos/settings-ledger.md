@@ -74,3 +74,22 @@ Normalización (ver `figma/README.md`, misma fecha): la columna de switches se l
 estado editable no es una acción); la primera columna de Adjustment types se llama **Name**; las pestañas son
 **Adjustment types** y **Payment methods**; el buscador dice "Search adjustment types" o "Search payment methods" según
 la pestaña (el frame decía "Search patients", anomalía 2, corregida). El pie dice "Showing X to Y of N …".
+
+## *Adjustment types* y *Payment methods* en pestañas (2026-11-20)
+
+Pedido de Julián. Corrige el 2026-11-20 anterior: qué lista se ve no es un filtro, son dos catálogos distintos.
+
+1. El grupo *View* del Filter pasa a `Tabs` `sm` debajo del título, como las fichas de Settings (Location, Account,
+   Employee). Cambiar de pestaña vuelve *Type* a All, limpia el buscador y la página, como antes.
+2. El Filter queda con un solo grupo, *Type*, con las opciones de la pestaña y su cantidad.
+
+### Las pestañas, a la derecha de la fila del buscador (2026-11-20)
+
+Pedido de Julián: las pestañas van a la altura del buscador, en la otra punta de la tabla. Buscador y Filter a la
+izquierda, *Adjustment types / Payment methods* a la derecha, alineadas al borde derecho de la tabla, en `md` (32, el alto
+del buscador). En el celular bajan a su propio renglón.
+
+### Las pestañas, a la izquierda y debajo del buscador (2026-11-20, corrige la anterior)
+
+Pedido de Julián: en toda la app las pestañas van a la izquierda. Buscador y Filter en su fila; debajo, *Adjustment
+types / Payment methods* a la izquierda (`md`); después la tabla.

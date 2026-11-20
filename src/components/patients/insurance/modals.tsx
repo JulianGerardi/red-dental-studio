@@ -1,4 +1,5 @@
 import { DrawerActions, DrawerStep } from '@/components/ui/drawer'
+import { Button } from '@/components/ui/button'
 import { useState } from 'react'
 import { Pencil, ShieldHalf, Hospital, AArrowUp, Plus } from 'lucide-react'
 import {
@@ -241,13 +242,9 @@ export function ManageSubscriptionModal({
           {/* "Dependers" es del Figma. */}
           <SectionCard title="Dependers">
             <PersonaSeleccionada p={DIRECTORIO[0]} />
-            <button
-              type="button"
-              onClick={onNuevoDependiente}
-              className="text-dash-blue flex items-center gap-1.5 self-end text-[13px] font-semibold hover:underline"
-            >
-              <Plus className="size-4" /> Add new
-            </button>
+            <Button variant="secondary" className="self-end" onClick={onNuevoDependiente}>
+              <Plus /> Add new
+            </Button>
           </SectionCard>
         </DrawerStep>
 

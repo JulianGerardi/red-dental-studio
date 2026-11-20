@@ -185,7 +185,7 @@ export function Household() {
 const VISTAS = ['Patient view', 'Guarantor view'] as const
 type Vista = (typeof VISTAS)[number]
 
-/* Los tres botones de red.dev, en la fila del título; cada uno abre su drawer, el mismo de Billing (ledger.md, 2026-11-19). */
+/* Los tres botones de red.dev, en la fila del título y en azul; cada uno abre su drawer, el mismo de Billing (ledger.md, 2026-11-19). */
 export function AccionesLedger({ onAccion }: { onAccion: (tipo: TipoAjusteBilling) => void }) {
   return (
     <div className="flex flex-wrap items-center gap-2">
@@ -348,13 +348,10 @@ export default function Ledger() {
         />
 
         <div className="flex min-w-0 flex-1 flex-col">
-          {/* Como red.dev: título, los tres botones y Patient View / Guarantor View en la misma fila (ledger.md, 2026-11-19). */}
+          {/* Al lado del título, sólo las acciones; la vista va en la barra de la tabla (ledger.md, 2026-11-20). */}
           <div className="flex flex-wrap items-start justify-between gap-3">
             <PageTitle>Ledger</PageTitle>
-            <div className="flex flex-wrap items-center gap-2">
-              <AccionesLedger onAccion={setAccion} />
-              <Tabs className="shrink-0" aria-label="Ledger view" tabs={VISTAS} value={vista} onChange={(v) => { setVista(v); setPagina(1) }} />
-            </div>
+            <AccionesLedger onAccion={setAccion} />
           </div>
 
           {/* Una card por métrica, como red.dev, Billing y Edit Account (`ui/stat-card`). */}
@@ -372,7 +369,10 @@ export default function Ledger() {
           {/* La tabla en su card, con Columns arriba a la derecha como red.dev; sin buscador ni filtro (no están en red.dev
               ni en CON-3753). Sin Export statement: no está en red.dev (ledger.md, 2026-11-20). */}
           <div className="mt-4 flex w-full flex-col overflow-hidden rounded-lg border border-line-row bg-white lg:flex-1">
-          <div className="flex items-center justify-end gap-2 border-b border-line-row px-3 py-2.5">
+          {/* Pestañas a la izquierda, Columns en la otra punta, como Billing (ledger.md, 2026-11-20). */}
+          <div className="flex flex-wrap items-center justify-between gap-2 border-b border-line-row px-3 py-2.5">
+            <Tabs size="sm" className="shrink-0" aria-label="Ledger view" tabs={VISTAS} value={vista} onChange={(v) => { setVista(v); setPagina(1) }} />
+            <div className="flex items-center gap-2">
             {filasPagina.length > 0 && (
               <BotonExpandirTodo todasAbiertas={todasAbiertas} hayAlgunaAbierta={hayAlgunaAbierta}
                 onExpandirTodo={expandirTodo} onColapsarTodo={colapsarTodo} />
@@ -385,6 +385,7 @@ export default function Ledger() {
               onReset={() => setOcultas(OCULTAS_DE_ENTRADA)}
               porDefecto={OCULTAS_DE_ENTRADA}
             />
+            </div>
           </div>
           <div ref={refVisible} data-tabla-scroll className="w-full overflow-x-auto lg:flex lg:flex-1 lg:flex-col">
             <div style={{ minWidth: anchoMinimo }} className="lg:flex lg:flex-1 lg:flex-col">

@@ -811,3 +811,39 @@ Pedido de Julián, con una grabación de red.dev.
    Para moverse de semana o de mes se elige el día en el calendario.
 5. **Sin breadcrumb:** el de un solo tramo repetía el título; Scheduling es de primer nivel y no lleva rastro (regla del
    design system).
+
+## Al lado del título, sólo las acciones (2026-11-20)
+
+Sin historia de Jira (pedido de Julián: *"al lado del título van los botones de acción"*).
+
+1. Corrige el punto 1 del 2026-11-19: **Day / Week / Month** y **View** no son acciones, cambian qué se ve, igual que la
+   fecha. Bajan a la barra de la fecha, alineados a la derecha (fecha, *Today* y *Status legend* a la izquierda). En la
+   fila del título queda sólo *New appointment*.
+2. En el celular la barra se parte en dos renglones: fecha y *Status legend* arriba, la vista y *View* abajo.
+3. Queda para decidir (análisis de filtros, misma fecha): *View* es un filtro (providers, estados y salas) pero se ve
+   como un botón primario sin ícono y aplica con *Save*, distinto del `FilterMenu` del resto de la app.
+
+### *View* con la cara del Filter (2026-11-20)
+
+Análisis de filtros, pedido por Julián: el botón *View* (azul, sin ícono) pasa a ser el `FilterTrigger` de la app (blanco,
+ícono y "Filter"). El panel no cambia: sigue con sus tres grupos y Save. **Sin contador**: la grilla todavía no se filtra
+con lo elegido (es mock); mostrar "Filter 3" en azul diría que hay filtros aplicados que no se ven. Cuando la grilla
+filtre, se pasa `count`.
+
+### La barra: pestañas a la izquierda; Status legend y Filter a la derecha (2026-11-20)
+
+Pedido de Julián. Corrige lo anterior del mismo día: **Day / Week / Month** a la izquierda (en toda la app las pestañas
+van a la izquierda), después la fecha y *Today*. **Status legend** y **Filter** juntos en la otra punta. En el celular
+la barra se parte en dos renglones: pestañas y fecha arriba, Status legend y Filter abajo.
+
+### La fecha también a la derecha (2026-11-20, corrige la anterior)
+
+Pedido de Julián: el selector de fecha va del lado derecho. Queda **Day / Week / Month** sola a la izquierda y, juntos en
+la otra punta, fecha, *Today* (fuera de hoy), *Status legend* y Filter. En el celular, pestañas arriba y el resto abajo.
+
+### Texto del calendario en negro (2026-11-20)
+
+Pedido de Julián (no todo el texto estaba en negro). Pasan a `ink`: las horas de la columna izquierda, los días de la
+semana (SUN, MON… en Day, Week y Month), los números de día (eran azules; el de hoy sigue en el círculo azul) y el texto de
+*Status legend* (era `ink-soft`, más claro que Filter y la fecha). Quedan en gris sólo los días de otro mes en Month y
+el "No appointments on this day." del panel del día, que son estados.

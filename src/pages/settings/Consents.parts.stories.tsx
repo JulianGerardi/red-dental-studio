@@ -94,7 +94,6 @@ function Consentimientos({ args }: { args: Args }) {
           elegidoId={elegido} q={q} onQ={setQ} filtro={filtro} onFiltro={setFiltro}
           onElegir={(t) => { setElegido(t.id); setBorrador(aBorrador(t)); setIntentado(false) }}
           onAlternar={alternar}
-          onNuevo={() => { setElegido(null); setBorrador(BORRADOR_VACIO); setIntentado(false) }}
         />
         <EditorTemplate actual={actual} borrador={borrador} onBorrador={setBorrador} intentado={intentado} onAlternar={() => actual && alternar(actual.id)} onCancelar={() => setIntentado(false)} onGuardar={() => setIntentado(true)} onPreview={() => setPreview(true)} />
       </div>
@@ -159,7 +158,7 @@ function Lista({ q }: { q: string }) {
   return (
     <ListaTemplates
       templates={TEMPLATES_INICIALES.filter((t) => coincide(t, filtro) && t.titulo.toLowerCase().includes(texto.toLowerCase()))}
-      elegidoId={elegido} q={texto} onQ={setTexto} filtro={filtro} onFiltro={setFiltro} onElegir={(t) => setElegido(t.id)} onAlternar={nada} onNuevo={() => setElegido(null)}
+      elegidoId={elegido} q={texto} onQ={setTexto} filtro={filtro} onFiltro={setFiltro} onElegir={(t) => setElegido(t.id)} onAlternar={nada}
     />
   )
 }

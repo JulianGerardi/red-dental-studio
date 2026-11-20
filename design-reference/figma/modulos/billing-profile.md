@@ -167,3 +167,9 @@ quedaban (*Complete the information…* y los de Primary Provider) se quedan (Ju
    *This field is required.* (`OBLIGATORIO`, regla en [figma/README.md › Validación](../README.md)).
 2. NPI y TIN/SSN vacíos también dicen *This field is required.*; *Enter the 10-digit NPI.* / *Enter the 9-digit tax
    identification number.* quedan para un número cargado con otra cantidad de dígitos.
+
+## El salto por letra con el color de las pestañas (2026-11-20)
+
+Pedido de Julián (el color no estaba alineado). Las letras A–Z de *Contracted with* estaban en azul suelto y parecían
+links. Ahora siguen a `Tabs`: gris (`ink-slate`), hover gris y azul relleno sólo la activa. Lo usan el provider y la
+location (mismo componente).

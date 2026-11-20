@@ -167,13 +167,10 @@ export default function Scheduling() {
 
   return (
     <div className={CONTENEDOR_PAGINA}>
-      {/* Los botones van a la altura del título, como en el resto de la app (scheduling.md, 2026-11-19). */}
+      {/* Al lado del título, sólo las acciones; la vista y los filtros van con la fecha (scheduling.md, 2026-11-20). */}
       <div className="flex flex-wrap items-start justify-between gap-3">
         <PageTitle>Scheduling</PageTitle>
         <div className="flex flex-wrap items-center gap-2">
-          {/* El Figma marca "Month" activo aunque la vista sea semanal. */}
-          <Tabs aria-label="Calendar view" tabs={['Day', 'Week', 'Month'] as const} value={view} onChange={setView} />
-          <ViewMenu valor={vista} onGuardar={setVista} />
           {/* Event y Register appointment quedan fuera de la barra hasta que se
               defina qué hacen. No se borran: el markup sigue acá detrás de
               PENDIENTES, así volver a mostrarlos es cambiar una constante y no
@@ -201,17 +198,22 @@ export default function Scheduling() {
         </div>
       </div>
 
-      {/* La fecha con el selector de la app, igual que el Dashboard (sin flechas); al lado, Status legend
-          (scheduling.md, 2026-11-19). */}
-      <div className="mt-4 flex flex-wrap items-center gap-2">
-        <DatePicker variant="toolbar" value={fecha} onChange={setFecha} />
-        {/* Volver a hoy; desaparece cuando ya estás en hoy, como en el Dashboard. */}
-        {!sameDay(fecha, FECHA_ANCLA) && (
-          <Button variant="secondary" size="md" onClick={() => setFecha(FECHA_ANCLA)} title="Go to today">
-            <CalendarClock /> Today
-          </Button>
-        )}
-        <StatusLegend />
+      {/* Day / Week / Month a la izquierda, como las pestañas de toda la app. En la otra punta, juntos: la fecha (el selector
+          del Dashboard, sin flechas), Today, Status legend y Filter (scheduling.md, 2026-11-20). */}
+      <div className="mt-4 flex flex-wrap items-center justify-between gap-2">
+        {/* El Figma marca "Month" activo aunque la vista sea semanal. */}
+        <Tabs aria-label="Calendar view" tabs={['Day', 'Week', 'Month'] as const} value={view} onChange={setView} />
+        <div className="flex flex-wrap items-center gap-2">
+          <DatePicker variant="toolbar" value={fecha} onChange={setFecha} />
+          {/* Volver a hoy; desaparece cuando ya estás en hoy, como en el Dashboard. */}
+          {!sameDay(fecha, FECHA_ANCLA) && (
+            <Button variant="secondary" size="md" onClick={() => setFecha(FECHA_ANCLA)} title="Go to today">
+              <CalendarClock /> Today
+            </Button>
+          )}
+          <StatusLegend />
+          <ViewMenu valor={vista} onGuardar={setVista} />
+        </div>
       </div>
 
       {/* Grilla: la misma agenda en tres vistas. */}
