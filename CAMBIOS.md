@@ -5,7 +5,7 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-11-19
 
-### Dashboard: el título con el tamaño de las demás pantallas
+### Dashboard: el título con el tamaño de las demás pantallas ([#170](https://github.com/JulianGerardi/red-dental-studio/pull/170))
 - *Dashboard* deja `PageTitle size="lg"` y usa el tamaño por defecto (20px semibold), como Patients, Scheduling y
   Billing. Ninguna pantalla usa `size="lg"` ahora; la variante sigue en `ui/page-title`.
 
