@@ -1,0 +1,256 @@
+import{n as e,r as t}from"./rolldown-runtime-DkW27tQK.js";var n=t({default:()=>r}),r;function i(){return(i=e((()=>{r=`import { Link, useNavigate } from 'react-router-dom'
+import {
+  Check, X, EllipsisVertical, Pencil, User, DoorClosed, Clock, ArrowRight, CalendarDays, type LucideIcon,
+} from 'lucide-react'
+import { InnerCard, StatusPill } from './primitives'
+import { cn } from '@/lib/utils'
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
+import { RowActionsMenu } from '@/components/ui/row-actions-menu'
+import { aviso } from '@/components/ui/toaster'
+import { BUTTON_VARIANTS, type ButtonVariant } from '@/components/ui/button'
+import { Avatar } from '@/components/ui/avatar'
+import { slug } from '@/data/patientsStore'
+
+export type Appointment = {
+  name: string
+  initials: string
+  provider: string
+  operatory: string
+  time: string
+  /* Para qué viene: lo muestra la línea del día de cada sala (OperatoryCard). */
+  motivo?: string
+  /* Botón del pie. En el frame casi todas dicen "Check out" y una "Cancel"; Julián sumó "Check in" (2026-10-13). */
+  accion?: AccionTurno
+}
+
+export type AccionTurno = 'Check in' | 'Check out' | 'Cancel'
+
+/* El color dice la acción, para no confundirlas en una lista larga (Julián, 2026-10-13): Check In verde, Check Out
+   azul, Cancel rojo. Son variantes de ui/button. Ver design-reference/figma/modulos/dashboard.md. */
+export const ACCION_TURNO: Record<AccionTurno, ButtonVariant> = {
+  'Check in': 'success',
+  'Check out': 'primary',
+  Cancel: 'destructive',
+}
+
+/* Figma 4430:57451. El card se rediseñó: sin borde, con la foto y el badge
+   "Check in" a la izquierda, los chips TR/CC y el kebab a la derecha, los dos
+   campos grises con la caja de hora al costado, y el botón de acción a lo
+   ancho del pie. Ver Elements / Appointment cards.
+
+   Por qué así:
+   - Es la card más grande de las cuatro de turnos porque es la de trabajo del
+     día: trae todo lo que hace falta para atender (quién, con quién, en qué
+     sala, a qué hora) sin abrir nada.
+   - La acción que sigue (Check Out, Cancel) va a lo ancho del pie: es lo que
+     más se toca en la lista, y así se toca sin apuntar.
+   - Click en la card abre la ficha rápida del paciente anclada a ella; el
+     anillo azul marca cuál la abrió mientras está abierta.
+   - La misma card sirve para Appointments y Waiting Room: un turno se ve igual
+     antes y después de llegar. */
+export function AppointmentCard({
+  appt,
+  id,
+  activa,
+  onSelect,
+  onEdit,
+  compact,
+}: {
+  appt: Appointment
+  /** Identifica la card entre los dos paneles. */
+  id?: string
+  /** Con el popup abierto: la card queda marcada con el anillo azul. */
+  activa?: boolean
+  onSelect?: (appt: Appointment, el: HTMLElement, id?: string) => void
+  onEdit?: (appt: Appointment) => void
+  /** Versión chica para una lista angosta -el costado de Patients-: una fila
+      con nombre + hora/provider, sin los chips TR/CC, sin el "Check in" y
+      sin el botón de Check Out. Es otro layout, no el mismo con partes
+      escondidas -por eso vive en su propio componente más abajo. */
+  compact?: boolean
+}) {
+  if (compact) return <AppointmentCardCompacta appt={appt} onEdit={onEdit} />
+
+  const accion = appt.accion ?? 'Check out'
+  const Paciente = onSelect ? 'button' : 'div'
+
+  return (
+    <InnerCard
+      data-appt-card
+      className={cn(
+        'flex flex-col gap-2.5 p-3',
+        onSelect && 'cursor-pointer transition-colors hover:bg-page-background',
+        /* Mismo anillo que el FAB de Scheduling: outline + offset, con el
+           hueco transparente para que se vea el fondo del panel. */
+        '[outline-style:solid] outline-[3px] outline-offset-[3px] outline-transparent transition-[outline-color]',
+        activa && 'outline-[var(--color-dash-ring)]',
+      )}
+      onClick={(e) => onSelect?.(appt, e.currentTarget, id)}
+    >
+      {/* Fila 1: paciente + acciones */}
+      {/* Todo en un renglón, también en angosto: Julián prefiere que el nombre
+          se recorte antes que mandar los chips a una segunda línea. */}
+      <div className="flex items-center justify-between gap-2">
+        {/* Con el teclado se llega por el nombre: la card entera no puede ser
+            un botón porque adentro tiene otros (kebab, Check Out). */}
+        <Paciente
+          type={onSelect ? 'button' : undefined}
+          aria-expanded={onSelect ? !!activa : undefined}
+          onClick={onSelect && ((e: React.MouseEvent<HTMLElement>) => {
+            e.stopPropagation()
+            onSelect(appt, e.currentTarget.closest<HTMLElement>('[data-appt-card]')!, id)
+          })}
+          className={cn(
+            'flex min-w-0 flex-1 items-center gap-2.5 rounded-xl text-left',
+            onSelect && 'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-dash-blue',
+          )}
+        >
+          <Avatar initials={appt.initials} size={44} />
+          <span className="flex min-w-0 flex-col gap-1">
+            <span className="text-dash-name truncate text-[15px] leading-none font-bold">
+              {appt.name}
+            </span>
+            <StatusPill tone="ok" className="self-start">Check in</StatusPill>
+          </span>
+        </Paciente>
+
+        <div className="flex shrink-0 items-center gap-1.5">
+          <span className="flex h-8 items-center gap-1 rounded-lg bg-green-soft px-2 text-[13px] text-ink">
+            TR <Check className="text-dash-ok-fg size-4" strokeWidth={2.5} />
+          </span>
+          <span className="flex h-8 items-center gap-1 rounded-lg bg-dash-bad-chip px-2 text-[13px] text-ink">
+            CC <X className="size-4 text-field-error" strokeWidth={2.5} />
+          </span>
+          <MenuCard nombre={appt.name} onEdit={onEdit && (() => onEdit(appt))} />
+        </div>
+      </div>
+
+      {/* Fila 2: los dos campos y, al costado, la caja de hora con el alto
+          de los dos apilados. */}
+      <div className="flex items-stretch gap-2">
+        <div className="flex min-w-px flex-1 flex-col gap-2">
+          <Field icon={<User className="size-4 shrink-0" />} text={appt.provider} />
+          <Field icon={<DoorClosed className="size-4 shrink-0" />} text={appt.operatory} />
+        </div>
+        <div className="bg-dash-field flex w-[68px] shrink-0 flex-col items-center justify-center gap-1 rounded-lg">
+          <Clock className="size-4 text-ink-medium" />
+          <span className="text-[13px] font-medium text-ink">{appt.time}</span>
+        </div>
+      </div>
+
+      <button
+        type="button"
+        onClick={(e) => {
+          e.stopPropagation()
+          accionTurno(appt)
+        }}
+        className={cn(
+          BUTTON_VARIANTS[ACCION_TURNO[accion]],
+          'flex h-11 w-full items-center justify-center gap-2 rounded-lg text-sm font-semibold transition-colors focus-visible:outline-2 focus-visible:outline-offset-2',
+        )}
+      >
+        {accion} <ArrowRight className="size-4" />
+      </button>
+    </InnerCard>
+  )
+}
+
+/* Lo que hace el botón del pie (Check In, Check Out o Cancel). Lo comparten la card y la fila (DashboardRows). */
+export function accionTurno(appt: Appointment) {
+  const accion = appt.accion ?? 'Check out'
+  if (accion === 'Cancel') aviso.warn(\`Appointment for \${appt.name} was cancelled.\`)
+  else if (accion === 'Check in') aviso.ok(\`\${appt.name} checked in.\`)
+  else aviso.ok(\`\${appt.name} checked out.\`)
+}
+
+/* Una fila, no una card de dos pisos: avatar, nombre-link a la ficha del paciente (como el resto de la app:
+   PatientsTable, PatientCard) y hora/provider abajo en gris, y el kebab de las tablas (RowActionsMenu) con Edit y
+   Go to appointment -antes era una flecha suelta a Scheduling-. El id sale de \`slug(appt.name)\`: el turno no trae
+   el id del paciente, y da el mismo id que patientsStore para los que están en la lista (patients.md, 2026-10-19). */
+export function AppointmentCardCompacta({
+  appt, onEdit, menuAbierto,
+}: {
+  appt: Appointment
+  onEdit?: (appt: Appointment) => void
+  /** Sólo para las stories: deja el menú del kebab abierto. */
+  menuAbierto?: boolean
+}) {
+  const navigate = useNavigate()
+  return (
+    <InnerCard className="flex items-center gap-2.5 p-2.5">
+      <Avatar initials={appt.initials} />
+      <span className="flex min-w-0 flex-1 flex-col gap-0.5">
+        <Link
+          to={\`/patients/\${slug(appt.name)}\`}
+          className="text-dash-blue min-w-0 truncate text-[13px] font-semibold hover:underline"
+        >
+          {appt.name}
+        </Link>
+        <span className="flex items-center gap-1 text-[11px] text-ink-muted">
+          <Clock className="size-3 shrink-0" />
+          <span className="truncate">{appt.time} · {appt.provider}</span>
+        </span>
+      </span>
+      <RowActionsMenu label={appt.name} className="shrink-0" abierto={menuAbierto}>
+        <DropdownMenuItem onSelect={() => onEdit?.(appt)}>
+          <Pencil className="size-4 shrink-0" /> Edit
+        </DropdownMenuItem>
+        <DropdownMenuItem onSelect={() => navigate('/scheduling')}>
+          <CalendarDays className="size-4 shrink-0" /> Go to appointment
+        </DropdownMenuItem>
+      </RowActionsMenu>
+    </InnerCard>
+  )
+}
+
+export function Field({ icon, text }: { icon: React.ReactNode; text: string }) {
+  return (
+    <span className="bg-dash-field flex h-10 items-center gap-2 rounded-lg px-3 text-[13px] text-ink-medium">
+      {icon}
+      <span className="truncate">{text}</span>
+    </span>
+  )
+}
+
+
+export type AccionMenu = {
+  label: string
+  icon: LucideIcon
+  onSelect: () => void
+  /** Cancel appointment: rojo y separado de las de edición, para no tocarlo por error. */
+  destructiva?: boolean
+}
+
+/* El kebab de la card y de la fila. Sin \`acciones\`, sólo "Edit appointment" (abre el mismo drawer con los datos de la
+   card). Con \`acciones\`, las que tocan según el estado de la cita; nunca Check In ni Check Out, que tienen su botón
+   (dashboard.md, 2026-11-19). Las destructivas van al final, después de un separador. */
+export function MenuCard({ nombre, onEdit, acciones }: { nombre: string; onEdit?: () => void; acciones?: AccionMenu[] }) {
+  const lista = acciones ?? (onEdit ? [{ label: 'Edit appointment', icon: Pencil, onSelect: onEdit }] : [])
+  const normales = lista.filter((x) => !x.destructiva)
+  const destructivas = lista.filter((x) => x.destructiva)
+  const item = (x: AccionMenu) => (
+    <DropdownMenuItem key={x.label} variant={x.destructiva ? 'destructive' : 'default'} onSelect={x.onSelect} className="text-[13px]">
+      <x.icon className="size-3.5" /> {x.label}
+    </DropdownMenuItem>
+  )
+  return (
+    <div onClick={(e) => e.stopPropagation()}>
+      <DropdownMenu>
+        <DropdownMenuTrigger
+          aria-label={\`Actions for \${nombre}\`}
+          className="flex size-8 shrink-0 items-center justify-center rounded-lg border border-line bg-white text-ink shadow-sm hover:bg-surface-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-dash-blue data-[state=open]:bg-surface-muted"
+        >
+          <EllipsisVertical className="size-4" />
+        </DropdownMenuTrigger>
+        {lista.length > 0 && (
+          <DropdownMenuContent align="end" className="w-max min-w-[190px]">
+            {normales.map(item)}
+            {normales.length > 0 && destructivas.length > 0 && <DropdownMenuSeparator />}
+            {destructivas.map(item)}
+          </DropdownMenuContent>
+        )}
+      </DropdownMenu>
+    </div>
+  )
+}
+`})))()}export{n,i as r,r as t};
