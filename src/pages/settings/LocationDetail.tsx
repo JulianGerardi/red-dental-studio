@@ -654,7 +654,7 @@ export function SettingsLocationDetail() {
     <div className="px-4 py-6 sm:px-8">
       <PageTitle>{tab === 'Information' ? loc.nombre : tab}</PageTitle>
 
-      <Tabs className="mt-4" aria-label="Location sections" tabs={TABS} value={tab} onChange={cambiarTab} />
+      <Tabs size="sm" className="mt-4" aria-label="Location sections" tabs={TABS} value={tab} onChange={cambiarTab} />
 
       <div className="mt-4">
         {tab === 'Information' && <InformationTab nombreLocacion={loc.nombre} />}

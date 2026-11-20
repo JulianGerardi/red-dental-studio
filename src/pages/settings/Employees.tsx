@@ -246,7 +246,7 @@ export function SettingsEmployeeDetail() {
     <div className="px-4 py-6 sm:px-8">
       <PageTitle>{tab === 'Employee' ? 'Employee Information' : tab}</PageTitle>
 
-      <Tabs
+      <Tabs size="sm"
         className="mt-4"
         aria-label="Employee sections"
         /* Las pestañas de provider nacen con el mismo pop que el resto de los

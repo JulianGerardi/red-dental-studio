@@ -169,6 +169,22 @@ valor en negro y bajada. Mismos textos y datos; 2 + 2 en angosto, cuatro en fila
 3. El menú de Settings del rail también saca Parameters, Libraries, Patient Portal y Security, y sus rutas
    (Julián, mismo día). Quedan como "Coming soon" Roles y Preferences.
 
+## Subscription con los tamaños del Ledger y Billing (2026-11-20)
+
+Julián: la pestaña Subscription de Edit Account no estaba alineada en tamaños con el Ledger y Billing. Medido a 1440px:
+
+- **Las cards ya eran iguales** (`ui/stat-card`): rótulo de 11px en mayúsculas, valor de 20px en azul, padding de 12px y
+  12px entre cards. Se ven más grandes porque son cuatro a todo el ancho (315px), sin la columna de Find Patient ni la
+  ficha del paciente al lado; en Billing y el Ledger miden 252–259px.
+- **Los títulos de sección eran los distintos:** *Subscription Summary* y *Subscription History* estaban en 16px. Pasan a
+  15px bold, como *Recent Billing Activity* de Billing.
+- **Pestañas y pie, en todo Settings** (Julián: "hacelo"):
+  - Las pestañas de las pantallas de edición pasan a `Tabs size="sm"` (28px), como el Ledger y Billing: Account,
+    Location, Employee, Carriers e Insurance Plan (Ledger options ya no tiene pestañas: pasaron al Filter, settings-ledger.md).
+  - `FormFooter` (Cancel / Save) pasa a 32px en una pantalla, como los botones de acción del Ledger. Vale también para
+    Edit Patient e Insurance del paciente, que lo comparten.
+  - Adentro de un drawer el pie sigue en 36px, como `DrawerActions`: lo fija `ModalShell`.
+
 ## Un solo diseño de filtro, el de Accounts (2026-11-20)
 
 Sin historia en Jira: es un pedido de diseño de Julián (*"que los filtros de accounts tengan el mismo diseño para todos
