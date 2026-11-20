@@ -4,13 +4,14 @@ import { TextField, SelectField, TextArea } from '@/components/patients/form'
 import { LedgerAllocationTable } from '@/components/patients/ledger/LedgerAllocationTable'
 import { ApplyToSelect } from '@/components/patients/ledger/ApplyToSelect'
 import {
-  CampoFecha, SeccionLedger, ShellLedger, useAplicacion, type FormularioLedger,
+  CampoFecha, FILA, SeccionLedger, ShellLedger, useAplicacion, type FormularioLedger,
 } from '@/components/patients/ledger/formulario'
 import { CAMPOS_METODO, METODOS_PAGO, type Movimiento } from '@/data/ledger'
 import {
   ALCANCE_GUARANTOR, MENSAJES, cargosAbiertos, esFutura, limpiarImporte, numero, opcionesAplicaA, pacienteDeAlcance, soloAplicado,
 } from '@/lib/ledgerAplicacion'
 import { formatMDY } from '@/lib/fecha'
+import { cn } from '@/lib/utils'
 import { OBLIGATORIO } from '@/lib/validacion'
 
 /* Patient Payment (CON-3738), como en red.dev (video de Julián, 2026-11-19): Payment Information con la fecha, Apply to y
@@ -84,27 +85,21 @@ export function PatientPaymentPanel({
   }
 
   const botonMetodo = 'mt-7 flex size-9 shrink-0 items-center justify-center rounded-md border border-line bg-white text-ink-muted shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] hover:bg-surface-muted focus-visible:outline-2 focus-visible:outline-dash-blue'
-  /* Campos de a dos y del mismo ancho (Components / UI / Drawer → Specs → Fields). */
-  const grilla = 'grid flex-1 gap-4 sm:grid-cols-2'
-
   const primero = (
     <SeccionLedger titulo="Payment Information">
-      {/* El hueco de la derecha es el del botón + / −: las columnas quedan alineadas con las de los métodos. */}
-      <div className="flex items-start gap-2">
-        <div className={grilla}>
-          <CampoFecha value={fecha} onChange={setFecha} error={intentado ? errorFecha : undefined} />
-          <ApplyToSelect opciones={opciones} value={aplicaA} onChange={cambiarAplicaA} titulo="Apply payment to" />
-        </div>
-        <span aria-hidden className="w-9 shrink-0" />
+      {/* Fecha y Apply to en las dos primeras columnas de cuatro, como red.dev (ledger.md, 2026-11-20). */}
+      <div className={FILA[4]}>
+        <CampoFecha value={fecha} onChange={setFecha} error={intentado ? errorFecha : undefined} />
+        <ApplyToSelect opciones={opciones} value={aplicaA} onChange={cambiarAplicaA} titulo="Apply payment to" />
       </div>
 
-      {/* Los métodos en su propia caja gris, como red.dev: cada uno con su importe y lo que pide (cheque y banco, ID de
-          autorización o número de referencia). + suma otro y − lo saca (CON-3738). */}
-      {!sinCargos && (
-      <div className="flex flex-col gap-3 rounded-lg border border-line bg-surface-subtle p-3">
-        {metodos.map((f, i) => (
-          <div key={f.id} className="flex items-start gap-2">
-            <div className={grilla}>
+      {/* Cada método en su caja gris, con todos sus campos en una fila, como red.dev: importe, método y lo que pide (cheque
+          y banco, ID de autorización o número de referencia). + suma otro y − lo saca (CON-3738). */}
+      {!sinCargos && metodos.map((f, i) => {
+        const extra = CAMPOS_METODO[f.metodo] ?? []
+        return (
+          <div key={f.id} className="flex items-start gap-2 rounded-lg border border-line bg-surface-subtle p-3">
+            <div className={cn('flex-1', FILA[(2 + extra.length) as 2 | 3 | 4])}>
               <TextField
                 label="Amount" required placeholder="$ 0.00" value={f.monto}
                 onChange={(v) => setFila(f.id, { monto: limpiarImporte(v) })}
@@ -114,7 +109,7 @@ export function PatientPaymentPanel({
                 label="Payment method" required options={[...METODOS_PAGO]} value={f.metodo}
                 onChange={(v) => setFila(f.id, { metodo: v, extra: {} })}
               />
-              {(CAMPOS_METODO[f.metodo] ?? []).map((c) => (
+              {extra.map((c) => (
                 <TextField
                   key={c.id} label={c.label} required placeholder={c.placeholder} value={f.extra[c.id] ?? ''}
                   onChange={(v) => setFila(f.id, { extra: { ...f.extra, [c.id]: v } })}
@@ -122,24 +117,26 @@ export function PatientPaymentPanel({
                 />
               ))}
             </div>
-            {metodos.length > 1 && (
-              <button type="button" aria-label="Remove this payment method" onClick={() => setMetodos((p) => p.filter((x) => x.id !== f.id))} className={botonMetodo}>
-                <Minus className="size-4" />
-              </button>
-            )}
-            {i === metodos.length - 1 && (
-              <button
-                type="button" aria-label="Add another payment method"
-                onClick={() => setMetodos((p) => [...p, filaVacia(Math.max(...p.map((x) => x.id)) + 1, '0.00', METODOS_PAGO[1])])}
-                className={botonMetodo}
-              >
-                <Plus className="size-4" />
-              </button>
-            )}
+            {/* Lugar fijo para − y +: las columnas de todas las filas quedan alineadas. */}
+            <div className="flex shrink-0 justify-end gap-2 @2xl:w-20">
+              {metodos.length > 1 && (
+                <button type="button" aria-label="Remove this payment method" onClick={() => setMetodos((p) => p.filter((x) => x.id !== f.id))} className={botonMetodo}>
+                  <Minus className="size-4" />
+                </button>
+              )}
+              {i === metodos.length - 1 && (
+                <button
+                  type="button" aria-label="Add another payment method"
+                  onClick={() => setMetodos((p) => [...p, filaVacia(Math.max(...p.map((x) => x.id)) + 1, '0.00', METODOS_PAGO[1])])}
+                  className={botonMetodo}
+                >
+                  <Plus className="size-4" />
+                </button>
+              )}
+            </div>
           </div>
-        ))}
-      </div>
-      )}
+        )
+      })}
 
       <TextArea label="Notes" placeholder="Add a note (optional)" value={notas} onChange={setNotas} />
     </SeccionLedger>

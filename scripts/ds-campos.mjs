@@ -18,6 +18,8 @@ function medir() {
   const dlgs = [...document.querySelectorAll('[role=dialog]')].filter((d) => d.getBoundingClientRect().width > 300)
   const out = []
   for (const dlg of dlgs) {
+    // Los drawers del Ledger van con los campos en fila, como red.dev (ledger.md, 2026-11-20).
+    if (dlg.querySelector('[data-campos="fila"]')) continue
     const titulo = dlg.querySelector('h2')?.textContent?.trim() ?? '(sin título)'
     const body = [...dlg.querySelectorAll('div')].find((d) => String(d.className).includes('overflow-y-auto') && String(d.className).includes('px-6'))
     if (!body) continue

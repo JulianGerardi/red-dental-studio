@@ -1144,3 +1144,24 @@ Están todos los inputs del video; cambia cómo se comportan algunos:
 
 **A validar:** que en recepción no se extrañe poder registrar un pago sin cargos abiertos, por ejemplo un adelanto. red.dev
 no lo deja; si hace falta, es una historia aparte.
+
+### Campos en fila y el desplegable de Apply to, como red.dev (2026-11-20)
+
+Julián, con dos videos de red.dev: los campos van en una sola fila y le gusta más cómo se despliega *Apply to*, pero
+alineado al design system.
+
+1. **Campos en fila** (`FILA` en `ledger/formulario`, con container queries sobre la card):
+   - **Crédito:** fecha, *Apply to*, *Adjustment type* y *Amount* en una fila.
+   - **Charge:** tres por fila (fecha, *Amount*, *Type* / *Provider*, *Apply to*, *Visit date*).
+   - **Pago:** fecha y *Apply to* ocupan las dos primeras de cuatro columnas. Cada método va en su propia caja gris, con
+     todos sus campos en una fila: dos con efectivo, tres con tarjeta o transferencia y cuatro con cheque.
+   - En una card de menos de 672px (576px en Charge) bajan de a dos, y de a uno en el celular.
+   - Es una excepción a la regla de campos de a dos de los drawers, sólo para estos tres. `ds:campos` los saltea por
+     `data-campos="fila"`.
+2. **Botones − y +:** tienen un lugar fijo a la derecha, así las columnas de todos los métodos quedan alineadas aunque la
+   última fila tenga los dos botones.
+3. **Desplegable de Apply to** (`ApplyToSelect`): cada opción lleva un cuadradito con su ícono (edificio para la cuenta
+   del guarantor, silueta para una persona), el nombre y el rol abajo. La elegida va en una caja con borde `dash-blue`,
+   fondo `info-bg` y ✓. Colores, radios y letra del design system; los textos siguen siendo los nuestros (*Whole
+   household*, *Self*, *Dependent*).
+4. El pie de *Ledger Transactions* ya no parte "Amount not applied" en dos renglones.

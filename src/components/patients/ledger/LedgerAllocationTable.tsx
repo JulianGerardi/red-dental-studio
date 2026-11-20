@@ -85,11 +85,11 @@ export function LedgerAllocationTable({
             </span>
             <dl className="w-fit overflow-hidden rounded-md border border-line bg-white text-[13px]">
               <div className="flex items-center">
-                <dt className="w-36 bg-surface-alt px-3 py-2 text-right font-medium text-ink-soft">Amount not applied</dt>
+                <dt className="w-40 bg-surface-alt px-3 py-2 text-right font-medium whitespace-nowrap text-ink-soft">Amount not applied</dt>
                 <dd className="w-24 px-3 py-2 text-right font-semibold tabular-nums text-ink">{moneda(noAplicado)}</dd>
               </div>
               <div className="flex items-center border-t border-line">
-                <dt className="w-36 bg-surface-alt px-3 py-2 text-right font-medium text-ink-soft">Amount applied</dt>
+                <dt className="w-40 bg-surface-alt px-3 py-2 text-right font-medium whitespace-nowrap text-ink-soft">Amount applied</dt>
                 <dd className="w-24 px-3 py-2 text-right font-semibold tabular-nums text-dash-blue">{moneda(aplicadoTotal)}</dd>
               </div>
             </dl>
