@@ -3,6 +3,19 @@
 Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber el dev. El porqué de cada decisión está en
 `design-reference/figma/modulos/<módulo>.md`; lo anterior al 2026-10-06, en `git log` y en esos mismos archivos.
 
+## 2026-11-20
+
+### Drawers del Ledger y Billing contra el video de red.dev (CON-3738, CON-3739, CON-3735)
+- **Sin ícono ni plegado** en el título de la card. `SeccionLedger` pierde la prop `caja`: siempre es una card con
+  título, también en Credit y Charge Adjustment, que antes no lo mostraban.
+- **Sin transacciones abiertas:** Patient Payment no muestra los métodos y Save se apaga; Credit Adjustment también
+  apaga Save. La tabla dice *No open transactions.*
+- **Patient Payment:** cambiar Apply to con un solo método pone el saldo abierto del nuevo alcance; el método que suma
+  el + arranca en Check Payment con 0.00.
+- **Credit Adjustment en una sola página** (sin Adjustment → Allocation). *Adjustment type* arranca vacío
+  ("Select credit type") y es obligatorio.
+- Decisiones en `modulos/ledger.md` (2026-11-20).
+
 ## 2026-11-19
 
 ### Dashboard: el título con el tamaño de las demás pantallas ([#170](https://github.com/JulianGerardi/red-dental-studio/pull/170))
