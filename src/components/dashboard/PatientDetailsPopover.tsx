@@ -211,7 +211,7 @@ export function PatientDetailsPopover({
           {/* Misma tabla que Insurance y Documents: cabecera #f9f9f9 y filas
               finas. Con scroll, así no hay ningún "+N" que no lleve a nada. */}
           <div className="mt-2 overflow-hidden rounded-lg border border-line-row">
-            <div className="flex h-7 items-center gap-3 border-b border-line-row bg-surface-alt px-2.5 text-[10px] font-semibold tracking-wide text-ink-muted uppercase">
+            <div className="flex h-7 items-center gap-3 border-b border-line-row bg-surface-alt px-2.5 text-[11px] font-semibold text-ink-muted">
               <span className="w-[46px] shrink-0">Code</span>
               <span className="min-w-0 flex-1">Procedure</span>
             </div>

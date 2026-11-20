@@ -149,13 +149,13 @@ export function SettingsAccount() {
             </div>
 
             <div>
-              <h2 className="text-base font-bold text-ink">Subscription history</h2>
+              <h2 className="text-[15px] font-bold text-ink">Subscription history</h2>
               <div className="mt-3 overflow-x-auto rounded-lg border border-line-row bg-white">
                 {cuenta ? (
                   <EmptyState icon={CreditCard} title="No billing history" detail="This account doesn't have a subscription history yet." className="border-0" />
                 ) : (
                   <div className="min-w-[620px]">
-                    <div className="flex items-center gap-3 bg-surface-alt px-3 py-2.5 text-[11px] font-semibold text-ink-muted uppercase">
+                    <div className="flex items-center gap-3 bg-surface-alt px-3 py-2.5 text-[11px] font-semibold text-ink-muted">
                       <span className="min-w-0 flex-1">Plan</span>
                       <span className="w-[90px] shrink-0">Status</span>
                       <span className="w-[100px] shrink-0">Expired on</span>

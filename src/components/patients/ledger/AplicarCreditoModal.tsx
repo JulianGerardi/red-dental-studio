@@ -126,7 +126,7 @@ export function AplicarCreditoModal({
                vive adentro de un modal, sin el ancho de página completo. */
             <div className="overflow-x-auto">
             <div className="min-w-[600px]">
-              <div className="flex h-9 items-center gap-3 border-t border-line-row bg-surface-alt px-3 text-[10px] font-semibold tracking-wide text-ink-muted uppercase">
+              <div className="flex h-9 items-center gap-3 border-t border-line-row bg-surface-alt px-3 text-[11px] font-semibold text-ink-muted">
                 <span className="w-[18px] shrink-0" />
                 <span className="w-[92px] shrink-0">Date</span>
                 <span className="w-[56px] shrink-0">Code</span>

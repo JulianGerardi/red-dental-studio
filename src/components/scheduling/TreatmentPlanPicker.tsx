@@ -160,7 +160,7 @@ export function VisitRow({ visita, on, onClick }: { visita: Visita; on: boolean;
       {on && (
         <div className="w-full px-3 pb-3">
           <div className="overflow-hidden rounded-lg border border-line-row bg-white">
-            <div className="flex h-8 items-center gap-3 border-b border-line-row bg-surface-alt px-3 text-[10px] font-semibold tracking-wide text-ink-muted uppercase">
+            <div className="flex h-8 items-center gap-3 border-b border-line-row bg-surface-alt px-3 text-[11px] font-semibold text-ink-muted">
               <span className="w-[52px] shrink-0">Code</span>
               <span className="min-w-0 flex-1">Procedure</span>
             </div>
