@@ -5,7 +5,7 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-11-20
 
-### Ledger: sin Export statement en la barra de la tabla
+### Ledger: sin Export statement en la barra de la tabla ([#173](https://github.com/JulianGerardi/red-dental-studio/pull/173))
 - Sale el botón de descargar (*Export statement*) de la barra de la tabla del Ledger: no está en red.dev (en Billing ya
   había salido). La barra queda con Expand / Collapse all y Columns. Decisión en `modulos/ledger.md` (2026-11-20).
 
