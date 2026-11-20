@@ -89,3 +89,17 @@ Sin historia de Jira: devolución de diseño de Julián sobre Locations, Employe
 
 **A validar:** que recepción y administración no extrañen el clic en el nombre (es el patrón de Patients, que sí lo
 conserva). Si lo extrañan, la salida es la fila entera clickeable, no volver al link.
+
+## CON-4085 · CON-3542 · Sin casillas y *Clinical practitioner* (2026-11-20)
+
+Pedido de Julián; el nombre sale de Jira (CON-4085 nombra la columna `Is clinical practitioner`; CON-3542, *Enable /
+Disable Clinical Practitioner*).
+
+1. **Sin casillas** en la lista: no había ninguna acción sobre varios empleados a la vez (el "N selected" no llevaba a
+   nada). Se van la columna de casillas y la pastilla.
+2. La columna *Provider* pasa a **Clinical practitioner** (160 px para que entre el título). El interruptor de la ficha
+   pasa de *Is provider* a **Is clinical practitioner** y la opción del ⋮ *Remove provider role* a **Disable clinical
+   practitioner**: según CON-3542 deshabilitar el perfil clínico no toca los roles, así que "Remove role" decía otra
+   cosa. Las pestañas *Provider info* quedan: CON-3542 las llama así.
+3. Pendiente (no se pidió): CON-4085 suma "Credentials expired" con un ícono debajo del *Yes* cuando vence una
+   credencial requerida; CON-3542 pide validar turnos y encounters antes de deshabilitar (hoy se deshabilita directo).

@@ -208,8 +208,9 @@ export function TarjetaTemplate({ t, elegida, onElegir, onAlternar }: {
   )
 }
 
-/* El panel de la izquierda: New template, buscador, filtros (Active, Inactive, System, All) y la lista. */
-export function ListaTemplates({ templates, elegidoId, q, onQ, filtro, onFiltro, onElegir, onAlternar, onNuevo, todos }: {
+/* El panel de la izquierda: buscador, filtros (Active, Inactive, System, All) y la lista. New template va en el título de
+   la pantalla (consents.md, 2026-11-20). */
+export function ListaTemplates({ templates, elegidoId, q, onQ, filtro, onFiltro, onElegir, onAlternar, todos }: {
   templates: ConsentTemplate[]
   elegidoId: string | null
   q: string
@@ -218,16 +219,12 @@ export function ListaTemplates({ templates, elegidoId, q, onQ, filtro, onFiltro,
   onFiltro: (f: Filtro) => void
   onElegir: (t: ConsentTemplate) => void
   onAlternar: (id: string) => void
-  onNuevo: () => void
   /** Todos los templates, para la cantidad de cada opción del filtro. */
   todos?: ConsentTemplate[]
 }) {
   return (
     <section aria-label="Templates" className="flex flex-col gap-3 self-start rounded-lg bg-white shadow-panel p-4">
-      <div className="flex items-center justify-between gap-2">
-        <h2 className="text-sm font-bold text-ink">Templates</h2>
-        <Button size="sm" onClick={onNuevo}><Plus /> New template</Button>
-      </div>
+      <h2 className="text-sm font-bold text-ink">Templates</h2>
       {/* Buscador y después Filter, como Accounts (consents.md, 2026-11-20); dentro de la card, en sm (figma/README.md). */}
       <div className="flex items-center gap-2">
         <SearchInput size="sm" value={q} onChange={onQ} placeholder="Search templates" aria-label="Search templates" className="sm:max-w-none" />
@@ -573,7 +570,10 @@ export function SettingsConsents() {
 
   return (
     <div className={cn('@container', PADDING_PAGINA)}>
-      <SettingsPageHeader titulo="Consent templates" />
+      <SettingsPageHeader
+        titulo="Consent templates"
+        accion={<Button size="md" onClick={nuevoTemplate}><Plus /> New template</Button>}
+      />
 
       <div className="mt-4 grid grid-cols-1 gap-4 @3xl:grid-cols-[288px_minmax(0,1fr)]">
         <ListaTemplates
@@ -586,7 +586,6 @@ export function SettingsConsents() {
           onFiltro={(f) => { setFiltro(f); setFijados([]) }}
           onElegir={elegir}
           onAlternar={alternarActivo}
-          onNuevo={nuevoTemplate}
         />
         <EditorTemplate
           actual={actual}

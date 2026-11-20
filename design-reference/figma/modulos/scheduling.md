@@ -811,3 +811,14 @@ Pedido de Julián, con una grabación de red.dev.
    Para moverse de semana o de mes se elige el día en el calendario.
 5. **Sin breadcrumb:** el de un solo tramo repetía el título; Scheduling es de primer nivel y no lleva rastro (regla del
    design system).
+
+## Al lado del título, sólo las acciones (2026-11-20)
+
+Sin historia de Jira (pedido de Julián: *"al lado del título van los botones de acción"*).
+
+1. Corrige el punto 1 del 2026-11-19: **Day / Week / Month** y **View** no son acciones, cambian qué se ve, igual que la
+   fecha. Bajan a la barra de la fecha, alineados a la derecha (fecha, *Today* y *Status legend* a la izquierda). En la
+   fila del título queda sólo *New appointment*.
+2. En el celular la barra se parte en dos renglones: fecha y *Status legend* arriba, la vista y *View* abajo.
+3. Queda para decidir (análisis de filtros, misma fecha): *View* es un filtro (providers, estados y salas) pero se ve
+   como un botón primario sin ícono y aplica con *Save*, distinto del `FilterMenu` del resto de la app.

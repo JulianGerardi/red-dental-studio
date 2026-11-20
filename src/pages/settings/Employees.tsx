@@ -53,7 +53,6 @@ export function SettingsEmployees({ nuevo = false }: { nuevo?: boolean }) {
   const cerrar = () => { setCreando(false); if (nuevo) navigate('/settings/team', { replace: true }) }
   const [q, setQ] = useState('')
   const [filas, setFilas] = useState(EMPLEADOS)
-  const [seleccion, setSeleccion] = useState<string[]>([])
 
   const visibles = useMemo(
     () => filas.filter((e) => `${e.nombre} ${e.email} ${e.cargo}`.toLowerCase().includes(q.trim().toLowerCase())),
@@ -63,18 +62,16 @@ export function SettingsEmployees({ nuevo = false }: { nuevo?: boolean }) {
   const borrar = (e: Empleado) => {
     const indice = filas.findIndex((x) => x.id === e.id)
     setFilas((p) => p.filter((x) => x.id !== e.id))
-    setSeleccion((p) => p.filter((x) => x !== e.id))
     aviso.ok(`${e.nombre} was removed.`, {
       label: 'Undo',
       onClick: () => setFilas((p) => [...p.slice(0, indice), e, ...p.slice(indice)]),
     })
   }
 
-  /* "Remove provider role" no borra a la persona, sólo el rol: si hiciera lo
-     mismo que Delete, dos ítems del mismo menú harían la misma acción. */
+  /* Deshabilita el perfil clínico, no borra a la persona ni sus roles (CON-3542). */
   const quitarRolProvider = (e: Empleado) => {
     setFilas((p) => p.map((x) => (x.id === e.id ? { ...x, esProvider: false } : x)))
-    aviso.ok(`${e.nombre} is no longer a provider.`)
+    aviso.ok(`${e.nombre} is no longer a clinical practitioner.`)
   }
 
   return (
@@ -88,11 +85,6 @@ export function SettingsEmployees({ nuevo = false }: { nuevo?: boolean }) {
         )}
       >
         <SettingsSearch value={q} onChange={setQ} placeholder="Search employees" />
-        {seleccion.length > 0 && (
-          <span className="bg-dash-count-bg text-dash-blue-hover flex h-8 items-center rounded-md px-3 text-[13px] font-semibold">
-            {seleccion.length} selected
-          </span>
-        )}
       </SettingsPageHeader>
 
       <div className="mt-4">
@@ -102,15 +94,13 @@ export function SettingsEmployees({ nuevo = false }: { nuevo?: boolean }) {
             { key: 'nombre', header: 'Name', width: 240, cell: (e) => <PersonCell name={e.nombre} initials={e.iniciales} /> },
             { key: 'cumple', header: 'Date of birth', width: 120, cell: (e) => <TextCell>{e.cumpleanos}</TextCell> },
             { key: 'email', header: 'Email', cell: (e) => <TextCell>{e.email}</TextCell> },
-            { key: 'provider', header: 'Provider', width: 100, cell: (e) => <ProviderPill si={e.esProvider} /> },
+            /* "Clinical practitioner", como CON-4085 y CON-3542 (employees.md, 2026-11-20). */
+            { key: 'provider', header: 'Clinical practitioner', width: 160, cell: (e) => <ProviderPill si={e.esProvider} /> },
             { key: 'estado', header: 'Status', width: 100, cell: (e) => <EstadoPill estado={e.estado} /> },
           ]}
           rows={visibles}
           rowKey={(e) => e.id}
           rowLabel={(e) => e.nombre}
-          selectable
-          selected={seleccion}
-          onSelectedChange={setSeleccion}
           /* Todos en una página, como antes: el equipo de una práctica es corto. */
           pageSize={Math.max(visibles.length, 1)}
           itemLabel="employees"
@@ -140,7 +130,7 @@ export function SettingsEmployees({ nuevo = false }: { nuevo?: boolean }) {
                 </DropdownMenuItem>
               ))}
               <DropdownMenuItem variant="destructive" onSelect={() => quitarRolProvider(e)}>
-                <UserMinus className="size-4 shrink-0" /> Remove provider role
+                <UserMinus className="size-4 shrink-0" /> Disable clinical practitioner
               </DropdownMenuItem>
             </>
           )}
@@ -279,7 +269,7 @@ export function SettingsEmployeeDetail() {
                 </div>
                 <span className="flex items-center gap-2">
                   <Toggle on={esProvider} onChange={alternarProvider} />
-                  <span className="text-[13px] text-ink">Is provider</span>
+                  <span className="text-[13px] text-ink">Is clinical practitioner</span>
                 </span>
               </div>
 

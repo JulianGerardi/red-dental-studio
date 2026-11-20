@@ -221,3 +221,9 @@ Pedido de Julián de un solo diseño de filtro (detalle en `settings-accounts.md
 Inactive / System / All** de la lista de templates pasan al `FilterMenu`, al lado del buscador: grupo *Status* de una
 opción, All primero como en Accounts, sin puntos de color y con la cantidad de cada uno. Sigue arrancando en Active
 (no cuenta como filtro aplicado; Clear all vuelve a Active). `ListaTemplates` suma `todos` para las cantidades.
+
+## *New template* en la fila del título (2026-11-20)
+
+Pedido de Julián (*"botón a nivel de título, como en todos"*). *New template* sale de la card Templates y va al lado
+de *Consent templates*, en `md`, como New employee o New location. La card queda con su título, el buscador, Filter y la
+lista. `ListaTemplates` ya no recibe `onNuevo`.

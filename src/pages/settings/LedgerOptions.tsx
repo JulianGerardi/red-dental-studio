@@ -7,6 +7,7 @@ import { SettingsSearch } from '@/components/settings/SettingsSearch'
 import { FilterMenu } from '@/components/ui/filter-menu'
 import { Pagination } from '@/components/patients/ledger/Pagination'
 import { SettingsPageHeader } from '@/components/settings/SettingsPageHeader'
+import { Tabs } from '@/components/ui/tabs'
 
 /* Settings → Ledger. Figma 4293:57917.
    Ver design-reference/figma/modulos/settings-ledger.md. */
@@ -107,27 +108,21 @@ export function SettingsLedgerOptions() {
 
   return (
     <div className={PADDING_PAGINA}>
-      <SettingsPageHeader
-        titulo="Ledger options"
-        /* La bajada del frame es la de Locations, copiada tal cual. Se
-           replica: el contenido va como está. */
-      >
-        {/* "Search <lo que lista>": el frame decía "Search patients" en las dos pestañas (corregido 2026-11-20). */}
-        <SettingsSearch value={q} onChange={(v) => { setQ(v); setPagina(1) }} placeholder={tab === 'Adjustment types' ? 'Search adjustment types' : 'Search payment methods'} onSearch={() => setPagina(1)} />
-        {/* Qué lista se ve y su filtro, en el Filter de Accounts: antes un select y una tira de pestañas
-            (settings-ledger.md, 2026-11-20). */}
-        <FilterMenu
-          label="Filter ledger options"
-          groups={[
-            { type: 'single', title: 'View', defaultValue: TABS[0], value: tab, onChange: (v) => cambiarTab(v as Tab), options: [...TABS] },
-            {
-              type: 'single', title: 'Type', defaultValue: 'All', value: filtro, onChange: (f) => { setFiltro(f); setPagina(1) },
-              options: filtros.map((f) => ({ value: f, count: (tab === 'Adjustment types' ? AJUSTES : METODOS).filter((x) => coincide(x, f)).length })),
-            },
-          ]}
-        />
-      </SettingsPageHeader>
+      <SettingsPageHeader titulo="Ledger options" />
 
+      {/* Qué lista se ve, en pestañas como las fichas de Settings; el Filter queda para el tipo (settings-ledger.md, 2026-11-20). */}
+      <Tabs size="sm" className="mt-4" aria-label="Ledger options" tabs={TABS} value={tab} onChange={cambiarTab} />
+
+      <div className="mt-4 flex flex-wrap items-center gap-3">
+        <SettingsSearch value={q} onChange={(v) => { setQ(v); setPagina(1) }} placeholder={tab === 'Adjustment types' ? 'Search adjustment types' : 'Search payment methods'} onSearch={() => setPagina(1)} />
+        <FilterMenu
+          label={tab === 'Adjustment types' ? 'Filter adjustment types' : 'Filter payment methods'}
+          groups={[{
+            type: 'single', title: 'Type', defaultValue: 'All', value: filtro, onChange: (f) => { setFiltro(f); setPagina(1) },
+            options: filtros.map((f) => ({ value: f, count: (tab === 'Adjustment types' ? AJUSTES : METODOS).filter((x) => coincide(x, f)).length })),
+          }]}
+        />
+      </div>
 
       <div className="mt-4 w-full overflow-x-auto rounded-lg border border-line-row bg-white">
         <div className={tab === 'Adjustment types' ? 'min-w-[820px]' : 'min-w-[620px]'}>
