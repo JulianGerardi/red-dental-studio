@@ -5,6 +5,15 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-11-24
 
+### Ledger options, New template y la fecha de Dashboard y Scheduling ([#187](https://github.com/JulianGerardi/red-dental-studio/pull/187))
+- **Nuevo `ui/date-nav` (`DateNav`):** ‹ Today › + período con calendario, en un solo bloque. Props `value`, `onChange`,
+  `periodo` (`day` · `week` · `month`), `hoy`, `marked`, `tour`. Lo usan Dashboard (un día) y Scheduling (su vista).
+  **Dejar de usar** `DatePicker variant="toolbar"` + el botón *Today* aparte en esas pantallas.
+- **Scheduling:** la fecha a la izquierda; *Day / Week / Month*, *Status legend* y *Filter* a la derecha.
+- **Ledger options:** pestañas arriba y debajo el buscador y el Filter de la lista (Direction + Impact para Adjustment
+  types; Method type para Payment methods). Name y Description se reparten el ancho.
+- **Consents:** el editor nuevo dice *New template*.
+
 ### Consents: search, pestañas y Preview a pantalla completa como red.dev ([#186](https://github.com/JulianGerardi/red-dental-studio/pull/186))
 - **Pestañas Active · System · All** debajo del buscador (reemplazan el Filter); buscadores con X (`PanelLista`, también
   en Coverage). *Search procedure* abre la lista al hacer foco, filtra, X y *No results found.*
