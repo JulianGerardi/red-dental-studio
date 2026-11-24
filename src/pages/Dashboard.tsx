@@ -295,7 +295,8 @@ export default function Dashboard() {
     return { encounter: t?.enCurso ? 'In progress' : t?.completado ? 'Fulfilled' : null, iniciar: false }
   }
 
-  /* Los números salen de las listas del día, no de un mock aparte. */
+  /* Los números salen de las listas del día, no de un mock aparte. Los ⓘ, de la propuesta v3 confirmados en Jira: CON-3912,
+     CON-4178 y CON-2813 (dashboard.md, 2026-11-24). */
   const stats: Stat[] = useMemo(() => {
     const completados = dia.appointments.filter((a) => a.completado).length
     const nuevos = dia.waiting.filter((w) => w.nuevo).length
@@ -304,17 +305,17 @@ export default function Dashboard() {
         /* Una cancelada ya no es una cita del día; un No Show sí (no libera el lugar). */
         label: 'Appointments', value: String(dia.appointments.filter((a) => a.cerrado !== 'Cancelled').length),
         nota: `${completados} completed`, icon: CalendarDays,
-        info: `Appointments for this day, without cancellations. ${completados} completed.`,
+        info: 'Appointments scheduled for the selected date, without cancellations.',
       },
       {
         label: 'Waiting room', value: String(dia.waiting.length),
         nota: `${nuevos} new`, icon: Clock,
-        info: 'Patients who checked in and have not checked out yet.',
+        info: 'Visits checked in, on hold, or ready to check out.',
       },
       {
         label: 'Open encounters', value: String(dia.encuentros.abiertos),
         nota: dia.encuentros.promedio, icon: Activity,
-        info: `Encounters started and not closed yet. ${dia.encuentros.promedio}`,
+        info: 'Encounters at this location that are not fulfilled yet, from any date.',
       },
     ]
   }, [dia])

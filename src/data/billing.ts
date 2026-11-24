@@ -139,12 +139,13 @@ export type VistaPaciente = (typeof VISTAS_PACIENTE)[number]
 /** `info`: el texto del círculo de info (InfoTip). Las bajadas se fueron con las métricas v3 (billing.md, 2026-11-24). */
 export type StatBilling = { label: string; value: string; info: string; icon: LucideIcon }
 
-/* "Overdue balance" repetía el valor exacto de "Insurance A/R" en el Figma
-   -ver billing.md, anomalía documentada y corregida acá. */
+/* "Overdue balance" repetía el valor exacto de "Insurance A/R" en el Figma -ver billing.md, anomalía documentada y
+   corregida acá-. Total A/R es la suma de Guarantor A/R e Insurance A/R, con los valores de la propuesta v3 (billing.md,
+   2026-11-24). */
 export const STATS_BILLING: StatBilling[] = [
-  { label: 'Total A/R', value: '$2,131.86', icon: TrendingUp, info: "Sum of the remaining total balance of the location's open charges." },
+  { label: 'Total A/R', value: '$17,297.96', icon: TrendingUp, info: "Sum of the remaining total balance of the location's open charges." },
   { label: 'Guarantor A/R', value: '$7,411.30', icon: User, info: "Sum of the remaining guarantor balance of the location's open charges." },
-  { label: 'Insurance A/R', value: '$9,896.66', icon: Shield, info: "Sum of the remaining insurance balance of the location's open charges." },
+  { label: 'Insurance A/R', value: '$9,886.66', icon: Shield, info: "Sum of the remaining insurance balance of the location's open charges." },
   { label: 'Overdue balance', value: '$1,845.20', icon: Clock, info: 'Open charge balances older than 30 days.' },
   { label: 'Guarantors with open charges', value: '128', icon: Users, info: 'Ledgers whose charges at this location still carry a positive guarantor balance.' },
 ]

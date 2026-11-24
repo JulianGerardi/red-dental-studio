@@ -1093,5 +1093,13 @@ número y ⓘ en una línea, divisores verticales) con la estructura de la v3 y 
 sin borde, divisores `line-hair`): ícono de 18px en caja celeste de 36, rótulo de 13px Medium en sentence case
 (`ink-muted`) y número de 17px Bold. En celular las tres métricas se apilan, una por fila a todo el ancho, con el ⓘ a la
 derecha (antes iban en columnas sin ícono); desde 768px, en fila. Los textos del ⓘ
-siguen siendo los de la app: el de la v3 para Open encounters (*Exact included statuses must be confirmed*) es una nota
-para el equipo, no un texto para el usuario.
+son los de la v3, con lo que dejaba "a confirmar" resuelto en Jira:
+
+- **Appointments** (CON-3912: citas del día, no canceladas): *Appointments scheduled for the selected date, without
+  cancellations.* Sale "N completed" del ⓘ.
+- **Waiting room** (CON-4178: Checked in, On hold y Ready to check out): *Visits checked in, on hold, or ready to check
+  out.*
+- **Open encounters** (CON-2813: Planned, In Progress, On Hold, Completed y Discharged, sin Fulfilled, de cualquier día y
+  de la locación elegida): *Encounters at this location that are not fulfilled yet, from any date.* La v3 decía *Exact
+  included statuses must be confirmed*. **Anomalía:** el mock todavía da un número por día (`dia.encuentros.abiertos`); el
+  real no depende de la fecha elegida.
