@@ -1,28 +1,36 @@
 import { test } from '@e2e-dev/web'
 import { expect } from 'e2e'
 
-/* Settings → Consents: el preview se abre en un drawer desde el pie del editor. Ver design-reference/figma/modulos/consents.md. */
+/* Settings → Consents. Ver design-reference/figma/modulos/consents.md. */
 
-test('Preview abre la hoja en un drawer y Patient view saca lo de la clínica', async ({ app, screen }) => {
+/* CON-4094: el preview abre a pantalla completa, muestra lo que no se guardó y Back to editing vuelve sin perder nada. */
+test('Preview a pantalla completa con los cambios sin guardar y Back to editing', async ({ app, screen }) => {
   await app.open('/settings/consents')
-  await expect(screen.getByRole('article', 'Consent document preview')).toHaveCount(0)
+  await screen.getByRole('textbox', /Nature of procedure/).fill('Texto sin guardar para el preview.')
   await screen.getByRole('button', 'Preview').tap()
-  const drawer = screen.getByRole('dialog', 'Preview')
-  await expect(drawer.getByRole('article', 'Consent document preview')).toBeVisible()
-  await expect(drawer.getByText(/^Diagnosis$/)).toBeVisible()
-  await drawer.getByRole('button', 'Patient view').tap()
-  await expect(drawer.getByText(/^Diagnosis$/)).toHaveCount(0)
-  await drawer.getByRole('button', 'Back to editor').tap()
+  const vista = screen.getByRole('dialog', 'Patient View - Extraction Informed Consent')
+  await expect(vista.getByText('Preview includes your unsaved changes. Save the template to keep them.')).toBeVisible()
+  await expect(vista.getByText('Texto sin guardar para el preview.')).toBeVisible()
+  await vista.getByRole('button', 'Back to editing').tap()
   await expect(screen.getByRole('dialog')).toHaveCount(0)
+  await expect(screen.getByRole('textbox', /Nature of procedure/)).toHaveValue('Texto sin guardar para el preview.')
 })
 
-test('Save desde el preview lo cierra y deja los faltantes a la vista en el editor', async ({ app, screen }) => {
+/* Como red.dev: pestañas Active / System / All y el buscador de procedimientos abre la lista al hacer foco. */
+test('pestañas de la lista y buscador de procedimientos', async ({ app, screen }) => {
   await app.open('/settings/consents')
-  await screen.getByRole('button', 'New template').tap()
-  await screen.getByRole('button', 'Preview').tap()
-  await screen.getByRole('dialog', 'Preview').getByRole('button', 'Save').tap()
-  await expect(screen.getByRole('dialog')).toHaveCount(0)
-  await expect(screen.getByText(/All required fields marked/)).toBeVisible()
+  await screen.getByRole('tab', 'System').tap()
+  await expect(screen.getByRole('button', /^Root Canal Consent – Molar/)).toBeVisible()
+  await expect(screen.getByRole('button', /^Root Canal Consent Active/)).toHaveCount(0)
+  await screen.getByRole('tab', 'Active').tap()
+
+  await screen.getByPlaceholder('Search procedures').tap()
+  await expect(screen.getByRole('option', /^D0120 - Periodic oral evaluation/)).toBeVisible()
+  await screen.getByPlaceholder('Search procedures').fill('zzz')
+  await expect(screen.getByText('No results found.')).toBeVisible()
+  await screen.getByPlaceholder('Search procedures').fill('D1110')
+  await screen.getByRole('option', /^D1110/).tap()
+  await expect(screen.getByRole('button', 'Remove D1110')).toBeVisible()
 })
 
 /* Estandarización con Coverage tables (2026-11-24): Activate / Deactivate y Delete en el ⋮ de la lista. */

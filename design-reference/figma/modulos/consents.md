@@ -255,3 +255,31 @@ estandarización: la pantalla pasa a la pieza común `components/settings/ListaE
    de 520 a 820 px (`className="max-w-[820px] sm:px-10 sm:pt-8"`), sin perder la proporción carta. Sólo en el preview
    de Settings: el detalle del consentimiento de Clinical Mode sigue con su drawer `xl` y la hoja de 520 px. En el
    celular ocupa toda la pantalla, como antes.
+
+## Search, pestañas y Preview como red.dev (2026-11-24)
+
+**CON-4094** (preview a pantalla completa), **CON-3724** (listar). Pedido de Julián con dos videos de red.dev
+(`/settings/consents/:id/edit`): replicar la funcionalidad del buscador, las pestañas y el preview, sin tocar el resto
+del patrón estandarizado.
+
+1. **Pestañas Active · System · All** debajo del buscador, a todo el ancho (`ui/tabs`, `fullWidth`, como Coverage). Vuelven
+   las pestañas y se va el *Filter* del 2026-11-20. *Inactive* no tiene pestaña (queda en All), como red.dev.
+2. **Buscador de la lista** con X para borrar (`SearchInput clearable`, en `PanelLista`: vale también para Coverage).
+3. **Search procedure** como red.dev: al hacer foco abre la lista de todos los procedimientos que no están elegidos
+   (`CODE - Description`, con scroll), filtra mientras se escribe, X para borrar y *No results found.* sin coincidencias.
+   Flechas, Enter y Escape. La lista suma el catálogo CDT de la app (`clinical/dental/data` › `PROCEDURES`) a los de los
+   templates.
+4. **Preview a pantalla completa** (`PreviewPaciente`, reemplaza a `DrawerPreview`): tapa la app; arriba *Back to editing*
+   y *Patient View - {título}*; el aviso gris *Preview includes your unsaved changes. Save the template to keep them.*
+   (CON-4094) y la hoja. Escape también vuelve. **Se van** el toggle *Patient view* y el *Save* del preview: red.dev no
+   los tiene y CON-4094 pide que abrir o cerrar el preview no guarde.
+5. **La hoja con el formato del PDF** (`settings/HojaConsentimientoPdf`): *Sample Dental Clinic* y dirección, *Consent
+   created* con la fecha a la derecha, línea, *INFORMED CONSENT*, el título y una card por sección con su rótulo en
+   banda gris: Patient, Provider, Appointment, Procedure, Diagnosis, Clinical findings, el texto del template, Patient
+   acknowledgment y Patient/Guardian Signature (*Date and time [Completed when signed]*). Los datos de ejemplo son los
+   de red.dev; Procedure usa el primer procedimiento elegido (sin ninguno, *D0000 — Sample procedure*).
+   - **Anomalía**: en red.dev el texto del template es una sola card sin rótulo (editor único); acá son dos campos, así
+     que van dos cards, *Nature of procedure* y *Risk and complications*.
+   - `ConsentDocument` (la hoja de Clinical Mode, con firmas) no cambia: convendría alinearla al mismo PDF en otra tanda.
+6. No se replica de red.dev (lo decidido en la estandarización sigue): *+ New* en el panel (va en el título de la
+   pantalla), el título del editor con el nombre del template y su bajada, y *Activate template* en el editor (va en el ⋮).
