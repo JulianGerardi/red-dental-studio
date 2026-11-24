@@ -1085,3 +1085,38 @@ note*, *Login to sign document*); el contenido del documento (vista y PDF) queda
 Note*, *Medical History*…), igual que los demás nombres de documentos.
 
 `tests/pending-tasks.e2e.ts`.
+
+## Métricas v3: la variante compacta (2026-11-24)
+
+Pedido de Julián con la propuesta `metricas_unificadas_v3.html`. `StatStrip` sigue siendo el bloque compacto (rótulo,
+número y ⓘ en una línea, divisores verticales) con la estructura de la v3 y el estilo de la app (sombra `shadow-panel`,
+sin borde, divisores `line-hair`): ícono de 18px en caja celeste de 36, rótulo de 13px Medium en sentence case
+(`ink-muted`) y número de 17px Bold. En celular las tres métricas se apilan, una por fila a todo el ancho, con el ⓘ a la
+derecha (antes iban en columnas sin ícono); desde 768px, en fila. Los textos del ⓘ
+son los de la v3, con lo que dejaba "a confirmar" resuelto en Jira:
+
+- **Appointments** (CON-3912: citas del día, no canceladas): *Appointments scheduled for the selected date, without
+  cancellations.* Sale "N completed" del ⓘ.
+- **Waiting room** (CON-4178: Checked in, On hold y Ready to check out): *Visits checked in, on hold, or ready to check
+  out.*
+- **Open encounters** (CON-2813: Planned, In Progress, On Hold, Completed y Discharged, sin Fulfilled, de cualquier día y
+  de la locación elegida): *Encounters at this location that are not fulfilled yet, from any date.* La v3 decía *Exact
+  included statuses must be confirmed*. **Anomalía:** el mock todavía da un número por día (`dia.encuentros.abiertos`); el
+  real no depende de la fecha elegida.
+
+## Pending task: pestañas debajo del título (2026-11-20)
+
+Pedido de Julián. Las pestañas de Pending task salen del encabezado del panel (estaban a la derecha del título) y van
+debajo, a la izquierda, con el cuerpo del panel sin padding arriba (`bodyClassName="pt-0"`), como Billing.
+
+## Pending task: vuelven las pestañas al encabezado y suma Filter por provider (2026-11-24)
+
+Pedido de Julián. Deshace lo del 2026-11-20: en el Dashboard las pestañas vuelven a la derecha del título, para que el
+panel quede a la par de Appointments y Waiting room (título a la izquierda, controles a la derecha). En el Patient
+Dashboard siguen debajo del título.
+
+Suma un **Filter por provider** al lado de las pestañas (`FilterMenu` sm, varias opciones, cada provider con su
+cantidad): cada provider ve sus tareas. Se aplica primero el provider y después el tipo, así que las cantidades de las
+pestañas son las del provider elegido. Si el filtro deja todo afuera: "No results match your filters" / "Try other
+providers.", como los otros dos paneles. Las opciones salen de las tareas del día (`PendingTask.provider`). Es el camino
+que dejaba abierto la nota del 2026-10-29 (volver a un Filter sólo para Pending task), ahora junto a las pestañas.

@@ -3,6 +3,36 @@
 Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber el dev. El porqué de cada decisión está en
 `design-reference/figma/modulos/<módulo>.md`; lo anterior al 2026-10-06, en `git log` y en esos mismos archivos.
 
+## 2026-11-24
+
+### Métricas unificadas: estructura v3 con el estilo de la app ([#182](https://github.com/JulianGerardi/red-dental-studio/pull/182))
+- **Todas las métricas** (Billing, Ledger, Edit account → Subscription y Dashboard): ícono en caja celeste, rótulo en
+  sentence case, ⓘ en todas y **sin bajada**: lo que decía la bajada pasa al ⓘ.
+- **`ui/stat-card`:** props `label`, `value`, `info`, `icon`, `interna` (InnerCard adentro de un panel, como Today de
+  Billing) y `enFila`. **Dejar de usar `caption` y `compacta`** (se fueron). Card con sombra y sin borde (`TARJETA_PANEL`).
+- **`StatStrip` (Dashboard):** en celular las métricas se apilan una por fila con el ⓘ a la derecha; desde 768px, en fila.
+- **Textos y valores:** *Expires on* (era *Expired on*), Licenses "3 / 170 used", ⓘ nuevos de Today y del Dashboard.
+  Total A/R es la suma de Guarantor A/R + Insurance A/R ($17,297.96).
+- **Open encounters (CON-2813):** Planned, In Progress, On Hold, Completed y Discharged, sin Fulfilled, de cualquier día;
+  el mock todavía da un número por día. Appointments sin canceladas (CON-3912); Waiting room: Checked in, On hold y Ready
+  to check out (CON-4178).
+
+### Patient Dashboard: pestañas de vuelta en la fila del título y sin "N to resolve" ([#181](https://github.com/JulianGerardi/red-dental-studio/pull/181))
+- Pending task y Pending documents vuelven a tener las pestañas a la derecha del título, como el Dashboard (se deshace
+  lo del #180 en esta pantalla).
+- Pending documents ya no muestra la pastilla "N to resolve": las pestañas dicen cuántos hay por grupo.
+- **Para el dev:** sólo layout, en `PatientDetail.tsx` y `patients/PendingDocuments.tsx`. Decisión en
+  `modulos/patient-dashboard.md` (2026-11-24).
+
+### Pending task con Filter por provider; pestañas de Pending documents debajo del título ([#180](https://github.com/JulianGerardi/red-dental-studio/pull/180))
+- **Dashboard · Pending task:** las pestañas siguen a la derecha del título y suman un Filter por provider al lado
+  (cada provider ve sus tareas). Las cantidades de las pestañas son las del provider elegido; si no queda nada, "No
+  results match your filters".
+- **Patient Dashboard:** las pestañas de Pending task y de Pending documents van debajo del título, a la izquierda; "N to
+  resolve" a la derecha, a la altura del título.
+- **Para el dev:** el filtro usa `PendingTask.provider` (`FilterMenu` sm, varias opciones). Decisiones en
+  `modulos/dashboard.md` (2026-11-24) y `patient-dashboard.md` (2026-11-20).
+
 ## 2026-11-20
 
 ### Acciones al lado del título, pestañas a la izquierda, botones "Add" y Clinical practitioner ([#179](https://github.com/JulianGerardi/red-dental-studio/pull/179))

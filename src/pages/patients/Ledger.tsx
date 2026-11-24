@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { slug } from '@/data/patientsStore'
 import {
-  Receipt, Wallet, HandCoins, MoveHorizontal, FileText, MinusCircle, PlusCircle,
+  Receipt, Wallet, HandCoins, MoveHorizontal, FileText, MinusCircle, PlusCircle, House, UserRound, ShieldCheck, type LucideIcon,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { EmptyState } from '@/components/ui/empty-state'
@@ -195,7 +195,7 @@ export function AccionesLedger({ onAccion }: { onAccion: (tipo: TipoAjusteBillin
   )
 }
 
-type Metrica = { label: string; value: string; info: string }
+type Metrica = { label: string; value: string; info: string; icon: LucideIcon }
 
 export default function Ledger() {
   const { id = 'john-smith' } = useParams()
@@ -299,13 +299,13 @@ export default function Ledger() {
       .reduce((a, m) => a + (m.creditoDisponible ?? 0), 0)
     return [
       cuenta
-        ? { label: 'Guarantor balance', value: moneda(saldo), info: 'Consolidated balance of the household ledger. A negative value means available credit.' }
-        : { label: 'Patient balance', value: moneda(saldo), info: 'What the patient owes in this ledger. A negative value means available credit.' },
+        ? { label: 'Guarantor balance', value: moneda(saldo), icon: House, info: 'Consolidated balance of the household ledger. A negative value means available credit.' }
+        : { label: 'Patient balance', value: moneda(saldo), icon: UserRound, info: 'What the patient owes in this ledger. A negative value means available credit.' },
       cuenta
-        ? { label: 'Guarantor responsibility', value: moneda(responsabilidad), info: 'The portion of the household balance the guarantor is responsible for.' }
-        : { label: 'Patient responsibility', value: moneda(responsabilidad), info: 'The portion of the balance the patient is responsible for.' },
-      { label: 'Unapplied credits', value: moneda(credito), info: cuenta ? 'Household credit that is still available.' : 'Credit originated by this patient that is still available.' },
-      { label: 'Open charges', value: String(abiertos.length), info: 'Charges with a remaining balance greater than zero.' },
+        ? { label: 'Guarantor responsibility', value: moneda(responsabilidad), icon: ShieldCheck, info: 'The portion of the household balance the guarantor is responsible for.' }
+        : { label: 'Patient responsibility', value: moneda(responsabilidad), icon: ShieldCheck, info: 'The portion of the balance the patient is responsible for.' },
+      { label: 'Unapplied credits', value: moneda(credito), icon: PlusCircle, info: cuenta ? 'Household credit that is still available.' : 'Credit originated by this patient that is still available.' },
+      { label: 'Open charges', value: String(abiertos.length), icon: Receipt, info: 'Charges with a remaining balance greater than zero.' },
     ]
   }, [delaVista, vista])
 
@@ -353,9 +353,10 @@ export default function Ledger() {
             <AccionesLedger onAccion={setAccion} />
           </div>
 
-          {/* Una card por métrica, como red.dev, Billing y Edit Account (`ui/stat-card`). */}
+          {/* Una card por métrica, como Billing y Edit Account (`ui/stat-card`). El ancho lo decide el contenedor: con el
+              menú y la ficha abiertos, cuatro en fila recién desde 896px (ledger.md, 2026-11-24). */}
           <div className="@container mt-4">
-            <div className="grid grid-cols-2 gap-3 @2xl:grid-cols-4">
+            <div className="grid grid-cols-1 gap-3 @md:grid-cols-2 @4xl:grid-cols-4">
               {stats.map((s) => <StatCard key={s.label} enFila {...s} />)}
             </div>
           </div>
