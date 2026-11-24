@@ -5,6 +5,14 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-11-24
 
+### Consents: search, pestañas y Preview a pantalla completa como red.dev ([#186](https://github.com/JulianGerardi/red-dental-studio/pull/186))
+- **Pestañas Active · System · All** debajo del buscador (reemplazan el Filter); buscadores con X (`PanelLista`, también
+  en Coverage). *Search procedure* abre la lista al hacer foco, filtra, X y *No results found.*
+- **Preview a pantalla completa** (CON-4094): `PreviewPaciente` **reemplaza a `DrawerPreview`**; *Back to editing*,
+  *Patient View - título*, aviso de cambios sin guardar. Sin toggle *Patient view* ni *Save* en el preview.
+- **Nuevo `settings/HojaConsentimientoPdf`**: la hoja con el formato del PDF de red.dev (datos de ejemplo). `Filtro` pasa
+  a `'Active' | 'System' | 'All'`; `ListaTemplates` ya no recibe `todos`.
+
 ### Coverage tables y Consents con el mismo patrón de lista + editor ([#185](https://github.com/JulianGerardi/red-dental-studio/pull/185))
 - **Nuevo `settings/ListaEditor`:** `PanelLista`, `ItemLista`, `EncabezadoEditor`, `PieEditor`, `GRILLA_LISTA_EDITOR`,
   `TARJETA_EDITOR`. Lista de 340 px + editor en dos cards; ⋮ con Activate/Deactivate y Delete (con confirmación); pie

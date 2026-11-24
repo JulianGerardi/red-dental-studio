@@ -4,7 +4,7 @@ import { Eye } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Bloque, Forzar, Lienzo, Tabla, Token, medidasDe, type Medidas } from '@/design-system/kit'
 import {
-  BORRADOR_VACIO, DrawerPreview, EditorTemplate, ListaTemplates, SelectorProcedimientos, TEMPLATES_INICIALES, TarjetaTemplate,
+  BORRADOR_VACIO, PreviewPaciente, EditorTemplate, ListaTemplates, SelectorProcedimientos, TEMPLATES_INICIALES, TarjetaTemplate,
   TextoConsentimiento, ToolbarFormato, aBorrador, type Borrador, type ConsentTemplate, type Filtro,
 } from './Consents'
 
@@ -53,7 +53,7 @@ type Story = StoryObj<Args>
 
 const nada = () => {}
 const [extraccion, conducto, molar] = TEMPLATES_INICIALES
-const coincide = (t: ConsentTemplate, f: Filtro) => f === 'All' || (f === 'Active' && t.activo) || (f === 'Inactive' && !t.activo) || (f === 'System' && t.sistema)
+const coincide = (t: ConsentTemplate, f: Filtro) => f === 'All' || (f === 'Active' && t.activo) || (f === 'System' && t.sistema)
 const sinControles = { controls: { disable: true } }
 
 const Fondo = ({ children }: { children: ReactNode }) => <div className="bg-page-background p-4 sm:p-6">{children}</div>
@@ -83,7 +83,6 @@ function Consentimientos({ args }: { args: Args }) {
   const actual = templates.find((t) => t.id === elegido)
   const [borrador, setBorrador] = useState<Borrador>(actual ? aBorrador(actual) : BORRADOR_VACIO)
   const [intentado, setIntentado] = useState(args.validationErrors)
-  const [vista, setVista] = useState(args.patientView)
   const [preview, setPreview] = useState(args.previewOpen)
   const alternar = (id: string) => setTemplates((ts) => ts.map((t) => (t.id === id ? { ...t, activo: !t.activo } : t)))
   return (
@@ -97,7 +96,7 @@ function Consentimientos({ args }: { args: Args }) {
         />
         <EditorTemplate actual={actual} borrador={borrador} onBorrador={setBorrador} intentado={intentado} onCancelar={() => setIntentado(false)} onGuardar={() => setIntentado(true)} onPreview={() => setPreview(true)} />
       </div>
-      <DrawerPreview abierto={preview} onCerrar={() => setPreview(false)} borrador={borrador} vistaPaciente={vista} onVistaPaciente={setVista} onGuardar={() => { setPreview(false); setIntentado(true) }} />
+      <PreviewPaciente abierto={preview} onCerrar={() => setPreview(false)} borrador={borrador} />
     </div>
   )
 }
@@ -178,11 +177,10 @@ function Editor({ actual, intentado }: { actual?: ConsentTemplate; intentado?: b
   const [b, setB] = useState(actual ? aBorrador(actual) : BORRADOR_VACIO)
   const [probado, setProbado] = useState(!!intentado)
   const [preview, setPreview] = useState(false)
-  const [vista, setVista] = useState(false)
   return (
     <>
       <EditorTemplate actual={actual} borrador={b} onBorrador={setB} intentado={probado} onCancelar={() => setProbado(false)} onGuardar={() => setProbado(true)} onPreview={() => setPreview(true)} />
-      <DrawerPreview abierto={preview} onCerrar={() => setPreview(false)} borrador={b} vistaPaciente={vista} onVistaPaciente={setVista} onGuardar={() => { setPreview(false); setProbado(true) }} />
+      <PreviewPaciente abierto={preview} onCerrar={() => setPreview(false)} borrador={b} />
     </>
   )
 }
@@ -268,13 +266,12 @@ export const NarrowFooter: Story = {
 /* ── Preview drawer (en iframe) ────────────────────────────────────── */
 
 /* El drawer abierto sobre la página; Preview lo vuelve a abrir. */
-function Preview({ paciente }: { paciente?: boolean }) {
+function Preview(_: { paciente?: boolean }) {
   const [abierto, setAbierto] = useState(true)
-  const [v, setV] = useState(!!paciente)
   return (
     <>
       <Button variant="secondary" className="self-start" onClick={() => setAbierto(true)}><Eye /> Preview</Button>
-      <DrawerPreview abierto={abierto} onCerrar={() => setAbierto(false)} borrador={aBorrador(extraccion)} vistaPaciente={v} onVistaPaciente={setV} onGuardar={() => setAbierto(false)} />
+      <PreviewPaciente abierto={abierto} onCerrar={() => setAbierto(false)} borrador={aBorrador(extraccion)} />
     </>
   )
 }
