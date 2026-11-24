@@ -1,6 +1,6 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Navigate, useNavigate, useParams } from 'react-router-dom'
-import { ListChecks, Plus, ShieldAlert, Trash2 } from 'lucide-react'
+import { ListChecks, Plus, ShieldAlert } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { SettingsPageHeader } from '@/components/settings/SettingsPageHeader'
 import { SelectField, TextField } from '@/components/patients/form'
@@ -8,11 +8,12 @@ import { Alert } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import { EmptyState } from '@/components/ui/empty-state'
 import { aviso } from '@/components/ui/toaster'
-import { DropdownMenuItem } from '@/components/ui/dropdown-menu'
-import { MasterList, type ItemMaestro } from '@/components/finance/MasterList'
+import { Tabs } from '@/components/ui/tabs'
+import { ConfirmDialog } from '@/components/ui/confirm-dialog'
+import { EncabezadoEditor, GRILLA_LISTA_EDITOR, ItemLista, PanelLista, PieEditor, TARJETA_EDITOR } from '@/components/settings/ListaEditor'
 import { RangesTable, rangoCompleto, rangoVacio } from '@/components/finance/RangesTable'
 import { ExceptionsDrawer } from '@/components/finance/ExceptionsDrawer'
-import { TARJETA_PANEL, PADDING_PAGINA } from '@/lib/estilos'
+import { PADDING_PAGINA } from '@/lib/estilos'
 import { useFinanzas } from '@/data/finanzasStore'
 import { TIPOS_COBERTURA, idNuevo, type TablaCobertura, type TipoCobertura } from '@/data/finanzas'
 import { OBLIGATORIO } from '@/lib/validacion'
@@ -22,6 +23,8 @@ import { OBLIGATORIO } from '@/lib/validacion'
 
 export const LISTA_COBERTURAS = '/settings/finance/coverage-table'
 export const rutaCobertura = (id: string) => `${LISTA_COBERTURAS}/${id}/edit`
+/* Las pestañas de la lista: Percentage primero, como el selector que reemplazan. */
+const PESTANAS_TIPO: readonly TipoCobertura[] = ['Percentage', 'Copayment']
 
 /* El editor de la derecha (y, sin `tabla`, la página de alta). Type se elige al crear y después queda fijo. */
 export function CoverageTableEditor({ tabla, abrirExcepciones = false }: { tabla?: TablaCobertura; abrirExcepciones?: boolean }) {
@@ -54,18 +57,11 @@ export function CoverageTableEditor({ tabla, abrirExcepciones = false }: { tabla
   }
 
   return (
-    <div className="flex flex-col gap-4">
+    <section aria-label={tabla ? 'Edit coverage table' : 'New coverage table'} className={TARJETA_EDITOR}>
+      {tabla && <EncabezadoEditor titulo="Edit coverage table" activo={tabla.activo !== false} />}
       {intentado && (!nombre.trim() || !rangos.every(rangoCompleto)) && (
         <Alert tone="danger" title="Uncompleted fields">All required fields marked with (*) must be completed before proceeding</Alert>
       )}
-      <div className="flex flex-wrap justify-end gap-2">
-        {tabla && (
-          <Button variant="secondary" onClick={() => setExcepciones(true)}>
-            <ShieldAlert /> Manage exceptions{tabla.excepciones.length ? ` (${tabla.excepciones.length})` : ''}
-          </Button>
-        )}
-        <Button onClick={agregarRango}><Plus /> Add range</Button>
-      </div>
       <div className="grid gap-4 sm:grid-cols-2 lg:max-w-[560px]">
         <TextField
           label="Name" required placeholder="Insert name" value={nombre} onChange={setNombre}
@@ -76,11 +72,17 @@ export function CoverageTableEditor({ tabla, abrirExcepciones = false }: { tabla
           hint={tabla ? 'Set when the table is created.' : undefined}
         />
       </div>
-      <RangesTable tipo={tipo} rangos={rangos} onChange={setRangos} excepciones={tabla?.excepciones} intentado={intentado} nuevo={nuevo} />
-      <div className="flex justify-between gap-3">
-        <Button variant="secondary" onClick={() => navigate(LISTA_COBERTURAS)}>Cancel</Button>
-        <Button disabled={!cambiado} onClick={guardarTabla}>Save</Button>
+      {/* Las acciones de la tabla, justo encima y a la derecha (settings-billing.md, 2026-11-24). */}
+      <div className="-mb-2 flex flex-wrap justify-end gap-2">
+        {tabla && (
+          <Button variant="secondary" onClick={() => setExcepciones(true)}>
+            <ShieldAlert /> Manage exceptions{tabla.excepciones.length ? ` (${tabla.excepciones.length})` : ''}
+          </Button>
+        )}
+        <Button onClick={agregarRango}><Plus /> Add range</Button>
       </div>
+      <RangesTable tipo={tipo} rangos={rangos} onChange={setRangos} excepciones={tabla?.excepciones} intentado={intentado} nuevo={nuevo} />
+      <PieEditor onCancelar={() => navigate(LISTA_COBERTURAS)} onGuardar={guardarTabla} guardarDeshabilitado={!cambiado} />
 
       {excepciones && tabla && (
         <ExceptionsDrawer
@@ -93,56 +95,85 @@ export function CoverageTableEditor({ tabla, abrirExcepciones = false }: { tabla
           }}
         />
       )}
-    </div>
+    </section>
   )
 }
 
 export function SettingsCoverageTables() {
   const { tableId } = useParams()
   const navigate = useNavigate()
-  const { coberturas, borrar } = useFinanzas()
+  const { coberturas, guardar, borrar } = useFinanzas()
   const [q, setQ] = useState('')
-  const [tipo, setTipo] = useState<TipoCobertura>('Percentage')
   const elegida = coberturas.find((c) => c.id === tableId)
+  const [tipo, setTipo] = useState<TipoCobertura>(elegida?.tipo ?? 'Percentage')
+  const [aBorrar, setABorrar] = useState<TablaCobertura>()
 
-  const items: ItemMaestro[] = useMemo(() => coberturas
-    .filter((c) => (c.tipo === tipo || c.id === tableId) && c.nombre.toLowerCase().includes(q.trim().toLowerCase()))
-    .map((c) => ({
-      id: c.id, nombre: c.nombre, to: rutaCobertura(c.id),
-      acciones: (
-        <DropdownMenuItem
-          variant="destructive"
-          onSelect={() => {
-            const deshacer = borrar('coberturas', c.id)
-            if (c.id === tableId) navigate(LISTA_COBERTURAS)
-            aviso.ok(`${c.nombre} was deleted.`, { label: 'Undo', onClick: deshacer })
-          }}
-        >
-          <Trash2 className="size-4 shrink-0" /> Delete
-        </DropdownMenuItem>
-      ),
-    })), [coberturas, tipo, q, tableId, borrar, navigate])
+  /* Se entra a una tabla del otro tipo (un link desde un plan): la pestaña la sigue. */
+  useEffect(() => { if (elegida) setTipo(elegida.tipo) }, [elegida?.id]) // eslint-disable-line react-hooks/exhaustive-deps
 
-  if (tableId && !elegida) return <Navigate to={LISTA_COBERTURAS} replace />
+  /* Búsqueda y pestaña juntas: sólo se busca en el tipo elegido. */
+  const visibles = coberturas.filter((c) => c.tipo === tipo && c.nombre.toLowerCase().includes(q.trim().toLowerCase()))
+
+  /* Cambiar de pestaña abre la primera tabla de ese tipo, como al entrar a una lista. */
+  const cambiarTipo = (t: TipoCobertura) => {
+    setTipo(t)
+    const primera = coberturas.find((c) => c.tipo === t)
+    navigate(primera ? rutaCobertura(primera.id) : LISTA_COBERTURAS)
+  }
+
+  const alternar = (c: TablaCobertura) => {
+    const activa = c.activo !== false
+    guardar('coberturas', { ...c, activo: !activa })
+    aviso.ok(`${c.nombre} was ${activa ? 'deactivated' : 'activated'}.`)
+  }
+
+  const confirmarBorrado = (c: TablaCobertura) => {
+    setABorrar(undefined)
+    /* Si era la abierta, la guarda de abajo pasa a la primera que queda en la pestaña, como en Consents. */
+    const deshacer = borrar('coberturas', c.id)
+    aviso.ok(`${c.nombre} was deleted.`, { label: 'Undo', onClick: deshacer })
+  }
+
+  /* Una tabla que ya no está (recién borrada o un link viejo): la primera de la pestaña o, sin ninguna, la lista. */
+  if (tableId && !elegida) {
+    const primera = coberturas.find((c) => c.tipo === tipo)
+    return <Navigate to={primera ? rutaCobertura(primera.id) : LISTA_COBERTURAS} replace />
+  }
 
   return (
-    <div className={PADDING_PAGINA}>
+    <div className={cn('@container', PADDING_PAGINA)}>
       <SettingsPageHeader
         titulo="Coverage tables"
         accion={<Button size="md" onClick={() => navigate(`${LISTA_COBERTURAS}/new`)}><Plus /> New coverage table</Button>}
       />
-      <div className={cn(TARJETA_PANEL, 'mt-5 grid gap-6 p-4 sm:p-5 lg:grid-cols-[260px_minmax(0,1fr)] lg:items-start')}>
-        <MasterList
-          items={items} elegido={tableId} q={q} onQ={setQ} placeholder="Search coverage tables"
-          vacio={`No ${tipo.toLowerCase()} coverage tables match.`}
-          filtro={<SelectField hideLabel label="Type" options={[...TIPOS_COBERTURA]} value={tipo} onChange={(v) => setTipo(v as TipoCobertura)} />}
-        />
-        <div className="min-w-0">
-          {elegida
-            ? <CoverageTableEditor key={elegida.id} tabla={elegida} />
-            : <EmptyState icon={ListChecks} title="No coverage table found" detail="Select a coverage table from the list on the left or create one with New coverage table." className="py-16" />}
-        </div>
+      <div className={GRILLA_LISTA_EDITOR}>
+        <PanelLista
+          titulo="Coverage tables" q={q} onQ={setQ} placeholder="Search coverage tables" vacio={visibles.length === 0}
+          pestanas={<Tabs aria-label="Coverage table type" size="sm" fullWidth tabs={PESTANAS_TIPO} value={tipo} onChange={cambiarTipo} />}
+        >
+          {visibles.map((c) => (
+            <ItemLista
+              key={c.id} nombre={c.nombre} activo={c.activo !== false} elegido={c.id === tableId} to={rutaCobertura(c.id)}
+              onAlternar={() => alternar(c)} onBorrar={() => setABorrar(c)}
+            />
+          ))}
+        </PanelLista>
+        {elegida
+          ? <CoverageTableEditor key={elegida.id} tabla={elegida} />
+          : (
+            <div className={TARJETA_EDITOR}>
+              <EmptyState icon={ListChecks} title="No coverage table found" detail="Select a coverage table from the list on the left or create one with New coverage table." className="py-16" />
+            </div>
+          )}
       </div>
+      {aBorrar && (
+        <ConfirmDialog
+          title="Delete coverage table?" tone="danger" icon="delete" confirmLabel="Delete"
+          onCancel={() => setABorrar(undefined)} onConfirm={() => confirmarBorrado(aBorrar)}
+        >
+          “{aBorrar.nombre}” will be removed from the list.
+        </ConfirmDialog>
+      )}
     </div>
   )
 }
@@ -151,9 +182,7 @@ export function SettingsNewCoverageTable() {
   return (
     <div className={PADDING_PAGINA}>
       <SettingsPageHeader titulo="New coverage table" />
-      <div className={cn(TARJETA_PANEL, 'mt-5 p-4 sm:p-5')}>
-        <CoverageTableEditor />
-      </div>
+      <div className="mt-5"><CoverageTableEditor /></div>
     </div>
   )
 }

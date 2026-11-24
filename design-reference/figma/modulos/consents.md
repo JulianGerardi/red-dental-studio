@@ -227,3 +227,27 @@ opción, All primero como en Accounts, sin puntos de color y con la cantidad de 
 Pedido de Julián (*"botón a nivel de título, como en todos"*). *New template* sale de la card Templates y va al lado
 de *Consent templates*, en `md`, como New employee o New location. La card queda con su título, el buscador, Filter y la
 lista. `ListaTemplates` ya no recibe `onNuevo`.
+
+## Mismo patrón que Coverage tables (2026-11-24)
+
+**CON-3719** (Desactivar), **CON-3725** (Activar), **CON-3724** (Listar). Pedido de Julián con un HTML y un PDF de
+estandarización: la pantalla pasa a la pieza común `components/settings/ListaEditor.tsx` (detalle del patrón en
+`settings-billing.md`, misma fecha).
+
+1. Lista de 340 px y editor, 20 px entre las dos cards; en angosto, apiladas (`@3xl` del contenedor, antes 288 px).
+2. **Tarjeta**: nombre 14 px semibold y ⋮ a la derecha; debajo Active/Inactive, System y la cantidad de procedimientos.
+   **Se va el switch** de la tarjeta.
+3. **⋮**: *Deactivate* / *Activate*, línea y *Delete* en rojo. **Se va** el botón *Deactivate template* del editor.
+4. **Reglas de Jira que el HTML no tenía**:
+   - Deactivate (CON-3719) pide confirmación *Deactivate consent template?* con los procedimientos afectados y el texto
+     de la historia (singular o plural). Toast: *The consent template has been successfully deactivated.*
+   - Activate (CON-3725) frena si falta procedimiento o si otro template activo ya tiene alguno de sus procedimientos,
+     con los textos de la historia. Toast: *The consent template has been successfully activated.*
+   - Los **System** no se activan, desactivan ni borran (precondición `system = false`): las dos acciones quedan
+     deshabilitadas y el menú dice por qué. Cambia lo anotado antes (*un template de sistema también se puede desactivar*).
+5. **Delete** (con confirmación *Delete template?* y Undo) sigue el HTML, pero **CON-1484** *[Template] Delete Template*
+   está **cancelada** en Jira: queda como propuesta a confirmar con Julián.
+6. **Editor**: *Edit template* + pill de estado, sin la bajada (*Preview shows the sheet…*) y sin la pill System
+   (queda en la lista). Pie común: Preview a la izquierda, Cancel · Save a la derecha, fijo abajo.
+7. Sin coincidencias: *No matching results* (antes *No templates* con bajada).
+
