@@ -64,18 +64,15 @@ export function PendingDocuments({ docs: iniciales = DOCS_PENDIENTES }: {
 
   return (
     <div className="flex min-h-0 flex-1 flex-col gap-4">
-      {/* Como antes, todo en la fila del título: las pestañas a la derecha y, a su lado, "N to resolve" (patient-dashboard.md,
+      {/* Título y pestañas en la misma fila, sin "N to resolve": las pestañas ya dicen cuántos hay (patient-dashboard.md,
           2026-11-24). */}
-      <div className="flex flex-wrap items-center gap-3">
+      <div className="flex flex-wrap items-center justify-between gap-3">
         <h2 className="text-[15px] font-bold text-ink">Pending documents</h2>
-        <div className="ml-auto flex flex-wrap items-center gap-3">
-          {pendientes.length > 0 && <Pill tone="warning" size="sm">{pendientes.length} to resolve</Pill>}
-          <Tabs
-            size="sm" aria-label="Filter by urgency"
-            tabs={GRUPOS.map((g) => ({ value: g.titulo, count: pendientes.filter(g.filtro).length }))}
-            value={urgencia} onChange={setUrgencia}
-          />
-        </div>
+        <Tabs
+          size="sm" aria-label="Filter by urgency"
+          tabs={GRUPOS.map((g) => ({ value: g.titulo, count: pendientes.filter(g.filtro).length }))}
+          value={urgencia} onChange={setUrgencia}
+        />
       </div>
 
       {visibles.length === 0 ? (
