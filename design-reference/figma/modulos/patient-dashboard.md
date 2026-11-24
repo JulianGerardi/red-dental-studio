@@ -587,3 +587,12 @@ un botón "Patient information" (cerrado al entrar) y el título queda a 495 px.
 dashboard.md (2026-11-20). Acá: las nueve tareas pasan a ser **de John Smith**, el paciente de la ficha (antes decían
 Elena Marquez; CA9), con tres Lab Orders (Pending, Requested, Delayed) y dos de cada otro tipo. Las opciones del ⋮ quedan
 deshabilitadas (con su tooltip) hasta *Start Encounter*.
+
+## Pestañas debajo del título, a la izquierda (2026-11-20)
+
+Pedido de Julián, con la regla de la tanda (en toda la app las pestañas van a la izquierda).
+
+1. **Pending task:** las pestañas (All, Clinical note, Lab orders…) bajan debajo del título, a la izquierda, como las de
+   Appointments.
+2. **Pending documents:** *Overdue / Due this week / Later* bajan debajo del título, a la izquierda. *N to resolve* queda
+   a la derecha, a la altura del título.
