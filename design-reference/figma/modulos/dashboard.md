@@ -1086,6 +1086,24 @@ Note*, *Medical History*…), igual que los demás nombres de documentos.
 
 `tests/pending-tasks.e2e.ts`.
 
+## Métricas v3: la variante compacta (2026-11-24)
+
+Pedido de Julián con la propuesta `metricas_unificadas_v3.html`. `StatStrip` sigue siendo el bloque compacto (rótulo,
+número y ⓘ en una línea, divisores verticales) con la estructura de la v3 y el estilo de la app (sombra `shadow-panel`,
+sin borde, divisores `line-hair`): ícono de 18px en caja celeste de 36, rótulo de 13px Medium en sentence case
+(`ink-muted`) y número de 17px Bold. En celular las tres métricas se apilan, una por fila a todo el ancho, con el ⓘ a la
+derecha (antes iban en columnas sin ícono); desde 768px, en fila. Los textos del ⓘ
+son los de la v3, con lo que dejaba "a confirmar" resuelto en Jira:
+
+- **Appointments** (CON-3912: citas del día, no canceladas): *Appointments scheduled for the selected date, without
+  cancellations.* Sale "N completed" del ⓘ.
+- **Waiting room** (CON-4178: Checked in, On hold y Ready to check out): *Visits checked in, on hold, or ready to check
+  out.*
+- **Open encounters** (CON-2813: Planned, In Progress, On Hold, Completed y Discharged, sin Fulfilled, de cualquier día y
+  de la locación elegida): *Encounters at this location that are not fulfilled yet, from any date.* La v3 decía *Exact
+  included statuses must be confirmed*. **Anomalía:** el mock todavía da un número por día (`dia.encuentros.abiertos`); el
+  real no depende de la fecha elegida.
+
 ## Pending task: pestañas debajo del título (2026-11-20)
 
 Pedido de Julián. Las pestañas de Pending task salen del encabezado del panel (estaban a la derecha del título) y van

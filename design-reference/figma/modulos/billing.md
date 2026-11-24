@@ -511,3 +511,27 @@ secundario, igual que el Ledger (ledger.md, misma fecha).
 
 Pedido de Julián. Sin paciente, Filter va a la derecha, al lado de *Columns* (los dos en `actions` de `DataTable`); con
 paciente, *Patient view / Guarantor view* sigue a la izquierda.
+
+## Métricas v3: una sola card para todas (2026-11-24)
+
+Sin historia de Jira; pedido de Julián con la propuesta `metricas_unificadas_v3.html`. **De la v3 se toma la estructura,
+no el estilo** (Julián: "debe tener el estilo de nuestra app, no la del html"). `ui/stat-card` es la misma card en
+Billing, el Ledger y Edit Account → Subscription; el Dashboard usa su variante compacta (`StatStrip`).
+
+- **Estructura (v3):** ícono, rótulo en sentence case, ⓘ a la derecha y el valor debajo. **Sin bajada:** lo que cuenta
+  cada número va en el ⓘ, y toda métrica lleva el suyo.
+- **Estilo (app):** `TARJETA_PANEL` (sombra, sin borde) sobre la página y `TARJETA_INTERNA` adentro de un panel (Today);
+  sin el borde ni el acento azul de arriba del HTML. Ícono de 18px en caja `info-bg` de 36, como la tira del Dashboard;
+  rótulo de 13px Medium en `ink-muted`; valor de 20px Bold en `dash-blue`, como antes. El ⓘ es `InfoTip` (card blanca),
+  no el tooltip oscuro del HTML.
+- **Billing:** cinco en fila desde 1280px (a 1024 los rótulos quedaban en tres o cuatro líneas); antes, 3 + 2 de borde a
+  borde; en celular, una por fila. Las bajadas (*Across patient and insurance balances*…) se fueron. Info nuevos de la v3
+  para Today: *Sum of adjustment transactions posted today (practice timezone).* y *Credit originated today at this
+  location that is still available.* **Today** deja la fila compacta (número a la derecha) y usa la misma card, apilada.
+- **Anomalía corregida (recomendación de la v3):** *Total A/R* ($2,131.86) era menor que *Guarantor A/R* + *Insurance
+  A/R*. Pasa a ser la suma, con los valores de la v3: $7,411.30 + $9,886.66 = **$17,297.96** (Insurance A/R era
+  $9,896.66). *Unapplied credits* de Today sigue saliendo de los movimientos del día ($100.00, el crédito de Lucía Paz que
+  muestra la tabla), no del $0.00 ilustrativo de la v3.
+- **Reglas de la v3 que ya se cumplen:** un solo azul para ícono y valor (`dash-blue`), sin ámbar, rótulos en sentence
+  case, sin bajadas y ⓘ en todas las métricas.
+- Para validar: si la columna derecha, más alta con Today en cards, molesta frente a la fila compacta de antes.

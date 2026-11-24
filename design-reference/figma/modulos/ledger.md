@@ -1188,3 +1188,10 @@ Sin historia de Jira (pedido de Julián después del análisis de botones de acc
 Pedido de Julián: *Credit adjustment* y *Charge adjustment* vuelven a azul, como estaban (se deshace el punto 2 de
 arriba). En la barra de la tabla, *Patient view / Guarantor view* va a la izquierda y Expand all / Columns en la otra punta:
 en toda la app las pestañas van a la izquierda.
+
+## Métricas v3 (2026-11-24)
+
+Las cuatro métricas pasan a la estructura v3 con el estilo de la app (`ui/stat-card`, detalle en billing.md, 2026-11-24):
+ícono por métrica (House /
+UserRound para el saldo, ShieldCheck, PlusCircle, Receipt). El ancho lo decide el contenedor: una por fila hasta 448px, de
+a dos hasta 896px y cuatro en fila desde ahí (con menú y ficha abiertos, a 1024 quedan 2 × 2).
