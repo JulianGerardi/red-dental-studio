@@ -5,6 +5,18 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-11-24
 
+### Tablas estandarizadas v2: pie, alineación, fechas, Tooth/Surface y avatar ([#183](https://github.com/JulianGerardi/red-dental-studio/pull/183))
+- **Pie de toda tabla:** "Showing 1 to 10 of N results" (siempre *results*), *Rows per page* 10 / 25 / 50 a la derecha
+  con el paginador (sólo con más de una página). Todas arrancan en 10 filas.
+- **`ui/data-table`:** nuevos `PieTabla`, `usePaginas` (tablas propias: Ledger, Treatment plan) y `FILAS_POR_PAGINA`.
+  **Dejar de usar `itemLabel` y `pageSizeLabel`** (se fueron); `pageSizeOptions` tiene default `[10, 25, 50]`.
+- **Alineación:** cantidades e importes a la derecha (`align: 'right'` suma `pr-3`), *Actions* a la derecha, toggles a la
+  izquierda. *Assignments* (Fee schedules) a la izquierda: es un link.
+- **Fechas:** *Created date* en Problem list, Procedures y Treatment plan; MM/DD/YYYY en todas (`fechaDMA` → `fechaMDA`).
+- **Treatment plan:** *Created date, Location, Tooth, Surface*; Unassigned paginado. Avatar sólo en Patients y Employees.
+- Employees y Locations: el nombre es link a la ficha. Fee schedules: el Filter arranca vacío. Ledger options usa
+  `DataTable`. Detalle en `design-reference/figma/README.md` (2026-11-24).
+
 ### Métricas unificadas: estructura v3 con el estilo de la app ([#182](https://github.com/JulianGerardi/red-dental-studio/pull/182))
 - **Todas las métricas** (Billing, Ledger, Edit account → Subscription y Dashboard): ícono en caja celeste, rótulo en
   sentence case, ⓘ en todas y **sin bajada**: lo que decía la bajada pasa al ⓘ.

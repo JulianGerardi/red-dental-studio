@@ -167,19 +167,19 @@ test('Lab order filtra por estado y cancela una orden con Undo', async ({ app, s
   await app.open('/patients/patient-0001/clinical-mode')
   await screen.getByRole('button', /^Exams/).tap()
   await screen.getByRole('menuitem', 'Lab order').tap()
-  await expect(screen.getByText(/Showing 1 to 9 of 9 active prescriptions/)).toBeVisible()
+  await expect(screen.getByText(/Showing 1 to 9 of 9 results/)).toBeVisible()
 
   await screen.getByRole('button', /Filter lab orders by status/).tap()
   await screen.getByRole('menuitemcheckbox', /Requested/).tap()
   await screen.getByRole('menuitemcheckbox', /Requested/).press('Escape')
-  await expect(screen.getByText(/Showing 1 to 2 of 2 active prescriptions/)).toBeVisible()
+  await expect(screen.getByText(/Showing 1 to 2 of 2 results/)).toBeVisible()
 
   await screen.getByRole('button', 'Actions for Diego Garcia').tap()
   await screen.getByRole('menuitem', /Cancel order/).tap()
   await expect(screen.getByText('Lab order for Diego Garcia canceled.')).toBeVisible()
-  await expect(screen.getByText(/Showing 1 to 1 of 1 active prescriptions/)).toBeVisible()
+  await expect(screen.getByText(/Showing 1 to 1 of 1 results/)).toBeVisible()
   await screen.getByRole('button', 'Undo').tap()
-  await expect(screen.getByText(/Showing 1 to 2 of 2 active prescriptions/)).toBeVisible()
+  await expect(screen.getByText(/Showing 1 to 2 of 2 results/)).toBeVisible()
 })
 
 /* Procedures del Overview con el menú de CON-4052 y el consentimiento del procedimiento (prototipo de Julián). */

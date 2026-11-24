@@ -180,7 +180,8 @@ export function ProblemList({ procedimientoInicial }: {
   }
 
   const comunes = <T extends { fecha: string; ubicacion: string; pieza?: number; superficie: string }>(): DataTableColumn<T>[] => [
-    { key: 'fecha', header: 'Date', width: 80, cell: (r) => texto(r.fecha) },
+    /* "Created date" en Findings y Procedures, como el Treatment Plan (tablas estandarizadas v2, 2026-11-24). */
+    { key: 'fecha', header: 'Created date', width: 88, cell: (r) => texto(r.fecha) },
     { key: 'ubicacion', header: 'Location', width: 80, cell: (r) => texto(r.ubicacion) },
     { key: 'pieza', header: 'Tooth', width: 44, cell: (r) => <ToothCell pieza={r.pieza} /> },
     { key: 'superficie', header: 'Surface', width: 48, cell: (r) => texto(r.superficie) },
@@ -251,7 +252,7 @@ export function ProblemList({ procedimientoInicial }: {
             rowActions={(r) => menu(accionesProblema(r.estado), (a) => aplicar(setProblemas, problemas, r, r.condicion, a))}
             rowDetail={(r) => <DetalleRegistro registro={{ tipo: 'problema', r }} contexto={contexto} />}
             defaultExpanded={enfoque ? [enfoque] : undefined}
-            pageSize={5} pageSizeOptions={[5, 10, 20]} density="compact"
+            density="compact"
             empty={{ icon: Search, title: 'No problems found', detail: t ? `Nothing matches "${q}".` : `There are no ${filtroProblema.toLowerCase()} problems.` }}
           />
         ) : (
@@ -261,7 +262,7 @@ export function ProblemList({ procedimientoInicial }: {
             rowActions={(r) => <ItemsAcciones grupos={accionesDe(r.estado, contextoDe(r))} onElegir={(a) => elegirProcedimiento(r, a)} />}
             rowDetail={(r) => <DetalleRegistro registro={{ tipo: 'procedimiento', r }} contexto={contexto} />}
             defaultExpanded={enfoque ? [enfoque] : undefined}
-            pageSize={5} pageSizeOptions={[5, 10, 20]} density="compact"
+            density="compact"
             empty={{ icon: Search, title: 'No procedures found', detail: t ? `Nothing matches "${q}".` : `There are no ${filtroProcedimiento.toLowerCase()} procedures.` }}
           />
         )}

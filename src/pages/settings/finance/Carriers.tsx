@@ -63,7 +63,7 @@ export function SettingsCarriers({ nuevo = false }: { nuevo?: boolean }) {
   const columnas: DataTableColumn<Aseguradora>[] = [
     { key: 'nombre', header: 'Name', locked: true, cell: (c) => <Link to={rutaCarrier(c.id)} className={TABLA_LINK}>{c.nombre}</Link> },
     { key: 'payer', header: 'Payer ID', width: 140, cell: (c) => <span className="tabular-nums">{c.payerId}</span> },
-    { key: 'planes', header: 'Group plans #', width: 140, cell: (c) => <span className="tabular-nums">{planesDe(c)}</span> },
+    { key: 'planes', header: 'Group plans #', width: 140, align: 'right', cell: (c) => <span className="tabular-nums">{planesDe(c)}</span> },
   ]
 
   return (
@@ -81,7 +81,6 @@ export function SettingsCarriers({ nuevo = false }: { nuevo?: boolean }) {
           rows={filas}
           rowKey={(c) => c.id}
           rowLabel={(c) => c.nombre}
-          itemLabel="carriers"
           onRowClick={(c) => navigate(rutaCarrier(c.id))}
           empty={q ? { icon: Landmark, title: `No carriers match “${q}”.`, detail: 'Search by carrier name or payer ID.' } : { icon: Landmark, title: 'No carriers yet', detail: 'Add the insurance companies you send claims to.' }}
           rowActions={(c) => (
@@ -200,7 +199,6 @@ export function CarrierPlans({ carrier }: { carrier: Aseguradora }) {
         rows={filas}
         rowKey={(p) => p.id}
         rowLabel={(p) => p.nombre}
-        itemLabel="plans"
         onRowClick={(p) => navigate(rutaPlan(carrier.id, p.id))}
         empty={q ? { icon: ShieldCheck, title: `No plans match “${q}”.` } : { icon: ShieldCheck, title: 'No insurance plans yet', detail: 'Add the plans and employer groups your patients have with this carrier.' }}
         rowActions={(p) => (

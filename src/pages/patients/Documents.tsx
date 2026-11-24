@@ -42,7 +42,8 @@ const COLUMNAS: DataTableColumn<Doc>[] = [
   {
     key: 'name', header: 'Name', cell: (d) => (
       <span className="flex min-w-0 items-center gap-3">
-        <span className="bg-dash-blue flex size-7 shrink-0 items-center justify-center rounded text-white"><FileText className="size-4" /></span>
+        {/* Ícono neutro, sin la caja azul: el avatar queda para personas (tablas estandarizadas v2, 2026-11-24). */}
+        <FileText aria-hidden className="text-dash-blue size-4 shrink-0" />
         <span className="truncate" title={d.name}>{d.name}</span>
       </span>
     ),
@@ -108,8 +109,6 @@ export default function Documents() {
               selected={sel}
               onSelectedChange={setSel}
               pageSize={10}
-              pageSizeOptions={[10, 20, 50]}
-              itemLabel="documents"
               empty={{ icon: FileText, title: 'No documents found', detail: 'Try a different file name.' }}
             />
           </div>

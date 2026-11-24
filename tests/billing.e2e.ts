@@ -6,7 +6,7 @@ import { expect } from 'e2e'
 test('Elegir un paciente muestra sólo lo suyo, Patient / Guarantor view y los botones; la X vuelve al resumen', async ({ app, screen }) => {
   await app.open('/billing')
   await expect(screen.getByRole('button', /Patient payment/)).toHaveCount(0)
-  await expect(screen.getByText(/Showing 1 to 8 of 21 results/)).toBeVisible()
+  await expect(screen.getByText(/Showing 1 to 10 of 21 results/)).toBeVisible()
 
   const maria = screen.getByRole('button', /Maria Abril Viola/)
   await maria.tap()
@@ -22,7 +22,7 @@ test('Elegir un paciente muestra sólo lo suyo, Patient / Guarantor view y los b
   await screen.getByRole('button', 'Clear selected patient').tap()
   await expect(screen.getByRole('heading', 'Recent billing activity')).toBeVisible()
   await expect(screen.getByRole('button', /Patient payment/)).toHaveCount(0)
-  await expect(screen.getByText(/Showing 1 to 8 of 21 results/)).toBeVisible()
+  await expect(screen.getByText(/Showing 1 to 10 of 21 results/)).toBeVisible()
   await expect(maria).not.toHaveAttribute('aria-current')
 })
 
@@ -89,7 +89,7 @@ test('Filtros, Columns y Export CSV como red.dev', async ({ app, screen }) => {
     await screen.getByRole('menuitemradio', new RegExp(`^${tipo}`)).tap()
   }
   await filtrar('Payments')
-  await expect(screen.getByText(/Showing 1 to 8 of 9 results/)).toBeVisible()
+  await expect(screen.getByText(/Showing 1 to 9 of 9 results/)).toBeVisible()
   await filtrar('Adjustments')
   await expect(screen.getByText(/Showing 1 to 4 of 4 results/)).toBeVisible()
   await filtrar('Today')

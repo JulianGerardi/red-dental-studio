@@ -56,8 +56,6 @@ export function PatientsTable({
       rowKey={(r) => r.id}
       rowLabel={(r) => r.name}
       pageSize={POR_PAGINA}
-      pageSizeOptions={[10, 20, 50]}
-      itemLabel="patients"
       empty={{ icon: Users, title: 'No patients found', detail: 'Try a different name or last name.' }}
       rowActions={(r) => (
         <>

@@ -709,3 +709,34 @@ Propuestas funcionales de la misma revisión, **no implementadas** (cambian comp
 - **Employees: sacar los checkboxes de selección.** No hay historia de acciones masivas; la selección hoy no hace nada
   más que contar. Decidir si se saca o si se define la acción.
 - **Fecha con formato en el encabezado ("Date of birth (MM/DD/YYYY)")**: no se aplicó; el formato ya se ve en los datos.
+
+## Tablas estandarizadas v2 (2026-11-24)
+
+Sin historia de Jira: pedido de Julián con el HTML *Tablas estandarizadas v2* (13 tablas). Reglas para todas:
+
+1. **Pie** (`PieTabla` en `ui/data-table`, el mismo en DataTable, Ledger y Treatment Plan): a la izquierda "Showing 1 to
+   10 of 339 results", siempre *results* (se fue la prop `itemLabel`: "patients", "documents", "entries", "active
+   prescriptions", "insurances"); a la derecha *Rows per page* (10 / 25 / 50, `FILAS_POR_PAGINA`) y el paginador, que
+   sólo aparece con más de una página. Toda tabla arranca en 10 filas: Problem list y Procedures (antes 5), Billing
+   (antes 8, que entraba sin scroll a 1440 × 900), Ledger (antes 8), Ledger options (antes 6), Employees y Locations
+   (antes todo en una página). Las tablas propias paginan con `usePaginas`.
+2. **Alineación:** texto, fechas, códigos, badges y toggles a la izquierda; importes, balances y cantidades a la derecha,
+   con el encabezado igual que su contenido. *Actions* a la derecha. Cambian: Employees y Rooms (Locations), Group plans
+   # (Carriers), Assignments (Fee schedules, estaba centrada), Locations / Employees / Licenses (Accounts), Fee (Treatment
+   Plan) y Enabled (Ledger options, estaba a la derecha).
+3. **Fechas:** *Created date* en Problem list, Procedures y Treatment Plan (antes *Date*); *Trans. date* en Ledger y
+   Billing. MM/DD/YYYY en todas: Fee schedules mostraba día/mes/año como red.dev (`fechaDMA` → `fechaMDA`, también en
+   la versión y en Compare fees) y el Treatment Plan "2025/01/24".
+4. **Tooth antes de Surface** en las tablas clínicas: el Treatment Plan iba *Date, Surface, Tooth, Location*; ahora
+   *Created date, Location, Tooth, Surface*, como Procedures.
+5. **Avatar sólo en Patients y Employees.** Documents pasa de la caja azul a un ícono de archivo neutro; Lab order deja
+   el avatar de Provider y Patient (sólo el nombre).
+6. **⋮ sólo como columna final.** Ledger options pasa a `DataTable` (mismo encabezado y pie que el resto de Settings).
+
+Anomalías y decisiones:
+
+- Employees y Locations: el nombre vuelve a ser link a la ficha, como en el HTML (Julián, 2026-11-24). Corrige el punto
+  1 del 2026-11-18 (a la ficha sólo por el ⋮); el ⋮ → *Edit* sigue. Accounts no cambia: no está en el HTML.
+- El pie del Unassigned del Treatment Plan decía "Showing 15 of 15 insurances" (texto del frame, replicado). Ahora pagina
+  y lo que se saca de un caso con *Delete from Tx* entra arriba de todo: al final quedaba en la página 2.
+- Insurance plans conserva *Priority period* aunque el HTML no la muestra (rediseñar no es cambiar el contenido).

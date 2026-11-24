@@ -57,7 +57,6 @@ type Args = {
   clickableRows: boolean
   density: 'regular' | 'compact'
   pageSize: number
-  itemLabel: string
   state: 'ready' | 'loading' | 'error' | 'disabled'
   disabledRows: boolean
 }
@@ -84,7 +83,7 @@ const meta = {
     columns: ['Name', 'Email', 'Status', 'Balance'], rows: 24,
     search: true, filter: true, columnPicker: true, resizable: true, expandable: false, reorderable: false,
     selectable: true, rowActions: true, primaryAction: true, clickableRows: false,
-    density: 'regular', pageSize: 10, itemLabel: 'patients', state: 'ready', disabledRows: false,
+    density: 'regular', pageSize: 10, state: 'ready', disabledRows: false,
   },
   argTypes: {
     columns: { control: 'check', options: NOMBRES_COLUMNAS, description: 'Qué columnas mostrar, en ese orden.' },
@@ -101,7 +100,6 @@ const meta = {
     clickableRows: { control: 'boolean', description: 'La fila entera abre el detalle (sin expandir).' },
     density: { control: 'inline-radio', options: ['regular', 'compact'], description: 'regular 56px por fila · compact 44px. La fila crece si una celda tiene dos líneas.' },
     pageSize: { control: 'inline-radio', options: [5, 10, 20], description: 'Filas por página.' },
-    itemLabel: { control: 'text', description: 'Qué se cuenta en el pie.' },
     state: { control: 'inline-radio', options: ['ready', 'loading', 'error', 'disabled'], description: 'loading: filas grises · error: no se pudo cargar, con Try again · disabled: toda la tabla de sólo lectura.', table: { category: 'States' } },
     disabledRows: { control: 'boolean', description: 'Los pacientes Inactive no se pueden elegir ni accionar.', table: { category: 'States' } },
   },
@@ -128,7 +126,7 @@ function Detalle({ p }: { p: Paciente }) {
   )
 }
 
-function Armada({ columns, rows, search, filter, columnPicker, resizable, expandable, reorderable, selectable, rowActions, primaryAction, clickableRows, density, pageSize, itemLabel, state = 'ready', disabledRows = false }: Args) {
+function Armada({ columns, rows, search, filter, columnPicker, resizable, expandable, reorderable, selectable, rowActions, primaryAction, clickableRows, density, pageSize, state = 'ready', disabledRows = false }: Args) {
   const [reintentos, setReintentos] = useState(0)
   const [abierta, setAbierta] = useState<string | null>(null)
   const [orden, setOrden] = useState(PACIENTES)
@@ -166,7 +164,6 @@ function Armada({ columns, rows, search, filter, columnPicker, resizable, expand
         onRowClick={clickableRows ? (p) => setAbierta(p.nombre) : undefined}
         density={density}
         pageSize={pageSize}
-        itemLabel={itemLabel}
         empty={rows === 0 ? { icon: Users, title: 'No patients yet', detail: 'Add your first patient to see them here.' } : undefined}
         actions={primaryAction ? <Button size="md"><Plus />New patient</Button> : undefined}
         loading={state === 'loading'}
@@ -183,7 +180,7 @@ const BASE: Args = {
   columns: ['Name', 'Email', 'Status'], rows: 6,
   search: false, filter: false, columnPicker: false, resizable: false, expandable: false, reorderable: false,
   selectable: false, rowActions: false, primaryAction: false, clickableRows: false,
-  density: 'regular', pageSize: 10, itemLabel: 'patients', state: 'ready', disabledRows: false,
+  density: 'regular', pageSize: 10, state: 'ready', disabledRows: false,
 }
 
 /* Armá la tabla desde Controls. */
@@ -220,13 +217,13 @@ const PASOS: { titulo: string; texto: string; codigo: string }[] = [
   {
     titulo: 'Pass the rows',
     texto: 'Las filas y cómo identificar cada una. Con eso ya hay tabla, con pie y paginación de 10.',
-    codigo: `<DataTable columns={columns} rows={patients} rowKey={(p) => p.id} itemLabel="patients" />`,
+    codigo: `<DataTable columns={columns} rows={patients} rowKey={(p) => p.id} />`,
   },
   {
     titulo: 'Turn on what it needs',
     texto: 'Selección, menú de fila, acción principal y estado vacío, sólo si la pantalla los usa.',
     codigo: `<DataTable
-  columns={columns} rows={patients} rowKey={(p) => p.id} itemLabel="patients"
+  columns={columns} rows={patients} rowKey={(p) => p.id}
   selectable
   rowActions={(p) => <DropdownMenuItem onSelect={() => edit(p)}>Edit</DropdownMenuItem>}
   actions={<Button size="md"><Plus />New patient</Button>}
@@ -315,7 +312,6 @@ function ConDetalleAbierto() {
       rowDetail={(p) => <Detalle p={p} />}
       defaultExpanded={['p-7']}
       pageSize={5}
-      itemLabel="patients"
     />
   )
 }
@@ -327,7 +323,6 @@ function SinResultados() {
       columns={[COLUMNAS.Name!, COLUMNAS.Email!, COLUMNAS.Status!]}
       rows={PACIENTES.slice(0, 6).filter((p) => p.nombre.includes('zzz'))}
       rowKey={(p) => p.id}
-      itemLabel="patients"
       empty={{ title: 'No patients found', detail: 'Try a different name or email.' }}
     />
   )

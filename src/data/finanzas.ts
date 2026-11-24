@@ -113,7 +113,7 @@ export const conImporte = (precios: Record<string, number | null>) => PROCEDIMIE
 export function etiquetaVersion(a: Arancel, v: VersionArancel, hoy = hoyIso()) {
   const vigente = versionVigente(a, hoy)
   const estado = v.id === vigente.id ? 'Active' : v.desde > hoy ? 'Scheduled' : 'Expired'
-  return `${fechaDMA(v.desde)} - ${estado}`
+  return `${fechaMDA(v.desde)} - ${estado}`
 }
 
 /* ── Coverage tables (plantillas) ──────────────────────────────────── */
@@ -365,10 +365,11 @@ export const cantidad = (n: number, singular: string, plural = `${singular}s`) =
 
 export const dinero = (n: number) => `$${n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
 
-/* "2026-03-06" → "06/03/2026": red.dev muestra las fechas como día/mes/año. */
-export const fechaDMA = (iso: string) => {
+/* "2026-03-06" → "03/06/2026": MM/DD/YYYY, como todas las tablas (antes día/mes/año como red.dev; tablas estandarizadas
+   v2, 2026-11-24). */
+export const fechaMDA = (iso: string) => {
   const [a, m, d] = iso.split('-')
-  return `${d}/${m}/${a}`
+  return `${m}/${d}/${a}`
 }
 
 export const telefonoTexto = (t: Telefono) =>

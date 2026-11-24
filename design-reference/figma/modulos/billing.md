@@ -535,3 +535,8 @@ Billing, el Ledger y Edit Account → Subscription; el Dashboard usa su variante
 - **Reglas de la v3 que ya se cumplen:** un solo azul para ícono y valor (`dash-blue`), sin ámbar, rótulos en sentence
   case, sin bajadas y ⓘ en todas las métricas.
 - Para validar: si la columna derecha, más alta con Today en cards, molesta frente a la fila compacta de antes.
+
+## Tablas estandarizadas v2 (2026-11-24)
+
+Pie, alineación, fechas y avatar con las reglas comunes de todas las tablas: ver `design-reference/figma/README.md`
+(*Tablas estandarizadas v2*, 2026-11-24).

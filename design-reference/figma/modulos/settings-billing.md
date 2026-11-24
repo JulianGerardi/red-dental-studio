@@ -86,6 +86,7 @@ sección › ítem (› plan), como el resto de Settings (decisión 16).
    - *Name* (link al editor, pill *Default*), *Type*, *Assignments*, *Effective* (desde cuándo rige la versión vigente),
      *Last updated*, *Status* y *Actions* (*Edit*, *View assignments*, *Compare fees*).
    - Buscador *Search a Fee Schedule Here...* y *Filters* › *States*; arranca en Active + Inactive (Archived oculto).
+     Desde el 2026-11-24 arranca sin filtro (ver abajo).
    - Al editar se ve la pantalla de red.dev: la lista con su filtro y su ⋮ (*Inactive*/*Active*, *Archive*/*Restore*) y el
      editor a la derecha.
 6. **Type** (UCR · PPO · Medicaid · Discount plan) no existe en red.dev: es obligatorio en el editor para llenar la
@@ -165,3 +166,21 @@ Mismo texto en todos los campos obligatorios vacíos (`OBLIGATORIO`, regla en [f
 2. *Copy from fee schedule* sin elegir y *Increase fees* vacío: *This field is required.*; *Enter an amount other than
    0.* queda para el 0.
 3. Rangos de la Coverage Table: *Required* → *This field is required.* (entra en las celdas, también en celular).
+
+## Tablas estandarizadas v2 (2026-11-24)
+
+Pie, alineación, fechas y avatar con las reglas comunes de todas las tablas: ver `design-reference/figma/README.md`
+(*Tablas estandarizadas v2*, 2026-11-24).
+
+### Fee schedules: Assignments alineada y el Filter sin selección al entrar (2026-11-24)
+
+Devolución de Julián sobre las tablas estandarizadas v2.
+
+1. **Assignments** a la derecha quedaba pegada a *Effective* y el número con link, 6 px corrido del encabezado y del 0
+   (el padding del botón). Toda columna a la derecha de `DataTable` suma `pr-3` (24 px hasta la siguiente, como el HTML) y
+   el botón de `AssignmentsCount` compensa su padding con `-mx-1.5`.
+   - **Corrección (Julián, con referencia):** Assignments va a la **izquierda**, el número al inicio de la columna, debajo
+     de la "A" del encabezado. Excepción a "cantidades a la derecha": es un link que abre el desglose, no un importe.
+2. **Filter › States arranca vacío**: antes abría con Active + Inactive tildados y el botón decía *Filter 2* sin que nadie
+   hubiera filtrado. Sin nada tildado se ve todo, como en el resto de las listas; un fee schedule *Archived* también
+   aparece, con su pill. La lista del editor (a la izquierda) sigue arrancando en Active, como red.dev.

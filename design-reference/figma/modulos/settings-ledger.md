@@ -93,3 +93,8 @@ del buscador). En el celular bajan a su propio renglón.
 
 Pedido de Julián: en toda la app las pestañas van a la izquierda. Buscador y Filter en su fila; debajo, *Adjustment
 types / Payment methods* a la izquierda (`md`); después la tabla.
+
+## Tablas estandarizadas v2 (2026-11-24)
+
+Pie, alineación, fechas y avatar con las reglas comunes de todas las tablas: ver `design-reference/figma/README.md`
+(*Tablas estandarizadas v2*, 2026-11-24).

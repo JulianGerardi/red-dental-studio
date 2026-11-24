@@ -1195,3 +1195,8 @@ Las cuatro métricas pasan a la estructura v3 con el estilo de la app (`ui/stat-
 ícono por métrica (House /
 UserRound para el saldo, ShieldCheck, PlusCircle, Receipt). El ancho lo decide el contenedor: una por fila hasta 448px, de
 a dos hasta 896px y cuatro en fila desde ahí (con menú y ficha abiertos, a 1024 quedan 2 × 2).
+
+## Tablas estandarizadas v2 (2026-11-24)
+
+Pie, alineación, fechas y avatar con las reglas comunes de todas las tablas: ver `design-reference/figma/README.md`
+(*Tablas estandarizadas v2*, 2026-11-24).
