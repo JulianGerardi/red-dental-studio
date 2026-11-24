@@ -1,8 +1,8 @@
 import { test } from '@e2e-dev/web'
 import { expect } from 'e2e'
 
-/* Dashboard: el selector de fecha es el DatePicker en su look toolbar ("Feb 28, 2026"), el mismo campo y calendario
-   que el filtro de Notifications. Ver design-reference/figma/modulos/dashboard.md (2026-10-12). */
+/* Dashboard: la fecha es el bloque ‹ Today › + calendario (ui/date-nav, el mismo de Scheduling); el campo dice
+   "Feb 28, 2026". Ver design-reference/figma/modulos/dashboard.md (2026-11-24). */
 
 const largo = (d: Date) => d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
 
@@ -17,9 +17,12 @@ test('La fecha se lee "Feb 28, 2026"; elegir un día lo cambia y Today vuelve a 
   await expect(screen.getByRole('dialog')).toHaveCount(0)
   await expect(screen.getByRole('button', 'Feb 27, 2026')).toBeVisible()
 
-  await screen.getByRole('button', /Today/).tap()
+  // Las flechas mueven un día; Today vuelve a hoy y queda apagado (ui/date-nav, dashboard.md 2026-11-24).
+  await screen.getByRole('button', 'Next day').tap()
+  await expect(screen.getByRole('button', 'Feb 28, 2026')).toBeVisible()
+  await screen.getByRole('button', 'Today').tap()
   await expect(screen.getByRole('button', largo(new Date()))).toBeVisible()
-  await expect(screen.getByRole('button', /Today/)).toHaveCount(0)
+  await expect(screen.getByRole('button', 'Today')).toBeDisabled()
 })
 
 /* Cada columna muestra unos pocos y "Show N more" abre el resto; el total va en el título (comparativa del 2026-11-19,

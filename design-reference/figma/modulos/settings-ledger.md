@@ -98,3 +98,19 @@ types / Payment methods* a la izquierda (`md`); después la tabla.
 
 Pie, alineación, fechas y avatar con las reglas comunes de todas las tablas: ver `design-reference/figma/README.md`
 (*Tablas estandarizadas v2*, 2026-11-24).
+
+## Pestañas arriba y el Filter de cada lista (2026-11-24)
+
+Devolución de Julián. Sin historia nueva; la lógica de los filtros sale de CON-3363 (`method_type` de los payment
+methods: patient / insurance) y de los campos de los adjustment types (direction e impact).
+
+1. **Orden:** primero las pestañas *Adjustment types / Payment methods* y debajo el buscador y el Filter de esa lista;
+   después la tabla. Corrige el 2026-11-20 (pestañas debajo del buscador).
+2. **El Filter es de la pestaña elegida.** *Adjustment types* tiene dos grupos: *Direction* (All · Charge · Credit) e
+   *Impact* (All · Production · Collections). *Payment methods* tiene *Method type* (All · Patient · Insurance). Antes el
+   de Adjustment types mezclaba las cuatro opciones en un solo grupo *Type*.
+   - **Anomalía / a confirmar con Julián:** pidió Production / Collections para Payment methods, pero un payment method no
+     tiene ese dato (CON-3363 sólo le da patient / insurance); Production / Collections es el *impact* de un adjustment
+     type. Se dejó en su pestaña y Payment methods filtra por Method type.
+3. **Description** ya no se lleva media tabla: Name y Description se reparten el ancho; Category, Direction e Impact a
+   120px y Enabled a 80px.
