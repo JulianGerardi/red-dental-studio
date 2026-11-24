@@ -460,7 +460,7 @@ export function DrawerPreview({ abierto, onCerrar, borrador, vistaPaciente, onVi
       onClose={onCerrar}
       title="Preview"
       description="What the patient receives"
-      size="xl"
+      size="2xl"
       className="bg-surface-muted"
       footer={(
         <>
@@ -491,6 +491,7 @@ export function DrawerPreview({ abierto, onCerrar, borrador, vistaPaciente, onVi
           riesgos={borrador.riesgos}
           texto={EDITOR_UNICO ? borrador.texto : undefined}
           vistaPaciente={vistaPaciente}
+          className="max-w-[820px] sm:px-10 sm:pt-8"
         />
       </div>
     </Drawer>
