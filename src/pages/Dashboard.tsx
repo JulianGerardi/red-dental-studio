@@ -138,6 +138,8 @@ export default function Dashboard() {
      redundante con el filtro -ahora el filtro se saca a favor de las tabs, en las dos pantallas que comparten
      PendingTaskList-. */
   const [tipoTarea, setTipoTarea] = useState('All')
+  /* Pending task también se filtra por provider: cada uno ve sus tareas (Julián, 2026-11-24; dashboard.md). */
+  const [providersTarea, setProvidersTarea] = useState<string[]>([])
   /* La Waiting Room se filtra por etapa visible, no por sala (dashboard.md, 2026-11-19). */
   const [etapas, setEtapas] = useState<string[]>([])
   const [selected, setSelected] =
@@ -334,7 +336,10 @@ export default function Dashboard() {
       : dia.waiting.some((w) => w.name === t.person && w.etapa === 'On hold') ? 'enPausa' as const : undefined
   /* Clinical Mode lee el encuentro compartido: antes de abrir la tarea se deja el de ese paciente. */
   const accionesTarea = useAccionesTarea({ alAbrir: (t) => setEstadoEncuentro(encuentroDe(t) ?? 'sinEmpezar') })
-  const tareas = tipoTarea === 'All' ? todasLasTareas : todasLasTareas.filter((t) => t.kind === tipoTarea)
+  /* Primero el provider (Filter) y después el tipo (pestañas): las cantidades de las pestañas son las del provider elegido. */
+  const tareasDelProvider = todasLasTareas.filter((t) => providersTarea.length === 0 || (!!t.provider && providersTarea.includes(t.provider)))
+  const tareas = tipoTarea === 'All' ? tareasDelProvider : tareasDelProvider.filter((t) => t.kind === tipoTarea)
+  const providersDeTareas = [...new Set(todasLasTareas.map((t) => t.provider).filter((x): x is string => !!x))].sort()
   const enEspera = dia.waiting.filter((w) => etapas.length === 0 || etapas.includes(w.etapa))
 
   return (
@@ -433,29 +438,45 @@ export default function Dashboard() {
       </div>
 
       {/* Pending Task va abajo, a todo el ancho: arriba queda la fila de tres (Julián, 2026-10-19). */}
+      {/* Pestañas y Filter por provider a la derecha del título, a la par de los Filter de los paneles de arriba
+          (dashboard.md, 2026-11-24). */}
       <Panel
         title="Pending task" className="mt-4"
         controls={
-          <Tabs
-            size="sm" aria-label="Filter tasks"
-            tabs={[
-              { value: 'All', count: todasLasTareas.length },
-              ...TASK_KINDS.map((k) => ({ value: k, count: todasLasTareas.filter((t) => t.kind === k).length })),
-            ]}
-            value={tipoTarea} onChange={setTipoTarea}
-          />
+          <div className="flex flex-wrap items-center gap-2">
+            <Tabs
+              size="sm" aria-label="Filter tasks"
+              tabs={[
+                { value: 'All', count: tareasDelProvider.length },
+                ...TASK_KINDS.map((k) => ({ value: k, count: tareasDelProvider.filter((t) => t.kind === k).length })),
+              ]}
+              value={tipoTarea} onChange={setTipoTarea}
+            />
+            <FilterMenu
+              label="Filter tasks by provider" size="sm"
+              groups={[{
+                title: 'Provider', value: providersTarea, onChange: setProvidersTarea,
+                options: providersDeTareas.map((p) => ({ value: p, count: todasLasTareas.filter((t) => t.provider === p).length })),
+              }]}
+            />
+          </div>
         }
       >
         {tareas.length === 0 ? (
-          <EmptyState
-            icon={Activity}
-            title="Nothing pending"
-            detail={
-              todasLasTareas.length === 0
-                ? 'There are no tasks waiting on this day.'
-                : 'No pending tasks of this type today.'
-            }
-          />
+          /* Como Appointments y Waiting room: vacío de verdad, o con tareas que el filtro deja afuera. */
+          todasLasTareas.length > 0 && providersTarea.length > 0 && tareasDelProvider.length === 0 ? (
+            <EmptyState icon={Activity} title="No results match your filters" detail="Try other providers." />
+          ) : (
+            <EmptyState
+              icon={Activity}
+              title="Nothing pending"
+              detail={
+                todasLasTareas.length === 0
+                  ? 'There are no tasks waiting on this day.'
+                  : 'No pending tasks of this type today.'
+              }
+            />
+          )
         ) : (
           <PendingTaskList tasks={tareas} limit={TOPE.tareas} hoy={date} encuentroAbierto={(t) => !!encuentroDe(t)} onAccion={accionesTarea.hacer} />
         )}

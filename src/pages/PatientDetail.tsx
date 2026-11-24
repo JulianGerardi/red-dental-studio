@@ -156,18 +156,17 @@ export default function PatientDetail({ turnos = APPTS.length }: { turnos?: numb
               </Card>
 
               <Card className="flex min-h-0 flex-1 flex-col p-5">
-                <div className="flex items-center justify-between gap-3">
-                  <h2 className="text-[15px] font-bold text-ink">Pending task</h2>
-                  <Tabs
-                    size="sm" aria-label="Filter tasks"
-                    tabs={[
-                      { value: 'All', count: TASKS.length },
-                      ...TASK_KINDS.map((k) => ({ value: k, count: TASKS.filter((t) => t.kind === k).length })),
-                    ]}
-                    value={tipoTarea} onChange={setTipoTarea}
-                  />
-                </div>
-                <div className="mt-4 flex min-h-0 flex-1 flex-col">
+                <h2 className="text-[15px] font-bold text-ink">Pending task</h2>
+                {/* Pestañas debajo del título, a la izquierda, como en toda la app (patient-dashboard.md, 2026-11-20). */}
+                <Tabs
+                  size="sm" className="mt-3 self-start" aria-label="Filter tasks"
+                  tabs={[
+                    { value: 'All', count: TASKS.length },
+                    ...TASK_KINDS.map((k) => ({ value: k, count: TASKS.filter((t) => t.kind === k).length })),
+                  ]}
+                  value={tipoTarea} onChange={setTipoTarea}
+                />
+                <div className="mt-3 flex min-h-0 flex-1 flex-col">
                   {tareas.length === 0 ? (
                     <EmptyState icon={Activity} title="Nothing pending" detail="No pending tasks of this type." className="py-8" />
                   ) : (

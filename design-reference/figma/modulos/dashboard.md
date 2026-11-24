@@ -1085,3 +1085,20 @@ note*, *Login to sign document*); el contenido del documento (vista y PDF) queda
 Note*, *Medical History*…), igual que los demás nombres de documentos.
 
 `tests/pending-tasks.e2e.ts`.
+
+## Pending task: pestañas debajo del título (2026-11-20)
+
+Pedido de Julián. Las pestañas de Pending task salen del encabezado del panel (estaban a la derecha del título) y van
+debajo, a la izquierda, con el cuerpo del panel sin padding arriba (`bodyClassName="pt-0"`), como Billing.
+
+## Pending task: vuelven las pestañas al encabezado y suma Filter por provider (2026-11-24)
+
+Pedido de Julián. Deshace lo del 2026-11-20: en el Dashboard las pestañas vuelven a la derecha del título, para que el
+panel quede a la par de Appointments y Waiting room (título a la izquierda, controles a la derecha). En el Patient
+Dashboard siguen debajo del título.
+
+Suma un **Filter por provider** al lado de las pestañas (`FilterMenu` sm, varias opciones, cada provider con su
+cantidad): cada provider ve sus tareas. Se aplica primero el provider y después el tipo, así que las cantidades de las
+pestañas son las del provider elegido. Si el filtro deja todo afuera: "No results match your filters" / "Try other
+providers.", como los otros dos paneles. Las opciones salen de las tareas del día (`PendingTask.provider`). Es el camino
+que dejaba abierto la nota del 2026-10-29 (volver a un Filter sólo para Pending task), ahora junto a las pestañas.
