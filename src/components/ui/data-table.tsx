@@ -370,7 +370,9 @@ export function DataTable<T>({
 
           {filtradas.length > 0 && !loading && !error && (
             <PieTabla
-              className={cn(llenar && 'lg:mt-auto')}
+              /* Fijo al ancho que se ve: con la tabla más ancha que la pantalla (celular), Rows per page y el paginador no
+                 quedan escondidos a la derecha del scroll. */
+              className={cn('sticky left-0 w-[var(--tabla-visible,100%)]', llenar && 'lg:mt-auto')}
               desde={desde} hasta={hasta} total={filtradas.length}
               prefijo={selectable && elegidas.length > 0 ? `${elegidas.length} selected · ` : undefined}
               nota={filtradas.length !== rows.length ? `(filtered from ${rows.length})` : undefined}

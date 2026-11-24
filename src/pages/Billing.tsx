@@ -1,5 +1,5 @@
 import { SearchInput } from '@/components/ui/search-input'
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useLayoutEffect, useMemo, useRef, useState, type RefObject } from 'react'
 import {
   CreditCard, X, Download, Wallet, MinusCircle, PlusCircle,
 } from 'lucide-react'
@@ -131,6 +131,7 @@ export function ResultadoPaciente({ paciente, saldo, elegido, onElegir }: {
   return (
     <button
       type="button"
+      data-fila-paciente
       aria-current={elegido || undefined}
       onClick={onElegir}
       className={cn(
@@ -268,15 +269,52 @@ export function ActividadReciente({
 /* Find Patient: arriba el paciente que se está viendo; abajo el buscador y los resultados como InnerCard, como la lista
    lateral de Patients. */
 
-/** Arranque de cuántos pacientes se ven en Find Patient antes de "Show N more": su `ShowMore llenarAlto` mide cuántas
-    filas enteras entran en el alto que le deja el flex-1 (billing.md, 2026-10-19), así que este valor es sólo el
-    primer render, antes de esa medición. */
 /* El título más cerca de lo que sigue (Patients y Billing; billing.md, 2026-10-19). */
 const TITULO_PEGADO = '[&>header]:min-h-10'
+/** Pacientes de Find Patient antes de "Show N more" en el celular y la tablet, y el mínimo desde 1024px, donde los
+    cuenta `usePacientesQueEntran`. */
 const LIMITE_PACIENTES = 3
+/** Alto mínimo de las tres cards de Today en fila (56 + 8 + 56 + 8 + 56): lo que Find Patient le deja siempre. */
+const MINIMO_HOY = 184
 
-export function BuscarPaciente({ busqueda, onBusqueda, paciente, saldoDe, onElegir, onCerrar, className }: {
+/** Desde 1024px la columna derecha mide lo mismo que la tabla: Find Patient muestra los pacientes enteros que entran
+    dejándole a Today su mínimo, con "Show N more" pegado a la última fila, y Today se queda con el resto hasta el final
+    de la tabla (billing.md, 2026-11-24). Cuenta con lo que mide la columna izquierda, que no se estira. */
+function usePacientesQueEntran(izq: RefObject<HTMLElement | null>, buscar: RefObject<HTMLElement | null>, hoy: RefObject<HTMLElement | null>) {
+  const [cuantos, setCuantos] = useState(LIMITE_PACIENTES)
+  useLayoutEffect(() => {
+    const medir = () => {
+      const [a, b, c] = [izq.current, buscar.current, hoy.current]
+      if (!a || !b || !c) return
+      if (!window.matchMedia('(min-width: 1024px)').matches) { setCuantos(LIMITE_PACIENTES); return }
+      const fila = b.querySelector<HTMLElement>('[data-fila-paciente]')
+      const lista = b.querySelector<HTMLElement>('[data-show-more-lista]')
+      const cajaHoy = c.querySelector<HTMLElement>('[data-hoy]')
+      if (!fila || !lista || !cajaHoy) return
+      const gap = 12
+      const paso = fila.offsetHeight + gap
+      /* Encabezado, buscador y aire de Find Patient, sin la lista; y lo de Today sin sus cards. */
+      const fijo = b.offsetHeight - lista.offsetHeight
+      const boton = (b.querySelector<HTMLElement>('[data-show-more]')?.offsetHeight ?? 18) + 8
+      const hoyMinimo = c.offsetHeight - cajaHoy.offsetHeight + MINIMO_HOY
+      const libre = a.offsetHeight - 16 - hoyMinimo - fijo - boton
+      /* Nunca menos de tres: con un paciente elegido la tabla queda corta y el elegido no puede esconderse detrás de
+         "Show N more". Ahí la columna derecha queda más larga que la tabla. */
+      const n = Math.max(LIMITE_PACIENTES, Math.floor((libre + gap) / paso))
+      setCuantos((p) => (p === n ? p : n))
+    }
+    medir()
+    const ro = new ResizeObserver(medir)
+    for (const r of [izq, buscar]) if (r.current) ro.observe(r.current)
+    return () => ro.disconnect()
+  }, [izq, buscar, hoy])
+  return cuantos
+}
+
+export function BuscarPaciente({ busqueda, onBusqueda, paciente, saldoDe, onElegir, onCerrar, filas = LIMITE_PACIENTES, className }: {
   className?: string
+  /** Cuántos pacientes se ven antes de "Show N more". */
+  filas?: number
   busqueda: string
   onBusqueda: (q: string) => void
   paciente?: PacienteBilling
@@ -301,9 +339,9 @@ export function BuscarPaciente({ busqueda, onBusqueda, paciente, saldoDe, onEleg
       {resultados.length === 0 ? (
         <EmptyState title="No recent patients/guarantors to show yet." className="py-6" />
       ) : (
-        /* Se ven tres y "Show N more" abre el resto con scroll adentro, sin estirar el panel: la regla de las listas largas
-           (ui/show-more, como Patients). Al buscar, el scroll vuelve a cero. */
-        <ShowMore key={busqueda} total={resultados.length} limit={LIMITE_PACIENTES} enCaja llenarAlto label="patients" className="flex flex-col gap-3">
+        /* Se ven los que entran y "Show N more" abre el resto con scroll adentro, sin estirar el panel: la regla de las
+           listas largas (ui/show-more, como Patients). Al buscar, el scroll vuelve a cero. */
+        <ShowMore key={`${busqueda}:${filas}`} total={resultados.length} limit={filas} enCaja label="patients" className="flex flex-col gap-3">
           {(cuantos) => resultados.slice(0, cuantos).map((p) => (
             <ResultadoPaciente
               key={p.nombre}
@@ -351,6 +389,10 @@ export default function Billing({ inicial }: {
   const [modal, setModal] = useState<TipoAjusteBilling | null>(null)
   const refElegido = useRef<HTMLDivElement>(null)
   const subir = useRef(false)
+  const refIzq = useRef<HTMLDivElement>(null)
+  const refBuscar = useRef<HTMLDivElement>(null)
+  const refHoy = useRef<HTMLDivElement>(null)
+  const pacientesQueEntran = usePacientesQueEntran(refIzq, refBuscar, refHoy)
 
   const pacienteSeleccionado = seleccionado ? PACIENTES_BILLING.find((p) => p.nombre === seleccionado) : undefined
   const grupo = useMemo(() => (seleccionado ? grupoDeGarante(seleccionado) : []), [seleccionado])
@@ -421,11 +463,11 @@ export default function Billing({ inicial }: {
         {STATS_BILLING.map((s, i) => <Stat key={s.label} {...s} enFila className={cn(LUGAR_NUMERO[i], 'xl:col-span-1')} />)}
       </div>
 
-      {/* La actividad a la izquierda; Find Patient y Today a la derecha, como red.dev. Con las métricas a todo el ancho la
-          columna derecha ya no se ata al alto de la izquierda: Find Patient tiene su alto y Today va debajo
-          (billing.md, 2026-11-19). */}
-      <div className="mt-4 grid grid-cols-1 items-start gap-4 lg:grid-cols-[minmax(0,1fr)_280px]">
-        <div className="flex min-w-0 flex-col gap-4">
+      {/* La actividad a la izquierda; Find Patient y Today a la derecha, como red.dev. La columna derecha mide lo mismo que
+          la tabla: Find Patient con los pacientes que entran y Today hasta el final (billing.md, 2026-11-24). La izquierda
+          no se estira: su alto es el que se mide. */}
+      <div className="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,1fr)_280px]">
+        <div ref={refIzq} className="flex min-w-0 flex-col gap-4 lg:self-start">
           <ActividadReciente
             className="flex-1"
             filas={filas}
@@ -441,19 +483,28 @@ export default function Billing({ inicial }: {
         </div>
 
         <div className="flex min-w-0 flex-col gap-4">
-          {/* Alto propio: entran unos cinco pacientes y "Show N more" abre el resto con scroll adentro. */}
-          <BuscarPaciente
-            className="h-[440px]"
-            busqueda={busqueda}
-            onBusqueda={setBusqueda}
-            paciente={pacienteSeleccionado}
-            saldoDe={saldoActual}
-            onElegir={elegirDeLaLista}
-            onCerrar={() => setSeleccionado(null)}
-          />
-          <Panel title="Today" className={cn('shrink-0', TITULO_PEGADO)} bodyClassName="gap-3 pt-0">
-            {STATS_HOY.map((s) => <Stat key={s.label} interna {...s} />)}
-          </Panel>
+          <div ref={refBuscar} className="shrink-0">
+            <BuscarPaciente
+              filas={pacientesQueEntran}
+              busqueda={busqueda}
+              onBusqueda={setBusqueda}
+              paciente={pacienteSeleccionado}
+              saldoDe={saldoActual}
+              onElegir={elegirDeLaLista}
+              onCerrar={() => setSeleccionado(null)}
+            />
+          </div>
+          {/* Las tres cards siempre a la vista: con poco alto pasan a una fila cada una y se reparten el alto (el
+              contenedor `hoy` y `filaSiNoEntra` de ui/stat-card); con lugar, enteras. */}
+          <div ref={refHoy} className="flex flex-col lg:flex-1">
+            <Panel title="Today" className={cn('lg:flex-1', TITULO_PEGADO)} bodyClassName="gap-3 pt-0">
+              <div data-hoy className="lg:min-h-[184px] lg:flex-1 lg:[container:hoy/size]">
+                <div className="flex flex-col gap-3 lg:h-full [@container_hoy_(max-height:339px)]:gap-2">
+                  {STATS_HOY.map((s) => <Stat key={s.label} interna filaSiNoEntra {...s} />)}
+                </div>
+              </div>
+            </Panel>
+          </div>
         </div>
       </div>
 

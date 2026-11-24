@@ -540,3 +540,29 @@ Billing, el Ledger y Edit Account → Subscription; el Dashboard usa su variante
 
 Pie, alineación, fechas y avatar con las reglas comunes de todas las tablas: ver `design-reference/figma/README.md`
 (*Tablas estandarizadas v2*, 2026-11-24).
+
+## La columna derecha termina con la tabla: Find patient justo y Today adaptable (2026-11-24)
+
+Sin historia de Jira: devolución de Julián con la referencia del Figma *Confidentally UI · Design System* (113:1042).
+Find patient medía 440px fijos y sólo entraban cuatro pacientes enteros: quedaba un hueco arriba de *Show N more*. Today,
+con las tres cards apiladas, bajaba unos 200px más que la tabla. En el Figma, Today termina con la tabla pero muestra una
+sola card; Julián pidió mantener las tres.
+
+1. **Desde 1024px la columna derecha mide lo mismo que la tabla.** La columna izquierda no se estira (`lg:self-start`) y
+   su alto es el que se mide (`usePacientesQueEntran` en `Billing.tsx`, con ResizeObserver): Find patient muestra los
+   pacientes enteros que entran dejándole a Today su mínimo, *Show N more* va pegado a la última fila y Today
+   (`lg:flex-1`) se queda con el resto hasta el final de la tabla. Se recalcula al paginar, cambiar *Rows per page*,
+   buscar o elegir un paciente.
+2. **Today, siempre con las tres cards (solución con container query).** El cuerpo de Today es un contenedor de alto
+   (`[container:hoy/size]`). Con menos de 340px, cada `StatCard` pasa a una fila (`filaSiNoEntra`: ícono de 32, rótulo de
+   12px, ⓘ y el valor a la derecha) y las tres se reparten el alto; con lugar (25 filas por página, una búsqueda con
+   pocos resultados), vuelven a ser las cards enteras. Mínimo de las tres en fila: 184px (`MINIMO_HOY`).
+3. **Mínimo de tres pacientes en Find patient.** Con un paciente elegido la tabla queda corta: si Find patient bajara a
+   uno, el elegido quedaba escondido detrás de *Show N more*. Ahí la columna derecha queda más larga que la tabla, como
+   antes.
+4. En el celular y la tablet no cambia nada: Find patient con tres y Today con las cards enteras, debajo de la tabla.
+5. De paso (todas las tablas): el pie de `DataTable` queda fijo al ancho visible. En el celular, *Rows per page* y el
+   paginador quedaban escondidos a la derecha del scroll horizontal de la tabla.
+
+A validar con usuarios: si la fila compacta de Today se lee tan rápido como la card, y si recepción extraña ver más de
+cuatro pacientes recientes a la vez.
