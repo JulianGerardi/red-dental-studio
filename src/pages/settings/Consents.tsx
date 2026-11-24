@@ -460,7 +460,7 @@ export function DrawerPreview({ abierto, onCerrar, borrador, vistaPaciente, onVi
       onClose={onCerrar}
       title="Preview"
       description="What the patient receives"
-      size="lg"
+      size="xl"
       className="bg-surface-muted"
       footer={(
         <>

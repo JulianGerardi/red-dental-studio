@@ -251,3 +251,6 @@ estandarización: la pantalla pasa a la pieza común `components/settings/ListaE
    (queda en la lista). Pie común: Preview a la izquierda, Cancel · Save a la derecha, fijo abajo.
 7. Sin coincidencias: *No matching results* (antes *No templates* con bajada).
 
+8. **Preview más ancho** (pedido de Julián): el drawer pasa de `lg` (560 px) a `xl` (760 px), el ancho del detalle del
+   consentimiento en Clinical Mode. La hoja sigue en tamaño carta (520 px) y ahora queda centrada con aire gris alrededor
+   en vez de pegada a los bordes. En el celular ocupa toda la pantalla, como antes.
