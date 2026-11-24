@@ -596,3 +596,14 @@ Pedido de Julián, con la regla de la tanda (en toda la app las pestañas van a 
    Appointments.
 2. **Pending documents:** *Overdue / Due this week / Later* bajan debajo del título, a la izquierda. *N to resolve* queda
    a la derecha, a la altura del título.
+
+## Las pestañas vuelven a la fila del título (2026-11-24)
+
+Pedido de Julián: como en el Dashboard, se deshace lo del 2026-11-20. Pending task: título a la izquierda y pestañas a
+la derecha. Pending documents: pestañas a la derecha en la fila del título y, a su lado, *N to resolve* (antes iba
+pegado al título). En el celular los controles bajan debajo del título.
+
+### Sin *N to resolve* (2026-11-24)
+
+Pedido de Julián: se saca la pastilla *N to resolve* de Pending documents. Las pestañas ya muestran cuántos hay en cada
+grupo. Queda título a la izquierda y pestañas a la derecha, como Pending task.
