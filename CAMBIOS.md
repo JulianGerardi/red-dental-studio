@@ -3,6 +3,17 @@
 Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber el dev. El porqué de cada decisión está en
 `design-reference/figma/modulos/<módulo>.md`; lo anterior al 2026-10-06, en `git log` y en esos mismos archivos.
 
+## 2026-11-24
+
+### Pending task con Filter por provider; pestañas de Pending documents debajo del título (PR_PENDIENTE)
+- **Dashboard · Pending task:** las pestañas siguen a la derecha del título y suman un Filter por provider al lado
+  (cada provider ve sus tareas). Las cantidades de las pestañas son las del provider elegido; si no queda nada, "No
+  results match your filters".
+- **Patient Dashboard:** las pestañas de Pending task y de Pending documents van debajo del título, a la izquierda; "N to
+  resolve" a la derecha, a la altura del título.
+- **Para el dev:** el filtro usa `PendingTask.provider` (`FilterMenu` sm, varias opciones). Decisiones en
+  `modulos/dashboard.md` (2026-11-24) y `patient-dashboard.md` (2026-11-20).
+
 ## 2026-11-20
 
 ### Acciones al lado del título, pestañas a la izquierda, botones "Add" y Clinical practitioner ([#179](https://github.com/JulianGerardi/red-dental-studio/pull/179))
