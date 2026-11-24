@@ -5,6 +5,18 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-11-24
 
+### Métricas unificadas: estructura v3 con el estilo de la app ([#182](https://github.com/JulianGerardi/red-dental-studio/pull/182))
+- **Todas las métricas** (Billing, Ledger, Edit account → Subscription y Dashboard): ícono en caja celeste, rótulo en
+  sentence case, ⓘ en todas y **sin bajada**: lo que decía la bajada pasa al ⓘ.
+- **`ui/stat-card`:** props `label`, `value`, `info`, `icon`, `interna` (InnerCard adentro de un panel, como Today de
+  Billing) y `enFila`. **Dejar de usar `caption` y `compacta`** (se fueron). Card con sombra y sin borde (`TARJETA_PANEL`).
+- **`StatStrip` (Dashboard):** en celular las métricas se apilan una por fila con el ⓘ a la derecha; desde 768px, en fila.
+- **Textos y valores:** *Expires on* (era *Expired on*), Licenses "3 / 170 used", ⓘ nuevos de Today y del Dashboard.
+  Total A/R es la suma de Guarantor A/R + Insurance A/R ($17,297.96).
+- **Open encounters (CON-2813):** Planned, In Progress, On Hold, Completed y Discharged, sin Fulfilled, de cualquier día;
+  el mock todavía da un número por día. Appointments sin canceladas (CON-3912); Waiting room: Checked in, On hold y Ready
+  to check out (CON-4178).
+
 ### Pending task con Filter por provider; pestañas de Pending documents debajo del título ([#180](https://github.com/JulianGerardi/red-dental-studio/pull/180))
 - **Dashboard · Pending task:** las pestañas siguen a la derecha del título y suman un Filter por provider al lado
   (cada provider ve sus tareas). Las cantidades de las pestañas son las del provider elegido; si no queda nada, "No
