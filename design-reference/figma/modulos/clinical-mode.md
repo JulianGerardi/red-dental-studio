@@ -3321,3 +3321,15 @@ muestran.
 
 Pie, alineación, fechas y avatar con las reglas comunes de todas las tablas: ver `design-reference/figma/README.md`
 (*Tablas estandarizadas v2*, 2026-11-24).
+
+## El consentimiento en el visor de documentos (2026-11-24)
+
+Propuesta A (regla en `figma/README.md` › *Visor de documentos*).
+
+1. **Procedure consent** (`ConsentDetail`) deja de abrirse dentro del módulo: va en `ui/document-viewer`, a pantalla
+   completa. Arriba Back, el paciente, el título, el estado y View PDF.
+   - El aviso *Sign to start/complete this procedure* pasa del `Alert` a la línea de aviso (`info`).
+   - *Rejected/Discarded* (… *It can no longer be signed.*) pasa al aviso (`neutral`).
+   - Con las dos firmas hechas, la barra de abajo desaparece y el aviso dice *Patient signed … · Provider signed …*.
+2. **View consent** desde Consent required (`VistaConsentimiento`) deja el drawer: el mismo visor con *Back* (vuelve
+   al diálogo), el estado y el aviso de quién firmó.

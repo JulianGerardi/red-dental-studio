@@ -283,3 +283,9 @@ del patrón estandarizado.
    - `ConsentDocument` (la hoja de Clinical Mode, con firmas) no cambia: convendría alinearla al mismo PDF en otra tanda.
 6. No se replica de red.dev (lo decidido en la estandarización sigue): *+ New* en el panel (va en el título de la
    pantalla), el título del editor con el nombre del template y su bajada, y *Activate template* en el editor (va en el ⋮).
+
+## El preview en el visor de documentos (2026-11-24)
+
+Propuesta A (regla en `figma/README.md` › *Visor de documentos*). `PreviewPaciente` usa `ui/document-viewer`: mismo
+contenido que antes (*Back to editing*, *Patient View - título*, el aviso gris de cambios sin guardar). La hoja
+(`HojaConsentimientoPdf`) pierde su marco gris propio: el fondo lo pone el visor.

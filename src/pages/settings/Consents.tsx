@@ -1,8 +1,7 @@
 import { PADDING_PAGINA } from '@/lib/estilos'
 import { useEffect, useId, useRef, useState } from 'react'
 import { Chip } from '@/components/ui/chip'
-import { Dialog as DialogPrimitive } from 'radix-ui'
-import { Search, Plus, Bold, Italic, Underline, Heading1, Heading2, Pilcrow, List, ListOrdered, Eye, ArrowLeft, Info, X } from 'lucide-react'
+import { Search, Plus, Bold, Italic, Underline, Heading1, Heading2, Pilcrow, List, ListOrdered, Eye, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { SettingsPageHeader } from '@/components/settings/SettingsPageHeader'
 import { cn } from '@/lib/utils'
@@ -13,6 +12,7 @@ import { SelectField } from '@/components/patients/form'
 import { aviso } from '@/components/ui/toaster'
 import { textoPlano } from '@/components/settings/ConsentDocument'
 import { HojaConsentimientoPdf } from '@/components/settings/HojaConsentimientoPdf'
+import { DocumentViewer } from '@/components/ui/document-viewer'
 import { Tabs } from '@/components/ui/tabs'
 import { PROCEDURES } from '@/components/clinical/dental/data'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
@@ -477,39 +477,31 @@ export function EditorTemplate({ actual, borrador, onBorrador, intentado, onCanc
   )
 }
 
-/* El preview a pantalla completa, como red.dev (CON-4094, patrón Patient View): tapa la app, arriba Back to editing y
-   "Patient View - título", el aviso de que incluye lo que no se guardó y la hoja con el formato del PDF. No guarda nada:
-   volver deja el formulario como estaba. Escape también vuelve. */
+/* El preview en el visor de documentos (ui/document-viewer), como red.dev (CON-4094, patrón Patient View): Back to
+   editing y "Patient View - título", el aviso gris de que incluye lo que no se guardó y la hoja con el formato del PDF.
+   No guarda nada: volver deja el formulario como estaba. Escape también vuelve. */
 export function PreviewPaciente({ abierto, onCerrar, borrador }: {
   abierto: boolean
   onCerrar: () => void
   borrador: Borrador
 }) {
+  if (!abierto) return null
   const primero = borrador.procedimientos[0]
   return (
-    <DialogPrimitive.Root open={abierto} onOpenChange={(o) => { if (!o) onCerrar() }}>
-      <DialogPrimitive.Portal>
-        <DialogPrimitive.Content aria-describedby={undefined} className="fixed inset-0 z-50 overflow-y-auto bg-white outline-none motion-safe:animate-[loc-in_150ms_ease-out]">
-          <div className="mx-auto flex max-w-[900px] flex-col gap-4 px-4 py-5 sm:px-6 sm:py-6">
-            <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
-              <Button variant="secondary" size="sm" onClick={onCerrar}><ArrowLeft /> Back to editing</Button>
-              <DialogPrimitive.Title className="min-w-0 text-sm font-semibold text-ink">
-                Patient View - {borrador.titulo || 'Untitled template'}
-              </DialogPrimitive.Title>
-            </div>
-            <p role="note" className="flex items-center gap-2 rounded-md border border-line bg-surface-subtle px-3 py-2.5 text-[13px] text-ink-muted">
-              <Info className="size-4 shrink-0" aria-hidden /> Preview includes your unsaved changes. Save the template to keep them.
-            </p>
-            <HojaConsentimientoPdf
-              titulo={borrador.titulo}
-              procedimiento={primero ? `${primero} — ${procedimiento(primero)?.nombre ?? ''}` : undefined}
-              naturaleza={borrador.naturaleza}
-              riesgos={borrador.riesgos}
-            />
-          </div>
-        </DialogPrimitive.Content>
-      </DialogPrimitive.Portal>
-    </DialogPrimitive.Root>
+    <DocumentViewer
+      title={`Patient View - ${borrador.titulo || 'Untitled template'}`}
+      backLabel="Back to editing"
+      onBack={onCerrar}
+      notice="Preview includes your unsaved changes. Save the template to keep them."
+      noticeTone="neutral"
+    >
+      <HojaConsentimientoPdf
+        titulo={borrador.titulo}
+        procedimiento={primero ? `${primero} — ${procedimiento(primero)?.nombre ?? ''}` : undefined}
+        naturaleza={borrador.naturaleza}
+        riesgos={borrador.riesgos}
+      />
+    </DocumentViewer>
   )
 }
 

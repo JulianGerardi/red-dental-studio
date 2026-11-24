@@ -1120,3 +1120,9 @@ cantidad): cada provider ve sus tareas. Se aplica primero el provider y después
 pestañas son las del provider elegido. Si el filtro deja todo afuera: "No results match your filters" / "Try other
 providers.", como los otros dos paneles. Las opciones salen de las tareas del día (`PendingTask.provider`). Es el camino
 que dejaba abierto la nota del 2026-10-29 (volver a un Filter sólo para Pending task), ahora junto a las pestañas.
+
+## La Clinical note en el visor de documentos (2026-11-24)
+
+Propuesta A (regla en `figma/README.md` › *Visor de documentos*). La Clinical note de Pending tasks usa `ui/document-viewer`:
+*Back to history*, el título, *View PDF* arriba a la derecha y *Sign clinical note* en la barra de abajo, a la derecha
+(antes centrado). Firmada, la barra desaparece. La hoja (`VistaDocumento`) no cambia.

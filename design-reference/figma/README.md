@@ -740,3 +740,20 @@ Anomalías y decisiones:
 - El pie del Unassigned del Treatment Plan decía "Showing 15 of 15 insurances" (texto del frame, replicado). Ahora pagina
   y lo que se saca de un caso con *Delete from Tx* entra arriba de todo: al final quedaba en la página 2.
 - Insurance plans conserva *Priority period* aunque el HTML no la muestra (rediseñar no es cambiar el contenido).
+
+## Visor de documentos (2026-11-24)
+
+Propuesta A de Julián (página de propuesta del 2026-11-24, *Un solo visor para los documentos*): todo documento para leer
+o firmar se abre en `ui/document-viewer` (`DocumentViewer`), **siempre a pantalla completa y nunca en un drawer**.
+
+1. **Barra de arriba:** volver con el destino en el texto (*Back*, *Back to history*, *Back to editing*), de quién o qué es
+   (`subtitle`), el título, el estado (Pill) y *View PDF* (`onPdf`; en el celular, sólo el ícono).
+2. **Un solo aviso** debajo (`notice`): qué falta o en qué modo está. `info` (azul) cuando pide algo; `neutral` (gris)
+   cuando sólo informa (cambios sin guardar, quién firmó, ya no se firma).
+3. **La hoja sobre el escritorio gris**, hasta 900 px. Cada pantalla conserva su hoja (unificar la hoja era la propuesta
+   B, no elegida).
+4. **Barra de abajo sólo si hay algo para hacer** (`footer`): firmar. Firmado, cerrado o en preview, no aparece.
+5. *Preparing document...* con `loading`; Escape vuelve como el botón.
+
+Dónde: Clinical note (`pages/ClinicalNote.tsx`), Procedure consent de Clinical Mode (`ConsentDetail`), *View consent*
+desde Consent required (`VistaConsentimiento`, antes drawer) y el preview de Consent templates (`PreviewPaciente`).

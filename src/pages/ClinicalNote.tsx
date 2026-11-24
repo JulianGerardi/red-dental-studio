@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { ChevronLeft, Eye, EyeOff, FileText, Loader2, PenLine } from 'lucide-react'
+import { Eye, EyeOff, FileText, PenLine } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { aviso } from '@/components/ui/toaster'
 import { Button } from '@/components/ui/button'
@@ -10,11 +10,12 @@ import { buscarTarea } from '@/components/dashboard/dashboard-data'
 import { aplicarAccion } from '@/components/dashboard/tareas'
 import { CLINICA, abrirDocumento, documentoTarea, type Documento } from '@/components/dashboard/documentoTarea'
 import { EmptyState } from '@/components/ui/empty-state'
+import { DocumentViewer } from '@/components/ui/document-viewer'
 
 /* La Clinical Note que abre Complete this Task en Pending Task, como red.dev (videos de Julián, 2026-11-20): Back to
    History (vuelve a Patient Summary de Clinical Mode), el nombre, View PDF, el documento y Sign Clinical Note, que pide
-   el usuario y la contraseña otra vez. Pantalla completa, sin el shell, como Clinical Mode. Ver
-   design-reference/figma/modulos/dashboard.md (2026-11-20). */
+   el usuario y la contraseña otra vez. En el visor de documentos (ui/document-viewer), a pantalla completa. Ver
+   design-reference/figma/modulos/dashboard.md (2026-11-20 y 2026-11-24). */
 
 /* El documento en pantalla: el mismo contenido que el PDF (documentoTarea). */
 export function VistaDocumento({ doc }: { doc: Documento }) {
@@ -118,38 +119,19 @@ export default function ClinicalNote() {
   const volver = () => navegar(`/patients/${id}/clinical-mode?tab=${encodeURIComponent('Patient summary')}`)
 
   return (
-    <div className="bg-page-background flex h-svh flex-col p-4 sm:p-[30px] lg:px-12">
-      <div className="mx-auto flex min-h-0 w-full max-w-[1440px] flex-1 flex-col rounded-lg bg-white shadow-panel">
-        <div className="flex flex-wrap items-center gap-3 border-b border-line-soft px-4 py-3 sm:px-6">
-          <Button variant="ghost" size="sm" onClick={volver}><ChevronLeft /> Back to history</Button>
-          {tarea && <span className="h-5 w-px bg-line" aria-hidden />}
-          {tarea && <h1 className="text-[14px] font-semibold text-ink">Clinical note - {tarea.person}</h1>}
-          {doc && (
-            <Button variant="secondary" size="sm" className="ml-auto" disabled={!listo}
-              onClick={() => abrirDocumento(doc, () => aviso.error("We couldn't open the PDF. Allow pop-ups for this site and try again."))}>
-              <FileText /> View PDF
-            </Button>
-          )}
-        </div>
-
-        <div className="min-h-0 flex-1 overflow-y-auto bg-surface-subtle/40 px-4 py-6 sm:px-6">
-          {!doc ? (
-            <EmptyState icon={FileText} title="Clinical note not found" detail="It may have been signed or removed. Go back to the history to find it." />
-          ) : !listo ? (
-            <p role="status" className="flex h-full flex-col items-center justify-center gap-2 text-[13px] text-ink-muted">
-              <Loader2 className="text-dash-blue size-6 animate-spin" aria-hidden /> Preparing document...
-            </p>
-          ) : (
-            <VistaDocumento doc={doc} />
-          )}
-        </div>
-
-        {doc && listo && !firmada && (
-          <div className="flex justify-center border-t border-line-soft px-4 py-3">
-            <Button onClick={() => setFirmando(true)}><PenLine /> Sign clinical note</Button>
-          </div>
-        )}
-      </div>
+    <>
+      <DocumentViewer
+        title={tarea ? `Clinical note - ${tarea.person}` : 'Clinical note'}
+        backLabel="Back to history"
+        onBack={volver}
+        loading={!!doc && !listo}
+        onPdf={doc ? () => abrirDocumento(doc, () => aviso.error("We couldn't open the PDF. Allow pop-ups for this site and try again.")) : undefined}
+        footer={doc && !firmada ? <Button className="ml-auto" onClick={() => setFirmando(true)}><PenLine /> Sign clinical note</Button> : undefined}
+      >
+        {doc
+          ? <VistaDocumento doc={doc} />
+          : <EmptyState icon={FileText} title="Clinical note not found" detail="It may have been signed or removed. Go back to the history to find it." className="rounded-lg bg-white" />}
+      </DocumentViewer>
 
       {firmando && tarea && (
         <FirmarDialog
@@ -157,6 +139,6 @@ export default function ClinicalNote() {
           onFirmar={() => { setFirmando(false); setFirmada(new Date()); aplicarAccion(tarea, 'Sign') }}
         />
       )}
-    </div>
+    </>
   )
 }

@@ -48,8 +48,10 @@ export function HojaConsentimientoPdf({ titulo, procedimiento, naturaleza, riesg
   const lineasRiesgo = riesgos.split('\n').filter(Boolean)
   const vacio = <p className="text-ink-faint">No content yet.</p>
   return (
-    <article aria-label="Consent document preview" className={cn('rounded-xl bg-surface-muted p-3 sm:p-5', className)}>
-      <div className="flex flex-col gap-5 bg-white px-5 py-6 sm:px-9 sm:py-8">
+    <article
+      aria-label="Consent document preview"
+      className={cn('flex flex-col gap-5 bg-white px-5 py-6 shadow-[0_0_0_1px_rgb(0_0_0/0.06),0_2px_4px_rgb(0_0_0/0.06),0_14px_28px_-8px_rgb(0_0_0/0.22)] sm:px-9 sm:py-8', className)}
+    >
         <header className="flex flex-wrap items-start justify-between gap-x-6 gap-y-2 border-b border-line pb-5">
           <div>
             <p className="text-xl leading-tight font-bold text-dash-blue">{MUESTRA_PDF.clinica}</p>
@@ -82,7 +84,6 @@ export function HojaConsentimientoPdf({ titulo, procedimiento, naturaleza, riesg
             <p>[Completed when signed]</p>
           </div>
         </Seccion>
-      </div>
     </article>
   )
 }
