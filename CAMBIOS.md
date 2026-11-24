@@ -5,6 +5,15 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-11-24
 
+### Billing: la columna derecha termina con la tabla ([#184](https://github.com/JulianGerardi/red-dental-studio/pull/184))
+- **Find patient** sin alto fijo: los pacientes enteros que entran (mínimo tres) y *Show N more* pegado a la última
+  fila. **Today** (`lg:flex-1`) termina donde termina la tabla y muestra siempre sus tres cards.
+- **`ui/stat-card`:** prop nueva `filaSiNoEntra`: dentro de un contenedor `[container:hoy/size]` de menos de 340px de
+  alto, la card pasa a una fila (ícono, rótulo, ⓘ y valor a la derecha).
+- **`Billing.tsx`:** `usePacientesQueEntran` mide la columna izquierda (`lg:self-start`) y calcula cuántos pacientes
+  entran; `BuscarPaciente` recibe `filas`. Find patient deja `llenarAlto` y los 440px fijos.
+- **Todas las tablas:** el pie de `DataTable` queda fijo al ancho visible (en el celular se escondía en el scroll).
+
 ### Tablas estandarizadas v2: pie, alineación, fechas, Tooth/Surface y avatar ([#183](https://github.com/JulianGerardi/red-dental-studio/pull/183))
 - **Pie de toda tabla:** "Showing 1 to 10 of N results" (siempre *results*), *Rows per page* 10 / 25 / 50 a la derecha
   con el paginador (sólo con más de una página). Todas arrancan en 10 filas.
