@@ -95,7 +95,7 @@ function Consentimientos({ args }: { args: Args }) {
           onElegir={(t) => { setElegido(t.id); setBorrador(aBorrador(t)); setIntentado(false) }}
           onAlternar={alternar}
         />
-        <EditorTemplate actual={actual} borrador={borrador} onBorrador={setBorrador} intentado={intentado} onAlternar={() => actual && alternar(actual.id)} onCancelar={() => setIntentado(false)} onGuardar={() => setIntentado(true)} onPreview={() => setPreview(true)} />
+        <EditorTemplate actual={actual} borrador={borrador} onBorrador={setBorrador} intentado={intentado} onCancelar={() => setIntentado(false)} onGuardar={() => setIntentado(true)} onPreview={() => setPreview(true)} />
       </div>
       <DrawerPreview abierto={preview} onCerrar={() => setPreview(false)} borrador={borrador} vistaPaciente={vista} onVistaPaciente={setVista} onGuardar={() => { setPreview(false); setIntentado(true) }} />
     </div>
@@ -181,7 +181,7 @@ function Editor({ actual, intentado }: { actual?: ConsentTemplate; intentado?: b
   const [vista, setVista] = useState(false)
   return (
     <>
-      <EditorTemplate actual={actual} borrador={b} onBorrador={setB} intentado={probado} onAlternar={nada} onCancelar={() => setProbado(false)} onGuardar={() => setProbado(true)} onPreview={() => setPreview(true)} />
+      <EditorTemplate actual={actual} borrador={b} onBorrador={setB} intentado={probado} onCancelar={() => setProbado(false)} onGuardar={() => setProbado(true)} onPreview={() => setPreview(true)} />
       <DrawerPreview abierto={preview} onCerrar={() => setPreview(false)} borrador={b} vistaPaciente={vista} onVistaPaciente={setVista} onGuardar={() => { setPreview(false); setProbado(true) }} />
     </>
   )

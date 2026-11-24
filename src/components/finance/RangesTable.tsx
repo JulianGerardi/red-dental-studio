@@ -8,9 +8,11 @@ import { TIPOS_DEDUCIBLE, excepcionesEnRango, type Excepcion, type Rango, type T
 import { OBLIGATORIO } from '@/lib/validacion'
 
 /* La tabla de rangos de una coverage table, la de la plantilla y la de cada plan (red.dev, Coverage Table): un rango de
-   códigos, su categoría, el tipo de deducible y lo que paga. En el celular cada rango baja a dos columnas. */
+   códigos, su categoría, el tipo de deducible y lo que paga. Angosta, cada rango baja a dos columnas. */
 
-const COLUMNAS = 'sm:grid-cols-[minmax(170px,1.3fr)_minmax(140px,1.6fr)_150px_110px_40px_32px]'
+/* Columnas según el ancho de la tabla (no de la ventana): con la lista al lado, el editor puede ser angosto y entonces cada
+   rango baja a dos columnas en vez de cortarse (settings-billing.md, 2026-11-24). */
+const COLUMNAS = '@3xl:grid-cols-[minmax(160px,1.3fr)_minmax(130px,1.6fr)_140px_100px_80px_32px]'
 
 export const rangoVacio = (): Rango => ({ id: `r-${Math.random().toString(36).slice(2, 8)}`, desde: '', hasta: '', categoria: '', deducible: 'None', valor: 0 })
 
@@ -25,7 +27,7 @@ export function RangesTable({
   tipo: TipoCobertura
   rangos: Rango[]
   onChange: (rangos: Rango[]) => void
-  /** Las excepciones de la plantilla: la columna Exc cuenta las que caen en cada rango. */
+  /** Las excepciones de la plantilla: la columna Exceptions cuenta las que caen en cada rango. */
   excepciones?: Excepcion[]
   /** Después de Save: marca en rojo lo que falta. */
   intentado?: boolean
@@ -44,13 +46,13 @@ export function RangesTable({
   }, [nuevo])
 
   return (
-    <div ref={tabla} role="table" aria-label="Coverage ranges" className={TABLA_MARCO}>
-      <div role="row" className={cn('hidden gap-3 sm:grid', TABLA_ENCABEZADO, COLUMNAS)}>
+    <div ref={tabla} role="table" aria-label="Coverage ranges" className={cn('@container', TABLA_MARCO)}>
+      <div role="row" className={cn('hidden gap-3 @3xl:grid', TABLA_ENCABEZADO, COLUMNAS)}>
         <span role="columnheader">Code ranges<span className="text-required">*</span></span>
         <span role="columnheader">Category<span className="text-required">*</span></span>
         <span role="columnheader">Deductible type<span className="text-required">*</span></span>
-        <span role="columnheader">{porcentaje ? 'Coverage %' : 'Copayment'}<span className="text-required">*</span></span>
-        <span role="columnheader" title="Exceptions">Exc</span>
+        <span role="columnheader" className="text-right">{porcentaje ? 'Coverage %' : 'Copayment'}<span className="text-required">*</span></span>
+        <span role="columnheader" className="text-right">Exceptions</span>
         <span role="columnheader"><span className="sr-only">Actions</span></span>
       </div>
 
@@ -62,12 +64,12 @@ export function RangesTable({
             key={r.id} role="row" data-rango={r.id}
             className={cn('grid grid-cols-2 gap-3', TABLA_FILA, 'items-start', COLUMNAS, r.id === nuevo && 'motion-safe:animate-[rango-nuevo_1.6s_ease-out]')}
           >
-            <div role="cell" className="col-span-2 flex items-start gap-2 sm:col-span-1">
+            <div role="cell" className="col-span-2 flex items-start gap-2 @3xl:col-span-1">
               <TextField hideLabel label={`Range ${i + 1} from`} placeholder="R. min" value={r.desde} onChange={(v) => cambiar(r.id, { desde: codigo(v) })} error={falta(r.desde)} className="min-w-0 flex-1" />
               <span className="pt-2 text-ink-faint">-</span>
               <TextField hideLabel label={`Range ${i + 1} to`} placeholder="R. max" value={r.hasta} onChange={(v) => cambiar(r.id, { hasta: codigo(v) })} error={falta(r.hasta)} className="min-w-0 flex-1" />
             </div>
-            <div role="cell" className="col-span-2 sm:col-span-1">
+            <div role="cell" className="col-span-2 @3xl:col-span-1">
               <TextField hideLabel label={`Range ${i + 1} category`} placeholder="Category" value={r.categoria} onChange={(v) => cambiar(r.id, { categoria: v })} error={falta(r.categoria)} />
             </div>
             <div role="cell">
@@ -76,11 +78,11 @@ export function RangesTable({
             <div role="cell">
               <TextField
                 hideLabel label={`Range ${i + 1} ${porcentaje ? 'coverage %' : 'copayment'}`} placeholder={porcentaje ? 'Coverage %' : '$0.00'}
-                value={String(r.valor)} onChange={(v) => cambiar(r.id, { valor: Math.min(porcentaje ? 100 : 99999, Number(v.replace(/[^\d.]/g, '')) || 0) })}
+                numero value={String(r.valor)} onChange={(v) => cambiar(r.id, { valor: Math.min(porcentaje ? 100 : 99999, Number(v.replace(/[^\d.]/g, '')) || 0) })}
               />
             </div>
-            <span role="cell" className="flex h-9 items-center tabular-nums" aria-label={`${excepcionesEnRango(r, excepciones)} exceptions`}>
-              <span className="mr-1 text-xs sm:hidden">Exc</span>{excepcionesEnRango(r, excepciones)}
+            <span role="cell" className="flex h-9 items-center tabular-nums @3xl:justify-end" aria-label={`${excepcionesEnRango(r, excepciones)} exceptions`}>
+              <span className="mr-1 text-xs @3xl:hidden">Exceptions</span>{excepcionesEnRango(r, excepciones)}
             </span>
             <span role="cell" className="flex h-9 items-center justify-end">
               <button type="button" aria-label={`Remove range ${i + 1}`} onClick={() => onChange(rangos.filter((x) => x.id !== r.id))} className={cn(ICONO_SUELTO, 'text-dash-bad-fg')}>

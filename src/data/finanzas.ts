@@ -136,7 +136,8 @@ export type Excepcion = {
   motivo: string
 }
 
-export type TablaCobertura = { id: string; nombre: string; tipo: TipoCobertura; rangos: Rango[]; excepciones: Excepcion[] }
+/* `activo` falso: desactivada desde el menú de la lista (propuesta, settings-billing.md 2026-11-24). Sin el campo, activa. */
+export type TablaCobertura = { id: string; nombre: string; tipo: TipoCobertura; rangos: Rango[]; excepciones: Excepcion[]; activo?: boolean }
 
 const rango = (desde: string, hasta: string, categoria: string, deducible: TipoDeducible, valor: number): Rango =>
   ({ id: `${desde}-${hasta}`, desde, hasta, categoria, deducible, valor })

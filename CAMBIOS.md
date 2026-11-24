@@ -5,6 +5,17 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-11-24
 
+### Coverage tables y Consents con el mismo patrón de lista + editor ([#185](https://github.com/JulianGerardi/red-dental-studio/pull/185))
+- **Nuevo `settings/ListaEditor`:** `PanelLista`, `ItemLista`, `EncabezadoEditor`, `PieEditor`, `GRILLA_LISTA_EDITOR`,
+  `TARJETA_EDITOR`. Lista de 340 px + editor en dos cards; ⋮ con Activate/Deactivate y Delete (con confirmación); pie
+  fijo con Cancel · Save. Va dentro de un `@container`. `MasterList` queda sólo para Fee schedules.
+- **Coverage:** pestañas Percentage / Copayment (reemplazan el select), `TablaCobertura.activo?` (propuesta, sin
+  historia; no filtra *Copy from template*), *Exc* → *Exceptions* y valores a la derecha (`TextField numero`).
+  `RangesTable` arma columnas según el ancho de la tabla (`@3xl` de contenedor), sin scroll horizontal.
+- **Consents:** sin switch ni *Deactivate template*; Deactivate confirma con los procedimientos (CON-3719), Activate
+  valida que no haya otro template activo para el procedimiento (CON-3725), System bloqueado. Preview en drawer `2xl`
+  con la hoja a 820 px. Delete de templates es propuesta: **CON-1484 está cancelada**.
+
 ### Billing: la columna derecha termina con la tabla ([#184](https://github.com/JulianGerardi/red-dental-studio/pull/184))
 - **Find patient** sin alto fijo: los pacientes enteros que entran (mínimo tres) y *Show N more* pegado a la última
   fila. **Today** (`lg:flex-1`) termina donde termina la tabla y muestra siempre sus tres cards.
