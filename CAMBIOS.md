@@ -5,7 +5,7 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-11-24
 
-### Pending task con Filter por provider; pestañas de Pending documents debajo del título (PR_PENDIENTE)
+### Pending task con Filter por provider; pestañas de Pending documents debajo del título ([#180](https://github.com/JulianGerardi/red-dental-studio/pull/180))
 - **Dashboard · Pending task:** las pestañas siguen a la derecha del título y suman un Filter por provider al lado
   (cada provider ve sus tareas). Las cantidades de las pestañas son las del provider elegido; si no queda nada, "No
   results match your filters".
