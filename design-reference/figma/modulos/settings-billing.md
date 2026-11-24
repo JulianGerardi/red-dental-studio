@@ -179,6 +179,8 @@ Devolución de Julián sobre las tablas estandarizadas v2.
 1. **Assignments** a la derecha quedaba pegada a *Effective* y el número con link, 6 px corrido del encabezado y del 0
    (el padding del botón). Toda columna a la derecha de `DataTable` suma `pr-3` (24 px hasta la siguiente, como el HTML) y
    el botón de `AssignmentsCount` compensa su padding con `-mx-1.5`.
+   - **Corrección (Julián, con referencia):** Assignments va a la **izquierda**, el número al inicio de la columna, debajo
+     de la "A" del encabezado. Excepción a "cantidades a la derecha": es un link que abre el desglose, no un importe.
 2. **Filter › States arranca vacío**: antes abría con Active + Inactive tildados y el botón decía *Filter 2* sin que nadie
    hubiera filtrado. Sin nada tildado se ve todo, como en el resto de las listas; un fee schedule *Archived* también
    aparece, con su pill. La lista del editor (a la izquierda) sigue arrancando en Active, como red.dev.

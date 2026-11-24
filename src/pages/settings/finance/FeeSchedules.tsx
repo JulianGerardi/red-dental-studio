@@ -278,7 +278,8 @@ export function SettingsFeeSchedules() {
     },
     { key: 'tipo', header: 'Type', width: 120, cell: (a) => <TextCell>{a.tipo}</TextCell> },
     {
-      key: 'asignaciones', header: 'Assignments', width: 120, align: 'right',
+      /* A la izquierda, al inicio de la columna: es un link que abre el desglose, no un importe (Julián, 2026-11-24). */
+      key: 'asignaciones', header: 'Assignments', width: 120,
       cell: (a) => <AssignmentsCount asignaciones={asignacionesDe(a, planes, aseguradoras)} onVer={() => setDrawer({ tipo: 'asignaciones', a })} />,
     },
     { key: 'vigencia', header: 'Effective', width: 110, cell: (a) => <span className="tabular-nums">{fechaMDA(versionVigente(a).desde)}</span> },
