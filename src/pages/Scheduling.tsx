@@ -1,6 +1,6 @@
 import { Tabs } from '@/components/ui/tabs'
 import { useState } from 'react'
-import { Plus, CalendarCheck, CalendarClock, Inbox } from 'lucide-react'
+import { Plus, CalendarCheck, Inbox } from 'lucide-react'
 import { AppointmentDetailsDrawer } from '@/components/scheduling/AppointmentDetailsDrawer'
 import { ViewMenu, VISTA_INICIAL, type VistaCalendario } from '@/components/scheduling/ViewFiltersPanel'
 import { NewAppointmentModal, type DatosTurno } from '@/components/scheduling/NewAppointmentModal'
@@ -11,7 +11,7 @@ import {
 import { cn } from '@/lib/utils'
 import { aviso } from '@/components/ui/toaster'
 import { PageTitle } from '@/components/ui/page-title'
-import { DatePicker, sameDay } from '@/components/ui/date-picker'
+import { DateNav, type PeriodoFecha } from '@/components/ui/date-nav'
 import {
   EVENTOS_INICIALES, FECHA_ANCLA, BLOCK_STYLE,
   type EventoConFecha, type ApptState,
@@ -32,6 +32,9 @@ import { useFabDePagina } from '@/components/help/HelpProvider'
 /* Interruptor de lo que está en el tablero pero todavía no se usa. En false
    el markup existe y no se renderiza; se prende cuando se defina el alcance. */
 const PENDIENTES = false
+
+/* Cuánto mueven las flechas de la fecha en cada vista. */
+const PERIODO: Record<Vista, PeriodoFecha> = { Day: 'day', Week: 'week', Month: 'month' }
 
 export default function Scheduling() {
   /* En celular la vista semanal obliga a scrollear de costado para ver un
@@ -198,19 +201,13 @@ export default function Scheduling() {
         </div>
       </div>
 
-      {/* Day / Week / Month a la izquierda, como las pestañas de toda la app. En la otra punta, juntos: la fecha (el selector
-          del Dashboard, sin flechas), Today, Status legend y Filter (scheduling.md, 2026-11-20). */}
+      {/* La fecha a la izquierda (‹ Today › + el período de la vista, ui/date-nav, el mismo bloque del Dashboard); en la
+          otra punta, juntos: Day / Week / Month, Status legend y Filter (scheduling.md, 2026-11-24). */}
       <div className="mt-4 flex flex-wrap items-center justify-between gap-2">
-        {/* El Figma marca "Month" activo aunque la vista sea semanal. */}
-        <Tabs aria-label="Calendar view" tabs={['Day', 'Week', 'Month'] as const} value={view} onChange={setView} />
+        <DateNav value={fecha} onChange={setFecha} periodo={PERIODO[view]} hoy={FECHA_ANCLA} />
         <div className="flex flex-wrap items-center gap-2">
-          <DatePicker variant="toolbar" value={fecha} onChange={setFecha} />
-          {/* Volver a hoy; desaparece cuando ya estás en hoy, como en el Dashboard. */}
-          {!sameDay(fecha, FECHA_ANCLA) && (
-            <Button variant="secondary" size="md" onClick={() => setFecha(FECHA_ANCLA)} title="Go to today">
-              <CalendarClock /> Today
-            </Button>
-          )}
+          {/* El Figma marca "Month" activo aunque la vista sea semanal. */}
+          <Tabs aria-label="Calendar view" tabs={['Day', 'Week', 'Month'] as const} value={view} onChange={setView} />
           <StatusLegend />
           <ViewMenu valor={vista} onGuardar={setVista} />
         </div>

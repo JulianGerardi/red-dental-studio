@@ -68,55 +68,71 @@ const METODOS: Metodo[] = [
 const TABS = ['Adjustment types', 'Payment methods'] as const
 type Tab = (typeof TABS)[number]
 
-const FILTROS_AJUSTE = ['All', 'Charge', 'Credit', 'Production', 'Collections'] as const
-const FILTROS_METODO = ['All', 'Patient', 'Insurance'] as const
+/* El Filter de cada pestaña, con lo que cada lista tiene (settings-ledger.md, 2026-11-24): un adjustment type tiene
+   Direction (Charge / Credit) e Impact (Production / Collections); un payment method, sólo Method type (Patient /
+   Insurance, CON-3363). */
+const DIRECCIONES = ['All', 'Charge', 'Credit'] as const
+const IMPACTOS = ['All', 'Production', 'Collections'] as const
+const TIPOS_METODO = ['All', 'Patient', 'Insurance'] as const
 
 const VACIO = { icon: SlidersHorizontal, title: 'Nothing here', detail: 'Nothing matches the current search or filter.' }
 
-/* Charge/Credit filtran por Direction y Production/Collections por Impact; en Payment Method, por tipo. */
-const coincide = (x: Ajuste | Metodo, f: string) =>
-  f === 'All' || ('direccion' in x ? x.direccion === f || x.impacto === f : x.tipo === f)
+const es = (valor: string, f: string) => f === 'All' || valor === f
 
 export function SettingsLedgerOptions() {
   const [tab, setTab] = useState<Tab>('Adjustment types')
   const [q, setQ] = useState('')
-  const [filtro, setFiltro] = useState<string>('All')
+  const [direccion, setDireccion] = useState('All')
+  const [impacto, setImpacto] = useState('All')
+  const [tipoMetodo, setTipoMetodo] = useState('All')
   const [apagados, setApagados] = useState<string[]>([])
 
   const alternar = (id: string) =>
     setApagados((p) => (p.includes(id) ? p.filter((x) => x !== id) : [...p, id]))
 
-  const cambiarTab = (t: Tab) => { setTab(t); setFiltro('All'); setQ('') }
-
-  const filtros = tab === 'Adjustment types' ? FILTROS_AJUSTE : FILTROS_METODO
+  const cambiarTab = (t: Tab) => { setTab(t); setDireccion('All'); setImpacto('All'); setTipoMetodo('All'); setQ('') }
 
   const filas = useMemo(() => {
     const texto = q.trim().toLowerCase()
     if (tab === 'Adjustment types') {
-      return AJUSTES.filter((a) => coincide(a, filtro) && `${a.tipo} ${a.descripcion}`.toLowerCase().includes(texto))
+      return AJUSTES.filter((a) => es(a.direccion, direccion) && es(a.impacto, impacto) && `${a.tipo} ${a.descripcion}`.toLowerCase().includes(texto))
     }
-    return METODOS.filter(
-      (m) => coincide(m, filtro) && m.nombre.toLowerCase().includes(texto),
-    )
-  }, [tab, q, filtro])
+    return METODOS.filter((m) => es(m.tipo, tipoMetodo) && m.nombre.toLowerCase().includes(texto))
+  }, [tab, q, direccion, impacto, tipoMetodo])
 
   return (
     <div className={PADDING_PAGINA}>
       <SettingsPageHeader titulo="Ledger options" />
 
-      <div className="mt-5 flex flex-wrap items-center gap-3">
-        <SettingsSearch value={q} onChange={setQ} placeholder={tab === 'Adjustment types' ? 'Search adjustment types' : 'Search payment methods'} />
-        <FilterMenu
-          label={tab === 'Adjustment types' ? 'Filter adjustment types' : 'Filter payment methods'}
-          groups={[{
-            type: 'single', title: 'Type', defaultValue: 'All', value: filtro, onChange: setFiltro,
-            options: filtros.map((f) => ({ value: f, count: (tab === 'Adjustment types' ? AJUSTES : METODOS).filter((x) => coincide(x, f)).length })),
-          }]}
-        />
-      </div>
+      {/* Primero qué lista se ve (pestañas) y debajo el buscador y el Filter de esa lista (settings-ledger.md, 2026-11-24). */}
+      <Tabs className="mt-5" aria-label="Ledger options" tabs={TABS} value={tab} onChange={cambiarTab} />
 
-      {/* Qué lista se ve, en pestañas a la izquierda, debajo del buscador: como en toda la app (settings-ledger.md, 2026-11-20). */}
-      <Tabs className="mt-4" aria-label="Ledger options" tabs={TABS} value={tab} onChange={cambiarTab} />
+      <div className="mt-4 flex flex-wrap items-center gap-3">
+        <SettingsSearch value={q} onChange={setQ} placeholder={tab === 'Adjustment types' ? 'Search adjustment types' : 'Search payment methods'} />
+        {tab === 'Adjustment types' ? (
+          <FilterMenu
+            label="Filter adjustment types"
+            groups={[
+              {
+                type: 'single', title: 'Direction', defaultValue: 'All', value: direccion, onChange: setDireccion,
+                options: DIRECCIONES.map((f) => ({ value: f, count: AJUSTES.filter((a) => es(a.direccion, f)).length })),
+              },
+              {
+                type: 'single', title: 'Impact', defaultValue: 'All', value: impacto, onChange: setImpacto,
+                options: IMPACTOS.map((f) => ({ value: f, count: AJUSTES.filter((a) => es(a.impacto, f)).length })),
+              },
+            ]}
+          />
+        ) : (
+          <FilterMenu
+            label="Filter payment methods"
+            groups={[{
+              type: 'single', title: 'Method type', defaultValue: 'All', value: tipoMetodo, onChange: setTipoMetodo,
+              options: TIPOS_METODO.map((f) => ({ value: f, count: METODOS.filter((m) => es(m.tipo, f)).length })),
+            }]}
+          />
+        )}
+      </div>
 
       {/* La tabla estándar: mismo encabezado y pie que las otras de Settings; el switch Enabled va a la izquierda, como un
           badge (tablas estandarizadas v2, 2026-11-24). */}
@@ -125,12 +141,13 @@ export function SettingsLedgerOptions() {
           <DataTable<Ajuste>
             key="ajustes"
             columns={[
-              { key: 'tipo', header: 'Name', width: 180, cell: (a) => <TextCell>{a.tipo}</TextCell> },
+              /* Name y Description se reparten el ancho: sola, Description se llevaba media tabla (2026-11-24). */
+              { key: 'tipo', header: 'Name', cell: (a) => <TextCell>{a.tipo}</TextCell> },
               { key: 'descripcion', header: 'Description', cell: (a) => <TextCell>{a.descripcion}</TextCell> },
-              { key: 'categoria', header: 'Category', width: 100, cell: (a) => a.categoria },
-              { key: 'direccion', header: 'Direction', width: 90, cell: (a) => a.direccion },
-              { key: 'impacto', header: 'Impact', width: 100, cell: (a) => a.impacto },
-              { key: 'enabled', header: 'Enabled', width: 70, cell: (a) => <Switch on={!apagados.includes(a.id)} onChange={() => alternar(a.id)} label={`Enable ${a.tipo}`} /> },
+              { key: 'categoria', header: 'Category', width: 120, cell: (a) => a.categoria },
+              { key: 'direccion', header: 'Direction', width: 120, cell: (a) => a.direccion },
+              { key: 'impacto', header: 'Impact', width: 120, cell: (a) => a.impacto },
+              { key: 'enabled', header: 'Enabled', width: 80, cell: (a) => <Switch on={!apagados.includes(a.id)} onChange={() => alternar(a.id)} label={`Enable ${a.tipo}`} /> },
             ]}
             rows={filas as Ajuste[]}
             rowKey={(a) => a.id}
@@ -146,7 +163,7 @@ export function SettingsLedgerOptions() {
               { key: 'estado', header: 'Status', width: 90, cell: () => 'Active' },
               /* El switch es un estado editable, no una acción: la columna se llama Enabled en las dos pestañas
                  (propuesta de consistencia, 2026-11-20). */
-              { key: 'enabled', header: 'Enabled', width: 70, cell: (m) => <Switch on={!apagados.includes(m.id)} onChange={() => alternar(m.id)} label={`Enable ${m.nombre}`} /> },
+              { key: 'enabled', header: 'Enabled', width: 80, cell: (m) => <Switch on={!apagados.includes(m.id)} onChange={() => alternar(m.id)} label={`Enable ${m.nombre}`} /> },
             ]}
             rows={filas as Metodo[]}
             rowKey={(m) => m.id}

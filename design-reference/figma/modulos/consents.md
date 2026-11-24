@@ -284,6 +284,11 @@ del patrón estandarizado.
 6. No se replica de red.dev (lo decidido en la estandarización sigue): *+ New* en el panel (va en el título de la
    pantalla), el título del editor con el nombre del template y su bajada, y *Activate template* en el editor (va en el ⋮).
 
+## El editor dice "New template" (2026-11-24)
+
+Devolución de Julián: el título del editor decía *Edit template* para uno cargado y *New consent template* para uno
+nuevo, mientras el botón dice *New template*. Ahora dice **New template**, igual que el botón.
+
 ## El preview en el visor de documentos (2026-11-24)
 
 Propuesta A (regla en `figma/README.md` › *Visor de documentos*). `PreviewPaciente` usa `ui/document-viewer`: mismo
