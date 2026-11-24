@@ -255,3 +255,8 @@ estandarización: la pantalla pasa a la pieza común `components/settings/ListaE
    de 520 a 820 px (`className="max-w-[820px] sm:px-10 sm:pt-8"`), sin perder la proporción carta. Sólo en el preview
    de Settings: el detalle del consentimiento de Clinical Mode sigue con su drawer `xl` y la hoja de 520 px. En el
    celular ocupa toda la pantalla, como antes.
+
+## El editor dice "New template" (2026-11-24)
+
+Devolución de Julián: el título del editor decía *Edit template* para uno cargado y *New consent template* para uno
+nuevo, mientras el botón dice *New template*. Ahora dice **New template**, igual que el botón.

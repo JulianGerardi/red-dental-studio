@@ -847,3 +847,23 @@ Pedido de Julián (no todo el texto estaba en negro). Pasan a `ink`: las horas d
 semana (SUN, MON… en Day, Week y Month), los números de día (eran azules; el de hoy sigue en el círculo azul) y el texto de
 *Status legend* (era `ink-soft`, más claro que Filter y la fecha). Quedan en gris sólo los días de otro mes en Month y
 el "No appointments on this day." del panel del día, que son estados.
+
+## Navegación de fecha compartida: ‹ Today › + calendario (2026-11-24)
+
+Pedido de Julián con el prototipo `dashboard_scheduling_fecha_unificada.html` ("Date navigation"). De ahí se copia la
+distribución; el diseño de la fecha se adapta a la app. Nuevo `ui/date-nav` (`DateNav`), el mismo bloque en Dashboard y
+Scheduling:
+
+1. **Un solo bloque** de 32px (borde `line`, sombra sutil): flecha anterior, *Today*, flecha siguiente y, separado por una
+   línea, el período con el ícono de calendario y un ⌄. Al tocarlo se abre el calendario del DatePicker
+   (`MonthCalendar`, con año). En la vista semanal marca los siete días que se ven.
+2. **Qué mueve y qué dice, según la pantalla:** el Dashboard usa un día ("Feb 28, 2026"). Scheduling usa el período de su
+   vista: Day ("May 31, 2022"), Week ("May 29 – Jun 4, 2022") y Month ("May 2022"); las flechas mueven un día, una
+   semana o un mes (el mes conserva el día).
+3. **Today ya no desaparece:** en hoy queda apagado, así el bloque no cambia de ancho. Scheduling vuelve al día de su
+   demo (`FECHA_ANCLA`).
+4. **Distribución:** Dashboard, la fecha a la izquierda (con el ícono de preguntas frecuentes) y las métricas a la
+   derecha. Scheduling, la fecha a la izquierda y en la otra punta *Day / Week / Month*, *Status legend* y *Filter*
+   (corrige el 2026-11-20: pestañas a la izquierda y la fecha a la derecha).
+5. Sale el botón *Today* aparte con ícono (`CalendarClock`). El demo de Help ("The date drives every panel") muestra el
+   bloque nuevo.

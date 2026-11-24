@@ -395,7 +395,7 @@ function TextoConsentimientoUnico({ texto, onTexto }: { texto: string; onTexto: 
   )
 }
 
-/* El editor. El título dice qué se hace (Edit template con su estado, o New consent template), sin bajada; el aviso rojo
+/* El editor. El título dice qué se hace (Edit template con su estado, o New template, como el botón), sin bajada; el aviso rojo
    arriba si se intentó guardar con faltantes; Preview, Cancel y Save fijos al pie. Activate / Deactivate está en el ⋮ de
    la lista (consents.md, 2026-11-24). */
 export function EditorTemplate({ actual, borrador, onBorrador, intentado, onCancelar, onGuardar, onPreview }: {
@@ -411,7 +411,7 @@ export function EditorTemplate({ actual, borrador, onBorrador, intentado, onCanc
   const faltaProcedimiento = intentado && borrador.procedimientos.length === 0
   return (
     <section aria-label="Template editor" className={TARJETA_EDITOR}>
-      <EncabezadoEditor titulo={actual ? 'Edit template' : 'New consent template'} activo={actual?.activo} />
+      <EncabezadoEditor titulo={actual ? 'Edit template' : 'New template'} activo={actual?.activo} />
 
       {(faltaTitulo || faltaProcedimiento) && (
         <div role="alert" className="rounded-md border border-dash-bad-fg/30 bg-dash-bad-bg px-3 py-2.5 text-[12px] font-medium text-dash-bad-fg">

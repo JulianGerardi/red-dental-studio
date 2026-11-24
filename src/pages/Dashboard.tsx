@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
-import { CalendarDays, Clock, Activity, ShieldQuestionMark, CalendarClock, Pencil, UserX, CalendarX } from 'lucide-react'
+import { CalendarDays, Clock, Activity, ShieldQuestionMark, Pencil, UserX, CalendarX } from 'lucide-react'
 import { Globo, Panel } from '@/components/dashboard/primitives'
 import { EmptyState } from '@/components/ui/empty-state'
 import { FilterMenu } from '@/components/ui/filter-menu'
@@ -9,7 +9,7 @@ import { StatStrip, type Stat } from '@/components/dashboard/StatStrip'
 import type { AccionMenu, Appointment } from '@/components/dashboard/AppointmentCard'
 import { CancelAppointmentDialog, NoShowDialog } from '@/components/dashboard/AppointmentStatusDialogs'
 import { PatientDetailsPopover } from '@/components/dashboard/PatientDetailsPopover'
-import { DatePicker, sameDay } from '@/components/ui/date-picker'
+import { DateNav } from '@/components/ui/date-nav'
 import { OperatoryList } from '@/components/dashboard/OperatoryList'
 import { AppointmentRow } from '@/components/dashboard/DashboardRows'
 import { PendingTaskList } from '@/components/dashboard/PendingTaskList'
@@ -30,7 +30,7 @@ import { HORAS, hora24 } from '@/components/scheduling/AppointmentSlotPicker'
 import { formatDMY } from '@/components/ui/date-picker'
 import { aviso } from '@/components/ui/toaster'
 import { CONTENEDOR_PAGINA } from '@/lib/estilos'
-import { Button, buttonClasses } from '@/components/ui/button'
+import { buttonClasses } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 
 /* Figma 4430:57451 — rediseño del dashboard.
@@ -61,9 +61,8 @@ export function BotonFiltro({
   return <FilterMenu label={label} options={options} value={value} onChange={onChange} size="sm" tour="dash-filter" />
 }
 
-/* La fecha de toda la pantalla, el atajo a hoy y las preguntas frecuentes. Today va en md: la altura del
-   DatePicker (ver dashboard.md, 2026-10-09). El selector va como barra
-   ("Feb 28, 2026"), el mismo campo que el Date filter (dashboard.md, 2026-10-12). */
+/* La fecha de toda la pantalla y las preguntas frecuentes. La fecha es el bloque ‹ Today › + calendario (ui/date-nav),
+   el mismo de Scheduling (dashboard.md, 2026-11-24). */
 export function FiltroFecha({
   value, onChange, marked, className,
 }: {
@@ -73,18 +72,8 @@ export function FiltroFecha({
   className?: string
 }) {
   return (
-    <div className={cn('flex flex-wrap items-center gap-2', className)} data-tour="dash-date">
-      <DatePicker variant="toolbar" value={value} onChange={onChange} marked={marked} />
-      {/* Volver a hoy sin tener que abrir el calendario y buscar el día.
-          Desaparece cuando ya estás en hoy: no tendría nada que hacer. */}
-      {!sameDay(value, new Date()) && (
-        <Button
-          variant="secondary" size="md" onClick={() => onChange(new Date())} title="Go to today"
-          className="shadow-[0_1px_2px_0_rgb(0_0_0/0.05)]"
-        >
-          <CalendarClock /> Today
-        </Button>
-      )}
+    <div className={cn('flex flex-wrap items-center gap-2', className)}>
+      <DateNav value={value} onChange={onChange} marked={marked} tour="dash-date" />
       {/* Las preguntas frecuentes, en Help con el Dashboard abierto (Julián, 2026-10-13). */}
       <Link
         to="/help" aria-label="Frequently asked questions" title="Frequently asked questions"
