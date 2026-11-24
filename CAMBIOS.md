@@ -17,6 +17,13 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
   el mock todavía da un número por día. Appointments sin canceladas (CON-3912); Waiting room: Checked in, On hold y Ready
   to check out (CON-4178).
 
+### Patient Dashboard: pestañas de vuelta en la fila del título y sin "N to resolve" ([#181](https://github.com/JulianGerardi/red-dental-studio/pull/181))
+- Pending task y Pending documents vuelven a tener las pestañas a la derecha del título, como el Dashboard (se deshace
+  lo del #180 en esta pantalla).
+- Pending documents ya no muestra la pastilla "N to resolve": las pestañas dicen cuántos hay por grupo.
+- **Para el dev:** sólo layout, en `PatientDetail.tsx` y `patients/PendingDocuments.tsx`. Decisión en
+  `modulos/patient-dashboard.md` (2026-11-24).
+
 ### Pending task con Filter por provider; pestañas de Pending documents debajo del título ([#180](https://github.com/JulianGerardi/red-dental-studio/pull/180))
 - **Dashboard · Pending task:** las pestañas siguen a la derecha del título y suman un Filter por provider al lado
   (cada provider ve sus tareas). Las cantidades de las pestañas son las del provider elegido; si no queda nada, "No
