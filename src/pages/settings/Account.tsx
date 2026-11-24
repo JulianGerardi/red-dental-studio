@@ -145,13 +145,13 @@ export function SettingsAccount() {
           <>
             <div>
               <h2 className="text-[15px] font-bold text-ink">Subscription summary</h2>
-              {/* Las métricas con la card de la app (`ui/stat-card`, v3): sin bajada, lo que dice cada una va en el ⓘ. "Expired
+              {/* Las métricas con la card de la app (`ui/stat-card`): sin bajada, lo que dice cada una va en el ⓘ. "Expired
                   on" pasa a "Expires on" y Licenses a "3 / 170 used" (settings-accounts.md, 2026-11-24). */}
               <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
-                <StatCard enFila texto icon={CreditCard} label="Current plan" value={cuenta ? cuenta.plan : 'Prueba Red'} info="Plan currently assigned to the account." />
-                <StatCard enFila texto icon={Lock} label="Licenses" value={licencias.usadas} info={licencias.info} />
-                <StatCard enFila texto icon={CalendarDays} label="Expires on" value={cuenta ? (cuenta.vence || '—') : '12/31/2026'} info="Subscription end date." />
-                <StatCard enFila texto icon={CircleCheck} label="Status" value={cuenta ? (cuenta.estado in ESTADO_TONO_CUENTA ? cuenta.estado : '—') : 'Active'} info="Current subscription status." />
+                <StatCard enFila icon={CreditCard} label="Current plan" value={cuenta ? cuenta.plan : 'Prueba Red'} info="Plan currently assigned to the account." />
+                <StatCard enFila icon={Lock} label="Licenses" value={licencias.usadas} info={licencias.info} />
+                <StatCard enFila icon={CalendarDays} label="Expires on" value={cuenta ? (cuenta.vence || '—') : '12/31/2026'} info="Subscription end date." />
+                <StatCard enFila icon={CircleCheck} label="Status" value={cuenta ? (cuenta.estado in ESTADO_TONO_CUENTA ? cuenta.estado : '—') : 'Active'} info="Current subscription status." />
               </div>
             </div>
 

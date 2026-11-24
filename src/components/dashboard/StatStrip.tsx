@@ -68,26 +68,26 @@ export function StatStripApilada({ stats }: { stats: Stat[] }) {
   )
 }
 
-/* Variante compacta del Metric v3 (Dashboard): un bloque blanco con borde, ícono en caja celeste, rótulo en sentence
-   case, número y ⓘ en la misma línea, divisores verticales. En celular las métricas se apilan, una por fila, con el ⓘ a la
-   derecha (dashboard.md, 2026-11-24). La estándar es `ui/stat-card` (Billing, Ledger, Subscription). */
+/* Variante compacta del Metric (Dashboard): un bloque blanco con sombra, divisores finos, ícono en caja celeste, rótulo en
+   sentence case, número y ⓘ en la misma línea. En celular las métricas se apilan, una por fila, con el ⓘ a la derecha
+   (estructura de la propuesta v3, estilo de la app: dashboard.md, 2026-11-24). La estándar es `ui/stat-card`. */
 export function StatStrip({ stats = STATS, apilada = false }: { stats?: Stat[]; apilada?: boolean }) {
   if (apilada) return <StatStripApilada stats={stats} />
   return (
-    <div className="flex w-full flex-col rounded-[10px] border border-line bg-white shadow-xs md:w-fit md:max-w-full md:flex-row">
+    <div className="shadow-panel flex w-full flex-col rounded-xl bg-white md:w-fit md:max-w-full md:flex-row md:items-center md:px-2">
       {stats.map(({ label, value, info, icon: Icon }, i) => (
         <div
           key={label}
           className={cn(
-            'flex min-w-0 items-center gap-2.5 px-4 py-3 md:px-5 md:py-3.5',
-            i > 0 && 'border-t border-line md:border-t-0 md:border-l',
+            'flex min-w-0 items-center gap-2.5 px-4 py-3 md:shrink-0 md:gap-3',
+            i > 0 && 'border-t border-line-hair md:border-t-0 md:border-l',
           )}
         >
-          <span className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-info-bg text-dash-blue">
-            <Icon className="size-[19px]" strokeWidth={1.6} aria-hidden />
+          <span className="text-dash-blue flex size-9 shrink-0 items-center justify-center rounded-lg bg-info-bg">
+            <Icon className="size-[18px]" aria-hidden />
           </span>
-          <span className="text-[13px] leading-[18px] font-medium whitespace-nowrap text-dash-muted">{label}</span>
-          <span className="text-lg leading-none font-semibold text-dash-blue tabular-nums">{value}</span>
+          <span className="text-[13px] leading-snug font-medium whitespace-nowrap text-ink-muted">{label}</span>
+          <span className="text-[17px] leading-none font-bold text-dash-blue tabular-nums">{value}</span>
           {info && <InfoTip title={label} className="max-md:ml-auto">{info}</InfoTip>}
         </div>
       ))}

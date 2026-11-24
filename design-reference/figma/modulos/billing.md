@@ -514,22 +514,20 @@ paciente, *Patient view / Guarantor view* sigue a la izquierda.
 
 ## Métricas v3: una sola card para todas (2026-11-24)
 
-Sin historia de Jira; pedido de Julián con la propuesta `metricas_unificadas_v3.html`. `ui/stat-card` pasa a la card v3 y la
-usan igual Billing, el Ledger y Edit Account → Subscription; el Dashboard usa su variante compacta (`StatStrip`).
+Sin historia de Jira; pedido de Julián con la propuesta `metricas_unificadas_v3.html`. **De la v3 se toma la estructura,
+no el estilo** (Julián: "debe tener el estilo de nuestra app, no la del html"). `ui/stat-card` es la misma card en
+Billing, el Ledger y Edit Account → Subscription; el Dashboard usa su variante compacta (`StatStrip`).
 
-- **La card:** blanca, borde `line`, **acento azul de 3px arriba** (`dash-blue`), ícono de 19px en caja celeste de 32
-  (`info-bg`), rótulo de 13px Medium en sentence case (`dash-muted`), ⓘ a la derecha y valor de 28px Semibold en azul.
-  **Sin bajada:** lo que cuenta cada número va en el ⓘ, y toda métrica lleva el suyo.
-- **Excepción a la regla de cards:** la card sobre el fondo gris va sin borde (`TARJETA_PANEL`), pero la de métricas lleva
-  borde y acento porque así lo define la v3. Es la única.
-- **Tokens en vez de los hex del HTML:** el azul `#2358b6` es `dash-blue` (#1d56bc) y el celeste `#eef3fc` es `info-bg`; la
-  diferencia no se nota y no suma tokens. El ⓘ sigue siendo `InfoTip` (card blanca), no el tooltip oscuro del HTML: el
-  oscuro es sólo para nombrar.
-- **Un monto no se parte:** en una card angosta el valor baja a 24px (container query) en vez de cortarse en dos líneas.
-- **Billing:** cinco en fila desde 1280px (a 1024 no entraban los montos); antes, 3 + 2 de borde a borde; en celular, una
-  por fila. Las bajadas (*Across patient and insurance balances*…) se fueron. Info nuevos de la v3 para Today:
-  *Sum of adjustment transactions posted today (practice timezone).* y *Credit originated today at this location that is
-  still available.* **Today** deja la fila compacta y usa la misma card, apilada en el panel.
+- **Estructura (v3):** ícono, rótulo en sentence case, ⓘ a la derecha y el valor debajo. **Sin bajada:** lo que cuenta
+  cada número va en el ⓘ, y toda métrica lleva el suyo.
+- **Estilo (app):** `TARJETA_PANEL` (sombra, sin borde) sobre la página y `TARJETA_INTERNA` adentro de un panel (Today);
+  sin el borde ni el acento azul de arriba del HTML. Ícono de 18px en caja `info-bg` de 36, como la tira del Dashboard;
+  rótulo de 13px Medium en `ink-muted`; valor de 20px Bold en `dash-blue`, como antes. El ⓘ es `InfoTip` (card blanca),
+  no el tooltip oscuro del HTML.
+- **Billing:** cinco en fila desde 1280px (a 1024 los rótulos quedaban en tres o cuatro líneas); antes, 3 + 2 de borde a
+  borde; en celular, una por fila. Las bajadas (*Across patient and insurance balances*…) se fueron. Info nuevos de la v3
+  para Today: *Sum of adjustment transactions posted today (practice timezone).* y *Credit originated today at this
+  location that is still available.* **Today** deja la fila compacta (número a la derecha) y usa la misma card, apilada.
 - **Anomalía (sin cambiar):** *Total A/R* ($2,131.86) es menor que *Guarantor A/R* + *Insurance A/R* ($17,307.96). La v3
   muestra el total como la suma. Valores de prueba: confirmar con Julián si se corrigen.
-- Para validar: si la columna derecha, más alta con Today en cards grandes, molesta frente a la fila compacta de antes.
+- Para validar: si la columna derecha, más alta con Today en cards, molesta frente a la fila compacta de antes.

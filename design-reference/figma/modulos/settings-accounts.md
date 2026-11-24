@@ -218,8 +218,8 @@ la lista: actualizarlo al documentar.
 
 ## Subscription summary con las métricas v3 (2026-11-24)
 
-Las cuatro cards pasan a la card v3 (`ui/stat-card`, detalle en billing.md, 2026-11-24), con `texto` (valor de 24px:
-son palabras y fechas). Las bajadas pasan al ⓘ. Copy de la v3: *Expired on* → **Expires on** y Licenses en
+Las cuatro cards pasan a la estructura v3 con el estilo de la app (`ui/stat-card`, detalle en billing.md, 2026-11-24):
+ícono por métrica y las bajadas pasan al ⓘ. Copy de la v3: *Expired on* → **Expires on** y Licenses en
 **"3 / 170 used"** (en uso = empleados de la cuenta, sobre el total); el ⓘ dice cuántas quedan. Una cuenta sin plan
 muestra "—". La tabla Subscription history sigue con *Expired on* y "3 Used / 167 Total", como el Figma. Una por fila en
 celular, de a dos desde 640px y cuatro desde 1280px.

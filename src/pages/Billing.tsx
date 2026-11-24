@@ -456,7 +456,7 @@ export default function Billing({ inicial }: {
             onCerrar={() => setSeleccionado(null)}
           />
           <Panel title="Today" className={cn('shrink-0', TITULO_PEGADO)} bodyClassName="gap-3 pt-0">
-            {STATS_HOY.map((s) => <Stat key={s.label} {...s} />)}
+            {STATS_HOY.map((s) => <Stat key={s.label} interna {...s} />)}
           </Panel>
         </div>
       </div>

@@ -1089,8 +1089,9 @@ Note*, *Medical History*…), igual que los demás nombres de documentos.
 ## Métricas v3: la variante compacta (2026-11-24)
 
 Pedido de Julián con la propuesta `metricas_unificadas_v3.html`. `StatStrip` sigue siendo el bloque compacto (rótulo,
-número y ⓘ en una línea, divisores verticales), con el estilo de la v3: borde `line`, radio de 10, ícono de 19px en caja
-celeste de 32, rótulo de 13px Medium en `dash-muted` y número de 18px Semibold. En celular las tres métricas se apilan, una
-por fila a todo el ancho, con el ⓘ a la derecha (antes iban en columnas sin ícono); desde 768px, en fila. Los textos del ⓘ
+número y ⓘ en una línea, divisores verticales) con la estructura de la v3 y el estilo de la app (sombra `shadow-panel`,
+sin borde, divisores `line-hair`): ícono de 18px en caja celeste de 36, rótulo de 13px Medium en sentence case
+(`ink-muted`) y número de 17px Bold. En celular las tres métricas se apilan, una por fila a todo el ancho, con el ⓘ a la
+derecha (antes iban en columnas sin ícono); desde 768px, en fila. Los textos del ⓘ
 siguen siendo los de la app: el de la v3 para Open encounters (*Exact included statuses must be confirmed*) es una nota
 para el equipo, no un texto para el usuario.
