@@ -65,7 +65,8 @@ export function AssignmentsCount({ asignaciones, onVer }: { asignaciones: Asigna
           onMouseEnter={entrar} onMouseLeave={salir}
           onClick={() => { porMouse.current = false; setAbierto(true) }}
           className={cn(
-            'rounded px-1.5 py-0.5 font-semibold text-dash-blue tabular-nums underline decoration-dotted underline-offset-4 hover:bg-info-bg',
+            /* -mx: el fondo del hover sale del número sin correrlo; queda a ras del encabezado, como el 0. */
+            '-mx-1.5 rounded px-1.5 py-0.5 font-semibold text-dash-blue tabular-nums underline decoration-dotted underline-offset-4 hover:bg-info-bg',
             'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-dash-blue',
           )}
         >

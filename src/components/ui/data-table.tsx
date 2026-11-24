@@ -170,8 +170,10 @@ export function DataTable<T>({
     const w = manual(c) ?? c.width
     return w !== undefined ? { width: w, flexShrink: 0 } : { minWidth: MIN_FLEX }
   }
+  /* Una columna a la derecha suma aire a su derecha: si no, el número queda pegado a la columna que sigue (Fee schedules,
+     tablas estandarizadas v2, 2026-11-24). */
   const celda = (c: DataTableColumn<T>) =>
-    cn('relative flex min-w-0 items-center', ALINEAR[c.align ?? 'left'], elastica(c) && 'flex-1')
+    cn('relative flex min-w-0 items-center', ALINEAR[c.align ?? 'left'], c.align === 'right' && 'pr-3', elastica(c) && 'flex-1')
   /* Si ya no queda columna elástica (se achicó a mano o se ocultó), un
      relleno ocupa lo que sobra y el menú de fila sigue pegado a la derecha. */
   const relleno = !visiblesCols.some(elastica) ? <div aria-hidden className="flex-1" /> : null

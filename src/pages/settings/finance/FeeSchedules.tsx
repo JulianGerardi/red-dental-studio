@@ -257,7 +257,8 @@ export function SettingsFeeSchedules() {
   const navigate = useNavigate()
   const { aranceles, planes, aseguradoras } = useFinanzas()
   const [q, setQ] = useState('')
-  const [estados, setEstados] = useState<string[]>(['Active', 'Inactive'])
+  /* Arranca sin filtro, como todas las listas (Julián, 2026-11-24; antes Active + Inactive y el Filter decía 2). */
+  const [estados, setEstados] = useState<string[]>([])
   const [drawer, setDrawer] = useState<{ tipo: 'asignaciones' | 'comparar'; a: Arancel } | null>(null)
 
   const filas = useMemo(
