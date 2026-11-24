@@ -165,3 +165,8 @@ Mismo texto en todos los campos obligatorios vacíos (`OBLIGATORIO`, regla en [f
 2. *Copy from fee schedule* sin elegir y *Increase fees* vacío: *This field is required.*; *Enter an amount other than
    0.* queda para el 0.
 3. Rangos de la Coverage Table: *Required* → *This field is required.* (entra en las celdas, también en celular).
+
+## Tablas estandarizadas v2 (2026-11-24)
+
+Pie, alineación, fechas y avatar con las reglas comunes de todas las tablas: ver `design-reference/figma/README.md`
+(*Tablas estandarizadas v2*, 2026-11-24).

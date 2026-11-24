@@ -23,7 +23,7 @@ import { CopyFormDrawer, IncreaseAllDrawer, aumentar } from '@/components/financ
 import { ICONO_SUELTO, TABLA_ENCABEZADO, TABLA_FILA, TABLA_LINK, TABLA_MARCO, TARJETA_PANEL, PADDING_PAGINA } from '@/lib/estilos'
 import { useFinanzas } from '@/data/finanzasStore'
 import {
-  ESTADOS_ARANCEL, PROCEDIMIENTOS, SIN_ASIGNAR, TIPOS_ARANCEL, TONO_ARANCEL, conImporte, dinero, etiquetaVersion, fechaDMA,
+  ESTADOS_ARANCEL, PROCEDIMIENTOS, SIN_ASIGNAR, TIPOS_ARANCEL, TONO_ARANCEL, conImporte, dinero, etiquetaVersion, fechaMDA,
   hoyIso, idNuevo, versionVigente, type Arancel, type EstadoArancel, type TipoArancel,
 } from '@/data/finanzas'
 import { OBLIGATORIO } from '@/lib/validacion'
@@ -118,7 +118,7 @@ export function FeeScheduleEditor({ arancel, onGuardado }: { arancel?: Arancel; 
     guardar('aranceles', actualizado)
     setIntentado(false)
     setRenombrando(false)
-    aviso.ok(preciosCambiados && desde ? `${actualizado.nombre} was saved. The new fees apply from ${fechaDMA(aIso(desde))}.` : `${actualizado.nombre} was saved.`)
+    aviso.ok(preciosCambiados && desde ? `${actualizado.nombre} was saved. The new fees apply from ${fechaMDA(aIso(desde))}.` : `${actualizado.nombre} was saved.`)
     onGuardado?.(actualizado)
   }
 
@@ -277,11 +277,11 @@ export function SettingsFeeSchedules() {
     },
     { key: 'tipo', header: 'Type', width: 120, cell: (a) => <TextCell>{a.tipo}</TextCell> },
     {
-      key: 'asignaciones', header: 'Assignments', width: 120, align: 'center',
+      key: 'asignaciones', header: 'Assignments', width: 120, align: 'right',
       cell: (a) => <AssignmentsCount asignaciones={asignacionesDe(a, planes, aseguradoras)} onVer={() => setDrawer({ tipo: 'asignaciones', a })} />,
     },
-    { key: 'vigencia', header: 'Effective', width: 110, cell: (a) => <span className="tabular-nums">{fechaDMA(versionVigente(a).desde)}</span> },
-    { key: 'actualizado', header: 'Last updated', width: 120, cell: (a) => <span className="tabular-nums">{fechaDMA(a.actualizado)}</span> },
+    { key: 'vigencia', header: 'Effective', width: 110, cell: (a) => <span className="tabular-nums">{fechaMDA(versionVigente(a).desde)}</span> },
+    { key: 'actualizado', header: 'Last updated', width: 120, cell: (a) => <span className="tabular-nums">{fechaMDA(a.actualizado)}</span> },
     { key: 'estado', header: 'Status', width: 100, cell: (a) => <Pill tone={TONO_ARANCEL[a.estado]}>{a.estado}</Pill> },
   ]
 
@@ -307,7 +307,6 @@ export function SettingsFeeSchedules() {
           rows={filas}
           rowKey={(a) => a.id}
           rowLabel={(a) => a.nombre}
-          itemLabel="fee schedules"
           empty={{ icon: ReceiptText, title: 'No fee schedule found', detail: 'Try another name or state, or create a new one with New fee schedule.' }}
           rowActions={(a) => (
             <>

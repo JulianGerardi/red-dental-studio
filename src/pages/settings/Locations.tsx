@@ -64,15 +64,13 @@ export function SettingsLocations({ nuevo = false }: { nuevo?: boolean }) {
           columns={[
             /* El nombre es el acceso, como en la tabla de pacientes. */
             { key: 'nombre', header: 'Name', width: 180, cell: (l) => <TextCell>{l.nombre}</TextCell> },
-            { key: 'empleados', header: 'Employees', width: 100, cell: (l) => l.empleados },
-            { key: 'salas', header: 'Rooms', width: 80, cell: (l) => l.salas },
+            { key: 'empleados', header: 'Employees', width: 100, align: 'right', cell: (l) => <span className="tabular-nums">{l.empleados}</span> },
+            { key: 'salas', header: 'Rooms', width: 80, align: 'right', cell: (l) => <span className="tabular-nums">{l.salas}</span> },
             { key: 'info', header: 'Address', cell: (l) => <TextCell>{l.info}</TextCell> },
           ]}
           rows={visibles}
           rowKey={(l) => l.id}
           rowLabel={(l) => l.nombre}
-          pageSize={Math.max(visibles.length, 1)}
-          itemLabel="locations"
           empty={filas.length === 0
             ? { icon: MapPin, title: 'No locations yet', detail: 'Add your first location to start assigning employees and rooms.' }
             : { icon: MapPin, title: 'No locations found', detail: 'Try a different name or address.' }}

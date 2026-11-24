@@ -119,3 +119,8 @@ formulario. *Select file* del drop de Documents usa `buttonClasses` (era un span
 *Add exception* (Location), *Add another time range* (New hours y Location hours), *Add new subscription* (Insurance) y
 *Add new* (dependientes de Manage subscription). Los links que navegan (*All images*, *Go to procedure ›*) siguen siendo
 links.
+
+## Tablas estandarizadas v2 (2026-11-24)
+
+Pie, alineación, fechas y avatar con las reglas comunes de todas las tablas: ver `design-reference/figma/README.md`
+(*Tablas estandarizadas v2*, 2026-11-24).

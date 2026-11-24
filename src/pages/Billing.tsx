@@ -252,8 +252,6 @@ export function ActividadReciente({
           <DetalleMovimiento m={{ ...m, saldo: undefined }} aplicaciones={APLICACIONES_BILLING} movimientos={ACTIVIDAD_RECIENTE} onVerTransaccion={ver} />
         ) : undefined}
         density="compact"
-        pageSize={PAGINA_ACTIVIDAD}
-        pageSizeOptions={[PAGINA_ACTIVIDAD, 20, 50]}
         empty={paciente
           ? { icon: CreditCard, title: 'No billing activity yet.', detail: 'Payments and adjustments posted for this patient show up here.' }
           : sinActividad
@@ -269,8 +267,6 @@ export function ActividadReciente({
 
 /* Find Patient: arriba el paciente que se está viendo; abajo el buscador y los resultados como InnerCard, como la lista
    lateral de Patients. */
-/** Filas por página de la actividad: con ocho la pantalla entra entera a 1440 × 900, sin scroll. */
-const PAGINA_ACTIVIDAD = 8
 
 /** Arranque de cuántos pacientes se ven en Find Patient antes de "Show N more": su `ShowMore llenarAlto` mide cuántas
     filas enteras entran en el alto que le deja el flex-1 (billing.md, 2026-10-19), así que este valor es sólo el

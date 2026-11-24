@@ -69,9 +69,9 @@ const COLUMNAS: DataTableColumn<Cuenta>[] = [
   { key: 'suscripcion', header: 'Subscription', width: 90, cell: (c) => c.suscripcion },
   { key: 'vence', header: 'Expires on', width: 95, cell: (c) => c.vence },
   { key: 'estadoSub', header: 'Subscription status', width: 110, cell: (c) => c.estadoSuscripcion },
-  { key: 'locaciones', header: 'Locations', width: 80, cell: (c) => c.locaciones },
-  { key: 'empleados', header: 'Employees', width: 85, cell: (c) => c.empleados },
-  { key: 'licencias', header: 'Licenses', width: 75, cell: (c) => c.licencias },
+  { key: 'locaciones', header: 'Locations', width: 80, align: 'right', cell: (c) => <span className="tabular-nums">{c.locaciones}</span> },
+  { key: 'empleados', header: 'Employees', width: 85, align: 'right', cell: (c) => <span className="tabular-nums">{c.empleados}</span> },
+  { key: 'licencias', header: 'Licenses', width: 75, align: 'right', cell: (c) => <span className="tabular-nums">{c.licencias}</span> },
   { key: 'duenos', header: 'Owners', cell: (c) => <TextCell>{c.duenos}</TextCell> },
   { key: 'estado', header: 'Status', width: 85, cell: (c) => <Pill tone={ESTADO_TONO[c.estado]}>{c.estado}</Pill> },
 ]
@@ -119,7 +119,6 @@ export function SettingsAccounts() {
           rowLabel={(c) => c.nombre}
           /* "Mostrar" en castellano en una pantalla en inglés: así viene en el
              diseño y el contenido se replica tal cual. */
-          pageSizeOptions={[10, 25, 50]}
           empty={{ icon: Building2, title: 'No accounts', detail: 'Nothing matches the current search or filter.' }}
           rowActions={(c) => (
             <>

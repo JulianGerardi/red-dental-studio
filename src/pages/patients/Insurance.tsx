@@ -206,7 +206,6 @@ export default function Insurance() {
                 rowKey={(p) => p.id}
                 rowLabel={(p) => p.plan}
                 reorder={{ onReorder: reordenar, canMove: (p) => planes.some((x) => x.id === p.id) }}
-                itemLabel="insurances"
                 empty={{ icon: CreditCard, title: 'No plans yet', detail: "Add a subscription to start tracking this patient's coverage." }}
               />
 

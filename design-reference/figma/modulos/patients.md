@@ -630,3 +630,8 @@ not to say*); y si pedir teléfono y dirección completos para guardar cualquier
 Pedido de Julián de un solo diseño de filtro (detalle en `settings-accounts.md`, misma fecha): el buscador de la tabla
 de Patients medía 32 px de alto; ahora es `SettingsSearch`, el de Accounts (36 px, con Search). Los buscadores chicos de
 las cards de la derecha (Today Appointments, Recent Patients) no cambian: van dentro de un panel.
+
+## Tablas estandarizadas v2 (2026-11-24)
+
+Pie, alineación, fechas y avatar con las reglas comunes de todas las tablas: ver `design-reference/figma/README.md`
+(*Tablas estandarizadas v2*, 2026-11-24).

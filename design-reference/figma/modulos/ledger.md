@@ -1188,3 +1188,8 @@ Sin historia de Jira (pedido de Julián después del análisis de botones de acc
 Pedido de Julián: *Credit adjustment* y *Charge adjustment* vuelven a azul, como estaban (se deshace el punto 2 de
 arriba). En la barra de la tabla, *Patient view / Guarantor view* va a la izquierda y Expand all / Columns en la otra punta:
 en toda la app las pestañas van a la izquierda.
+
+## Tablas estandarizadas v2 (2026-11-24)
+
+Pie, alineación, fechas y avatar con las reglas comunes de todas las tablas: ver `design-reference/figma/README.md`
+(*Tablas estandarizadas v2*, 2026-11-24).

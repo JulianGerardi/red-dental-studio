@@ -8,7 +8,6 @@ import { DropdownMenuItem } from '@/components/ui/dropdown-menu'
 import { Pill, type PillTone } from '@/components/ui/pill'
 import { TARJETA_PANEL } from '@/lib/estilos'
 import { ORDENES, type EstadoOrden, type OrdenLab } from '@/data/clinical-mode'
-import { Avatar } from '@/components/ui/avatar'
 import type { PendingTask } from '@/components/dashboard/PendingTaskCard'
 import { tareaViva, useAccionesTarea, useTareasVivas } from '@/components/dashboard/tareas'
 import { LabOrderDetail } from './LabOrderDetail'
@@ -27,17 +26,8 @@ const ABIERTAS: EstadoOrden[] = ['Requested', 'Pending', 'Delayed']
    Laboratory" quedan pendientes. "active prescriptions" y "New prescription" son texto de Prescription que quedó pegado
    en el frame (anomalía 85). Ver design-reference/figma/modulos/clinical-mode.md. */
 
-function iniciales(nombre: string) {
-  return nombre.replace(/^Dr\.\s*/, '').split(' ').map((w) => w[0]).slice(0, 2).join('').toUpperCase()
-}
-
-/* El Avatar y el nombre, como PersonCell pero sin link: la orden no lleva a la ficha. */
-const persona = (nombre: string) => (
-  <span className="flex min-w-0 items-center gap-2.5">
-    <Avatar initials={iniciales(nombre)} />
-    <TextCell>{nombre}</TextCell>
-  </span>
-)
+/* Sólo el nombre: el avatar queda para las tablas de personas, Patients y Employees (tablas estandarizadas v2, 2026-11-24). */
+const persona = (nombre: string) => <TextCell>{nombre}</TextCell>
 
 const COLUMNAS: DataTableColumn<OrdenLab>[] = [
   { key: 'proveedor', header: 'Provider', cell: (o) => persona(o.proveedor) },
@@ -119,8 +109,6 @@ export function LabOrderPanel({ ordenes: inicio = ORDENES, tarea, encuentroAbier
           </>
         )}
         pageSize={10}
-        pageSizeOptions={[5, 10, 20]}
-        itemLabel="active prescriptions"
         empty={{ icon: FlaskConical, title: 'No lab orders yet', detail: 'Orders sent to the lab will show up here.' }}
       />
     </div>

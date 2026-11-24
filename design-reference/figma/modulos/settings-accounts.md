@@ -215,3 +215,8 @@ pantalla tiene breadcrumb; `/settings/accounts` y `/settings/accounts/:id` redir
 `SettingsAccounts` (la lista) queda sin ruta en `Accounts.tsx`, que sigue exportando los datos y lo que usan
 NewAccountDrawer y ManageLicensesDrawer. El flujo de Figma `scripts/figma/flujos/settings-accounts.mjs` todavía captura
 la lista: actualizarlo al documentar.
+
+## Tablas estandarizadas v2 (2026-11-24)
+
+Pie, alineación, fechas y avatar con las reglas comunes de todas las tablas: ver `design-reference/figma/README.md`
+(*Tablas estandarizadas v2*, 2026-11-24).

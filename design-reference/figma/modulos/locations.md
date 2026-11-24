@@ -675,3 +675,8 @@ una caja blanca con encabezado gris (*Exception · Date · Status*) y una fila p
 grilla que `FILA_SALA`): nombre en semibold, fecha, estado en `Pill` y, al final, *Edit exception* con el lápiz (como
 *Edit room*) y el tacho. El chevron que abría la edición pasa a ser *Edit exception*: hace lo mismo. En el celular la
 fecha baja debajo del nombre, como el tipo de una sala.
+
+## Tablas estandarizadas v2 (2026-11-24)
+
+Pie, alineación, fechas y avatar con las reglas comunes de todas las tablas: ver `design-reference/figma/README.md`
+(*Tablas estandarizadas v2*, 2026-11-24).

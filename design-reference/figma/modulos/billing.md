@@ -511,3 +511,8 @@ secundario, igual que el Ledger (ledger.md, misma fecha).
 
 Pedido de Julián. Sin paciente, Filter va a la derecha, al lado de *Columns* (los dos en `actions` de `DataTable`); con
 paciente, *Patient view / Guarantor view* sigue a la izquierda.
+
+## Tablas estandarizadas v2 (2026-11-24)
+
+Pie, alineación, fechas y avatar con las reglas comunes de todas las tablas: ver `design-reference/figma/README.md`
+(*Tablas estandarizadas v2*, 2026-11-24).

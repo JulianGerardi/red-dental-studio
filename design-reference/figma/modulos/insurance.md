@@ -246,3 +246,8 @@ Al comparar Insurance con red.dev para CON-4138, dos cosas de red.dev están bie
 Julián: en la app real el nombre del subscriber es un hipervínculo, así que va con el diseño de links de tabla
 (`TABLA_LINK`: semibold azul, subrayado al pasar). Lleva a Relationships del paciente, donde están las personas
 vinculadas; si el destino real es otro (la ficha del subscriber), se cambia el `to`.
+
+## Tablas estandarizadas v2 (2026-11-24)
+
+Pie, alineación, fechas y avatar con las reglas comunes de todas las tablas: ver `design-reference/figma/README.md`
+(*Tablas estandarizadas v2*, 2026-11-24).

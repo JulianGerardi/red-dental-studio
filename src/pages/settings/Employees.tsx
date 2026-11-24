@@ -111,9 +111,6 @@ export function SettingsEmployees({ nuevo = false }: { nuevo?: boolean }) {
           rows={visibles}
           rowKey={(e) => e.id}
           rowLabel={(e) => e.nombre}
-          /* Todos en una página, como antes: el equipo de una práctica es corto. */
-          pageSize={Math.max(visibles.length, 1)}
-          itemLabel="employees"
           empty={filas.length === 0
             ? { title: 'No employees yet', detail: 'Add the people who work at your practice.' }
             : { title: 'No employees found', detail: 'Try a different name or email.' }}

@@ -3316,3 +3316,8 @@ muestran.
 - *New Laboratory* avisa que no está en esta versión (el modal del Figma 4070:148911 sigue pendiente). Cancelar o borrar
   la orden desde su ⋮ vuelve a la lista. La orden de la tarea no está en la tabla de Lab Order (mocks distintos).
 - *Back to History* de la Clinical Note (dashboard.md, 2026-11-20) abre esta pantalla en Patient Summary.
+
+## Tablas estandarizadas v2 (2026-11-24)
+
+Pie, alineación, fechas y avatar con las reglas comunes de todas las tablas: ver `design-reference/figma/README.md`
+(*Tablas estandarizadas v2*, 2026-11-24).

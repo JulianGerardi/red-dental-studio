@@ -494,7 +494,6 @@ function VerTabla({ b }: { b: BloqueDe<'tabla'> }) {
       ) : undefined}
       density={b.compacta ? 'compact' : 'regular'}
       pageSize={b.porPagina}
-      itemLabel={cj.plural}
     />
   )
 }
@@ -1152,7 +1151,7 @@ function codigoBloque(c: Codigo, b: Bloque, contenedor: TipoContenedor): string[
       }
       if (b.compacta) lineas.push(`  density="compact"`)
       if (b.porPagina !== 10) lineas.push(`  pageSize={${b.porPagina}}`)
-      lineas.push(`  itemLabel="${cj.plural}"`, `/>`)
+      lineas.push(`/>`)
       return lineas
     }
     case 'odontograma': {
