@@ -1,1 +1,0 @@
-import{n as e}from"./rolldown-runtime-DkW27tQK.js";var t,n;function r(){return(r=e((()=>{t={nombre:`Red Dental Studio`,sede:`Abril`,direccion:`Aroser Allee 97, 5 B, Berlin, 13407, C, AR`,contacto:`+54 312321322 · abril@gmail.com`},n={initials:`RD`,name:t.nombre,detail:`${t.sede} · ${t.direccion}\n${t.contacto}`}})))()}export{n,r,t};
