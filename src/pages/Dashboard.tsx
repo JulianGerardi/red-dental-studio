@@ -345,7 +345,7 @@ export default function Dashboard() {
       <PageTitle>Dashboard</PageTitle>
       <div className="mt-3 flex flex-wrap items-center justify-between gap-x-6 gap-y-3">
         <FiltroFecha value={date} onChange={setDate} marked={diasConDatos} />
-        <div data-tour="dash-stats">
+        <div data-tour="dash-stats" className="w-full md:w-auto">
           <StatStrip stats={stats} />
         </div>
       </div>

@@ -219,8 +219,8 @@ export const States: Story = {
             <Estado titulo="In a row" nota="Los cinco de arriba a 880px (1280px de pantalla): una etiqueta en dos líneas no baja el número; etiqueta, número y bajada quedan alineados entre cards (subgrid)." ancho={880}>
               <div className="grid grid-cols-5 gap-3">{STATS_BILLING.map((x) => <Stat key={x.label} {...x} enFila />)}</div>
             </Estado>
-            <Estado titulo="On the page" nota="Card de página, sombra y sin borde, con el círculo de info." ancho={248}><Stat {...STATS_BILLING[0]!} /></Estado>
-            <Estado titulo="Inside a panel" nota="Today: InnerCard baja (p-2.5, como las cards de Patients), con el círculo de info; el número a la derecha." ancho={248}><div className="flex flex-col gap-3 rounded-lg bg-white px-4 pb-4">{STATS_HOY.map((s) => <Stat key={s.label} interna compacta {...s} />)}</div></Estado>
+            <Estado titulo="On the page" nota="Card v3: borde, acento azul arriba, ícono y el círculo de info." ancho={248}><Stat {...STATS_BILLING[0]!} /></Estado>
+            <Estado titulo="Inside a panel" nota="Today: la misma card, apilada en el panel." ancho={248}><div className="flex flex-col gap-3 rounded-lg bg-white px-4 pb-4">{STATS_HOY.map((s) => <Stat key={s.label} {...s} />)}</div></Estado>
           </Fila>
         </Bloque>
       </div>

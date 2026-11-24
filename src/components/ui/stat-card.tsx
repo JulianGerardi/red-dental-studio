@@ -1,49 +1,46 @@
+import type { LucideIcon } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { InfoTip } from '@/components/ui/info-tip'
-import { TARJETA_INTERNA, TARJETA_PANEL } from '@/lib/estilos'
 
-/* La métrica de la app: una card por número, con el rótulo, el ⓘ arriba a la derecha, el monto y una bajada opcional,
-   como las cards de red.dev: rótulo en mayúsculas y el monto en azul (Julián, 2026-11-19). La usan Billing, el Ledger y Edit Account → Subscription. */
-export function StatCard({ label, value, caption, info, interna, enFila, compacta, className }: {
+/* La métrica de la app (v3): card blanca con borde y acento azul arriba, ícono en caja celeste, rótulo en sentence case,
+   el ⓘ a la derecha y el valor en azul; sin bajada: lo que cuenta el número va en el ⓘ (billing.md, 2026-11-24).
+   La usan Billing, el Ledger y Edit Account → Subscription; la variante compacta es StatStrip (Dashboard). */
+export function StatCard({ label, value, info, icon: Icon, texto, enFila, className }: {
   label: string
   value: string
-  /** Qué es el número, en una o dos líneas debajo. */
-  caption?: string
-  /** Qué cuenta el número: abre un InfoTip arriba a la derecha. */
+  /** Qué cuenta el número: abre un InfoTip arriba a la derecha. Toda métrica lleva el suyo. */
   info?: string
-  /** Adentro de otra card (Today de Billing): InnerCard en vez de card de página. */
-  interna?: boolean
-  /** Today: rótulo y bajada a la izquierda, el número a la derecha, en una sola fila baja (billing.md, 2026-10-19). */
-  compacta?: boolean
-  /** En una fila de cards: rótulo, número y bajada se alinean con los de al lado (subgrid de tres filas). */
+  icon?: LucideIcon
+  /** El valor es una palabra o una fecha, no un número (Subscription): un punto más chico. */
+  texto?: boolean
+  /** En una fila de cards: los valores se alinean aunque un rótulo ocupe dos líneas (subgrid de dos filas). */
   enFila?: boolean
   className?: string
 }) {
-  if (compacta) {
-    return (
-      <div className={cn('flex min-w-0 items-center justify-between gap-2.5 p-2.5', interna ? TARJETA_INTERNA : TARJETA_PANEL, className)}>
-        <div className="flex min-w-0 flex-col gap-0.5">
-          <p className="flex items-center gap-1 text-[13px] leading-snug font-semibold text-ink">
-            {label}
-            {info && <InfoTip title={label}>{info}</InfoTip>}
-          </p>
-          {caption && <p className="line-clamp-2 text-[11px] leading-snug text-ink-muted" title={caption}>{caption}</p>}
-        </div>
-        <p className="shrink-0 text-base font-bold text-dash-blue tabular-nums">{value}</p>
-      </div>
-    )
-  }
   return (
-    <div className={cn('min-w-0', enFila ? 'p-3' : 'p-4', interna ? TARJETA_INTERNA : TARJETA_PANEL, enFila && 'row-span-3 grid grid-rows-subgrid gap-y-0', className)}>
-      {/* En una card angosta el rótulo y la bajada pasan a dos líneas en vez de cortarse (billing.md, 2026-10-13). */}
-      <div className="flex items-start justify-between gap-2">
-        <p className="text-[11px] leading-snug font-medium tracking-wide text-ink-muted uppercase">{label}</p>
+    <div className={cn(
+      'min-w-0 rounded-lg border border-line border-t-[3px] border-t-dash-blue bg-white p-[18px] shadow-xs',
+      enFila && 'row-span-2 grid grid-rows-subgrid gap-y-0',
+      className,
+    )}>
+      <div className="flex min-h-8 items-center gap-2.5 self-start">
+        {Icon && (
+          <span className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-info-bg text-dash-blue">
+            <Icon className="size-[19px]" strokeWidth={1.6} aria-hidden />
+          </span>
+        )}
+        <p className="min-w-0 flex-1 text-[13px] leading-[18px] font-medium text-dash-muted">{label}</p>
         {info && <InfoTip title={label}>{info}</InfoTip>}
       </div>
-      <p className="mt-1 truncate text-xl font-bold text-dash-blue tabular-nums" title={value}>{value}</p>
-      {caption
-        ? <p className="mt-0.5 line-clamp-2 text-[11px] leading-snug text-ink-faint" title={caption}>{caption}</p>
-        : enFila && <span aria-hidden />}
+      {/* Un monto no se parte: en una card angosta el valor baja un punto en vez de cortarse a la mitad. */}
+      <div className="@container mt-3 min-w-0">
+        <p className={cn(
+          'leading-[34px] font-semibold text-dash-blue tabular-nums',
+          texto ? 'text-xl break-words @[180px]:text-2xl' : 'truncate text-2xl @[160px]:text-[28px]',
+        )} title={value}>
+          {value}
+        </p>
+      </div>
     </div>
   )
 }

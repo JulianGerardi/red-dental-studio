@@ -48,9 +48,9 @@ function detalleTipo(m: Movimiento): { texto: string; tono: PillTone } {
 /* Los números son la card de métricas de la app (`ui/stat-card`), la misma del Ledger y de Edit Account. */
 export const Stat = StatCard
 
-/* Los cinco números de borde a borde: cinco en fila desde lg; antes, 3 + 2 del mismo ancho por fila; en el celular 2 + 2
-   y el último entero. */
-const LUGAR_NUMERO = ['sm:col-span-2', 'sm:col-span-2', 'sm:col-span-2', 'sm:col-span-3', 'col-span-2 sm:col-span-3']
+/* Los cinco números de borde a borde: cinco en fila desde xl; antes, 3 + 2 del mismo ancho por fila; en el celular, una
+   por fila, como la propuesta v3 (billing.md, 2026-11-24). */
+const LUGAR_NUMERO = ['sm:col-span-2', 'sm:col-span-2', 'sm:col-span-2', 'sm:col-span-3', 'sm:col-span-3']
 
 /* Los filtros de red.dev: Payments junta paciente y seguro; Today, lo del día (billing.md, 2026-11-13). */
 export function coincideFiltro(m: Movimiento, f: FiltroActividad) {
@@ -421,8 +421,8 @@ export default function Billing({ inicial }: {
       </div>
 
       {/* Los cinco números de borde a borde, como red.dev y las métricas del Ledger. */}
-      <div className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-6 lg:grid-cols-5">
-        {STATS_BILLING.map((s, i) => <Stat key={s.label} {...s} enFila className={cn(LUGAR_NUMERO[i], 'lg:col-span-1')} />)}
+      <div className="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-6 xl:grid-cols-5">
+        {STATS_BILLING.map((s, i) => <Stat key={s.label} {...s} enFila className={cn(LUGAR_NUMERO[i], 'xl:col-span-1')} />)}
       </div>
 
       {/* La actividad a la izquierda; Find Patient y Today a la derecha, como red.dev. Con las métricas a todo el ancho la
@@ -456,7 +456,7 @@ export default function Billing({ inicial }: {
             onCerrar={() => setSeleccionado(null)}
           />
           <Panel title="Today" className={cn('shrink-0', TITULO_PEGADO)} bodyClassName="gap-3 pt-0">
-            {STATS_HOY.map((s) => <Stat key={s.label} interna compacta {...s} />)}
+            {STATS_HOY.map((s) => <Stat key={s.label} {...s} />)}
           </Panel>
         </div>
       </div>

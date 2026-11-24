@@ -68,44 +68,27 @@ export function StatStripApilada({ stats }: { stats: Stat[] }) {
   )
 }
 
+/* Variante compacta del Metric v3 (Dashboard): un bloque blanco con borde, ícono en caja celeste, rótulo en sentence
+   case, número y ⓘ en la misma línea, divisores verticales. En celular las métricas se apilan, una por fila, con el ⓘ a la
+   derecha (dashboard.md, 2026-11-24). La estándar es `ui/stat-card` (Billing, Ledger, Subscription). */
 export function StatStrip({ stats = STATS, apilada = false }: { stats?: Stat[]; apilada?: boolean }) {
   if (apilada) return <StatStripApilada stats={stats} />
   return (
-    /* En angosto la tira ocupa todo el ancho y reparte las métricas en
-       columnas: el sentido del componente es verlas de un vistazo, y con
-       scroll horizontal había que arrastrar para enterarse de que existían.
-       Desde lg vuelve a la fila compacta del Figma, alineada a la derecha.
-       Ledger suma una cuarta (Unapplied credits) -grid-cols-3 la partía
-       3+1 en dos filas desparejas-, así que el mobile grid se adapta a
-       cuántas hay en vez de asumir siempre tres. */
-    <div className={cn(
-      'shadow-panel grid w-full rounded-xl bg-white lg:flex lg:w-fit lg:max-w-full lg:items-center lg:px-2',
-      stats.length === 4 ? 'grid-cols-2 sm:grid-cols-4' : 'grid-cols-3',
-    )}>
-      {/* Variante compacta del Metric (Dashboard): rótulo y número en una línea, sin bajada. Lo que cuenta cada número va
-          en el ⓘ, no en una segunda línea fija (propuesta de consistencia, dashboard.md 2026-11-20). La variante estándar,
-          con monto y contexto, es StatStripApilada (Ledger) y las cards de Billing. */}
+    <div className="flex w-full flex-col rounded-[10px] border border-line bg-white shadow-xs md:w-fit md:max-w-full md:flex-row">
       {stats.map(({ label, value, info, icon: Icon }, i) => (
         <div
           key={label}
           className={cn(
-            'flex min-w-0 items-center gap-2.5 px-3 py-3',
-            'lg:shrink-0 lg:gap-3 lg:px-4',
-            i > 0 && 'border-l border-line-hair',
+            'flex min-w-0 items-center gap-2.5 px-4 py-3 md:px-5 md:py-3.5',
+            i > 0 && 'border-t border-line md:border-t-0 md:border-l',
           )}
         >
-          <span className="text-dash-blue hidden size-10 shrink-0 items-center justify-center rounded-lg bg-info-bg sm:flex">
-            <Icon className="size-5" />
+          <span className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-info-bg text-dash-blue">
+            <Icon className="size-[19px]" strokeWidth={1.6} aria-hidden />
           </span>
-          {/* Rótulo y número en la misma línea, y el detalle abajo. El número
-              apenas por encima del rótulo —14/15 contra 10/11—: con 18 el salto
-              era tal que parecían dos jerarquías distintas en vez de un dato y
-              su nombre. */}
-          <span className="flex min-w-0 flex-wrap items-center gap-x-1.5 gap-y-0.5 leading-tight">
-            <span className="text-[11px] font-semibold tracking-wide text-dash-muted uppercase">{label}</span>
-            <span className="text-[17px] leading-none font-bold text-dash-blue tabular-nums">{value}</span>
-            {info && <InfoTip title={label}>{info}</InfoTip>}
-          </span>
+          <span className="text-[13px] leading-[18px] font-medium whitespace-nowrap text-dash-muted">{label}</span>
+          <span className="text-lg leading-none font-semibold text-dash-blue tabular-nums">{value}</span>
+          {info && <InfoTip title={label} className="max-md:ml-auto">{info}</InfoTip>}
         </div>
       ))}
     </div>
