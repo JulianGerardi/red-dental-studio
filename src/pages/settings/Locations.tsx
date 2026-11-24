@@ -1,7 +1,7 @@
 import { SettingsSearch } from '@/components/settings/SettingsSearch'
-import { PADDING_PAGINA } from '@/lib/estilos'
+import { PADDING_PAGINA, TABLA_LINK } from '@/lib/estilos'
 import { useMemo, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { Pencil, Trash2, Plus, MapPin } from 'lucide-react'
 import { aviso } from '@/components/ui/toaster'
 import { SettingsPageHeader } from '@/components/settings/SettingsPageHeader'
@@ -62,8 +62,8 @@ export function SettingsLocations({ nuevo = false }: { nuevo?: boolean }) {
       <div className="mt-4">
         <DataTable
           columns={[
-            /* El nombre es el acceso, como en la tabla de pacientes. */
-            { key: 'nombre', header: 'Name', width: 180, cell: (l) => <TextCell>{l.nombre}</TextCell> },
+            /* El nombre lleva a la ficha, como en Patients y Carriers; el ⋮ → Edit también (tablas estandarizadas v2, 2026-11-24). */
+            { key: 'nombre', header: 'Name', width: 180, cell: (l) => <Link to={`/settings/locations/${l.id}`} title={l.nombre} className={TABLA_LINK}>{l.nombre}</Link> },
             { key: 'empleados', header: 'Employees', width: 100, align: 'right', cell: (l) => <span className="tabular-nums">{l.empleados}</span> },
             { key: 'salas', header: 'Rooms', width: 80, align: 'right', cell: (l) => <span className="tabular-nums">{l.salas}</span> },
             { key: 'info', header: 'Address', cell: (l) => <TextCell>{l.info}</TextCell> },

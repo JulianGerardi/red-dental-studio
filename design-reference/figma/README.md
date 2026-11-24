@@ -735,8 +735,8 @@ Sin historia de Jira: pedido de Julián con el HTML *Tablas estandarizadas v2* (
 
 Anomalías y decisiones:
 
-- El HTML muestra el nombre como link en Employees y Locations; se mantiene la decisión del 2026-11-18 (a la ficha sólo
-  por el ⋮). A confirmar con Julián.
+- Employees y Locations: el nombre vuelve a ser link a la ficha, como en el HTML (Julián, 2026-11-24). Corrige el punto
+  1 del 2026-11-18 (a la ficha sólo por el ⋮); el ⋮ → *Edit* sigue. Accounts no cambia: no está en el HTML.
 - El pie del Unassigned del Treatment Plan decía "Showing 15 of 15 insurances" (texto del frame, replicado). Ahora pagina
   y lo que se saca de un caso con *Delete from Tx* entra arriba de todo: al final quedaba en la página 2.
 - Insurance plans conserva *Priority period* aunque el HTML no la muestra (rediseñar no es cambiar el contenido).

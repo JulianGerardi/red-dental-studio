@@ -124,3 +124,8 @@ links.
 
 Pie, alineación, fechas y avatar con las reglas comunes de todas las tablas: ver `design-reference/figma/README.md`
 (*Tablas estandarizadas v2*, 2026-11-24).
+
+### El nombre vuelve a ser link (2026-11-24)
+
+Pedido de Julián con el HTML de tablas estandarizadas v2: el nombre de la fila lleva a la ficha (link azul, como Patients
+y Carriers) y el ⋮ → *Edit* sigue. Corrige el punto 1 del 2026-11-18.

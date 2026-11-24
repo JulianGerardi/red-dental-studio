@@ -100,8 +100,8 @@ export function SettingsEmployees({ nuevo = false }: { nuevo?: boolean }) {
       <div className="mt-4">
         <DataTable
           columns={[
-            /* A la ficha se entra sólo por el ⋮ → Edit (employees.md, 2026-11-18). */
-            { key: 'nombre', header: 'Name', width: 240, cell: (e) => <PersonCell name={e.nombre} initials={e.iniciales} /> },
+            /* El nombre lleva a la ficha, como en Patients; el ⋮ → Edit también (tablas estandarizadas v2, 2026-11-24). */
+            { key: 'nombre', header: 'Name', width: 240, cell: (e) => <PersonCell name={e.nombre} initials={e.iniciales} to={`/settings/team/${e.id}`} /> },
             { key: 'cumple', header: 'Date of birth', width: 120, cell: (e) => <TextCell>{e.cumpleanos}</TextCell> },
             { key: 'email', header: 'Email', cell: (e) => <TextCell>{e.email}</TextCell> },
             /* "Clinical practitioner", como CON-4085 y CON-3542 (employees.md, 2026-11-20). */
