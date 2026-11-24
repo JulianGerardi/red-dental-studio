@@ -5,7 +5,7 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-11-24
 
-### Patient Dashboard: pestañas de vuelta en la fila del título y sin "N to resolve" (PR_PENDIENTE)
+### Patient Dashboard: pestañas de vuelta en la fila del título y sin "N to resolve" ([#181](https://github.com/JulianGerardi/red-dental-studio/pull/181))
 - Pending task y Pending documents vuelven a tener las pestañas a la derecha del título, como el Dashboard (se deshace
   lo del #180 en esta pantalla).
 - Pending documents ya no muestra la pastilla "N to resolve": las pestañas dicen cuántos hay por grupo.
