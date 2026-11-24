@@ -36,7 +36,7 @@ export function PanelLista({ titulo, q, onQ, placeholder, filtro, pestanas, vaci
     <section aria-label={titulo} className={cn(TARJETA_PANEL, 'flex flex-col gap-3 p-4 sm:p-5')}>
       <h2 className="text-sm font-bold text-ink">{titulo}</h2>
       <div className="flex items-center gap-2">
-        <SearchInput size="sm" value={q} onChange={onQ} placeholder={placeholder} aria-label={placeholder} className="sm:max-w-none" />
+        <SearchInput size="sm" value={q} onChange={onQ} placeholder={placeholder} aria-label={placeholder} clearable className="sm:max-w-none" />
         {filtro}
       </div>
       {pestanas}
