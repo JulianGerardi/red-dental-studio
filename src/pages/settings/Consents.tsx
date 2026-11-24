@@ -10,8 +10,7 @@ import { ConfirmDialog } from '@/components/ui/confirm-dialog'
 import { EncabezadoEditor, GRILLA_LISTA_EDITOR, ItemLista, PanelLista, PieEditor, TARJETA_EDITOR } from '@/components/settings/ListaEditor'
 import { SelectField } from '@/components/patients/form'
 import { aviso } from '@/components/ui/toaster'
-import { textoPlano } from '@/components/settings/ConsentDocument'
-import { HojaConsentimientoPdf } from '@/components/settings/HojaConsentimientoPdf'
+import { ConsentDocument, textoPlano } from '@/components/settings/ConsentDocument'
 import { DocumentViewer } from '@/components/ui/document-viewer'
 import { Tabs } from '@/components/ui/tabs'
 import { PROCEDURES } from '@/components/clinical/dental/data'
@@ -478,7 +477,7 @@ export function EditorTemplate({ actual, borrador, onBorrador, intentado, onCanc
 }
 
 /* El preview en el visor de documentos (ui/document-viewer), como red.dev (CON-4094, patrón Patient View): Back to
-   editing y "Patient View - título", el aviso gris de que incluye lo que no se guardó y la hoja con el formato del PDF.
+   editing y "Patient View - título", el aviso gris de que incluye lo que no se guardó y la hoja común (ConsentDocument).
    No guarda nada: volver deja el formulario como estaba. Escape también vuelve. */
 export function PreviewPaciente({ abierto, onCerrar, borrador }: {
   abierto: boolean
@@ -495,11 +494,13 @@ export function PreviewPaciente({ abierto, onCerrar, borrador }: {
       notice="Preview includes your unsaved changes. Save the template to keep them."
       noticeTone="neutral"
     >
-      <HojaConsentimientoPdf
+      <ConsentDocument
         titulo={borrador.titulo}
-        procedimiento={primero ? `${primero} — ${procedimiento(primero)?.nombre ?? ''}` : undefined}
+        procedimiento={primero ? `${primero} · ${procedimiento(primero)?.nombre ?? ''}` : undefined}
         naturaleza={borrador.naturaleza}
         riesgos={borrador.riesgos}
+        texto={EDITOR_UNICO ? borrador.texto : undefined}
+        vistaPaciente={false}
       />
     </DocumentViewer>
   )

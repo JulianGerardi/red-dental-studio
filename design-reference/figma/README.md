@@ -750,10 +750,32 @@ o firmar se abre en `ui/document-viewer` (`DocumentViewer`), **siempre a pantall
    (`subtitle`), el título, el estado (Pill) y *View PDF* (`onPdf`; en el celular, sólo el ícono).
 2. **Un solo aviso** debajo (`notice`): qué falta o en qué modo está. `info` (azul) cuando pide algo; `neutral` (gris)
    cuando sólo informa (cambios sin guardar, quién firmó, ya no se firma).
-3. **La hoja sobre el escritorio gris**, hasta 900 px. Cada pantalla conserva su hoja (unificar la hoja era la propuesta
-   B, no elegida).
+3. **La hoja sobre el escritorio gris**, hasta 900 px: la hoja común (ver *Hoja de documentos*, abajo).
 4. **Barra de abajo sólo si hay algo para hacer** (`footer`): firmar. Firmado, cerrado o en preview, no aparece.
 5. *Preparing document...* con `loading`; Escape vuelve como el botón.
 
 Dónde: Clinical note (`pages/ClinicalNote.tsx`), Procedure consent de Clinical Mode (`ConsentDetail`), *View consent*
 desde Consent required (`VistaConsentimiento`, antes drawer) y el preview de Consent templates (`PreviewPaciente`).
+
+## Hoja de documentos (2026-11-24)
+
+Propuesta B de Julián, pedida después del visor (*"los pdf de adentro el diseño también lo cambiaría y unificaría"*):
+todo documento usa `ui/document-sheet` (`DocumentSheet`), y el PDF descargado tiene el mismo diseño.
+
+1. **Membrete:** iniciales de la clínica en un cuadrado azul, nombre, sede y dirección, contacto en otra línea
+   (`data/clinica.ts` › `MEMBRETE`, el mismo en todos los documentos); a la derecha, el rótulo y la fecha (`meta`).
+   Una línea negra de 2 px lo cierra.
+2. **Tipo y título:** el tipo chico, en mayúsculas y azul (lo único con color); el título grande.
+3. **Resumen en tabla de tres columnas** (dos en el celular) en lugar de una card por dato.
+4. **Secciones numeradas** (en un documento legal se citan), sin bandas grises ni rótulos en mayúscula con línea.
+5. **Firmas lado a lado al final:** trazo o nombre sobre la línea, *nombre · rol* y *Signed electronically · fecha* o
+   *Pending signature* / *Not signed yet*.
+6. **Pie:** clínica · documento · paciente y *Page 1 of 1*.
+
+Se usa en `ConsentDocument` (preview de Consent templates, Procedure consent y View consent: la misma hoja en los tres) y
+en la Clinical note (`VistaDocumento`). El PDF de la Clinical note (`documentoTarea` › `pdfDeDocumento`) se dibuja con el
+mismo diseño. Se va `settings/HojaConsentimientoPdf` (el formato de cards de red.dev del preview).
+
+**Para backend:** el PDF real lo genera el servidor; el formato de referencia es este (`pdfDeDocumento` lo muestra en
+una página A4 con Helvetica).
+

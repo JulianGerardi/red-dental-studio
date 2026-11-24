@@ -11,53 +11,47 @@ import { aplicarAccion } from '@/components/dashboard/tareas'
 import { CLINICA, abrirDocumento, documentoTarea, type Documento } from '@/components/dashboard/documentoTarea'
 import { EmptyState } from '@/components/ui/empty-state'
 import { DocumentViewer } from '@/components/ui/document-viewer'
+import { DocumentSheet } from '@/components/ui/document-sheet'
+import { MEMBRETE } from '@/data/clinica'
 
 /* La Clinical Note que abre Complete this Task en Pending Task, como red.dev (videos de Julián, 2026-11-20): Back to
    History (vuelve a Patient Summary de Clinical Mode), el nombre, View PDF, el documento y Sign Clinical Note, que pide
    el usuario y la contraseña otra vez. En el visor de documentos (ui/document-viewer), a pantalla completa. Ver
    design-reference/figma/modulos/dashboard.md (2026-11-20 y 2026-11-24). */
 
-/* El documento en pantalla: el mismo contenido que el PDF (documentoTarea). */
+/* El documento en pantalla, con la hoja común (ui/document-sheet) y el mismo contenido que el PDF (documentoTarea): la
+   primera sección de datos va al resumen y el resto, numerado. Firma el provider. */
 export function VistaDocumento({ doc }: { doc: Documento }) {
+  const datos = doc.secciones.find((s) => 'campos' in s)
+  const resto = doc.secciones.filter((s) => s !== datos)
   return (
-    <article className="mx-auto w-full max-w-[760px] rounded-lg bg-white px-6 py-8 shadow-inner-card sm:px-12 sm:py-10">
-      <header className="flex flex-wrap items-start justify-between gap-4">
-        <div className="flex items-center gap-3">
-          <span className="text-dash-blue flex size-16 items-center justify-center rounded-full bg-info-bg text-xl font-bold" aria-hidden>R</span>
-          <span className="flex flex-col">
-            <span className="text-[14px] font-semibold text-ink">{CLINICA.nombre}</span>
-            <span className="text-[12px] text-ink-muted">{CLINICA.sede}</span>
-          </span>
-        </div>
-        <span className="text-[12px] text-ink sm:text-right">{CLINICA.direccion}<br />{CLINICA.contacto}</span>
-      </header>
-
-      {doc.secciones.map((s) => (
-        <section key={s.titulo} className="mt-8 flex flex-col gap-3">
-          <h2 className="rounded-md bg-surface-subtle px-3 py-2 text-[15px] font-semibold text-ink">{s.titulo}</h2>
-          {'campos' in s && (
-            <dl className="grid gap-x-6 gap-y-2 text-[13px] sm:grid-cols-2">
-              {s.campos.map(([k, v]) => (
-                <div key={k}><dt className="inline font-semibold text-ink">{k}: </dt><dd className="inline text-ink-muted">{v}</dd></div>
-              ))}
-            </dl>
-          )}
-          {'listas' in s && s.listas.map(([k, items]) => (
-            <div key={k} className="text-[13px]">
-              <p className="font-semibold text-ink">{k}</p>
-              <ul className="mt-1 list-disc pl-5 text-ink">{items.map((it) => <li key={it}>{it}</li>)}</ul>
-            </div>
-          ))}
-          {'parrafos' in s && s.parrafos.map((p) => <p key={p} className="text-[13px] leading-relaxed text-ink-muted">{p}</p>)}
-        </section>
-      ))}
-
-      <footer className="mt-8 border-t border-ink pt-2 text-[11px]">
-        <p className="font-semibold text-ink">Provider</p>
-        <p className="text-ink-muted">{doc.provider}</p>
-        <p className="text-ink-muted">Date: {doc.firmado}</p>
-      </footer>
-    </article>
+    <DocumentSheet
+      clinic={MEMBRETE}
+      type={doc.titulo}
+      title={doc.paciente}
+      summary={datos && 'campos' in datos ? datos.campos.map(([label, value]) => ({ label, value })) : []}
+      sections={resto.map((s) => ({
+        title: s.titulo,
+        content: 'campos' in s ? (
+          <dl className="grid gap-x-6 gap-y-1 sm:grid-cols-2">
+            {s.campos.map(([k, v]) => <div key={k}><dt className="inline font-semibold text-ink">{k}: </dt><dd className="inline">{v}</dd></div>)}
+          </dl>
+        ) : 'listas' in s ? (
+          <div className="flex flex-col gap-2">
+            {s.listas.map(([k, items]) => (
+              <div key={k}>
+                <p className="font-semibold text-ink">{k}</p>
+                <ul className="list-disc pl-5">{items.map((it) => <li key={it}>{it}</li>)}</ul>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="flex flex-col gap-2">{s.parrafos.map((p) => <p key={p}>{p}</p>)}</div>
+        ),
+      }))}
+      signatures={[{ role: 'Provider', name: doc.provider, signed: doc.firmado ? { date: doc.firmado, text: doc.provider } : undefined }]}
+      footer={`${CLINICA.nombre} · ${doc.titulo} · ${doc.paciente}`}
+    />
   )
 }
 

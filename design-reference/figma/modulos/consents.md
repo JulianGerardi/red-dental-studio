@@ -294,3 +294,11 @@ nuevo, mientras el botón dice *New template*. Ahora dice **New template**, igua
 Propuesta A (regla en `figma/README.md` › *Visor de documentos*). `PreviewPaciente` usa `ui/document-viewer`: mismo
 contenido que antes (*Back to editing*, *Patient View - título*, el aviso gris de cambios sin guardar). La hoja
 (`HojaConsentimientoPdf`) pierde su marco gris propio: el fondo lo pone el visor.
+
+## La hoja unificada (2026-11-24)
+
+Propuesta B (regla en `figma/README.md` › *Hoja de documentos*). El preview vuelve a usar `ConsentDocument`, ahora sobre
+`ui/document-sheet`: la misma hoja que el Procedure consent de Clinical Mode. **Cambia lo decidido hoy más temprano**
+(*Search, pestañas y Preview como red.dev*, punto 5): se va `HojaConsentimientoPdf`, el formato de cards del PDF de
+red.dev. Los datos de ejemplo vuelven a ser los de `ConsentDocument` (Sarah Stone, John Lorem); el membrete es el de la
+clínica (`data/clinica.ts`).

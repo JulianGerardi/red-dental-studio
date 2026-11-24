@@ -1146,3 +1146,10 @@ Scheduling:
 Propuesta A (regla en `figma/README.md` › *Visor de documentos*). La Clinical note de Pending tasks usa `ui/document-viewer`:
 *Back to history*, el título, *View PDF* arriba a la derecha y *Sign clinical note* en la barra de abajo, a la derecha
 (antes centrado). Firmada, la barra desaparece. La hoja (`VistaDocumento`) no cambia.
+
+## La hoja unificada de la Clinical note (2026-11-24)
+
+Propuesta B (regla en `figma/README.md` › *Hoja de documentos*). `VistaDocumento` usa `ui/document-sheet`: la primera
+sección de datos va al resumen y el resto, numerado; la firma del provider al final. El PDF de *View PDF*
+(`pdfDeDocumento`) se dibuja igual: membrete con *RD*, tipo en azul, resumen en tabla, secciones numeradas, firma y pie.
+`CLINICA` se mudó a `data/clinica.ts` (documentoTarea la reexporta).

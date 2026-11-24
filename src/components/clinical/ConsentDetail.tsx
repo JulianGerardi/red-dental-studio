@@ -182,7 +182,6 @@ export function ConsentDetail({ procedimiento: p, pendiente, onVolver, onFirmar 
         firmas={firmasHoja(p)}
         reconocidos={marcadas}
         onReconocer={firmas.Patient || cerrado ? undefined : (r, v) => setMarcadas((m) => (v ? [...m, r] : m.filter((x) => x !== r)))}
-        ancho="completo"
       />
     </DocumentViewer>
 
@@ -443,7 +442,6 @@ export function VistaConsentimiento({ procedimiento: p, onClose, cerrar = 'Close
         paciente={PACIENTE}
         proveedor={proveedor}
         firmas={firmasHoja({ firmas, rubricas: p.rubricas, proveedor })}
-        ancho="completo"
       />
     </DocumentViewer>
   )
