@@ -67,6 +67,35 @@ export const totales = (filas: FilaEstimacion[]): TotalesEstimacion => {
   }
 }
 
+/* ── El estimado de un procedimiento (Edit Procedure › Estimate, CON-4211) ───────── */
+
+/** Lo que se guarda: si se calcula solo, los montos cargados a mano y los overrides de cada seguro (sin override:
+ *  undefined). Sin esto, el procedimiento se estima solo. Ver modulos/clinical-mode.md (2026-11-25). */
+export type EstimadoProcedimiento = {
+  automatico: boolean
+  primario: number
+  secundario: number
+  ajuste: number
+  override: { primario?: number; secundario?: number }
+}
+
+/** El cálculo de un procedimiento solo, con la misma tabla de cobertura que Estimate details. El deducible se aplica
+ *  en el caso (se consume en orden entre sus procedimientos), así que acá no entra. Sin seguro secundario en el mock. */
+export function calcularEstimado(codigo: string, cobrado: number) {
+  const pct = cobertura(codigo)
+  const permitido = redondear(cobrado * (pct === 100 ? 0.9 : PERMITIDO))
+  return { cobrado, permitido, cobertura: pct, primario: redondear(permitido * (pct / 100)), secundario: 0, ajuste: redondear(cobrado - permitido) }
+}
+
+/** Lo que vale cada parte con lo guardado: automático o a mano, y el override encima. El paciente paga el resto. */
+export function resolverEstimado(codigo: string, cobrado: number, e?: EstimadoProcedimiento) {
+  const auto = calcularEstimado(codigo, cobrado)
+  const base = !e || e.automatico ? auto : { ...auto, primario: e.primario, secundario: e.secundario, ajuste: e.ajuste }
+  const primario = e?.override.primario ?? base.primario
+  const secundario = e?.override.secundario ?? base.secundario
+  return { ...base, primario, secundario, paciente: redondear(cobrado - primario - secundario - base.ajuste) }
+}
+
 export const dinero = (n: number) => `$${n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
 
 /* Estimaciones de arranque: Periodontists Recommended cambió después del último cálculo (la foto no tiene el último

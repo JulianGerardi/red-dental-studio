@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import {
   Ban, Check, CheckCheck, CircleSlash, Eye, Info, Pencil, Play, RotateCcw, Search, Trash2, UserX, XCircle, type LucideIcon,
 } from 'lucide-react'
@@ -11,16 +11,21 @@ import { DataTable, type DataTableColumn } from '@/components/ui/data-table'
 import { TooltipProvider } from '@/components/ui/tooltip'
 import { DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator } from '@/components/ui/dropdown-menu'
 import { ConAyuda } from '@/components/clinical/dental/ProcedureRow'
+import { EditFindingDrawer } from '@/components/clinical/dental/EditFindingDrawer'
+import type { Finding } from '@/components/clinical/dental/data'
+import {
+  bloqueoEstimadoDe, cambiosDeProblema, cambiosDeProcedimiento, findingDeProblema, findingDeProcedimiento, type ExtrasEdicion,
+} from '@/components/clinical/dental/registroComoFinding'
 import { DetalleRegistro, TONO_PROBLEMA, TONO_PROCEDIMIENTO, tratamientoDe, useIr, type ContextoDetalle } from '@/components/clinical/RecordDetail'
 import { sinPedir, useFlujoConsentimiento } from '@/components/clinical/ConsentRequiredDialog'
 import { EstadoConsentimiento, tieneDocumento } from '@/components/clinical/ConsentDetail'
 import {
-  ACCION, DialogoBorrar, DialogoCambioEstado, DialogoEditar, ItemsAcciones, accionesDe, conColumnaConsent, contextoDeCaso,
+  ACCION, DialogoBorrar, DialogoCambioEstado, ItemsAcciones, accionesDe, conColumnaConsent, contextoDeCaso,
   type AccionProcedimiento,
 } from '@/components/clinical/accionesProcedimiento'
 import { AYUDA_CONSENTIMIENTO, type ConsentProcedimiento } from '@/data/treatment-plan'
 import {
-  ESTADOS_PROBLEMA, ESTADOS_PROCEDIMIENTO, PROBLEMAS, PROCEDIMIENTOS,
+  ESTADOS_PROBLEMA, ESTADOS_PROCEDIMIENTO, PROBLEMAS, PROCEDIMIENTOS, VINCULOS_PROCEDIMIENTO,
   type EstadoProblema, type EstadoProcedimiento, type Problema, type ProcedimientoPaciente,
 } from '@/data/clinical-mode'
 
@@ -83,8 +88,10 @@ export function ProblemList({ procedimientoInicial }: {
   procedimientoInicial?: string
 } = {}) {
   const [pestana, setPestana] = useState<Pestana>(procedimientoInicial ? 'Procedures' : 'Problem list')
-  const [problemas, setProblemas] = useState(PROBLEMAS)
-  const [procedimientos, setProcedimientos] = useState(PROCEDIMIENTOS)
+  const [problemas, setProblemas] = useState<(Problema & ExtrasEdicion)[]>(PROBLEMAS)
+  const [procedimientos, setProcedimientos] = useState<(ProcedimientoPaciente & ExtrasEdicion)[]>(PROCEDIMIENTOS)
+  /* Edit del ⋮: el mismo Edit Finding del examen (clinical-mode.md, 2026-11-25). */
+  const [editando, setEditando] = useState<{ fila: Problema; finding: Finding } | null>(null)
   const [filtroProblema, setFiltroProblema] = useState<EstadoProblema>('Active')
   const [filtroProcedimiento, setFiltroProcedimiento] = useState<EstadoProcedimiento | 'All'>('All')
   const [q, setQ] = useState('')
@@ -108,7 +115,15 @@ export function ProblemList({ procedimientoInicial }: {
   /* El menú de un procedimiento (CON-4052), el mismo de Treatment Plan: lo que no corresponde no está y Start / Complete
      bloqueados no llegan acá. Start y Complete de un procedimiento de un caso pasan por su consentimiento; los sueltos
      cambian directo. Edit, Refer, Discard, Discontinue y Delete abren su diálogo (abajo). */
-  const [abierto, setAbierto] = useState<{ fila: ProcedimientoPaciente; accion: AccionProcedimiento } | null>(null)
+  const [abierto, setAbierto] = useState<{ fila: ProcedimientoPaciente & ExtrasEdicion; accion: AccionProcedimiento } | null>(null)
+  /* El finding de Edit Procedure se arma una vez al abrir: si cambiara en cada render, el drawer se reiniciaría. */
+  const editandoProc = useMemo(() => {
+    if (abierto?.accion !== 'edit') return null
+    const tr = tratamientoDe(abierto.fila)
+    return { tr, finding: findingDeProcedimiento({
+      ...abierto.fila, fee: tr?.procCaso?.fee, vinculados: abierto.fila.vinculados ?? VINCULOS_PROCEDIMIENTO[abierto.fila.id]?.problemas,
+    }) }
+  }, [abierto])
   const cambiar = (fila: ProcedimientoPaciente, destino: EstadoProcedimiento, nota = '') =>
     aplicar(setProcedimientos, procedimientos, fila, fila.codigo, { label: '', icono: Pencil, a: destino }, nota)
   const flujo = useFlujoConsentimiento({
@@ -249,7 +264,7 @@ export function ProblemList({ procedimientoInicial }: {
           <DataTable
             key="problemas"
             columns={colsProblema} rows={filasProblema} rowKey={(r) => r.id} rowLabel={(r) => r.condicion}
-            rowActions={(r) => menu(accionesProblema(r.estado), (a) => aplicar(setProblemas, problemas, r, r.condicion, a))}
+            rowActions={(r) => menu(accionesProblema(r.estado), (a) => (a === EDITAR ? setEditando({ fila: r, finding: findingDeProblema(r) }) : aplicar(setProblemas, problemas, r, r.condicion, a)))}
             rowDetail={(r) => <DetalleRegistro registro={{ tipo: 'problema', r }} contexto={contexto} />}
             defaultExpanded={enfoque ? [enfoque] : undefined}
             density="compact"
@@ -268,18 +283,34 @@ export function ProblemList({ procedimientoInicial }: {
         )}
       </div>
       {flujo.elemento}
+      <EditFindingDrawer
+        finding={editando?.finding ?? null}
+        onClose={() => setEditando(null)}
+        onSave={(patch) => {
+          if (!editando) return
+          const { fila } = editando
+          setProblemas((ps) => ps.map((p) => (p.id === fila.id ? { ...p, ...cambiosDeProblema(patch) } : p)))
+          aviso.ok(`${fila.condicion} updated.`)
+        }}
+      />
       {abierto && (() => {
         const { fila, accion } = abierto
         const cerrar = () => setAbierto(null)
         const caso = tratamientoDe(fila)?.caso.nombre
         const r = fila
-        if (accion === 'edit') {
+        if (accion === 'edit' && editandoProc) {
           return (
-            <DialogoEditar procedimiento={r} nota={fila.nota} caso={caso} onClose={cerrar} onGuardar={(n) => {
-              cerrar()
-              setProcedimientos((ps) => ps.map((p) => (p.id === fila.id ? { ...p, nota: n || undefined } : p)))
-              aviso.ok('Procedure notes updated. The status has not changed.')
-            }} />
+            <EditFindingDrawer
+              finding={editandoProc.finding}
+              findings={problemas.map(findingDeProblema)}
+              estado={{ texto: fila.estado, tono: TONO_PROCEDIMIENTO[fila.estado] }}
+              bloqueoEstimado={bloqueoEstimadoDe(editandoProc.tr?.caso)}
+              onClose={cerrar}
+              onSave={(patch) => {
+                setProcedimientos((ps) => ps.map((p) => (p.id === fila.id ? { ...p, ...cambiosDeProcedimiento(patch) } : p)))
+                aviso.ok(`${fila.codigo} updated.`)
+              }}
+            />
           )
         }
         if (accion === 'delete') {

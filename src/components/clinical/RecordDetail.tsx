@@ -386,7 +386,7 @@ export function SeccionesProblema({ r, c }: { r: Problema; c: ContextoDetalle })
 
 const ESTADO_HALLAZGO: Record<FindingStatus, EstadoProblema> = {
   Active: 'Active', Monitoring: 'Monitoring', 'In treatment': 'In treatment', Treated: 'Treated', 'Externally treated': 'Externally treated',
-  'No treatment needed': 'No treatment needed', 'Patient declined': 'Patient declined', 'Clinic declined': 'Clinic declined', Discarded: 'Discarded',
+  'No treatment needed': 'No treatment needed', 'Patient declined': 'Patient declined', 'Clinic declined': 'Clinic declined', Discarded: 'Discarded', Referred: 'Referred',
 }
 
 /** Un finding del panel de un examen como registro: sus datos y, si es una fila de la Problem List, lo vinculado a ella. */

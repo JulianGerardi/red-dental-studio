@@ -1,3 +1,4 @@
+import type { EstimadoProcedimiento } from '@/data/estimaciones'
 /* Treatment Plan — Figma 4118:220403 "Treatment Plan — Section (Cases,
    Workflow & Dialogs)".
 
@@ -29,8 +30,12 @@ export type Procedimiento = {
   consentimiento?: ConsentProcedimiento
   /** Las firmas del consentimiento, con la fecha de cada una. Con las dos, el consentimiento queda Accepted. */
   firmas?: FirmasConsentimiento
-  /** Las notas de Edit procedure: no cambian el estado. */
+  /** Las notas de Edit Procedure: no cambian el estado. */
   nota?: string
+  /** Lo demás que guarda Edit Procedure: findings y diagnósticos vinculados, y el estimado (CON-4211). */
+  vinculados?: string[]
+  diagnosticos?: string[]
+  estimado?: EstimadoProcedimiento
   /** El envío del consentimiento falla (en el ejemplo, Night Guard Plan): el procedimiento no cambia y se reintenta. */
   envioFalla?: boolean
   /** Cómo firmó cada uno: el trazo dibujado (imagen) o el nombre escrito. Sin esto, la hoja muestra el nombre. */
