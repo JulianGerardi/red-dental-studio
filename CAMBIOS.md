@@ -5,6 +5,35 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-11-25
 
+### Referral: Complete this task abre el detalle ([#194](https://github.com/JulianGerardi/red-dental-studio/pull/194))
+- **Nuevo `clinical/ReferralDetail`** (`ReferralDetail`, `ReferralPanel`): *Complete this task* de una Referral abre
+  Clinical Mode en `?tab=Referral&task=<id>` con la derivación (CON-2321). Una card como el panel de Treatment plan,
+  secciones sin caja, Cancel / Save al pie. Sólo se edita en Pending con encuentro abierto (CON-2323); Procedures sólo
+  Planned; nota de 500; adjuntos PDF/JPG/PNG ≤10MB (CON-2322).
+- **Nuevo `clinical/NewProviderDrawer`**: General, Address, Phone; el provider nuevo queda elegido (CON-2610).
+- **`tareas.accionesDe`**: Referral tiene ⋮ (Pending → Request, Cancel, Delete; Requested → Cancel), también en las filas
+  de Pending task. Request pregunta antes (CON-2394). Mock: `PROVEEDORES_DERIVACION`, `DERIVACION_TAREA`.
+
+### End Encounter: procedimientos del turno con fases en orden ([#193](https://github.com/JulianGerardi/red-dental-studio/pull/193))
+- **Nuevo `clinical/EndEncounterDrawer`** (CON-4153): *Complete encounter* de Clinical Mode abre el drawer con los
+  procedimientos del turno antes de cerrar; sin procedimientos cierra directo. Acción por fila: *Start procedure*,
+  *Complete phase N* o *Complete procedure*, siempre la siguiente fase sin registrar (CON-4154, CON-4155). ⋮ en tres
+  secciones (CON-4156) y *View execution history* en drawer con la nota de cada encuentro (CON-4158).
+- **Nuevo `lib/ejecucion.ts`** (estado y reglas: `accionPrincipal`, `faseDeCierre`, `esAnticipado`) y `data/ejecucion.ts`.
+  `ClinicalNoteDialog` suma `onFirmar` (opcional).
+- Para backend: completar antes de la última fase actualiza a `FINISHED` la fila de la fase de hoy (no crea otra) y no
+  registra fases futuras.
+
+### Lab Order: rediseño del detalle, New Laboratory y la tabla alineada ([#192](https://github.com/JulianGerardi/red-dental-studio/pull/192))
+- **`LabOrderDetail`** con otro layout y mismo contenido que red.dev: cabecera *LAB ORDER* + estado, PDF y ⋮; la fecha
+  va con ASAP; *Teeth & surface* en su card; *Details* a la derecha; Cancel / Save fijos abajo. Sin íconos decorativos.
+  Editable sólo con encuentro abierto **y** la orden en Pending (CON-2218).
+- Procedimientos (CON-3904): `SearchPicker` + `FilterMenu`, sólo los elegibles; `ui/search-picker` suma `disabled`.
+- **Nuevos `clinical/NewLaboratoryDrawer`** (CON-2285, pasos General · Contact · Address · Credentials) y
+  **`clinical/dental/DentalArch`** (arcadas en U con botones). `PROCEDIMIENTOS_ORDEN` en `data/clinical-mode.ts`.
+- **`LabOrderPanel`** como las tablas generales: sin card, `SettingsSearch` (*Search lab orders* + Search), botones md,
+  *Last update* / *Created date*.
+
 ### Billing: el tipo de actividad en pestañas, como red.dev ([#191](https://github.com/JulianGerardi/red-dental-studio/pull/191))
 - *Recent billing activity* deja el `FilterMenu`: **All / Payments / Adjustments / Today** van en `ui/tabs` (sm), en la
   fila del título y a la izquierda de *Columns*. Con un paciente, *Patient view / Guarantor view* va en el mismo lugar.

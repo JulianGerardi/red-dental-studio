@@ -10,7 +10,7 @@
   Referral · CON-2724 Nota Clinica · CON-2793 Encounter continuacion · CON-900 Medical conditions · CON-1751 Cambios
   Procedure y Condition · CON-1961 Condition [Treatment Area] · CON-3900 Modelo de procedimientos · CON-3742 Dental
   Asessment nueva libreria · CON-3686 Patient Dentition · CON-570 Workflow · CON-2258 Workflow configuration ·
-  CON-2412 Llenado de preguntas workflow
+  CON-2412 Llenado de preguntas workflow · CON-4153 Ejecución y trazabilidad de procedimientos por encounter
   ([historias](https://confidetally.atlassian.net/issues?jql=parent%20in%20%28CON-1611%2CCON-1610%2CCON-1608%2CCON-2825%2CCON-1609%2CCON-771%2CCON-3114%2CCON-1397%2CCON-2067%2CCON-2083%2CCON-880%2CCON-881%2CCON-882%2CCON-883%2CCON-965%2CCON-810%2CCON-1649%2CCON-2212%2CCON-2214%2CCON-2321%2CCON-2724%2CCON-2793%2CCON-900%2CCON-1751%2CCON-1961%2CCON-3900%2CCON-3742%2CCON-3686%2CCON-570%2CCON-2258%2CCON-2412%29%20AND%20issuetype%20%21%3D%20Bug%20AND%20status%20%21%3D%20Cancelled%20AND%20%28labels%20is%20EMPTY%20OR%20labels%20%21%3D%20%22design-system%22%29%20ORDER%20BY%20created%20DESC))
 - Historias de abril: CON-2827, CON-2828, CON-2829, CON-2830, CON-2936, CON-2832, CON-2833, CON-2834, CON-2835,
   CON-2845, CON-2852, CON-2939, CON-2846, CON-2854, CON-2955, CON-2937, CON-2884, CON-2885, CON-2886
@@ -3339,3 +3339,188 @@ Propuesta A (regla en `figma/README.md` › *Visor de documentos*).
 Propuesta B (regla en `figma/README.md` › *Hoja de documentos*). `ConsentDocument` usa `ui/document-sheet`: membrete de
 la clínica (antes el avatar *LA* y *Los Angeles, Dental Clinic*), resumen en tres columnas (antes la grilla de 2×2 con
 íconos), secciones numeradas y firmas con *Signed electronically · fecha* o *Pending signature*. Se va la prop `ancho`.
+
+## CON-2218 · CON-2285 · CON-3904 · Lab Order: rediseño del detalle y New Laboratory (2026-11-25)
+
+**Jira:** CON-2218 (Edit Lab Order: sólo en Pending, "The lab order has been successfully updated."), CON-2285 (New
+Laboratory), CON-3904 (procedimientos elegibles), CON-2643. Pedido de Julián con un video de red.dev (Pending Tasks →
+Lab Order → ⋮ → Edit): cambiar el diseño de la parte de Clinical Mode respetando lo que hace.
+
+Lo que el video muestra y se respeta: *LAB ORDER* con *Delivery Expiration Date\**, estado, PDF y ⋮; Receiving
+Laboratory\* con ✕ y *New Laboratory*; ASAP; Procedures con buscador, **Filter** y la card del procedimiento vinculado
+(chip del caso, estado, código - descripción, *Created date* y el tacho); Teeth & Surface con Permanent / Primary y las
+arcadas; Details (Dental Work Requested\*, Special Instructions, Attachments); Cancel y Save fijos abajo; el modal New
+Laboratory.
+
+Decisiones:
+
+1. **Cabecera liviana:** ícono, *LAB ORDER* y el estado juntos a la izquierda; PDF y ⋮ a la derecha. La fecha deja la
+   cabecera y pasa a *General information* junto a ASAP: las dos dicen para cuándo es, y el error quedaba suelto lejos
+   del campo.
+2. **Dos columnas 3:2 por tarea:** a la izquierda lo que define la orden (laboratorio, plazo, procedimientos) y, en su
+   propia card, *Teeth & surface*, que antes quedaba apretado debajo; a la derecha *Details*, que en desktop queda
+   pegajosa (sticky) mientras se marcan dientes. En celular, una columna.
+3. **Procedimientos:** `ui/search-picker` (busca al escribir, vincula) + `FilterMenu` por Status y Treatment case. Sólo
+   aparecen los elegibles de CON-3904: sueltos en Planned o Pending / In progress de un caso aceptado (Waiting for
+   consent, Accepted, In progress). Los vinculados, en cards internas con el chip del caso y la pill del estado
+   (`TONO_PROCEDIMIENTO`). Mensajes de Jira: *No procedures match your search.* / *No eligible procedures available.*
+   La orden arranca con uno (`PROCEDIMIENTOS_ORDEN`), como en el video. `SearchPicker` suma `disabled`.
+4. **Arcadas en U (`dental/DentalArch`):** los mismos botones numerados (24px, `aria-pressed`) dispuestos como en el
+   odontograma de red.dev: Maxillary 1–16 arriba, Mandibular 32–17 abajo (A–J y T–K en Primary), el ancho se ajusta al
+   contenedor. Un punto marca los dientes que ya tienen superficies. Sigue sin la librería (no admite dos instancias).
+   Permanent / Primary pasan a un control segmentado en el título de la card; antes de elegir, los dos *Initialize…*.
+5. **Adjuntos:** zona compacta que acepta arrastrar y soltar de verdad, valida PDF/JPG/PNG hasta 10MB (*Only PDF, JPG or
+   PNG files up to 10MB.*) y lista los archivos con su ✕.
+6. **Cancel / Save en una barra flotante** (`sticky bottom-4`), siempre a la vista como en red.dev; en celular, del mismo
+   ancho.
+7. **Sólo lectura:** sin encuentro, el aviso de siempre; con encuentro pero la orden fuera de Pending, el de CON-2218
+   (*This lab order cannot be edited because it is not in an editable state.*).
+8. **New Laboratory = drawer con pasos** (regla de pop ups), `NewLaboratoryDrawer`: *General* (Organization name\*,
+   Email\*), *Contact* (Country code\*, Area code (3 digits)\*, Number (7 digits)\*), *Address* (Address line 1\*, Address
+   line 2, Country\*, State\*, City\*, ZIP code\*) y *Credentials* (opcional; *No credentials added yet.*, de a varias sin
+   repetir tipo: Credential type\*, Number\*, Expiration date). Valida email, 3 y 7 dígitos y que no exista el mismo
+   nombre + email. Al guardar avisa *The laboratory has been successfully created.*, se suma a la lista y queda elegido.
+
+Anomalías / supuestos:
+
+- El modal de red.dev pone Contact information adentro de General; acá es su paso. Placeholder del email genérico
+  (`laboratory@example.com`) en vez de una dirección de hotmail. Los laboratorios viven en `data/laboratorios.ts` (de #190).
+- Los tipos de credencial de CON-2285 están "en el documento" que no tenemos: se usan los de Employees (License, DEA,
+  NPI) y License pide vencimiento. Validar con Julián.
+- CON-2285 pide el aviso *Uncompleted fields…*; se mantiene el error por campo de la app (CON-4161).
+- Cancel con cambios sin guardar no pregunta (tampoco en red.dev): propuesta aparte.
+
+### Sin íconos y la tabla como las demás (2026-11-25, 2ª vuelta)
+
+Pedido de Julián al revisar el link de prueba:
+
+- **Fuera los íconos decorativos** del detalle: el del encabezado (*LAB ORDER*), los de los títulos de las cards
+  (General information, Teeth & surface, Details), los de Permanent / Primary e *Initialize…* y el del adjunto. Quedan
+  sólo los de acción (PDF, ⋮, ✕, tacho, *+ New laboratory*, buscador y Filter).
+- **El listado de Lab Order alineado a las tablas generales** (Employees, Patients, Documents): sin la card blanca
+  alrededor, la tabla sobre el fondo; *Search lab orders* con su botón **Search** (`SettingsSearch`, el
+  `SearchInput` + `SearchButton` de toda tabla con buscador al inicio), Filter al lado y los botones en 32px (md), la
+  misma altura que el buscador. Encabezados de fecha como el resto: *Last update* (Documents) y *Created date* (regla 3
+  de *Tablas estandarizadas v2*); *Expiration date* queda. Vacío con búsqueda: *No lab orders found*.
+- Se mergeó `main` (#190): los laboratorios y las arcadas salen de `data/laboratorios.ts`; New Laboratory arma el
+  teléfono y la dirección con el formato de ese archivo, así el PDF los muestra.
+
+## CON-4153 · End Encounter: los procedimientos del turno y sus fases (2026-11-25)
+
+Epic **CON-4153** (Ejecución y trazabilidad de procedimientos por encounter) con sus cinco historias: **CON-4154** (HU 1,
+Start procedure y fases intermedias), **CON-4155** (HU 2, Complete procedure y el cierre anticipado), **CON-4156** (HU 3,
+el menú ⋮ por secciones), **CON-4157** (HU 4, el drawer End Encounter) y **CON-4158** (HU 5, el historial de ejecución).
+La planificación de las fases viene de **CON-3942**. Julián pasó el prototipo *end_encounter_sequential_phases*; Abril
+había comentado en el epic los cinco casos para probar.
+
+**El flujo.** *Complete encounter* (el pill de la barra, CON-1612) ya no cierra directo: si el turno tiene procedimientos
+previstos abre el drawer **End Encounter**; sin procedimientos sigue el cierre de antes. En el drawer:
+
+- Arriba una línea de qué se hace ("Record the phases or procedures done in this appointment…") y el contexto del turno:
+  fecha, hora, provider y cuántos procedimientos. No es bajada del título (la regla del drawer sigue): es contenido.
+- *Appointment procedures* con `ui/list-group`: cada fila con código y nombre, la pill del estado (`TONO_PROCEDIMIENTO`),
+  pieza/superficie o área y la fase ("Next: phase 2 of 4", "Single phase", "Last completed: phase 2 of 4 · Completed
+  early"); debajo, en verde, lo registrado **en este encuentro** ("Phase 3 completed", "Procedure completed"). A la
+  derecha la acción que toca y el ⋮ (`RowActionsMenu`), siempre visible.
+- Pie con *Back* y *End Encounter*. Back y la X no cierran el encuentro ni deshacen nada; End Encounter lo cierra aunque
+  queden fases sin registrar y sigue con la Clinical Note de siempre (*Remind me later* / *Review and sign*).
+
+**La acción de la fila** (`accionPrincipal`, `lib/ejecucion.ts`), siempre la **siguiente fase sin registrar** (ejecución
+lineal de CON-4154, no la fase agendada): una sola fase → *Complete procedure*; la 1 de varias → *Start procedure*
+(Started, el procedimiento pasa a In progress); una intermedia → *Complete phase N* (Continued); la última → *Complete
+procedure* (Finished, Completed). Registrar una fase deja disponible la siguiente **en el mismo encuentro** (lo que agrega
+el prototipo *sequential phases*): se pueden hacer varias en una visita.
+
+**El ⋮** (CON-4156), en tres secciones: *Phase* (la siguiente fase, si no es la última), *Procedure* (*Complete
+procedure*, o *Complete procedure at phase N* si hoy ya se registró una; *Discontinue* si está In progress; *Refer* y
+*Discard* si está Pending) y *Actions* (*Edit* y *View execution history*). En un estado final sólo quedan las de
+*Actions*. Refer, Discard, Discontinue y Edit reusan los diálogos de CON-4052 (`DialogoCambioEstado`, `DialogoEditar`).
+
+**Completar antes de la última fase** (CON-4155) pide *Complete procedure?* con el texto del ticket ("This procedure has
+remaining planned phases…") y en qué fase termina. La fase de cierre es la última registrada hoy (esa misma fila pasa a
+Finished, no se duplica) o, si hoy no se hizo ninguna, la siguiente. No se crean fases futuras ni se toca el plan.
+Cancel no cambia nada.
+
+**View execution history** (CON-4158) abre un drawer encima: el procedimiento con su estado y la tabla *Phase ·
+Encounter date · Procedure event · Clinical note*, sólo con lo registrado y de menor a mayor. La nota: *View clinical
+note* (con la pill *Unsigned* si no se firmó), *No clinical note* o *Access restricted*. *View clinical note* abre la
+nota del encuentro en el visor de documentos (`ui/document-viewer` + `VistaDocumento`) y *Back to history* vuelve. Los
+dos estados vacíos del ticket ("No phases have been recorded…" y el de Completed sin historial). Cerrar el encuentro
+pasa lo de hoy a un encuentro con su fecha y la nota sin firmar; *Review and sign* la deja firmada (`onFirmar` de
+`ClinicalNoteDialog`).
+
+**Datos de ejemplo** (`data/ejecucion.ts`), los cinco casos del prototipo con códigos reales: D2391 (una fase, Pending),
+D3330 (fase 2 de 4), D2750 (la 3 ya registrada hoy desde el Treatment Plan, aparece confirmada), D5110 (la última de 4)
+y D6010 (tres fases sin empezar). Los encuentros anteriores cubren los cuatro estados de la nota. El estado vive fuera de
+React (como `lib/encuentro`), así que lo hecho se conserva al cerrar y reabrir el drawer.
+
+**Desvíos del prototipo y anomalías**
+
+1. **Rótulos de Jira, no del HTML**: el HTML dice "Complete phase 1 / start procedure" y "Complete phase N / procedure";
+   el ticket (HU 3 y HU 4) y el comentario de Abril, *Start procedure* y *Complete procedure*. Manda Jira.
+2. El HTML pone "Dr. Julio Perez" como provider del turno: Julio Perez es el paciente. Acá va el provider de los datos.
+3. El historial en el HTML es un modal de una línea; CON-4158 pide drawer con tabla: se siguió el ticket.
+4. El pill de la barra sigue diciendo *Complete encounter* (CON-1612, red.dev); el ticket lo llama *End Encounter*. El
+   drawer y su botón sí dicen End Encounter.
+5. Los procedimientos del drawer tienen el consentimiento resuelto ("Execution permission granted" en el prototipo): no
+   pasan por `useFlujoConsentimiento`. Con uno pendiente habría que encadenarlo (CON-4154 lo pide).
+6. El fallo al cerrar ("el encounter permanece abierto") no tiene disparador en el mock.
+
+**Pendiente (a definir con Julián)**
+
+- **HU 3 en el Treatment Plan**: las acciones de fase en el ⋮ de las visitas del caso. Hoy el Treatment Plan no tiene
+  fases (los datos de `treatment-plan.ts` no repiten procedimientos entre visitas) y el drawer usa su propia lista; unirlos
+  es el próximo paso.
+- **La ficha del paciente**: su *Complete encounter* sigue cerrando directo. El drawer va sólo en Clinical Mode, que es
+  "la pantalla clínica actual" del ticket y la única con los procedimientos del turno.
+
+**A validar con usuarios**: si "Next: phase 2 of 4" junto a "Phase 1 completed" se entiende como "ya hice una, sigue
+otra"; si el odontólogo espera que *End Encounter* avise de procedimientos sin tocar (hoy no avisa, como pide el ticket);
+y si *Complete procedure at phase N* en el ⋮ se distingue bien de la acción de la fila.
+
+Código: `clinical/EndEncounterDrawer.tsx`, `lib/ejecucion.ts`, `data/ejecucion.ts`, `clinical/ClinicalTopBar.tsx`; e2e en
+`tests/clinical-mode.e2e.ts` (y el de Pending signature en `tests/patient-dashboard.e2e.ts`, que ahora pasa por el drawer).
+
+## CON-2321 · CON-2322 · CON-2323 · CON-2394 · El detalle de la Referral desde Pending Task (2026-11-25)
+
+**Jira:** CON-2321 (Referral, epic), CON-2322 (New Referral: campos y validaciones), CON-2323 (Edit: sólo Pending),
+CON-2394 (Request), CON-2391 (Cancel), CON-3436 (Delete), CON-2610 (autocomplete de Referral Provider y New Provider),
+CON-3128 (especialidad del provider), CON-2643 (Complete this task lleva al detalle). Video de red.dev de Julián: Pending
+Task → Referrals → *Complete this task* abre Clinical Mode en la pestaña Referral con la derivación cargada. Julián pidió
+el mismo comportamiento pero **con el diseño de Clinical Mode**, no el de red.dev.
+
+- **Qué se copió de red.dev (contenido):** título *Referral*, estado, ⋮; *General information* (Referral provider\* +
+  New provider, Procedures, ASAP, Mandatory to continue treatment) y *Details* (Referral note\*, Attachments con la lista
+  de archivos); *Cancel* y *Save*; *Read-only mode* sin encuentro abierto. New provider con los campos del modal de
+  red.dev (nombre, apellido, email, notas, credenciales, dirección y teléfono).
+- **Qué cambió (diseño):** red.dev arma dos cajas sueltas con un ícono en cada título, una barra de título aparte y los
+  botones flotando debajo. Acá va **una sola card** (`TARJETA_PANEL`) como el panel de Treatment plan: encabezado con
+  título, estado y ⋮ (más una línea con paciente, Register y Expiration date, los mismos datos de la fila de Pending
+  task), las dos secciones **sin caja ni borde** (`DrawerSection`) en dos columnas, y *Cancel* / *Save* en el pie de la
+  card con una línea fina arriba. Adjuntos: zona de arrastre en una fila (no un bloque alto) y cada archivo en
+  `TARJETA_INTERNA` con su tamaño y ✕. New provider es un **drawer con pasos** (General, Address, Phone), regla de la app
+  para todo pop up; red.dev usa un modal centrado.
+- **Reglas de Jira aplicadas:** sólo se edita en Pending y con encuentro abierto; en Requested, aviso *This referral
+  can't be edited* (CON-2323). Procedures busca sólo procedimientos **Planned** del paciente, varios a la vez
+  (`SearchPicker`, CON-2322). Nota máx. 500 caracteres con contador; adjuntos PDF/JPG/PNG hasta 10MB, si no *Invalid file
+  format or size.* Save valida provider y nota (*This field is required.* y el aviso *All required fields marked with (\*)
+  must be completed before proceeding.*); al guardar, *The referral has been successfully updated.* El provider muestra su
+  especialidad debajo y, sin coincidencias, *No results found.* (CON-2610). El provider nuevo queda elegido al guardar.
+- **⋮ de Referral** (también en la fila del Dashboard y del Patient Dashboard; antes no tenía): Pending → Request,
+  Cancel, Delete; Requested → Cancel. Request pregunta antes, con el texto de CON-2394 (*Once marked as Requested, you
+  will no longer be able to edit this referral.*); Delete usa título y texto de CON-3436.
+- Cancel vuelve a la pestaña Referral, que sigue en *Planned* (la lista de derivaciones, CON-3870, no está construida).
+
+Anomalías y pendientes:
+
+1. **Inventado para el mock** (red.dev no lo muestra): los providers (Dr. Laura Chen, Dr. Omar Haddad, Dr. Priya Shah,
+   tomados de las derivaciones ya cargadas en la Problem List), la nota y el adjunto de ejemplo, y la lista de
+   especialidades del drawer.
+2. Complete (CON-2398) y Rejected (CON-2392) de una Referral Requested no se sumaron al ⋮: piden revisar los findings
+   vinculados en el mismo modal, que todavía no existe.
+3. *Provider Type* (CON-3128) no se agregó: la historia no dice qué opciones tiene. *Credentials* avisa que no está en
+   esta versión (no hay historia con sus campos).
+4. El `TextArea` compartido mete la ayuda (el contador) dentro del `<label>`: el lector lee "Referral note 94/500".
+
+**A validar con usuarios:** si recepción entiende *Request* como "enviar al provider"; si el contador de 500 alcanza; y si
+conviene ver los procedimientos derivados también en la lista de Treatment plan.

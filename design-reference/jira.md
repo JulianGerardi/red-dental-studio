@@ -111,6 +111,7 @@ Documento: [figma/modulos/clinical-mode.md](figma/modulos/clinical-mode.md)
 - [CON-570](https://confidetally.atlassian.net/browse/CON-570) Workflow
 - [CON-2258](https://confidetally.atlassian.net/browse/CON-2258) Workflow configuration
 - [CON-2412](https://confidetally.atlassian.net/browse/CON-2412) Llenado de preguntas workflow
+- [CON-4153](https://confidetally.atlassian.net/browse/CON-4153) Ejecución y trazabilidad de procedimientos por encounter (HU 1-5: CON-4154 a CON-4158) · armado en Clinical Mode › End Encounter (`clinical-mode.md`, 2026-11-25)
 
 **Historias de abril**
 
