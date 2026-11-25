@@ -67,6 +67,7 @@ una al lado de la otra.
 | ⚙️ Settings — Billing & Ledger | `7:19` | `settings-billing.mjs` | `settings-billing.md`, `settings-ledger.md` |
 | 🔔 Notifications | `7:20` | `notifications.mjs` | `notifications.md` |
 | ❓ Help | `7:21` | `help.mjs` | `help.md` |
+| 📧 Email | `138:4` | `emails.mjs` | `emails.md` |
 
 Al 2026-11-15: 19 páginas de módulo, 63 flujos y 281 pantallas. Relationships & Billing se completó ese día: Add
 Relationship con sus tres pasos (con y sin Contact, persona nueva), Edit, Delete y el garante en Ledger y Billing.
@@ -98,6 +99,20 @@ Employees (12), Locations (37) y Accounts (9), y se reconectaron a la library. D
   claves de `biblio`) y el Button con su propiedad *Icon position* (Leading o Trailing según dónde esté el ícono).
   `arreglar` también quedó guardado en el archivo (`rds.ds` → `arreglar`, recibe `PAGE_IDS`). Después de los motores,
   los botones con el texto cortado (el pie Cancel / Save de 60 px, filtros) pasan a ancho por contenido.
+
+2026-11-20 (mails de la plataforma, CON-3325): la página **📧 Email** (`138:4`, entre Onboarding y Scheduling) suma 6
+flujos y 19 pantallas: *Template & preview* (escritorio, celular y variables) y los 16 mails por categoría. Se capturan
+de la página aparte `/emails/`, no de la app. Tres cosas del proceso:
+
+- **El mail va en un iframe y la captura no entra ahí:** el flujo (`sinIframe` en `flujos/emails.mjs`) lo reemplaza por
+  su contenido antes de serializar, con los estilos del mail pasados a cada elemento (los de celular si la caja mide
+  menos de 620 px) y el tamaño real de las imágenes, que el preflight de Tailwind pisaba. La ruta de la pantalla ahora
+  incluye el hash (`/emails/#appointment-request`).
+- **Las chips de variables salen en Liberation Mono**, que Figma no tiene, y `ordenar` falla al mover el frame. Se
+  cambiaron a Roboto Mono antes de ordenar.
+- **Los diseños originales** (*Welcome email* y *Email onboarding*, con textos en Arial) quedan al pie de la página sin
+  tocar: el orden se corrió salteando esas dos secciones. Motores de la library corridos: 152 Pill y 19 Button, 0 instancias
+  locales; otros 19 botones (fuera de la escala 28/32/36) quedaron como capas.
 
 **Recapturar una página ya conectada a la library** (Locations, 2026-11-16): después de ordenar y arreglar, correr los
 motores guardados en el archivo, en este orden y con `PAGES` = el nombre de la página: `motorLib`, `chipcountLib`, `binder`,

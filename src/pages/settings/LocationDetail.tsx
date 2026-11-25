@@ -383,8 +383,9 @@ export function WorkingHoursTab() {
    cada uno se edita aparte (Edit Appointment, para cambiarle la sala) y Confirm cancela los que quedan y los pasa a la
    lista de espera. Dejar la locación sin salas activas también se pregunta. Ver figma/modulos/locations.md. */
 /* Exceptions usa la misma caja que Rooms (locations.md, 2026-11-20). */
-const FILA_EXCEPCION = 'grid grid-cols-[minmax(0,1fr)_auto_auto] items-center gap-3 px-4 lg:grid-cols-[minmax(0,1fr)_140px_120px_150px]'
-const FILA_SALA = 'grid grid-cols-[minmax(0,1fr)_auto_auto] items-center gap-3 px-4 lg:grid-cols-[minmax(0,1fr)_120px_140px_130px_120px]'
+/* Columnas de datos del mismo ancho, como las demás tablas; las acciones al final en 160 px, el mismo en el encabezado y las filas (locations.md, 2026-11-25). */
+const FILA_EXCEPCION = 'grid grid-cols-[minmax(0,1fr)_auto_auto] items-center gap-3 px-4 lg:grid-cols-[repeat(3,minmax(0,1fr))_160px]'
+const FILA_SALA = 'grid grid-cols-[minmax(0,1fr)_auto_auto] items-center gap-3 px-4 lg:grid-cols-[repeat(4,minmax(0,1fr))_160px]'
 const fechaTurno = (d: Date) =>
   d.toLocaleString('en-US', { month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit', hour12: false })
 /* Las horas del drawer de turnos ("09 AM", "02 PM"): la agenda va de hora en hora. */

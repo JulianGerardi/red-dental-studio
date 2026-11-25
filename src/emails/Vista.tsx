@@ -16,7 +16,16 @@ import { EJEMPLO, MAILS, htmlDe, variablesDeMail, type Mail } from '@/emails/pla
 
 /* Las imágenes salen de public/emails/, la misma carpeta que se le entrega al backend. */
 const ASSETS = new URL(`${import.meta.env.BASE_URL}emails`, window.location.origin).href
-const IMAGENES = { assets_url: ASSETS, practice_logo_url: `${ASSETS}/sample-practice-logo.png` }
+/* Logos de ejemplo de la clínica en varios colores, para probar que ninguno pise el degradé de la cabecera. */
+const LOGOS = [
+  { id: 'red', nombre: 'Red', color: '#d6383f' },
+  { id: 'blue', nombre: 'Blue', color: '#1d56bc' },
+  { id: 'green', nombre: 'Green', color: '#15803d' },
+  { id: 'purple', nombre: 'Purple', color: '#7c3aed' },
+  { id: 'black', nombre: 'Black', color: '#18181b' },
+] as const
+type Logo = (typeof LOGOS)[number]['id']
+const imagenes = (logo: Logo) => ({ assets_url: ASSETS, practice_logo_url: `${ASSETS}/sample-practice-logo-${logo}.png` })
 const CATEGORIAS = [...new Set(MAILS.map((m) => m.categoria))]
 const JIRA = 'https://confidetally.atlassian.net/browse/'
 
@@ -29,6 +38,7 @@ export default function Emails() {
   const [mail, setMail] = useState(mailDelHash)
   const [ancho, setAncho] = useState<Ancho>('desktop')
   const [modo, setModo] = useState<Modo>('sample')
+  const [logo, setLogo] = useState<Logo>('red')
   useEffect(() => {
     const alCambiar = () => setMail(mailDelHash())
     window.addEventListener('hashchange', alCambiar)
@@ -99,11 +109,12 @@ export default function Emails() {
                 onChange={setModo}
                 tabs={[{ value: 'sample', label: 'Sample data', icon: Eye }, { value: 'variables', label: 'Variables', icon: Braces }]}
               />
+              {mail.remitente === 'clinica' && <ElegirLogo valor={logo} onChange={setLogo} />}
               <Button variant="secondary" size="md" className="ml-auto" onClick={() => bajar(mail)}>
                 <Download /> Download HTML
               </Button>
             </div>
-            <VistaMail key={`${mail.id}-${modo}-${ancho}`} mail={mail} ancho={ancho} modo={modo} />
+            <VistaMail key={`${mail.id}-${modo}-${ancho}-${logo}`} mail={mail} ancho={ancho} modo={modo} logo={logo} />
           </div>
         </div>
       </div>
@@ -128,7 +139,7 @@ function FichaMail({ mail }: { mail: Mail }) {
         <p className="text-[11px] font-semibold tracking-wide text-ink-faint uppercase">{mail.categoria}</p>
         {mail.origen === 'propuesta'
           ? <Pill tone="warning">Proposal · pending approval</Pill>
-          : <Pill tone="success">From the document</Pill>}
+          : <Pill tone="success">From the Figma</Pill>}
       </div>
       <h2 className="mt-1 text-base font-semibold text-ink">
         <span className="sr-only">Subject: </span>{mail.asunto}
@@ -142,7 +153,7 @@ function FichaMail({ mail }: { mail: Mail }) {
         ))}
         {mail.completado && (
           <>
-            <dt className="text-ink-muted">Not in the doc</dt>
+            <dt className="text-ink-muted">Not in the Figma</dt>
             <dd className="text-ink">{mail.completado.join(' · ')}</dd>
           </>
         )}
@@ -157,13 +168,38 @@ function FichaMail({ mail }: { mail: Mail }) {
   )
 }
 
-function VistaMail({ mail, ancho, modo }: { mail: Mail; ancho: Ancho; modo: Modo }) {
+/* Muestras de color del logo de ejemplo: sólo en los mails de la clínica, que llevan su logo en la cabecera. */
+function ElegirLogo({ valor, onChange }: { valor: Logo; onChange: (l: Logo) => void }) {
+  return (
+    <div role="group" aria-label="Sample clinic logo" className="flex items-center gap-1.5 pl-1">
+      <span className="text-xs text-ink-muted">Logo</span>
+      {LOGOS.map((l) => (
+        <button
+          key={l.id}
+          type="button"
+          aria-label={`${l.nombre} logo`}
+          aria-pressed={valor === l.id}
+          onClick={() => onChange(l.id)}
+          className={cn(
+            'grid size-7 place-items-center rounded-full focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-dash-blue',
+            valor === l.id ? 'ring-2 ring-dash-blue ring-offset-1' : 'hover:ring-1 hover:ring-line',
+          )}
+        >
+          <span className="size-4 rounded-full" style={{ background: l.color }} />
+        </button>
+      ))}
+    </div>
+  )
+}
+
+function VistaMail({ mail, ancho, modo, logo }: { mail: Mail; ancho: Ancho; modo: Modo; logo: Logo }) {
   const ref = useRef<HTMLIFrameElement>(null)
   const [alto, setAlto] = useState(900)
   const html = useMemo(() => {
     const crudo = htmlDe(mail)
-    return modo === 'sample' ? completar(crudo, { ...EJEMPLO, ...IMAGENES }) : completar(crudo, IMAGENES)
-  }, [mail, modo])
+    const img = imagenes(logo)
+    return modo === 'sample' ? completar(crudo, { ...EJEMPLO, ...img }) : completar(crudo, img)
+  }, [mail, modo, logo])
 
   const alCargar = () => {
     const doc = ref.current?.contentDocument

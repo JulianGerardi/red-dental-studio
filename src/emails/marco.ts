@@ -1,4 +1,4 @@
-/* Marco único de los mails: un layout y siete bloques fijos que arman HTML apto para clientes de correo (tablas,
+/* Marco único de los mails: un layout (cabecera, cuerpo y pie según quién escribe) y siete bloques fijos que arman HTML apto para clientes de correo (tablas,
    estilos inline, 600px). El backend sólo reemplaza {{variables}}: nada de bucles ni condicionales. Las decisiones,
    en design-reference/figma/modulos/emails.md. */
 
@@ -29,29 +29,33 @@ const mezclar = (color: string, fondo: string, a: number) =>
 const FUENTE = "Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif"
 
 export type Bloque =
-  | { tipo: 'saludo'; texto: string }
+  | { tipo: 'titulo'; texto: string }
   | { tipo: 'parrafo'; texto: string }
   | { tipo: 'aviso'; tono: TonoAviso; titulo: string; texto?: string }
   | { tipo: 'detalles'; titulo: string; filas: [rotulo: string, valor: string][] }
   | { tipo: 'boton'; texto: string; enlace: string }
   | { tipo: 'nota'; texto: string }
-  | { tipo: 'firma'; despedida: string; lineas: string[] }
+  | { tipo: 'firma'; despedida: string; equipo: string }
 
 /** Quién habla: la clínica (paciente, guardian, empleado) o Confidentally (dueño de la cuenta). */
 export type Remitente = 'clinica' | 'plataforma'
 
-const BOTON_FALLA = 'If the button does not work, copy and paste this link into your browser:'
+const BOTON_FALLA = 'If the button doesn’t work, copy and paste this link into your browser:'
+const LINK = `color:${COLOR.marca};text-decoration:none;`
+
+/** Un enlace con el estilo de los mails, para usar adentro de los textos. */
+export const enlace = (href: string, texto = href) => `<a href="${href}" style="${LINK}">${texto}</a>`
 
 function bloque(b: Bloque): string {
   switch (b.tipo) {
-    case 'saludo':
+    case 'titulo':
       return `<p style="margin:0 0 16px;font-size:18px;line-height:28px;font-weight:600;color:${COLOR.tinta};">${b.texto}</p>`
     case 'parrafo':
       return `<p style="margin:0 0 16px;font-size:16px;line-height:26px;color:${COLOR.texto};">${b.texto}</p>`
     case 'aviso': {
       // El Alert de la app: caja redondeada con borde fino, ícono, título en el color del tono y texto en tinta.
       const t = TONO_AVISO[b.tono]
-      return `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:0 0 20px;"><tr>
+      return `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:4px 0 20px;"><tr>
 <td bgcolor="${t.fondo}" style="background:${t.fondo};border:1px solid ${mezclar(t.color, t.fondo, 0.25)};border-radius:8px;padding:12px 16px;">
 <table role="presentation" cellpadding="0" cellspacing="0" border="0"><tr>
 <td valign="top" style="padding:3px 12px 0 0;width:16px;"><img src="{{assets_url}}/alert-${b.tono}.png" width="16" height="16" alt="" style="display:block;border:0;width:16px;height:16px;"></td>
@@ -65,32 +69,58 @@ function bloque(b: Bloque): string {
 <td style="background:${COLOR.caja};border:1px solid ${COLOR.linea};border-radius:8px;padding:20px 20px 12px;">
 <p style="margin:0 0 12px;padding-bottom:10px;border-bottom:1px solid ${COLOR.linea};font-size:12px;line-height:16px;font-weight:700;letter-spacing:0.04em;text-transform:uppercase;color:${COLOR.tinta};">${b.titulo}</p>
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
-${b.filas.map(([r, v]) => `<tr><td class="rotulo" valign="top" style="padding:0 12px 8px 0;width:132px;font-size:14px;line-height:20px;color:${COLOR.apagado};">${r}</td><td class="valor" valign="top" style="padding:0 0 8px;font-size:14px;line-height:20px;font-weight:600;color:${COLOR.tinta};word-break:break-word;">${v}</td></tr>`).join('\n')}
+${b.filas.map(([r, v]) => `<tr><td class="rotulo" valign="top" style="padding:0 12px 8px 0;width:144px;font-size:14px;line-height:20px;color:${COLOR.apagado};">${r}</td><td class="valor" valign="top" style="padding:0 0 8px;font-size:14px;line-height:20px;font-weight:600;color:${COLOR.tinta};word-break:break-word;">${v}</td></tr>`).join('\n')}
 </table>
 </td></tr></table>`
     case 'boton':
       // Botón "a prueba de balas": la celda lleva el color, así Outlook también lo pinta. El enlace de respaldo va siempre.
-      return `<table role="presentation" cellpadding="0" cellspacing="0" border="0" class="boton" style="margin:8px 0 20px;"><tr>
+      return `<table role="presentation" cellpadding="0" cellspacing="0" border="0" class="boton" style="margin:0 0 20px;"><tr>
 <td align="center" bgcolor="${COLOR.marca}" style="border-radius:8px;background:${COLOR.marca};">
 <a href="${b.enlace}" target="_blank" style="display:inline-block;padding:14px 28px;font-family:${FUENTE};font-size:16px;line-height:20px;font-weight:600;color:#ffffff;text-decoration:none;border-radius:8px;">${b.texto}</a>
 </td></tr></table>
 <p style="margin:0 0 4px;font-size:13px;line-height:20px;color:${COLOR.apagado};">${BOTON_FALLA}</p>
-<p style="margin:0 0 20px;font-size:13px;line-height:20px;word-break:break-all;"><a href="${b.enlace}" target="_blank" style="color:${COLOR.marca};text-decoration:underline;">${b.enlace}</a></p>`
+<p style="margin:0 0 20px;font-size:13px;line-height:20px;word-break:break-all;"><a href="${b.enlace}" target="_blank" style="${LINK}">${b.enlace}</a></p>`
     case 'nota':
       return `<p style="margin:0 0 12px;font-size:14px;line-height:22px;color:${COLOR.apagado};">${b.texto}</p>`
     case 'firma':
       return `<p style="margin:12px 0 4px;font-size:16px;line-height:24px;color:${COLOR.texto};">${b.despedida}</p>
-${b.lineas.map((l, i) => `<p style="margin:0;font-size:${i === 0 ? 16 : 14}px;line-height:${i === 0 ? 24 : 22}px;${i === 0 ? `font-weight:600;color:${COLOR.tinta};` : `color:${COLOR.apagado};`}">${l}</p>`).join('\n')}`
+<p style="margin:0;font-size:16px;line-height:24px;font-weight:600;color:${COLOR.tinta};">${b.equipo}</p>`
   }
 }
 
+/* Cabecera: el degradé arranca en blanco y sigue blanco hasta 280 px, así el logo (hasta 240 px más el margen) apoya
+   siempre sobre blanco, sea del color que sea, también en celular. Sin degradé (Outlook) queda blanca. */
+const DEGRADE = 'linear-gradient(100deg,#ffffff 0px,#ffffff 280px,#e8eef8 380px,#c9dafa 100%)'
+
 function cabecera(remitente: Remitente): string {
   const contenido = remitente === 'clinica'
-    // Logo de la clínica: PNG de 88 px de alto (se ve a 44). Si no carga, el alt muestra su nombre.
+    // Logo de la clínica: PNG de 88 px de alto (se ve a 44) y hasta 480 de ancho (240). Si no carga, el alt muestra su nombre.
     ? `<img src="{{practice_logo_url}}" height="44" alt="{{practice_name}}" style="display:block;border:0;height:44px;width:auto;max-width:240px;font-size:20px;line-height:28px;font-weight:600;color:${COLOR.tinta};">`
     : `<img src="{{assets_url}}/confidentally-logo.png" width="150" height="48" alt="Confidentally" style="display:block;border:0;width:150px;height:auto;">`
-  // Franja del Figma (blanco a azul claro), más baja y con quien escribe adentro. Sin degradé, queda el color plano.
-  return `<tr><td class="px" bgcolor="${COLOR.franja}" style="background:${COLOR.franja};background-image:linear-gradient(120deg,#ffffff 0%,${COLOR.franja} 55%,#c9dafa 100%);padding:28px 40px;">${contenido}</td></tr>`
+  return `<tr><td class="px" bgcolor="#ffffff" style="background:#ffffff;background-image:${DEGRADE};padding:28px 40px;">${contenido}</td></tr>`
+}
+
+const PIE_TEXTO = `font-size:12px;line-height:18px;color:${COLOR.apagado};`
+const LEGALES = `<p style="margin:0;font-size:12px;line-height:18px;"><a href="{{privacy_url}}" style="${LINK}">Privacy Policy</a><span style="color:${COLOR.apagado};">&nbsp;&nbsp;&bull;&nbsp;&nbsp;</span><a href="{{terms_url}}" style="${LINK}">Terms of Service</a></p>`
+
+/* Pie: el de la clínica dice quién es, dónde está y cómo contactarla, con "Powered by Confidentally"; el de
+   Confidentally, el copyright y su dirección. */
+function pie(remitente: Remitente): string {
+  const contenido = remitente === 'clinica'
+    ? `<p style="margin:0 0 4px;${PIE_TEXTO}">{{practice_name}}</p>
+<p style="margin:0 0 8px;${PIE_TEXTO}">{{practice_address}}</p>
+<table role="presentation" align="center" cellpadding="0" cellspacing="0" border="0" style="margin:0 auto 4px;"><tr>
+<td style="${PIE_TEXTO}">Powered by&nbsp;</td>
+<td style="padding:0 3px 0 2px;"><img src="{{assets_url}}/confidentally-mark.png" width="12" height="14" alt="" style="display:block;border:0;width:12px;height:14px;"></td>
+<td style="${PIE_TEXTO}">Confidentally</td>
+</tr></table>
+<p style="margin:0 0 8px;${PIE_TEXTO}">${enlace('mailto:{{practice_email}}', '{{practice_email}}')}<span>&nbsp;&middot;&nbsp;</span>${enlace('tel:{{practice_phone}}', '{{practice_phone}}')}</p>`
+    : `<p style="margin:0 0 4px;${PIE_TEXTO}">&copy; {{year}} Confidentally. All rights reserved.</p>
+<p style="margin:0 0 8px;${PIE_TEXTO}">{{company_address}}</p>`
+  return `<tr><td align="center" class="px" bgcolor="${COLOR.caja}" style="background:${COLOR.caja};border-top:1px solid ${COLOR.linea};padding:28px 40px;font-family:${FUENTE};">
+${contenido}
+${LEGALES}
+</td></tr>`
 }
 
 export function armarMail({ asunto, preheader, remitente, bloques }: {
@@ -128,18 +158,10 @@ export function armarMail({ asunto, preheader, remitente, bloques }: {
 <tr><td align="center" class="marco" style="padding:32px 16px;">
 <table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" class="tarjeta" style="width:100%;max-width:600px;background:#ffffff;border:1px solid ${COLOR.linea};border-radius:12px;overflow:hidden;font-family:${FUENTE};">
 ${cabecera(remitente)}
-<tr><td class="px" style="padding:36px 40px 16px;font-family:${FUENTE};">
+<tr><td class="px" style="padding:36px 40px;font-family:${FUENTE};">
 ${bloques.map(bloque).join('\n')}
 </td></tr>
-<tr><td class="px" style="padding:0 40px 28px;font-family:${FUENTE};">
-<p style="margin:0;padding-top:20px;border-top:1px solid ${COLOR.linea};font-size:12px;line-height:20px;color:${COLOR.apagado};">This email was sent to you as a registered member of <a href="{{website_url}}" style="color:${COLOR.marca};text-decoration:none;">Confidentally.com</a>. Use of the service and website is subject to our <a href="{{terms_url}}" style="color:${COLOR.marca};text-decoration:none;">Terms of Use</a> and <a href="{{privacy_url}}" style="color:${COLOR.marca};text-decoration:none;">Privacy Statement</a>.</p>
-</td></tr>
-<tr><td align="center" class="px" bgcolor="${COLOR.caja}" style="background:${COLOR.caja};border-top:1px solid ${COLOR.linea};padding:28px 40px;font-family:${FUENTE};">
-<img src="{{assets_url}}/confidentally-logo.png" width="140" height="45" alt="Confidentally" style="display:block;margin:0 auto 16px;border:0;width:140px;height:auto;">
-<p style="margin:0 0 4px;font-size:12px;line-height:18px;color:${COLOR.apagado};">&copy; {{year}} Confidentally. All rights reserved.</p>
-<p style="margin:0 0 8px;font-size:12px;line-height:18px;color:${COLOR.apagado};">{{company_address}}</p>
-<p style="margin:0;font-size:12px;line-height:18px;"><a href="{{privacy_url}}" style="color:${COLOR.marca};text-decoration:none;">Privacy Policy</a><span style="color:${COLOR.apagado};">&nbsp;&nbsp;&bull;&nbsp;&nbsp;</span><a href="{{terms_url}}" style="color:${COLOR.marca};text-decoration:none;">Terms of Service</a></p>
-</td></tr>
+${pie(remitente)}
 </table>
 </td></tr>
 </table>

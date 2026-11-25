@@ -685,3 +685,21 @@ Pie, alineación, fechas y avatar con las reglas comunes de todas las tablas: ve
 
 Pedido de Julián con el HTML de tablas estandarizadas v2: el nombre de la fila lleva a la ficha (link azul, como Patients
 y Carriers) y el ⋮ → *Edit* sigue. Corrige el punto 1 del 2026-11-18.
+
+## Working hours: el tacho en Set working hours, la ✕ en las franjas (2026-11-25)
+
+Sin historia nueva (el borrado es CON-4165 / CON-4166): pedido de Julián, igualar el ícono de borrar de Working hours con
+el tacho de Rooms y del resto de la app.
+
+- En *Set working hours*, el botón de cada rango pasa de la ✕ al tacho (*Delete time range*), como en *New exception*.
+- **Las franjas de la tabla siguen con la ✕ del chip** (Julián, mismo día: "en los badges de los horarios sí vale la
+  pena la X"). Es un chip y la ✕ es la forma de sacarlo; igual pregunta antes (*Delete working hours?*).
+
+## Rooms y Exceptions con columnas parejas (2026-11-25)
+
+Sin historia nueva (CON-404 / CON-1520): pedido de Julián, *"la tabla de Rooms quedó desproporcionada, ajustala como las
+otras"*. Room se llevaba todo el ancho (`1fr`) y Abbreviation, Type y Status quedaban angostas a la derecha. Ahora las
+columnas de datos se reparten el ancho por igual (`repeat(4, 1fr)`), como Subscription history y Roles, y las acciones
+(*Edit room* + tacho) van al final en 160 px, el mismo ancho en el encabezado y en las filas para que no se corran.
+Exceptions, que tiene el diseño de Rooms (2026-11-20), cambia igual: Exception, Date y Status parejas. En el celular no
+cambia nada.

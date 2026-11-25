@@ -2,10 +2,21 @@ import { cn } from '@/lib/utils'
 
 /* Compartidos entre la ficha de empleado y la de locación: la misma card con
    título opcional, y el mismo switch Yes/No. */
-export function Card({ title, children, className }: { title?: string; children: React.ReactNode; className?: string }) {
+export function Card({ title, action, children, className }: {
+  title?: string
+  /** Un control a la derecha del título (la dentición de Teeth & surface). */
+  action?: React.ReactNode
+  children: React.ReactNode
+  className?: string
+}) {
   return (
-    <section className={cn('rounded-lg bg-white shadow-panel p-4 sm:p-5', className)}>
-      {title && <h2 className="text-sm font-bold text-ink">{title}</h2>}
+    <section className={cn('rounded-lg bg-white shadow-panel p-4 sm:p-5', className)} aria-label={title}>
+      {title && (
+        <div className="flex flex-wrap items-center gap-3">
+          <h2 className="text-sm font-bold text-ink">{title}</h2>
+          {action && <span className="ml-auto">{action}</span>}
+        </div>
+      )}
       <div className={title ? 'mt-4' : ''}>{children}</div>
     </section>
   )

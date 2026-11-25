@@ -19,7 +19,7 @@ archivos['emails.json'] = JSON.stringify(
     subject: m.asunto,
     preheader: m.preheader,
     sender: m.remitente === 'clinica' ? 'clinic' : 'platform',
-    copy: m.origen === 'doc' ? 'approved document' : 'proposal, pending approval',
+    copy: m.origen === 'figma' ? 'approved in Figma' : 'proposal, pending approval',
     template: `${m.id}.html`,
     variables: variablesDeMail(m),
     jira: m.jira,

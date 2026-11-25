@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { ArrowLeft, CalendarDays, CircleCheck, Clock, History, Lock, Play, Stethoscope, UserRound } from 'lucide-react'
+import { ArrowLeft, CircleCheck, History, Lock, Play } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { aviso } from '@/components/ui/toaster'
 import { Button } from '@/components/ui/button'
@@ -17,7 +17,7 @@ import { VistaDocumento } from '@/pages/ClinicalNote'
 import type { Documento } from '@/components/dashboard/documentoTarea'
 import { TABLA_ENCABEZADO, TABLA_FILA, TABLA_MARCO, TABLA_LINK } from '@/lib/estilos'
 import { PACIENTE } from '@/data/treatment-plan'
-import { CITA_ENCUENTRO, ENCUENTRO_ACTUAL, type EventoFase, type ProcedimientoCita } from '@/data/ejecucion'
+import { ENCUENTRO_ACTUAL, type EventoFase, type ProcedimientoCita } from '@/data/ejecucion'
 import {
   accionPrincipal, cambiarEstadoCita, completarProcedimiento, encuentroDe, esAnticipado, esFinal, faseDeCierre,
   guardarNotaCita, registrarFase, registrosHoy, siguienteFase, useProcedimientosCita,
@@ -28,7 +28,6 @@ import {
    Encounter lo cierra aunque queden fases sin registrar. Prototipo: end_encounter_sequential_phases (Julián, 2026-11-25).
    Ver clinical-mode.md (2026-11-25). */
 
-const hoy = () => new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })
 
 /** Pieza y superficie, o el área: "Tooth #19 · O", "Upper arch". */
 export const zona = (p: ProcedimientoCita) =>
@@ -126,6 +125,7 @@ export function MenuProcedimientoCita({ p, onDialogo }: { p: ProcedimientoCita; 
 export function FilaProcedimientoCita({ p, onDialogo }: { p: ProcedimientoCita; onDialogo: (d: Dialogo) => void }) {
   const a = accionPrincipal(p)
   const hechas = registrosHoy(p)
+  const ultimaHecha = hechas.find((r) => r.evento === 'Finished') ?? hechas.reduce<(typeof hechas)[number] | undefined>((m, r) => (!m || r.fase > m.fase ? r : m), undefined)
   return (
     <div className="flex flex-wrap items-start gap-x-3 gap-y-2 px-4 py-3">
       <div className="flex min-w-0 flex-1 basis-[240px] flex-col gap-1">
@@ -134,15 +134,12 @@ export function FilaProcedimientoCita({ p, onDialogo }: { p: ProcedimientoCita; 
           <Pill tone={TONO_PROCEDIMIENTO[p.estado]} size="sm">{p.estado}</Pill>
         </div>
         <p className="text-[12px] text-ink-muted">{[zona(p), lineaFase(p)].filter(Boolean).join(' · ')}</p>
-        {hechas.length > 0 && (
-          <ul aria-label="Recorded in this encounter" className="flex flex-wrap gap-x-3 gap-y-1">
-            {hechas.map((r) => (
-              <li key={r.fase} className="flex items-center gap-1 text-[12px] font-medium text-dash-ok-fg">
-                <CircleCheck aria-hidden className="size-3.5" />
-                {r.evento === 'Finished' ? 'Procedure completed' : `Phase ${r.fase} completed`}
-              </li>
-            ))}
-          </ul>
+        {/* Una sola línea con lo último hecho hoy: completado el procedimiento, ya no se listan sus fases (Julián, 2026-11-25). */}
+        {ultimaHecha && (
+          <p className="flex items-center gap-1 text-[12px] font-medium text-dash-ok-fg">
+            <CircleCheck aria-hidden className="size-3.5" />
+            {ultimaHecha.evento === 'Finished' ? 'Procedure completed' : `Phase ${ultimaHecha.fase} completed`}
+          </p>
         )}
       </div>
       <div className="flex shrink-0 items-center gap-1 max-sm:w-full max-sm:justify-between">
@@ -227,24 +224,9 @@ export function EndEncounterDrawer({ open, onClose, onEnd }: { open: boolean; on
         }
       >
         <div className="flex flex-col gap-5">
-          <div className="flex flex-col gap-2">
-            <p className="text-[13px] leading-relaxed text-ink-soft">
-              Record the phases or procedures done in this appointment. Each action is saved right away.
-            </p>
-            <ul aria-label="Appointment" className="flex flex-wrap gap-x-4 gap-y-1 text-[12px] text-ink-muted">
-              <li className="flex items-center gap-1.5"><CalendarDays aria-hidden className="size-3.5" /> {hoy()}</li>
-              <li className="flex items-center gap-1.5"><Clock aria-hidden className="size-3.5" /> {CITA_ENCUENTRO.hora}</li>
-              <li className="flex items-center gap-1.5"><UserRound aria-hidden className="size-3.5" /> {CITA_ENCUENTRO.provider}</li>
-              <li className="flex items-center gap-1.5"><Stethoscope aria-hidden className="size-3.5" /> {procedimientos.length} procedures</li>
-            </ul>
-          </div>
           <ListGroup title="Appointment procedures">
             {procedimientos.map((p) => <FilaProcedimientoCita key={p.id} p={p} onDialogo={setDialogo} />)}
           </ListGroup>
-          <p className="text-[12px] leading-relaxed text-ink-muted">
-            You can end the encounter without completing every procedure. Phases you don't record stay pending, and the
-            treatment plan doesn't change. Closing this panel doesn't undo the actions you saved.
-          </p>
         </div>
       </Drawer>
       <DialogosProcedimientoCita dialogo={actual} onClose={() => setDialogo(null)} />
