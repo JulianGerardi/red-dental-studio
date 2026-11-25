@@ -245,6 +245,9 @@ export const ORDENES: OrdenLab[] = [
   { id: 'lo9', proveedor: 'Dr. Julián Gerardi', paciente: 'Mateo Perez',   estado: 'Delivered', actualizado: '04/12/2026', creado: '04/12/2026', vence: '04/19/2026', urgente: true },
 ]
 
+/* Los procedimientos que ya tiene la orden de Pending Task (el video de Julián del 2026-11-25 muestra uno). */
+export const PROCEDIMIENTOS_ORDEN = ['pr15']
+
 /* ── Vitals (Figma 4106:205304 "Vitals — Section (Entry Form)") ────── */
 
 export type EstadoVital = 'Normal' | 'Elevated' | 'Dangerously low'

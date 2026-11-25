@@ -3339,3 +3339,68 @@ Propuesta A (regla en `figma/README.md` › *Visor de documentos*).
 Propuesta B (regla en `figma/README.md` › *Hoja de documentos*). `ConsentDocument` usa `ui/document-sheet`: membrete de
 la clínica (antes el avatar *LA* y *Los Angeles, Dental Clinic*), resumen en tres columnas (antes la grilla de 2×2 con
 íconos), secciones numeradas y firmas con *Signed electronically · fecha* o *Pending signature*. Se va la prop `ancho`.
+
+## CON-2218 · CON-2285 · CON-3904 · Lab Order: rediseño del detalle y New Laboratory (2026-11-25)
+
+**Jira:** CON-2218 (Edit Lab Order: sólo en Pending, "The lab order has been successfully updated."), CON-2285 (New
+Laboratory), CON-3904 (procedimientos elegibles), CON-2643. Pedido de Julián con un video de red.dev (Pending Tasks →
+Lab Order → ⋮ → Edit): cambiar el diseño de la parte de Clinical Mode respetando lo que hace.
+
+Lo que el video muestra y se respeta: *LAB ORDER* con *Delivery Expiration Date\**, estado, PDF y ⋮; Receiving
+Laboratory\* con ✕ y *New Laboratory*; ASAP; Procedures con buscador, **Filter** y la card del procedimiento vinculado
+(chip del caso, estado, código - descripción, *Created date* y el tacho); Teeth & Surface con Permanent / Primary y las
+arcadas; Details (Dental Work Requested\*, Special Instructions, Attachments); Cancel y Save fijos abajo; el modal New
+Laboratory.
+
+Decisiones:
+
+1. **Cabecera liviana:** ícono, *LAB ORDER* y el estado juntos a la izquierda; PDF y ⋮ a la derecha. La fecha deja la
+   cabecera y pasa a *General information* junto a ASAP: las dos dicen para cuándo es, y el error quedaba suelto lejos
+   del campo.
+2. **Dos columnas 3:2 por tarea:** a la izquierda lo que define la orden (laboratorio, plazo, procedimientos) y, en su
+   propia card, *Teeth & surface*, que antes quedaba apretado debajo; a la derecha *Details*, que en desktop queda
+   pegajosa (sticky) mientras se marcan dientes. En celular, una columna.
+3. **Procedimientos:** `ui/search-picker` (busca al escribir, vincula) + `FilterMenu` por Status y Treatment case. Sólo
+   aparecen los elegibles de CON-3904: sueltos en Planned o Pending / In progress de un caso aceptado (Waiting for
+   consent, Accepted, In progress). Los vinculados, en cards internas con el chip del caso y la pill del estado
+   (`TONO_PROCEDIMIENTO`). Mensajes de Jira: *No procedures match your search.* / *No eligible procedures available.*
+   La orden arranca con uno (`PROCEDIMIENTOS_ORDEN`), como en el video. `SearchPicker` suma `disabled`.
+4. **Arcadas en U (`dental/DentalArch`):** los mismos botones numerados (24px, `aria-pressed`) dispuestos como en el
+   odontograma de red.dev: Maxillary 1–16 arriba, Mandibular 32–17 abajo (A–J y T–K en Primary), el ancho se ajusta al
+   contenedor. Un punto marca los dientes que ya tienen superficies. Sigue sin la librería (no admite dos instancias).
+   Permanent / Primary pasan a un control segmentado en el título de la card; antes de elegir, los dos *Initialize…*.
+5. **Adjuntos:** zona compacta que acepta arrastrar y soltar de verdad, valida PDF/JPG/PNG hasta 10MB (*Only PDF, JPG or
+   PNG files up to 10MB.*) y lista los archivos con su ✕.
+6. **Cancel / Save en una barra flotante** (`sticky bottom-4`), siempre a la vista como en red.dev; en celular, del mismo
+   ancho.
+7. **Sólo lectura:** sin encuentro, el aviso de siempre; con encuentro pero la orden fuera de Pending, el de CON-2218
+   (*This lab order cannot be edited because it is not in an editable state.*).
+8. **New Laboratory = drawer con pasos** (regla de pop ups), `NewLaboratoryDrawer`: *General* (Organization name\*,
+   Email\*), *Contact* (Country code\*, Area code (3 digits)\*, Number (7 digits)\*), *Address* (Address line 1\*, Address
+   line 2, Country\*, State\*, City\*, ZIP code\*) y *Credentials* (opcional; *No credentials added yet.*, de a varias sin
+   repetir tipo: Credential type\*, Number\*, Expiration date). Valida email, 3 y 7 dígitos y que no exista el mismo
+   nombre + email. Al guardar avisa *The laboratory has been successfully created.*, se suma a la lista y queda elegido.
+
+Anomalías / supuestos:
+
+- El modal de red.dev pone Contact information adentro de General; acá es su paso. Placeholder del email genérico
+  (`laboratory@example.com`) en vez de una dirección de hotmail. Los laboratorios viven en `data/laboratorios.ts` (de #190).
+- Los tipos de credencial de CON-2285 están "en el documento" que no tenemos: se usan los de Employees (License, DEA,
+  NPI) y License pide vencimiento. Validar con Julián.
+- CON-2285 pide el aviso *Uncompleted fields…*; se mantiene el error por campo de la app (CON-4161).
+- Cancel con cambios sin guardar no pregunta (tampoco en red.dev): propuesta aparte.
+
+### Sin íconos y la tabla como las demás (2026-11-25, 2ª vuelta)
+
+Pedido de Julián al revisar el link de prueba:
+
+- **Fuera los íconos decorativos** del detalle: el del encabezado (*LAB ORDER*), los de los títulos de las cards
+  (General information, Teeth & surface, Details), los de Permanent / Primary e *Initialize…* y el del adjunto. Quedan
+  sólo los de acción (PDF, ⋮, ✕, tacho, *+ New laboratory*, buscador y Filter).
+- **El listado de Lab Order alineado a las tablas generales** (Employees, Patients, Documents): sin la card blanca
+  alrededor, la tabla sobre el fondo; *Search lab orders* con su botón **Search** (`SettingsSearch`, el
+  `SearchInput` + `SearchButton` de toda tabla con buscador al inicio), Filter al lado y los botones en 32px (md), la
+  misma altura que el buscador. Encabezados de fecha como el resto: *Last update* (Documents) y *Created date* (regla 3
+  de *Tablas estandarizadas v2*); *Expiration date* queda. Vacío con búsqueda: *No lab orders found*.
+- Se mergeó `main` (#190): los laboratorios y las arcadas salen de `data/laboratorios.ts`; New Laboratory arma el
+  teléfono y la dirección con el formato de ese archivo, así el PDF los muestra.
