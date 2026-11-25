@@ -5,6 +5,16 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-11-25
 
+### End Encounter: procedimientos del turno con fases en orden ([#193](https://github.com/JulianGerardi/red-dental-studio/pull/193))
+- **Nuevo `clinical/EndEncounterDrawer`** (CON-4153): *Complete encounter* de Clinical Mode abre el drawer con los
+  procedimientos del turno antes de cerrar; sin procedimientos cierra directo. Acción por fila: *Start procedure*,
+  *Complete phase N* o *Complete procedure*, siempre la siguiente fase sin registrar (CON-4154, CON-4155). ⋮ en tres
+  secciones (CON-4156) y *View execution history* en drawer con la nota de cada encuentro (CON-4158).
+- **Nuevo `lib/ejecucion.ts`** (estado y reglas: `accionPrincipal`, `faseDeCierre`, `esAnticipado`) y `data/ejecucion.ts`.
+  `ClinicalNoteDialog` suma `onFirmar` (opcional).
+- Para backend: completar antes de la última fase actualiza a `FINISHED` la fila de la fase de hoy (no crea otra) y no
+  registra fases futuras.
+
 ### Lab Order: rediseño del detalle, New Laboratory y la tabla alineada ([#192](https://github.com/JulianGerardi/red-dental-studio/pull/192))
 - **`LabOrderDetail`** con otro layout y mismo contenido que red.dev: cabecera *LAB ORDER* + estado, PDF y ⋮; la fecha
   va con ASAP; *Teeth & surface* en su card; *Details* a la derecha; Cancel / Save fijos abajo. Sin íconos decorativos.

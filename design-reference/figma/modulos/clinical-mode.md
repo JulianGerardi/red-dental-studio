@@ -10,7 +10,7 @@
   Referral · CON-2724 Nota Clinica · CON-2793 Encounter continuacion · CON-900 Medical conditions · CON-1751 Cambios
   Procedure y Condition · CON-1961 Condition [Treatment Area] · CON-3900 Modelo de procedimientos · CON-3742 Dental
   Asessment nueva libreria · CON-3686 Patient Dentition · CON-570 Workflow · CON-2258 Workflow configuration ·
-  CON-2412 Llenado de preguntas workflow
+  CON-2412 Llenado de preguntas workflow · CON-4153 Ejecución y trazabilidad de procedimientos por encounter
   ([historias](https://confidetally.atlassian.net/issues?jql=parent%20in%20%28CON-1611%2CCON-1610%2CCON-1608%2CCON-2825%2CCON-1609%2CCON-771%2CCON-3114%2CCON-1397%2CCON-2067%2CCON-2083%2CCON-880%2CCON-881%2CCON-882%2CCON-883%2CCON-965%2CCON-810%2CCON-1649%2CCON-2212%2CCON-2214%2CCON-2321%2CCON-2724%2CCON-2793%2CCON-900%2CCON-1751%2CCON-1961%2CCON-3900%2CCON-3742%2CCON-3686%2CCON-570%2CCON-2258%2CCON-2412%29%20AND%20issuetype%20%21%3D%20Bug%20AND%20status%20%21%3D%20Cancelled%20AND%20%28labels%20is%20EMPTY%20OR%20labels%20%21%3D%20%22design-system%22%29%20ORDER%20BY%20created%20DESC))
 - Historias de abril: CON-2827, CON-2828, CON-2829, CON-2830, CON-2936, CON-2832, CON-2833, CON-2834, CON-2835,
   CON-2845, CON-2852, CON-2939, CON-2846, CON-2854, CON-2955, CON-2937, CON-2884, CON-2885, CON-2886
@@ -3404,3 +3404,79 @@ Pedido de Julián al revisar el link de prueba:
   de *Tablas estandarizadas v2*); *Expiration date* queda. Vacío con búsqueda: *No lab orders found*.
 - Se mergeó `main` (#190): los laboratorios y las arcadas salen de `data/laboratorios.ts`; New Laboratory arma el
   teléfono y la dirección con el formato de ese archivo, así el PDF los muestra.
+
+## CON-4153 · End Encounter: los procedimientos del turno y sus fases (2026-11-25)
+
+Epic **CON-4153** (Ejecución y trazabilidad de procedimientos por encounter) con sus cinco historias: **CON-4154** (HU 1,
+Start procedure y fases intermedias), **CON-4155** (HU 2, Complete procedure y el cierre anticipado), **CON-4156** (HU 3,
+el menú ⋮ por secciones), **CON-4157** (HU 4, el drawer End Encounter) y **CON-4158** (HU 5, el historial de ejecución).
+La planificación de las fases viene de **CON-3942**. Julián pasó el prototipo *end_encounter_sequential_phases*; Abril
+había comentado en el epic los cinco casos para probar.
+
+**El flujo.** *Complete encounter* (el pill de la barra, CON-1612) ya no cierra directo: si el turno tiene procedimientos
+previstos abre el drawer **End Encounter**; sin procedimientos sigue el cierre de antes. En el drawer:
+
+- Arriba una línea de qué se hace ("Record the phases or procedures done in this appointment…") y el contexto del turno:
+  fecha, hora, provider y cuántos procedimientos. No es bajada del título (la regla del drawer sigue): es contenido.
+- *Appointment procedures* con `ui/list-group`: cada fila con código y nombre, la pill del estado (`TONO_PROCEDIMIENTO`),
+  pieza/superficie o área y la fase ("Next: phase 2 of 4", "Single phase", "Last completed: phase 2 of 4 · Completed
+  early"); debajo, en verde, lo registrado **en este encuentro** ("Phase 3 completed", "Procedure completed"). A la
+  derecha la acción que toca y el ⋮ (`RowActionsMenu`), siempre visible.
+- Pie con *Back* y *End Encounter*. Back y la X no cierran el encuentro ni deshacen nada; End Encounter lo cierra aunque
+  queden fases sin registrar y sigue con la Clinical Note de siempre (*Remind me later* / *Review and sign*).
+
+**La acción de la fila** (`accionPrincipal`, `lib/ejecucion.ts`), siempre la **siguiente fase sin registrar** (ejecución
+lineal de CON-4154, no la fase agendada): una sola fase → *Complete procedure*; la 1 de varias → *Start procedure*
+(Started, el procedimiento pasa a In progress); una intermedia → *Complete phase N* (Continued); la última → *Complete
+procedure* (Finished, Completed). Registrar una fase deja disponible la siguiente **en el mismo encuentro** (lo que agrega
+el prototipo *sequential phases*): se pueden hacer varias en una visita.
+
+**El ⋮** (CON-4156), en tres secciones: *Phase* (la siguiente fase, si no es la última), *Procedure* (*Complete
+procedure*, o *Complete procedure at phase N* si hoy ya se registró una; *Discontinue* si está In progress; *Refer* y
+*Discard* si está Pending) y *Actions* (*Edit* y *View execution history*). En un estado final sólo quedan las de
+*Actions*. Refer, Discard, Discontinue y Edit reusan los diálogos de CON-4052 (`DialogoCambioEstado`, `DialogoEditar`).
+
+**Completar antes de la última fase** (CON-4155) pide *Complete procedure?* con el texto del ticket ("This procedure has
+remaining planned phases…") y en qué fase termina. La fase de cierre es la última registrada hoy (esa misma fila pasa a
+Finished, no se duplica) o, si hoy no se hizo ninguna, la siguiente. No se crean fases futuras ni se toca el plan.
+Cancel no cambia nada.
+
+**View execution history** (CON-4158) abre un drawer encima: el procedimiento con su estado y la tabla *Phase ·
+Encounter date · Procedure event · Clinical note*, sólo con lo registrado y de menor a mayor. La nota: *View clinical
+note* (con la pill *Unsigned* si no se firmó), *No clinical note* o *Access restricted*. *View clinical note* abre la
+nota del encuentro en el visor de documentos (`ui/document-viewer` + `VistaDocumento`) y *Back to history* vuelve. Los
+dos estados vacíos del ticket ("No phases have been recorded…" y el de Completed sin historial). Cerrar el encuentro
+pasa lo de hoy a un encuentro con su fecha y la nota sin firmar; *Review and sign* la deja firmada (`onFirmar` de
+`ClinicalNoteDialog`).
+
+**Datos de ejemplo** (`data/ejecucion.ts`), los cinco casos del prototipo con códigos reales: D2391 (una fase, Pending),
+D3330 (fase 2 de 4), D2750 (la 3 ya registrada hoy desde el Treatment Plan, aparece confirmada), D5110 (la última de 4)
+y D6010 (tres fases sin empezar). Los encuentros anteriores cubren los cuatro estados de la nota. El estado vive fuera de
+React (como `lib/encuentro`), así que lo hecho se conserva al cerrar y reabrir el drawer.
+
+**Desvíos del prototipo y anomalías**
+
+1. **Rótulos de Jira, no del HTML**: el HTML dice "Complete phase 1 / start procedure" y "Complete phase N / procedure";
+   el ticket (HU 3 y HU 4) y el comentario de Abril, *Start procedure* y *Complete procedure*. Manda Jira.
+2. El HTML pone "Dr. Julio Perez" como provider del turno: Julio Perez es el paciente. Acá va el provider de los datos.
+3. El historial en el HTML es un modal de una línea; CON-4158 pide drawer con tabla: se siguió el ticket.
+4. El pill de la barra sigue diciendo *Complete encounter* (CON-1612, red.dev); el ticket lo llama *End Encounter*. El
+   drawer y su botón sí dicen End Encounter.
+5. Los procedimientos del drawer tienen el consentimiento resuelto ("Execution permission granted" en el prototipo): no
+   pasan por `useFlujoConsentimiento`. Con uno pendiente habría que encadenarlo (CON-4154 lo pide).
+6. El fallo al cerrar ("el encounter permanece abierto") no tiene disparador en el mock.
+
+**Pendiente (a definir con Julián)**
+
+- **HU 3 en el Treatment Plan**: las acciones de fase en el ⋮ de las visitas del caso. Hoy el Treatment Plan no tiene
+  fases (los datos de `treatment-plan.ts` no repiten procedimientos entre visitas) y el drawer usa su propia lista; unirlos
+  es el próximo paso.
+- **La ficha del paciente**: su *Complete encounter* sigue cerrando directo. El drawer va sólo en Clinical Mode, que es
+  "la pantalla clínica actual" del ticket y la única con los procedimientos del turno.
+
+**A validar con usuarios**: si "Next: phase 2 of 4" junto a "Phase 1 completed" se entiende como "ya hice una, sigue
+otra"; si el odontólogo espera que *End Encounter* avise de procedimientos sin tocar (hoy no avisa, como pide el ticket);
+y si *Complete procedure at phase N* en el ⋮ se distingue bien de la acción de la fila.
+
+Código: `clinical/EndEncounterDrawer.tsx`, `lib/ejecucion.ts`, `data/ejecucion.ts`, `clinical/ClinicalTopBar.tsx`; e2e en
+`tests/clinical-mode.e2e.ts` (y el de Pending signature en `tests/patient-dashboard.e2e.ts`, que ahora pasa por el drawer).
