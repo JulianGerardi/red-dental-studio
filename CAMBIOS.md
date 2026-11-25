@@ -5,6 +5,16 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-11-25
 
+### End Encounter: procedimientos del turno con fases en orden ([#193](https://github.com/JulianGerardi/red-dental-studio/pull/193))
+- **Nuevo `clinical/EndEncounterDrawer`** (CON-4153): *Complete encounter* de Clinical Mode abre el drawer con los
+  procedimientos del turno antes de cerrar; sin procedimientos cierra directo. Acción por fila: *Start procedure*,
+  *Complete phase N* o *Complete procedure*, siempre la siguiente fase sin registrar (CON-4154, CON-4155). ⋮ en tres
+  secciones (CON-4156) y *View execution history* en drawer con la nota de cada encuentro (CON-4158).
+- **Nuevo `lib/ejecucion.ts`** (estado y reglas: `accionPrincipal`, `faseDeCierre`, `esAnticipado`) y `data/ejecucion.ts`.
+  `ClinicalNoteDialog` suma `onFirmar` (opcional).
+- Para backend: completar antes de la última fase actualiza a `FINISHED` la fila de la fase de hoy (no crea otra) y no
+  registra fases futuras.
+
 ### Billing: el tipo de actividad en pestañas, como red.dev ([#191](https://github.com/JulianGerardi/red-dental-studio/pull/191))
 - *Recent billing activity* deja el `FilterMenu`: **All / Payments / Adjustments / Today** van en `ui/tabs` (sm), en la
   fila del título y a la izquierda de *Columns*. Con un paciente, *Patient view / Guarantor view* va en el mismo lugar.
