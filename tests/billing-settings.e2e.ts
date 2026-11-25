@@ -88,6 +88,20 @@ test('Bulk edit sube los New fee y Save crea una versión nueva', async ({ app, 
   await expect(screen.getByText('$101.20')).toBeVisible()
 })
 
+test('irse de un fee schedule con cambios sin guardar pregunta antes, y buscar sin resultados lo dice', async ({ app, screen }) => {
+  await app.open('/settings/finance/fee-schedule/ucr-red/edit')
+  await screen.getByLabel('D0120 new fee').fill('70')
+  await screen.getByRole('link', 'Aetna 2026').tap()
+  const aviso = screen.getByRole('dialog', 'Are you sure you want to leave?')
+  await aviso.getByRole('button', 'Cancel').tap()
+  await expect(screen.getByText('UCR - Red').first()).toBeVisible()
+
+  await screen.getByRole('link', 'Aetna 2026').tap()
+  await screen.getByRole('button', 'Leave without saving').tap()
+  await screen.getByLabel('Search procedure').fill('zzzz')
+  await expect(screen.getByText('No procedures available')).toBeVisible()
+})
+
 test('una excepción nueva se arma en cuatro pasos y se suma a la plantilla', async ({ app, screen }) => {
   await app.open('/settings/finance/coverage-table/premium-ppo/edit')
   await screen.getByRole('button', 'Manage exceptions (3)').tap()
@@ -128,20 +142,6 @@ test('Compare fees compara por procedimiento contra el Default', async ({ app, s
   await expect(drawer.getByRole('columnheader', 'UCR - Red')).toBeVisible()
   /* D1110: $92 en Aetna 2026 contra $115 en UCR - Red. */
   await expect(drawer.getByText(/−\$23\.00/)).toBeVisible()
-})
-
-test('Bulk edit con filas tildadas cambia sólo esas', async ({ app, screen }) => {
-  await app.open('/settings/finance/fee-schedule/aetna-2026/edit')
-  await expect(screen.getByText('26 / 26')).toBeVisible()
-  await screen.getByRole('checkbox', 'Select D0120').tap()
-  await screen.getByRole('button', 'Bulk edit').tap()
-  const drawer = screen.getByRole('dialog', 'Increase selected')
-  await drawer.getByLabel(/^Increase selected fees by/).fill('10')
-  await drawer.getByRole('button', 'Confirm').tap()
-  await screen.getByRole('button', 'Save').tap()
-  /* +$10: D0120 pasa de $52 a $62 (el Current fee de la versión nueva); D0140 sigue en $68. */
-  await expect(screen.getByRole('row', /^Select D0120 .* \$62\.00 \$62\.00$/)).toBeVisible()
-  await expect(screen.getByRole('row', /^Select D0140 .* \$68\.00 \$68\.00$/)).toBeVisible()
 })
 
 test('Add range avisa y el breadcrumb sigue la regla de Settings', async ({ app, screen }) => {

@@ -84,8 +84,10 @@ export function PhoneFields({
 
 /* Monto en una celda: se escribe el número y al salir se muestra como $1,250.00. */
 export function MoneyInput({
-  label, value, onChange, placeholder = '$0.00', invalid, className,
+  label, value, onChange, placeholder = '$0.00', invalid, className, comoTexto,
 }: {
+  /** Se ve como texto y el borde aparece al pasar o al editar (New fee del fee schedule, como red.dev). */
+  comoTexto?: boolean
   /** Va como aria-label: el monto vive en una tabla con su encabezado. */
   label: string
   value: number | null
@@ -110,7 +112,7 @@ export function MoneyInput({
         onChange(limpio === '' ? null : Number(limpio))
       }}
       onBlur={() => setEditando(null)}
-      className={cn(control(invalid ? 'error' : undefined), 'h-8 px-2.5 text-right tabular-nums', className)}
+      className={cn(control(invalid ? 'error' : undefined), 'h-8 px-2.5 text-right tabular-nums', comoTexto && !invalid && '-mr-2.5 h-7 w-[calc(100%+10px)] border-transparent bg-transparent shadow-none hover:border-line focus:border-dash-blue focus:bg-white', className)}
     />
   )
 }

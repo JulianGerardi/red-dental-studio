@@ -5,6 +5,36 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-11-25
 
+### Mails: cabecera con degradé desde blanco, pie según quién escribe y textos nuevos del Figma ([#196](https://github.com/JulianGerardi/red-dental-studio/pull/196))
+- **Cabecera** igual para Confidentally y la clínica: el degradé queda blanco hasta 280 px, así el logo (máx. 240 px) apoya
+  siempre sobre blanco; en Outlook la cabecera es blanca. **Pie** según `remitente`: el de Confidentally (copyright,
+  dirección, legales) y el de la clínica (nombre, `{{practice_address}}`, "Powered by Confidentally", mail y teléfono,
+  legales). Sale el aviso legal largo.
+- **Textos de los 16 mails** según el Figma 📧 Email: título, "Hello {{nombre}},", "Questions? Contact …" y "The … team".
+  Booked, Confirmed y Canceled sin botón. Vuelve la **contraseña temporal** en Patient, Employee y Guardian invitation.
+- **Para el backend, variables nuevas:** `patient_name`, `account_owner_name`, `employee_name`, `guardian_name`,
+  `practice_address`, `previous_appointment_date`, `temporary_password`, `document_link`. **Dejan de usarse:** `*_first_name`,
+  `set_password_link`, `link_expiration`, `support_contact`, `website_url`. Imágenes nuevas en `public/emails/`:
+  `confidentally-mark.png` (pie) y `sample-practice-logo-<color>.png` (pruebas). El detalle va en `emails.json`.
+- Bloque `saludo` pasa a `titulo`; `firma` lleva `equipo` en vez de `lineas`; `origen` es `'figma' | 'propuesta'`.
+- **Vista previa** (`/emails/`): muestras de color del logo de ejemplo en los mails de la clínica.
+- **Figma:** la página 📧 Email documenta la plantilla y los 16 mails (6 flujos, `scripts/figma/flujos/emails.mjs`); la
+  ruta de cada pantalla capturada ahora incluye el hash.
+
+### Settings: Roles y Preferences, y arreglos de Fee schedule, Account y Working hours ([#195](https://github.com/JulianGerardi/red-dental-studio/pull/195))
+- **Roles** (`/settings/roles`) y **Preferences** (`/settings/preferences`) dejan de ser "Coming soon". Nuevos:
+  `data/roles.ts` (permisos por categoría y roles), `settings/PermissionsPicker`, `settings/RoleDrawer`,
+  `pages/settings/Roles.tsx`, `pages/settings/Preferences.tsx`. Lógica de CON-3130/3131/3132/3181/3229/3411/4065: roles del
+  sistema en sólo lectura; con empleados activos no se desactiva ni se borra. Preferences guarda el formato de fecha en el
+  navegador; usarlo en toda la app y el tema oscuro quedan pendientes.
+- **Nuevo `lib/useAvisoSalida(sucio)`**: con cambios sin guardar frena los links de la app y la recarga, y pregunta *Are
+  you sure you want to leave?*. Lo usa Edit Fee Schedule.
+- **Edit Fee Schedule**: tabla con scroll interno, sin casillas (Bulk edit cambia todo; se va *Increase selected*), New fee
+  como texto (`MoneyInput comoTexto`), vacío *No procedures available*, Filter de la lista sin selección al entrar.
+  `etiquetaVersion`: una versión que no empezó es *Scheduled*.
+- **Account**: Subscription history con `DataTable`; sin Cancel/Save en esa pestaña.
+- **Working hours**: en *Set working hours* el rango se borra con el tacho; las franjas de la tabla siguen con la ✕.
+
 ### Referral: Complete this task abre el detalle ([#194](https://github.com/JulianGerardi/red-dental-studio/pull/194))
 - **Nuevo `clinical/ReferralDetail`** (`ReferralDetail`, `ReferralPanel`): *Complete this task* de una Referral abre
   Clinical Mode en `?tab=Referral&task=<id>` con la derivación (CON-2321). Una card como el panel de Treatment plan,
