@@ -1,11 +1,8 @@
-import { cn } from '@/lib/utils'
-import {
-  Check, MapPin, Send, User, Stethoscope, CalendarDays, ClipboardList, X, type LucideIcon,
-} from 'lucide-react'
+import { Check, X, type LucideIcon } from 'lucide-react'
+import { DocumentSheet } from '@/components/ui/document-sheet'
+import { CLINICA, MEMBRETE } from '@/data/clinica'
 
-/* Preview del consentimiento como lo recibe el paciente: una hoja de papel
-   sobre el escritorio gris del panel, no una tarjeta más de la UI. Tipografía
-   de la app (Inter), la misma que tenía el preview antes de ser hoja. Detalle en
+/* El consentimiento como lo recibe el paciente, con la hoja común de documentos (ui/document-sheet). Detalle en
    design-reference/figma/modulos/consents.md. */
 
 /* "Patient acknowledgment" es el mismo texto en todos los consentimientos:
@@ -89,8 +86,6 @@ type Props = {
   /** Las afirmaciones marcadas; con `onReconocer`, el paciente las marca en la hoja (detalle del consentimiento). */
   reconocidos?: readonly string[]
   onReconocer?: (afirmacion: string, marcada: boolean) => void
-  /** completo: ocupa todo el ancho y crece con el contenido (el detalle del consentimiento), sin el tamaño de carta. */
-  ancho?: 'carta' | 'completo'
   className?: string
 }
 
@@ -123,125 +118,86 @@ export function LineaFirma({ rol, nombre, firma }: { rol: string; nombre: string
   )
 }
 
-export function ConsentDocument({ titulo, procedimiento, naturaleza, riesgos, texto, vistaPaciente, paciente = 'Sarah Stone', proveedor = 'John Lorem', firmas, reconocidos, onReconocer, ancho = 'carta', className }: Props) {
+/* La hoja del consentimiento con la hoja común de documentos (ui/document-sheet): la misma en el preview de Settings, en
+   el detalle del consentimiento y en View consent. Ver consents.md y clinical-mode.md (2026-11-24, hoja unificada). */
+export function ConsentDocument({ titulo, procedimiento, naturaleza, riesgos, texto, vistaPaciente, paciente = 'Sarah Stone', proveedor = 'John Lorem', firmas, reconocidos, onReconocer, className }: Props) {
   const firmaPaciente = firmas?.paciente
   const lineasRiesgo = riesgos.split('\n').filter(Boolean)
   const vacio = <p className="text-ink-faint">No content yet.</p>
+  const firmada = (f?: FirmaHoja) => f && { date: f.fecha, image: f.imagen, text: `${f.texto || f.nombre}${f.iniciales ? ` (${f.iniciales})` : ''}` }
+
+  const secciones = [
+    ...(vistaPaciente ? [] : [
+      { title: 'Diagnosis', content: <p>Non-restorable tooth with recurrent infection.</p> },
+      { title: 'Clinical findings', content: <p>Extensive decay affecting tooth structure and surrounding tissue.</p> },
+    ]),
+    ...(texto !== undefined
+      ? [{ title: 'Consent text', content: textoPlano(texto) ? <div className={PROSA_HOJA} dangerouslySetInnerHTML={{ __html: limpiarHtml(texto) }} /> : vacio }]
+      : [
+          { title: 'Nature of procedure', content: naturaleza ? <p className="whitespace-pre-line">{naturaleza}</p> : vacio },
+          {
+            title: 'Risk and complications',
+            content: lineasRiesgo.length > 0
+              ? <ul className="list-disc pl-5 marker:text-ink-faint">{lineasRiesgo.map((linea, i) => <li key={i}>{linea}</li>)}</ul>
+              : vacio,
+          },
+        ]),
+    {
+      title: 'Patient acknowledgment',
+      content: (
+        <>
+          <ul className="flex flex-col gap-1.5">
+            {RECONOCIMIENTOS_PACIENTE.map((r) => {
+              const on = firmaPaciente ? true : !!reconocidos?.includes(r)
+              const casilla = (
+                <span aria-hidden className={`mt-[3px] grid size-3.5 shrink-0 place-items-center rounded-[3px] border ${on ? 'border-dash-blue bg-dash-blue text-white' : 'border-ink-muted'}`}>
+                  {on && <Check className="size-2.5" strokeWidth={3} />}
+                </span>
+              )
+              return (
+                <li key={r}>
+                  {onReconocer ? (
+                    <button
+                      type="button"
+                      role="checkbox"
+                      aria-checked={on}
+                      onClick={() => onReconocer(r, !on)}
+                      className="-mx-1 flex gap-2 rounded px-1 text-left hover:bg-surface-subtle focus-visible:outline-2 focus-visible:outline-dash-blue"
+                    >
+                      {casilla}{r}
+                    </button>
+                  ) : <span className="flex gap-2">{casilla}{r}</span>}
+                </li>
+              )
+            })}
+          </ul>
+          <p className="mt-2 text-[12px] leading-snug font-medium text-ink-muted">{AVISO_RECONOCIMIENTOS}</p>
+        </>
+      ),
+    },
+  ]
 
   return (
-    <article
-      aria-label="Consent document preview"
-      className={cn(
-        'mx-auto flex w-full flex-col bg-white px-6 pt-6 pb-3.5 text-[12px] leading-[1.5] text-ink-soft shadow-[0_0_0_1px_rgb(0_0_0/0.06),0_2px_4px_rgb(0_0_0/0.06),0_14px_28px_-8px_rgb(0_0_0/0.22)]',
-        ancho === 'carta' ? 'aspect-[8.5/11] max-w-[520px]' : 'sm:px-10 sm:pt-8',
-        className,
-      )}
-    >
-      <header className="flex items-center gap-3 border-b-2 border-dash-blue pb-3">
-        <span aria-hidden className="bg-dash-blue grid size-9 shrink-0 place-items-center rounded-md text-[12px] font-bold text-white">LA</span>
-        <div className="flex min-w-0 flex-col gap-1 text-[11px] text-ink-muted">
-          <p className="flex items-center gap-1 font-semibold text-ink"><MapPin className="size-3 shrink-0" /> Los Angeles, Dental Clinic</p>
-          <p className="flex items-center gap-1"><Send className="size-3 shrink-0" /> Consent sent: {CONSENT_ENVIADO}</p>
-        </div>
-      </header>
-
-      <div className="mt-4 text-center">
-        <p className={`${ETIQUETA} text-dash-blue`}>Informed consent</p>
-        <h3 className="mt-1 text-[17px] leading-tight font-bold text-ink">{titulo || 'Untitled consent'}</h3>
-      </div>
-
-      <div className="mt-4 grid grid-cols-2 gap-px border border-line-strong bg-line-strong">
-        <Campo icono={User} etiqueta="Patient">
-          <p className="font-bold text-ink">{paciente}</p>
-          <p className="text-ink-muted">DOB: 04/02/1991</p>
-          <p className="text-ink-muted">Patient ID: 12345432</p>
-        </Campo>
-        <Campo icono={Stethoscope} etiqueta="Provider">
-          <p className="font-bold text-ink">{proveedor}</p>
-        </Campo>
-        <Campo icono={CalendarDays} etiqueta="Appointment">
-          <p className="font-bold text-ink">{FECHA_CITA}</p>
-          <p className="text-ink-muted">{HORA_CITA}</p>
-        </Campo>
-        <Campo icono={ClipboardList} etiqueta="Procedure">
-          <p className="font-bold text-ink">{procedimiento ?? '—'}</p>
-        </Campo>
-      </div>
-
-      {!vistaPaciente && (
-        <>
-          <Seccion titulo="Diagnosis"><p>Non-restorable tooth with recurrent infection.</p></Seccion>
-          <Seccion titulo="Clinical findings"><p>Extensive decay affecting tooth structure and surrounding tissue.</p></Seccion>
-        </>
-      )}
-
-      {texto !== undefined ? (
-        textoPlano(texto)
-          ? <div className={`${PROSA_HOJA} text-ink-soft`} dangerouslySetInnerHTML={{ __html: limpiarHtml(texto) }} />
-          : <Seccion titulo="Consent text">{vacio}</Seccion>
-      ) : (
-        <>
-          <Seccion titulo="Nature of procedure">
-            {naturaleza ? <p>{naturaleza}</p> : vacio}
-          </Seccion>
-          <Seccion titulo="Risk and complications">
-            {lineasRiesgo.length > 0 ? (
-              <ul className="list-disc pl-4 marker:text-ink-faint">
-                {lineasRiesgo.map((linea, i) => <li key={i}>{linea}</li>)}
-              </ul>
-            ) : vacio}
-          </Seccion>
-        </>
-      )}
-
-      <Seccion titulo="Patient acknowledgment">
-        <ul className="flex flex-col gap-1.5">
-          {RECONOCIMIENTOS_PACIENTE.map((r) => {
-            const on = firmaPaciente ? true : !!reconocidos?.includes(r)
-            const casilla = (
-              <span aria-hidden className={`mt-[3px] grid size-3 shrink-0 place-items-center rounded-[3px] border ${on ? 'border-dash-blue bg-dash-blue text-white' : 'border-ink-muted'}`}>
-                {on && <Check className="size-2.5" strokeWidth={3} />}
-              </span>
-            )
-            return (
-              <li key={r}>
-                {onReconocer ? (
-                  <button
-                    type="button"
-                    role="checkbox"
-                    aria-checked={on}
-                    onClick={() => onReconocer(r, !on)}
-                    className="-mx-1 flex gap-2 rounded px-1 text-left hover:bg-surface-subtle focus-visible:outline-2 focus-visible:outline-dash-blue"
-                  >
-                    {casilla}{r}
-                  </button>
-                ) : <span className="flex gap-2">{casilla}{r}</span>}
-              </li>
-            )
-          })}
-        </ul>
-        <p className="mt-2 text-[11px] leading-snug font-medium text-ink-muted">{AVISO_RECONOCIMIENTOS}</p>
-      </Seccion>
-
-      {firmas ? (
-        <section aria-label="Signatures" className="mt-auto grid gap-6 pt-7 sm:grid-cols-2 sm:gap-10">
-          <LineaFirma rol="Patient / legal guardian" nombre={paciente} firma={firmas.paciente} />
-          <LineaFirma rol="Provider" nombre={proveedor} firma={firmas.proveedor} />
-        </section>
-      ) : (
-        <div className="mt-auto grid grid-cols-[1fr_88px] gap-4 pt-7 text-[11px] text-ink-faint">
-          <div className="relative border-t border-ink-medium pt-1">
-            <X aria-hidden className="absolute -top-3.5 left-0 size-3 text-ink-faint" />
-            Patient / legal guardian
-          </div>
-          <div className="border-t border-ink-medium pt-1">Date</div>
-        </div>
-      )}
-
-      <footer className="mt-3 flex justify-between border-t border-line-soft pt-2 text-[10px] text-ink-faint">
-        <span>{paciente} · Patient ID 12345432</span>
-        <span>Page 1 of 1</span>
-      </footer>
-    </article>
+    <DocumentSheet
+      className={className}
+      clinic={MEMBRETE}
+      meta={['Consent sent', CONSENT_ENVIADO]}
+      type="Informed consent"
+      title={titulo || 'Untitled consent'}
+      summary={[
+        { label: 'Patient', value: paciente },
+        { label: 'Date of birth', value: '04/02/1991' },
+        { label: 'Patient ID', value: '12345432' },
+        { label: 'Provider', value: proveedor },
+        { label: 'Appointment', value: `${FECHA_CITA} · ${HORA_CITA}` },
+        { label: 'Procedure', value: procedimiento ?? '—' },
+      ]}
+      sections={secciones}
+      signatures={[
+        { role: 'Patient / legal guardian', name: paciente, signed: firmada(firmas?.paciente) },
+        { role: 'Provider', name: proveedor, signed: firmada(firmas?.proveedor) },
+      ]}
+      footer={`${CLINICA.nombre} · Informed consent · ${paciente}`}
+    />
   )
 }

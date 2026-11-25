@@ -5,6 +5,15 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-11-24
 
+### Visor y hoja de documentos unificados ([#188](https://github.com/JulianGerardi/red-dental-studio/pull/188))
+- **Nuevo `ui/document-viewer`** (`DocumentViewer`): todo documento a pantalla completa, nunca en drawer. Back con
+  destino, título, estado, View PDF, un aviso y la barra de firma sólo si hay algo que firmar. Lo usan la Clinical note,
+  el Procedure consent de Clinical Mode, *View consent* (antes drawer) y el preview de Consent templates.
+- **Nuevo `ui/document-sheet`** (`DocumentSheet`): membrete, tipo y título, resumen en tres columnas, secciones
+  numeradas, firmas y pie. `ConsentDocument` lo usa (**se va la prop `ancho`**) y la Clinical note también.
+  **Se borra `settings/HojaConsentimientoPdf`**. `CLINICA` y `MEMBRETE` en `data/clinica.ts`.
+- **PDF de la Clinical note** (`pdfDeDocumento`) con el mismo diseño. Para backend: es el formato de referencia del PDF.
+
 ### Ledger options, New template y la fecha de Dashboard y Scheduling ([#187](https://github.com/JulianGerardi/red-dental-studio/pull/187))
 - **Nuevo `ui/date-nav` (`DateNav`):** ‹ Today › + período con calendario, en un solo bloque. Props `value`, `onChange`,
   `periodo` (`day` · `week` · `month`), `hoy`, `marked`, `tour`. Lo usan Dashboard (un día) y Scheduling (su vista).
