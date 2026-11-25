@@ -5,6 +5,14 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-11-25
 
+### Lab order y Referral como Edit account; End Encounter más simple ([#198](https://github.com/JulianGerardi/red-dental-studio/pull/198))
+- **Nuevo `clinical/FichaClinica`**: `EncabezadoFicha` (título de pantalla + estado + acciones) y `Adjuntos` (archivos
+  PDF/JPG/PNG ≤10MB con lista). `LabOrderDetail` y `ReferralDetail` los usan, con cards apiladas (`settings` `Card`) y
+  `FormFooter` abajo a la derecha, como Edit account. Usarlos en toda ficha nueva de Clinical Mode.
+- **`settings/primitives` `Card`** suma `action` (control junto al título). Sin cambios para los usos actuales.
+- **`EndEncounterDrawer`** (CON-4153): una sola línea de lo hecho por procedimiento (*Procedure completed* reemplaza a
+  las fases), sin bajada debajo del título ni texto al pie.
+
 ### Mails: cabecera con degradé desde blanco, pie según quién escribe y textos nuevos del Figma ([#196](https://github.com/JulianGerardi/red-dental-studio/pull/196))
 - **Cabecera** igual para Confidentally y la clínica: el degradé queda blanco hasta 280 px, así el logo (máx. 240 px) apoya
   siempre sobre blanco; en Outlook la cabecera es blanca. **Pie** según `remitente`: el de Confidentally (copyright,
