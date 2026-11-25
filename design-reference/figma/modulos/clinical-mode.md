@@ -3384,8 +3384,23 @@ Decisiones:
 Anomalías / supuestos:
 
 - El modal de red.dev pone Contact information adentro de General; acá es su paso. Placeholder del email genérico
-  (`laboratory@example.com`) en vez de una dirección de hotmail.
+  (`laboratory@example.com`) en vez de una dirección de hotmail. Los laboratorios viven en `data/laboratorios.ts` (de #190).
 - Los tipos de credencial de CON-2285 están "en el documento" que no tenemos: se usan los de Employees (License, DEA,
   NPI) y License pide vencimiento. Validar con Julián.
 - CON-2285 pide el aviso *Uncompleted fields…*; se mantiene el error por campo de la app (CON-4161).
 - Cancel con cambios sin guardar no pregunta (tampoco en red.dev): propuesta aparte.
+
+### Sin íconos y la tabla como las demás (2026-11-25, 2ª vuelta)
+
+Pedido de Julián al revisar el link de prueba:
+
+- **Fuera los íconos decorativos** del detalle: el del encabezado (*LAB ORDER*), los de los títulos de las cards
+  (General information, Teeth & surface, Details), los de Permanent / Primary e *Initialize…* y el del adjunto. Quedan
+  sólo los de acción (PDF, ⋮, ✕, tacho, *+ New laboratory*, buscador y Filter).
+- **El listado de Lab Order alineado a las tablas generales** (Employees, Patients, Documents): sin la card blanca
+  alrededor, la tabla sobre el fondo; *Search lab orders* con su botón **Search** (`SettingsSearch`, el
+  `SearchInput` + `SearchButton` de toda tabla con buscador al inicio), Filter al lado y los botones en 32px (md), la
+  misma altura que el buscador. Encabezados de fecha como el resto: *Last update* (Documents) y *Created date* (regla 3
+  de *Tablas estandarizadas v2*); *Expiration date* queda. Vacío con búsqueda: *No lab orders found*.
+- Se mergeó `main` (#190): los laboratorios y las arcadas salen de `data/laboratorios.ts`; New Laboratory arma el
+  teléfono y la dirección con el formato de ese archivo, así el PDF los muestra.

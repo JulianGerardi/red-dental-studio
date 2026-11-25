@@ -245,14 +245,6 @@ export const ORDENES: OrdenLab[] = [
   { id: 'lo9', proveedor: 'Dr. Julián Gerardi', paciente: 'Mateo Perez',   estado: 'Delivered', actualizado: '04/12/2026', creado: '04/12/2026', vence: '04/19/2026', urgente: true },
 ]
 
-/* Los laboratorios de la account (Receiving laboratory). New Laboratory suma uno; no se repiten nombre y email (CON-2285). */
-export type Laboratorio = { nombre: string; email: string }
-export const LABORATORIOS: Laboratorio[] = [
-  { nombre: 'Olivos Laboratory', email: 'orders@olivoslab.com' },
-  { nombre: 'North Dental Lab', email: 'hello@northdental.com' },
-  { nombre: 'Smile Lab Studio', email: 'lab@smilestudio.com' },
-]
-
 /* Los procedimientos que ya tiene la orden de Pending Task (el video de Julián del 2026-11-25 muestra uno). */
 export const PROCEDIMIENTOS_ORDEN = ['pr15']
 

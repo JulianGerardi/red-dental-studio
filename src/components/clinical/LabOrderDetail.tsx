@@ -1,5 +1,5 @@
 import { useState, type DragEvent, type ReactNode } from 'react'
-import { Baby, FileText, FlaskConical, Paperclip, Plus, Smile, Trash2, User, X, type LucideIcon } from 'lucide-react'
+import { FileText, Plus, Trash2, X } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { aviso } from '@/components/ui/toaster'
 import { Alert } from '@/components/ui/alert'
@@ -16,7 +16,8 @@ import { DentalArch } from './dental/DentalArch'
 import { NewLaboratoryDrawer } from './NewLaboratoryDrawer'
 import { TONO_PROCEDIMIENTO } from './accionesProcedimiento'
 import { TARJETA_INTERNA, TARJETA_PANEL } from '@/lib/estilos'
-import { LABORATORIOS, PROCEDIMIENTOS, PROCEDIMIENTOS_ORDEN, VINCULOS_PROCEDIMIENTO, type Laboratorio, type ProcedimientoPaciente } from '@/data/clinical-mode'
+import { PROCEDIMIENTOS, PROCEDIMIENTOS_ORDEN, VINCULOS_PROCEDIMIENTO, type ProcedimientoPaciente } from '@/data/clinical-mode'
+import { ARCADAS, LABORATORIOS, type Denticion, type Laboratorio } from '@/data/laboratorios'
 import { CASOS } from '@/data/treatment-plan'
 import type { PendingTask } from '@/components/dashboard/PendingTaskCard'
 import { MenuTarea, SIN_ENCUENTRO, TONO_ESTADO, type AccionUI } from '@/components/dashboard/tareas'
@@ -27,13 +28,10 @@ import { MenuTarea, SIN_ENCUENTRO, TONO_ESTADO, type AccionUI } from '@/componen
    adjuntos, y Cancel/Save siempre a la vista. Sólo se edita con un encuentro abierto y la orden en Pending (CON-2218).
    Ver design-reference/figma/modulos/clinical-mode.md (2026-11-25). */
 
-const PERMANENTES = { arriba: Array.from({ length: 16 }, (_, i) => String(i + 1)), abajo: Array.from({ length: 16 }, (_, i) => String(32 - i)) }
-const PRIMARIOS = { arriba: 'ABCDEFGHIJ'.split(''), abajo: 'TSRQPONMLK'.split('') }
 const TIPOS_ADJUNTO = ['application/pdf', 'image/jpeg', 'image/png']
 const MAX_ADJUNTO = 10 * 1024 * 1024
 const NO_EDITABLE = 'This lab order cannot be edited because it is not in an editable state.'
 
-type Denticion = 'Permanent' | 'Primary'
 type Elegible = ProcedimientoPaciente & { caso?: string }
 
 /* CON-3904: sueltos en Planned, o Pending / In progress de un caso aceptado. */
@@ -45,10 +43,9 @@ const ELEGIBLES: Elegible[] = PROCEDIMIENTOS.flatMap((p) => {
     : []
 })
 
-/* El título de cada card con su ícono. */
-const Titulo = ({ icono: Icono, children, accion }: { icono: LucideIcon; children: string; accion?: ReactNode }) => (
+/* El título de cada card, sin ícono (Julián, 2026-11-25). */
+const Titulo = ({ children, accion }: { children: string; accion?: ReactNode }) => (
   <div className="flex flex-wrap items-center gap-3">
-    <span className="flex size-8 shrink-0 items-center justify-center rounded-md bg-dash-count-bg text-dash-blue"><Icono className="size-4" aria-hidden /></span>
     <h3 className="text-[15px] font-semibold text-ink">{children}</h3>
     {accion && <span className="ml-auto">{accion}</span>}
   </div>
@@ -93,7 +90,7 @@ export function LabOrderDetail({ tarea, abierto, onVolver, onAccion }: {
   const [arrastrando, setArrastrando] = useState(false)
   const [errores, setErrores] = useState<Record<string, string>>({})
 
-  const filas = denticion === 'Primary' ? PRIMARIOS : PERMANENTES
+  const filas = ARCADAS[denticion ?? 'Permanent']
   const todos = [...filas.arriba, ...filas.abajo]
   const elegirDenticion = (d: Denticion) => { if (d === denticion) return; setDenticion(d); setDientes([]); setActual(null); setSuperficies({}) }
   const tocarDiente = (d: string) => {
@@ -137,7 +134,6 @@ export function LabOrderDetail({ tarea, abierto, onVolver, onAccion }: {
 
       {/* Qué es, en qué estado está y sus acciones. */}
       <header className={cn(TARJETA_PANEL, 'flex flex-wrap items-center gap-3 px-4 py-3 sm:px-6')}>
-        <span className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-dash-blue text-white"><FlaskConical className="size-[18px]" aria-hidden /></span>
         <h2 className="text-[15px] font-semibold text-ink uppercase">Lab order</h2>
         <Pill tone={TONO_ESTADO[tarea.state] ?? 'info'}>{tarea.state}</Pill>
         <span className="ml-auto flex items-center gap-2">
@@ -149,7 +145,7 @@ export function LabOrderDetail({ tarea, abierto, onVolver, onAccion }: {
       <div className="grid min-w-0 items-start gap-4 lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]">
         <div className="flex min-w-0 flex-col gap-4">
           <section className={cn(TARJETA_PANEL, 'flex flex-col gap-5 p-4 sm:p-6')} aria-label="General information">
-            <Titulo icono={FileText}>General information</Titulo>
+            <Titulo>General information</Titulo>
 
             <div className="flex flex-col gap-2 sm:flex-row sm:items-start">
               <SearchField
@@ -214,18 +210,17 @@ export function LabOrderDetail({ tarea, abierto, onVolver, onAccion }: {
 
           <section className={cn(TARJETA_PANEL, 'flex flex-col gap-5 p-4 sm:p-6')} aria-label="Teeth and surface">
             <Titulo
-              icono={Smile}
               accion={denticion && (
                 <span className="inline-flex rounded-lg bg-surface-subtle p-0.5" role="group" aria-label="Dentition">
                   {(['Permanent', 'Primary'] as const).map((d) => (
                     <button
                       key={d} type="button" aria-pressed={denticion === d} onClick={() => elegirDenticion(d)}
                       className={cn(
-                        'flex h-7 items-center gap-1.5 rounded-md px-3 text-[12px] font-medium transition-colors focus-visible:outline-2 focus-visible:outline-dash-blue [&_svg]:size-3.5',
+                        'flex h-7 items-center rounded-md px-3 text-[12px] font-medium transition-colors focus-visible:outline-2 focus-visible:outline-dash-blue',
                         denticion === d ? 'bg-white text-dash-blue shadow-sm' : 'text-ink-muted hover:text-ink',
                       )}
                     >
-                      {d === 'Permanent' ? <User /> : <Baby />} {d}
+                      {d}
                     </button>
                   ))}
                 </span>
@@ -237,8 +232,8 @@ export function LabOrderDetail({ tarea, abierto, onVolver, onAccion }: {
             {!denticion ? (
               <div className="flex flex-col items-center gap-3 rounded-lg border border-dashed border-line-strong px-4 py-8 text-center">
                 <span className="flex flex-wrap justify-center gap-2">
-                  <Button variant="secondary" onClick={() => elegirDenticion('Permanent')}><User /> Initialize permanent dentition</Button>
-                  <Button variant="secondary" onClick={() => elegirDenticion('Primary')}><Baby /> Initialize primary dentition</Button>
+                  <Button variant="secondary" onClick={() => elegirDenticion('Permanent')}>Initialize permanent dentition</Button>
+                  <Button variant="secondary" onClick={() => elegirDenticion('Primary')}>Initialize primary dentition</Button>
                 </span>
               </div>
             ) : (
@@ -261,7 +256,7 @@ export function LabOrderDetail({ tarea, abierto, onVolver, onAccion }: {
         </div>
 
         <fieldset disabled={!editable} className={cn(TARJETA_PANEL, 'flex min-w-0 flex-col gap-5 p-4 sm:p-6 lg:sticky lg:top-4')} aria-label="Details">
-          <Titulo icono={FileText}>Details</Titulo>
+          <Titulo>Details</Titulo>
           <TextArea label="Dental work requested" required rows={4} value={trabajo} onChange={setTrabajo} error={errores.trabajo} disabled={!editable} />
           <TextArea label="Special instructions" rows={3} placeholder="Enter special instructions" value={indicaciones} onChange={setIndicaciones} disabled={!editable} />
           <div className="flex flex-col gap-2">
@@ -273,7 +268,6 @@ export function LabOrderDetail({ tarea, abierto, onVolver, onAccion }: {
                 arrastrando ? 'border-dash-blue bg-dash-count-bg/50' : errores.adjuntos ? 'border-field-error' : 'border-line-strong',
               )}
             >
-              <span className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-dash-count-bg text-dash-blue"><Paperclip className="size-5" aria-hidden /></span>
               <span className="flex min-w-0 flex-1 flex-col">
                 <span className="text-[13px] font-semibold text-ink">Drag and drop your files</span>
                 <span className="text-[11px] text-ink-muted">PDF, JPG, PNG, up to 10MB</span>
@@ -288,7 +282,6 @@ export function LabOrderDetail({ tarea, abierto, onVolver, onAccion }: {
               <ul className="flex flex-col gap-1.5" aria-label="Attachments">
                 {adjuntos.map((a) => (
                   <li key={a} className={cn(TARJETA_INTERNA, 'flex items-center gap-2 px-3 py-2 text-[12px] text-ink')}>
-                    <FileText className="size-4 shrink-0 text-dash-blue" aria-hidden />
                     <span className="min-w-0 flex-1 truncate">{a}</span>
                     {editable && (
                       <button type="button" aria-label={`Remove ${a}`} onClick={() => setAdjuntos((x) => x.filter((n) => n !== a))} className="flex size-6 items-center justify-center rounded text-ink-muted hover:text-ink focus-visible:outline-2 focus-visible:outline-dash-blue">

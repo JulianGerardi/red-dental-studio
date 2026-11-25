@@ -6,7 +6,7 @@ import { CountryCodeField, DateTextField, ModalShell, SelectField, TextField } f
 import { useFormPasos } from '@/lib/useFormPasos'
 import { OBLIGATORIO } from '@/lib/validacion'
 import { CODIGOS, ESTADOS, PAISES } from '@/data/location-options'
-import type { Laboratorio } from '@/data/clinical-mode'
+import type { Laboratorio } from '@/data/laboratorios'
 
 /* New Laboratory desde Receiving laboratory (CON-2285): el modal de red.dev (video de Julián, 2026-11-25) pasa a drawer
    con pasos, como New Location. Mismos campos y textos; las credenciales son opcionales y de a varias, sin repetir el
@@ -64,7 +64,12 @@ export function NewLaboratoryDrawer({ existentes, onClose, onGuardar }: {
     if (!listo() || ![0, 1, 2].every(revisar)) return
     const credIncompleta = credenciales.some((c) => !c.tipo || !c.numero.trim() || (CON_VENCIMIENTO.includes(c.tipo) && !c.vence.trim()))
     if (credIncompleta) { setIntentoCred(true); return }
-    onGuardar({ nombre: d.nombre.trim(), email: d.email.trim() })
+    const codigo = d.codigo.match(/\(([^)]+)\)/)?.[1] ?? '+1'
+    const abreviatura: Record<string, string> = { 'United States of America (the)': 'US', Canada: 'CA', Argentina: 'AR', Spain: 'ES', Mexico: 'MX' }
+    onGuardar({
+      nombre: d.nombre.trim(), email: d.email.trim(), telefono: `${codigo} ${d.area} ${d.numero.replace(/\D/g, '')}`,
+      direccion: [d.linea1, d.linea2, d.ciudad, d.zip, d.estado, abreviatura[d.pais] ?? d.pais].map((x) => x.trim()).filter(Boolean).join(', '),
+    })
     onClose()
   }
 
