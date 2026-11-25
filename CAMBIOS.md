@@ -5,7 +5,7 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-11-25
 
-### Clinical Mode: Edit finding / Edit procedure desde las tablas, Estimate y la card del plan (CON-4211, CON-2770) ([#PR](https://github.com/JulianGerardi/red-dental-studio/pull/PR))
+### Clinical Mode: Edit finding / Edit procedure desde las tablas, Estimate y la card del plan (CON-4211, CON-2770) ([#199](https://github.com/JulianGerardi/red-dental-studio/pull/199))
 - **El Edit del ⋮ abre los mismos drawers que el examen:** Problem List -> *Edit finding*; Procedures y las filas de
   Treatment Plan (casos y Unassigned) -> *Edit procedure*. Dejá de usar `DialogoEditar` (sólo la nota) ahí: queda sólo en
   `EndEncounterDrawer`. Las filas se pasan a `Finding` con `dental/registroComoFinding.ts` (`findingDeProblema`,
