@@ -612,3 +612,8 @@ grupo. Queda título a la izquierda y pestañas a la derecha, como Pending task.
 
 CON-2643. Mismo arreglo que el Dashboard (ver `dashboard.md`, misma fecha): la fila reserva el lugar del ⋮ aunque la
 tarea no tenga acciones, así el vencimiento y *Complete this task* no se corren entre Clinical note y el resto.
+
+## CON-2643 · El PDF de la Lab Order con los datos de red.dev (2026-11-25)
+
+Mismo PDF que el Dashboard (ver `dashboard.md`, misma fecha): Patient Information, Receiving Laboratory, Provider
+Information, Dental Work Request y Teeth & Surface Specifications con el diagrama de la boca, sin firma.

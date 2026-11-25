@@ -322,6 +322,7 @@
   /* Hover del botón destructivo (Delete, Discard). */
   --color-dash-bad-hover: #961f1f;
   --color-dash-bad-chip: #fbe5e5;
+  --color-encia: #f8d5d1; /* la encía del diagrama de la boca (Lab Order; el PDF usa el mismo) */
   --color-dash-count-bg: #e8ecf7;
 
   /* ── Tokens semánticos (2026-09-25) ───────────────────────────────
