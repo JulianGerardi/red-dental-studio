@@ -3480,3 +3480,47 @@ y si *Complete procedure at phase N* en el ⋮ se distingue bien de la acción d
 
 Código: `clinical/EndEncounterDrawer.tsx`, `lib/ejecucion.ts`, `data/ejecucion.ts`, `clinical/ClinicalTopBar.tsx`; e2e en
 `tests/clinical-mode.e2e.ts` (y el de Pending signature en `tests/patient-dashboard.e2e.ts`, que ahora pasa por el drawer).
+
+## CON-2321 · CON-2322 · CON-2323 · CON-2394 · El detalle de la Referral desde Pending Task (2026-11-25)
+
+**Jira:** CON-2321 (Referral, epic), CON-2322 (New Referral: campos y validaciones), CON-2323 (Edit: sólo Pending),
+CON-2394 (Request), CON-2391 (Cancel), CON-3436 (Delete), CON-2610 (autocomplete de Referral Provider y New Provider),
+CON-3128 (especialidad del provider), CON-2643 (Complete this task lleva al detalle). Video de red.dev de Julián: Pending
+Task → Referrals → *Complete this task* abre Clinical Mode en la pestaña Referral con la derivación cargada. Julián pidió
+el mismo comportamiento pero **con el diseño de Clinical Mode**, no el de red.dev.
+
+- **Qué se copió de red.dev (contenido):** título *Referral*, estado, ⋮; *General information* (Referral provider\* +
+  New provider, Procedures, ASAP, Mandatory to continue treatment) y *Details* (Referral note\*, Attachments con la lista
+  de archivos); *Cancel* y *Save*; *Read-only mode* sin encuentro abierto. New provider con los campos del modal de
+  red.dev (nombre, apellido, email, notas, credenciales, dirección y teléfono).
+- **Qué cambió (diseño):** red.dev arma dos cajas sueltas con un ícono en cada título, una barra de título aparte y los
+  botones flotando debajo. Acá va **una sola card** (`TARJETA_PANEL`) como el panel de Treatment plan: encabezado con
+  título, estado y ⋮ (más una línea con paciente, Register y Expiration date, los mismos datos de la fila de Pending
+  task), las dos secciones **sin caja ni borde** (`DrawerSection`) en dos columnas, y *Cancel* / *Save* en el pie de la
+  card con una línea fina arriba. Adjuntos: zona de arrastre en una fila (no un bloque alto) y cada archivo en
+  `TARJETA_INTERNA` con su tamaño y ✕. New provider es un **drawer con pasos** (General, Address, Phone), regla de la app
+  para todo pop up; red.dev usa un modal centrado.
+- **Reglas de Jira aplicadas:** sólo se edita en Pending y con encuentro abierto; en Requested, aviso *This referral
+  can't be edited* (CON-2323). Procedures busca sólo procedimientos **Planned** del paciente, varios a la vez
+  (`SearchPicker`, CON-2322). Nota máx. 500 caracteres con contador; adjuntos PDF/JPG/PNG hasta 10MB, si no *Invalid file
+  format or size.* Save valida provider y nota (*This field is required.* y el aviso *All required fields marked with (\*)
+  must be completed before proceeding.*); al guardar, *The referral has been successfully updated.* El provider muestra su
+  especialidad debajo y, sin coincidencias, *No results found.* (CON-2610). El provider nuevo queda elegido al guardar.
+- **⋮ de Referral** (también en la fila del Dashboard y del Patient Dashboard; antes no tenía): Pending → Request,
+  Cancel, Delete; Requested → Cancel. Request pregunta antes, con el texto de CON-2394 (*Once marked as Requested, you
+  will no longer be able to edit this referral.*); Delete usa título y texto de CON-3436.
+- Cancel vuelve a la pestaña Referral, que sigue en *Planned* (la lista de derivaciones, CON-3870, no está construida).
+
+Anomalías y pendientes:
+
+1. **Inventado para el mock** (red.dev no lo muestra): los providers (Dr. Laura Chen, Dr. Omar Haddad, Dr. Priya Shah,
+   tomados de las derivaciones ya cargadas en la Problem List), la nota y el adjunto de ejemplo, y la lista de
+   especialidades del drawer.
+2. Complete (CON-2398) y Rejected (CON-2392) de una Referral Requested no se sumaron al ⋮: piden revisar los findings
+   vinculados en el mismo modal, que todavía no existe.
+3. *Provider Type* (CON-3128) no se agregó: la historia no dice qué opciones tiene. *Credentials* avisa que no está en
+   esta versión (no hay historia con sus campos).
+4. El `TextArea` compartido mete la ayuda (el contador) dentro del `<label>`: el lector lee "Referral note 94/500".
+
+**A validar con usuarios:** si recepción entiende *Request* como "enviar al provider"; si el contador de 500 alcanza; y si
+conviene ver los procedimientos derivados también en la lista de Treatment plan.

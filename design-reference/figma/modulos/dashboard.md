@@ -1049,7 +1049,7 @@ pieza (`PendingTaskList` → `TaskRow`) sirve al Dashboard y al Patient Dashboar
 | **Sign Clinical Note** | *Login to Sign Document*: email y contraseña otra vez (*Sign* se habilita con los dos), Cancel y Sign. |
 | **⋮ Lab Order** | *Options*: Edit, Request, Cancel, Delete. |
 | **⋮ Prescription** | *Options*: Activate, Cancel. |
-| **⋮ Clinical Note / Referral** | La Clinical Note no lleva; el de Referral no aparece en los videos, así que no se puso. |
+| **⋮ Clinical Note / Referral** | La Clinical Note no lleva. Referral, desde el 2026-11-25: Request, Cancel y Delete en Pending, Cancel en Requested (clinical-mode.md). |
 | **PDF** (fila y *View PDF*) | Pestaña nueva con *Preparing document, please wait...* y después el PDF, con el formato de red.dev: encabezado de la clínica (logo, Red Dental Studio, Abril, dirección y contacto), *Dental Clinical Note* (Patient name, Date of birth con la edad, Date of visit, Attending dentist, Contact), *Medical History*, *Additional Notes* y la firma (*Provider*, nombre, *Date:*). Título de la pestaña: *Dental Clinical Note — <paciente>*. En la fila, sólo si ya hay documento (Requested, Fulfilled; no las Pending). |
 
 - **Sin encuentro abierto con el paciente** las opciones del ⋮ se ven apagadas y cada una muestra un tooltip con el

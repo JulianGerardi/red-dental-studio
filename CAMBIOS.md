@@ -5,6 +5,15 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-11-25
 
+### Referral: Complete this task abre el detalle ([#194](https://github.com/JulianGerardi/red-dental-studio/pull/194))
+- **Nuevo `clinical/ReferralDetail`** (`ReferralDetail`, `ReferralPanel`): *Complete this task* de una Referral abre
+  Clinical Mode en `?tab=Referral&task=<id>` con la derivación (CON-2321). Una card como el panel de Treatment plan,
+  secciones sin caja, Cancel / Save al pie. Sólo se edita en Pending con encuentro abierto (CON-2323); Procedures sólo
+  Planned; nota de 500; adjuntos PDF/JPG/PNG ≤10MB (CON-2322).
+- **Nuevo `clinical/NewProviderDrawer`**: General, Address, Phone; el provider nuevo queda elegido (CON-2610).
+- **`tareas.accionesDe`**: Referral tiene ⋮ (Pending → Request, Cancel, Delete; Requested → Cancel), también en las filas
+  de Pending task. Request pregunta antes (CON-2394). Mock: `PROVEEDORES_DERIVACION`, `DERIVACION_TAREA`.
+
 ### End Encounter: procedimientos del turno con fases en orden ([#193](https://github.com/JulianGerardi/red-dental-studio/pull/193))
 - **Nuevo `clinical/EndEncounterDrawer`** (CON-4153): *Complete encounter* de Clinical Mode abre el drawer con los
   procedimientos del turno antes de cerrar; sin procedimientos cierra directo. Acción por fila: *Start procedure*,

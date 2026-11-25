@@ -30,10 +30,12 @@ export const PESTANA_TAREA: Record<string, string> = { 'Lab orders': 'Lab order'
 export const TONO_ESTADO: Record<string, PillTone> = { Pending: 'warning', Requested: 'info', Delayed: 'warning', Fulfilled: 'danger' }
 
 /* El menú ⋮ de red.dev: Lab Order con Edit, Request, Cancel y Delete; Prescription con Activate y Cancel. La Clinical
-   Note no lleva y el de Referral no aparece en los videos. */
+   Note no lleva. Referral, según su estado en Jira: Pending pide, cancela o borra (CON-2394, CON-2391, CON-3436);
+   Requested sólo cancela (clinical-mode.md, 2026-11-25). */
 export function accionesDe(t: PendingTask): AccionTarea[] {
   if (t.kind === 'Lab orders') return ['Edit', 'Request', 'Cancel', 'Delete']
   if (t.kind === 'Prescriptions') return ['Activate', 'Cancel']
+  if (t.kind === 'Referrals') return t.state === 'Pending' ? ['Request', 'Cancel', 'Delete'] : ['Cancel']
   return []
 }
 
@@ -86,7 +88,14 @@ export function aplicarAccion(t: PendingTask, accion: AccionTarea | 'Sign') {
 export const abrirPdf = (t: PendingTask) =>
   abrirDocumento(documentoTarea(t), () => aviso.error("We couldn't open the PDF. Allow pop-ups for this site and try again."))
 
-type Pregunta = { t: PendingTask; accion: 'Cancel' | 'Delete' }
+type Pregunta = { t: PendingTask; accion: 'Cancel' | 'Delete' | 'Request' }
+
+/* Las preguntas de Referral, con los textos de Jira (CON-2394, CON-2391, CON-3436). */
+const PREGUNTA_REFERRAL = {
+  Request: { title: 'Mark this referral as requested?', confirm: 'Mark as requested', keep: 'Cancel', texto: 'Once marked as Requested, you will no longer be able to edit this referral.' },
+  Cancel: { title: 'Cancel this referral?', confirm: 'Cancel referral', keep: 'Keep it', texto: 'The referral will not be sent to the provider or followed by the patient.' },
+  Delete: { title: 'Delete referral', confirm: 'Delete', keep: 'Cancel', texto: 'Are you sure you want to delete this referral? This action cannot be undone.' },
+}
 
 /** Lo que hace cada botón de la tarea y las preguntas que abre. `paciente` fuerza la ficha (Patient Dashboard);
  *  `alAbrir` corre antes de ir a Clinical Mode (el Dashboard deja el encuentro de ese paciente). */
@@ -106,12 +115,22 @@ export function useAccionesTarea({ paciente, alAbrir }: { paciente?: string; alA
   const hacer = (t: PendingTask, accion: AccionUI) => {
     if (accion === 'PDF') abrirPdf(t)
     else if (accion === 'Complete' || accion === 'Edit') abrir(t)
-    else if (accion === 'Cancel' || accion === 'Delete') setPregunta({ t, accion })
+    else if (accion === 'Cancel' || accion === 'Delete' || (accion === 'Request' && t.kind === 'Referrals')) setPregunta({ t, accion })
     else aplicarAccion(t, accion)
   }
 
   const nombre = pregunta ? nombreTarea(pregunta.t) : ''
-  const dialogo: ReactNode = !pregunta ? null : (
+  const referral = pregunta?.t.kind === 'Referrals' ? PREGUNTA_REFERRAL[pregunta.accion] : undefined
+  const dialogo: ReactNode = !pregunta ? null : referral ? (
+    <ConfirmDialog
+      title={referral.title} confirmLabel={referral.confirm} cancelLabel={referral.keep}
+      tone={pregunta.accion === 'Request' ? undefined : 'danger'} icon={pregunta.accion === 'Delete' ? 'delete' : undefined}
+      onCancel={() => setPregunta(null)}
+      onConfirm={() => { aplicarAccion(pregunta.t, pregunta.accion); setPregunta(null) }}
+    >
+      <p>{referral.texto}</p>
+    </ConfirmDialog>
+  ) : pregunta.accion === 'Request' ? null : (
     <ConfirmDialog
       title={`${pregunta.accion === 'Cancel' ? 'Cancel' : 'Delete'} this ${nombre.toLowerCase()}?`}
       confirmLabel={`${pregunta.accion === 'Cancel' ? 'Cancel' : 'Delete'} ${nombre.toLowerCase()}`}
