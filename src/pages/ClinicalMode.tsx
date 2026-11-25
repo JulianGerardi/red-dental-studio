@@ -15,6 +15,7 @@ import { ProblemListFlotante } from '@/components/clinical/ProblemListFlotante'
 import { NavegacionClinica, examenDePestana, type DestinoClinico } from '@/components/clinical/RecordDetail'
 import { VitalsPanel } from '@/components/clinical/VitalsPanel'
 import { LabOrderPanel } from '@/components/clinical/LabOrderPanel'
+import { ReferralPanel } from '@/components/clinical/ReferralDetail'
 import { RadiographyPanel } from '@/components/clinical/RadiographyPanel'
 import { TreatmentPlanSection } from '@/components/clinical/TreatmentPlanSection'
 import { TreatmentPanel } from '@/components/clinical/TreatmentPanel'
@@ -46,7 +47,7 @@ export default function ClinicalMode() {
   /* ?consent= abre el consentimiento de ese procedimiento del caso, donde se firma (clinical-mode.md, 2026-11-02). */
   const consentimientoPedido = busqueda.get('consent') ?? undefined
   /* ?tab= y ?task=: Complete this Task de Pending Task abre la pestaña de su tipo y, en Lab Order, el detalle de la orden
-     (dashboard.md, 2026-11-20). */
+     (dashboard.md, 2026-11-20); en Referral, el de la derivación (clinical-mode.md, 2026-11-25). */
   const tabPedida = ([...EXAMENES, ...REGISTROS] as readonly string[]).includes(busqueda.get('tab') ?? '') ? (busqueda.get('tab') as Pestana) : undefined
   const tareaPedida = buscarTarea(busqueda.get('task') ?? '')
   const patient = PATIENTS.find((p) => p.id === id) ?? PATIENTS[0]
@@ -114,6 +115,8 @@ export default function ClinicalMode() {
       ? <ExamLayout findings={false}><VitalsPanel /></ExamLayout>
       : pestana === 'Lab order'
         ? <LabOrderPanel tarea={tareaPedida?.kind === 'Lab orders' ? tareaPedida : undefined} encuentroAbierto={encuentro !== 'sinEmpezar'} />
+        : pestana === 'Referral'
+          ? <ReferralPanel tarea={tareaPedida?.kind === 'Referrals' ? tareaPedida : undefined} encuentroAbierto={encuentro !== 'sinEmpezar'}>{enConstruccion}</ReferralPanel>
         : pestana === 'Radiographic'
           ? <RadiographyPanel />
           : pestana === 'Treatment plan'

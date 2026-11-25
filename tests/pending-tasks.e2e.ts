@@ -61,3 +61,33 @@ test('Complete this Task abre la Clinical Note; se firma con el login y Back to 
   await screen.getByRole('button', 'Back to history').tap()
   await expect(screen.getByRole('button', 'Patient summary')).toBeVisible()
 })
+
+/* Referral (video de red.dev de Julián, 2026-11-25; CON-2322, CON-2323, CON-2394). Ver clinical-mode.md. */
+test('Complete this task abre el detalle de la Referral, en sólo lectura sin encuentro', async ({ app, screen }) => {
+  await app.open('/')
+  await screen.getByRole('tab', /^Referrals/).tap()
+  /* Sophia Collins todavía no llegó: su derivación (Requested) se ve en sólo lectura. */
+  await screen.getByRole('button', /Complete this task/).first().tap()
+  await expect(screen.getByRole('heading', 'Referral')).toBeVisible()
+  await expect(screen.getByText('Read-only mode')).toBeVisible()
+  await expect(screen.getByRole('button', 'Save')).toBeDisabled()
+  await expect(screen.getByRole('button', 'New provider')).toBeDisabled()
+})
+
+test('Una Referral Pending con encuentro abierto se edita, valida y se pide desde su ⋮', async ({ app, screen }) => {
+  await app.open('/')
+  await screen.getByRole('tab', /^Referrals/).tap()
+  /* Olivia Brooks está en el sillón: su encuentro está abierto. */
+  await screen.getByRole('button', /Complete this task/).last().tap()
+  await expect(screen.getByText('Read-only mode')).toHaveCount(0)
+
+  await screen.getByRole('textbox', /^Referral note/).fill('')
+  await screen.getByRole('button', 'Save').tap()
+  await expect(screen.getByText('This field is required.')).toBeVisible()
+
+  await screen.getByRole('button', 'Actions for Referral for Olivia Brooks').tap()
+  await screen.getByRole('menuitem', 'Request').tap()
+  await screen.getByRole('dialog', 'Mark this referral as requested?').getByRole('button', 'Mark as requested').tap()
+  await expect(screen.getByText('Referral for Olivia Brooks requested.')).toBeVisible()
+  await expect(screen.getByText("This referral can't be edited")).toBeVisible()
+})

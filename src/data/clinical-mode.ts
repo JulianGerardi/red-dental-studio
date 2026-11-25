@@ -364,3 +364,22 @@ export const RADIOGRAFIAS: Radiografia[] = Array.from({ length: 20 }, (_, i) => 
   profesional: "Dr. Thompson's",
   tipo: TIPOS[i % TIPOS.length],
 }))
+
+/* Referral (CON-2321): los contactos que se pueden elegir como Referral Provider, con su especialidad (CON-3128), y lo
+   que trae cargado la derivación que abre Complete this task desde Pending Task (clinical-mode.md, 2026-11-25). */
+export type ProveedorDerivacion = { nombre: string; especialidad: string }
+export const PROVEEDORES_DERIVACION: ProveedorDerivacion[] = [
+  { nombre: 'Dr. Laura Chen', especialidad: 'Endodontics' },
+  { nombre: 'Dr. Omar Haddad', especialidad: 'Oral Surgery' },
+  { nombre: 'Dr. Priya Shah', especialidad: 'Periodontics' },
+]
+export type AdjuntoDerivacion = { nombre: string; bytes: number }
+export type DatosDerivacion = { proveedor: string; nota: string; procedimientos: string[]; asap: boolean; obligatoria: boolean; adjuntos: AdjuntoDerivacion[] }
+export const DERIVACION_TAREA: DatosDerivacion = {
+  proveedor: 'Dr. Laura Chen',
+  nota: 'Please evaluate tooth 19 for root canal treatment. The patient reports lingering pain to cold.',
+  procedimientos: [],
+  asap: false,
+  obligatoria: false,
+  adjuntos: [{ nombre: 'periapical-19.jpg', bytes: 8806 }],
+}
