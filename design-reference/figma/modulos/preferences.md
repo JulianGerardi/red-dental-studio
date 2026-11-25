@@ -55,3 +55,8 @@ Julián: *"me gustaría mejorar ese diseño"*. Cambios, mismos textos y opciones
    la app; Dark sigue deshabilitado con *Coming soon*.
 3. **Formato de fecha como lista**, cada opción con su ejemplo de hoy a la derecha (azul la elegida). La *Live preview*
    queda en una línea debajo.
+
+### Fill container (2026-11-25)
+
+Julián: la card y su contenido van a todo el ancho, como las otras pantallas de Settings. Se van el tope de 960 px de la
+card y el de 520 px de las opciones; las miniaturas de tema pasan a 120 px de alto para acompañar el ancho.

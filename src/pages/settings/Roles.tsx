@@ -40,7 +40,7 @@ export function SettingsRoles() {
 
   const columnas: DataTableColumn<Rol>[] = [
     {
-      key: 'nombre', header: 'Name', width: 300, locked: true,
+      key: 'nombre', header: 'Name', locked: true,
       cell: (r) => (
         <span className="flex min-w-0 items-center gap-2">
           <button type="button" onClick={() => abrir(r)} title={r.nombre} className={TABLA_LINK}>{r.nombre}</button>
@@ -48,11 +48,11 @@ export function SettingsRoles() {
         </span>
       ),
     },
-    /* Anchos fijos: la descripción ya no se estira hasta empujar Permissions al otro lado (roles.md, 2026-11-25). */
-    { key: 'descripcion', header: 'Description', width: 420, cell: (r) => <TextCell>{r.descripcion}</TextCell> },
-    { key: 'permisos', header: 'Permissions', width: 110, align: 'right', cell: (r) => <span className="tabular-nums">{r.permisos.length}</span> },
-    { key: 'actualizado', header: 'Last updated', width: 120, cell: (r) => <span className="tabular-nums">{r.actualizado}</span> },
-    { key: 'estado', header: 'Status', width: 100, cell: (r) => <Pill tone={r.activo ? 'success' : 'danger'}>{r.activo ? 'Active' : 'Inactive'}</Pill> },
+    /* Sin anchos fijos: las cinco columnas se reparten el ancho por igual, como Subscription history (roles.md, 2026-11-25). */
+    { key: 'descripcion', header: 'Description', cell: (r) => <TextCell>{r.descripcion}</TextCell> },
+    { key: 'permisos', header: 'Permissions', cell: (r) => <span className="tabular-nums">{r.permisos.length}</span> },
+    { key: 'actualizado', header: 'Last updated', cell: (r) => <span className="tabular-nums">{r.actualizado}</span> },
+    { key: 'estado', header: 'Status', cell: (r) => <Pill tone={r.activo ? 'success' : 'danger'}>{r.activo ? 'Active' : 'Inactive'}</Pill> },
   ]
 
   const responder = () => {

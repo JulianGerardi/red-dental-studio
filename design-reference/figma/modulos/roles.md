@@ -81,3 +81,10 @@ contenido) y el catálogo de permisos por categoría. `usuarios` (empleados acti
    primera categoría arranca abierta, así el botón aparece y se ve cómo es una categoría.
 4. **Casillas y textos** más chicos y alineados: el nombre del permiso en 12 px medium (antes 13), la descripción en 11 px
    (antes 12), la casilla a la altura de la primera línea; el nombre de la categoría en 12 px semibold.
+
+### Columnas parejas (2026-11-25, tercera vuelta)
+
+Julián: Description, Permissions y Status seguían desproporcionadas; *"todo debe quedar con el mismo largo, como en
+Subscription history"*. Las cinco columnas quedan sin ancho fijo y se reparten el ancho por igual (corrige el punto 1 de
+arriba). *Permissions* va a la izquierda, como el resto: con columnas iguales, el número a la derecha quedaba pegado a
+*Last updated* (misma excepción que *Assignments* en Fee schedules).

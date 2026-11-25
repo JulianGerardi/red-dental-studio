@@ -65,7 +65,7 @@ function Miniatura({ oscuro }: { oscuro?: boolean }) {
   const linea = oscuro ? 'bg-ink-medium' : 'bg-line'
   const card = oscuro ? 'bg-ink-soft' : 'bg-white shadow-hairline'
   return (
-    <span aria-hidden className={cn('flex h-[88px] overflow-hidden rounded-md', oscuro ? 'bg-ink' : 'bg-surface-muted')}>
+    <span aria-hidden className={cn('flex h-[120px] overflow-hidden rounded-md', oscuro ? 'bg-ink' : 'bg-surface-muted')}>
       <span className="w-4 shrink-0 bg-dash-blue" />
       <span className="flex flex-1 flex-col gap-1.5 p-2">
         <span className={cn('h-2.5 rounded-sm', oscuro ? 'bg-ink-soft' : 'bg-white')} />
@@ -117,9 +117,9 @@ export function SettingsPreferences() {
     <div className={PADDING_PAGINA}>
       <SettingsPageHeader titulo="Account preferences" />
 
-      <div className={cn(TARJETA_PANEL, 'mt-4 max-w-[960px] divide-y divide-line-row')}>
+      <div className={cn(TARJETA_PANEL, 'mt-4 divide-y divide-line-row')}>
         <Seccion titulo="Appearance" detalle="Choose the theme for your portal.">
-          <div role="radiogroup" aria-label="Theme" onKeyDown={moverConFlechas} className="grid max-w-[520px] grid-cols-2 gap-3">
+          <div role="radiogroup" aria-label="Theme" onKeyDown={moverConFlechas} className="grid grid-cols-2 gap-3">
             {temas.map((t) => {
               const on = tema === t.valor
               return (
@@ -144,7 +144,7 @@ export function SettingsPreferences() {
         </Seccion>
 
         <Seccion titulo="Localization & regional" detalle="Preferred date format for dates across your portal. Examples reflect the current date.">
-          <div className="flex max-w-[520px] flex-col gap-3">
+          <div className="flex flex-col gap-3">
             <div role="radiogroup" aria-label="Preferred date format" onKeyDown={moverConFlechas} className="flex flex-col overflow-hidden rounded-lg border border-line">
               {FORMATOS_FECHA.map((f, i) => {
                 const on = formato === f.valor
