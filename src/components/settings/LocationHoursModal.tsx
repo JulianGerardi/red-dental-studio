@@ -1,7 +1,7 @@
 import { DrawerActions } from '@/components/ui/drawer'
 import { Button } from '@/components/ui/button'
 import { useState } from 'react'
-import { X, Plus } from 'lucide-react'
+import { Trash2, Plus } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { ModalShell, SelectField } from '@/components/patients/form'
 import { aviso } from '@/components/ui/toaster'
@@ -144,11 +144,11 @@ export function LocationHoursModal({
               {rangos.length > 1 && (
                 <button
                   type="button"
-                  aria-label="Remove time range"
+                  aria-label="Delete time range"
                   onClick={() => setRangos((p) => p.filter((_, j) => j !== i))}
                   className="mt-7 shrink-0 rounded p-1 text-ink-muted hover:bg-surface-muted hover:text-dash-bad-fg"
                 >
-                  <X className="size-4" />
+                  <Trash2 className="size-4" />
                 </button>
               )}
             </div>
