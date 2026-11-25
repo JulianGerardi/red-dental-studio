@@ -13,6 +13,10 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 - **`EndEncounterDrawer`** (CON-4153): una sola línea de lo hecho por procedimiento (*Procedure completed* reemplaza a
   las fases), sin bajada debajo del título ni texto al pie.
 
+### Locations: Rooms y Exceptions con columnas parejas ([#197](https://github.com/JulianGerardi/red-dental-studio/pull/197))
+- `FILA_SALA` y `FILA_EXCEPCION` (`pages/settings/LocationDetail.tsx`): las columnas de datos se reparten el ancho por
+  igual y las acciones van al final en 160 px, igual en encabezado y filas. En el celular no cambia nada.
+
 ### Mails: cabecera con degradé desde blanco, pie según quién escribe y textos nuevos del Figma ([#196](https://github.com/JulianGerardi/red-dental-studio/pull/196))
 - **Cabecera** igual para Confidentally y la clínica: el degradé queda blanco hasta 280 px, así el logo (máx. 240 px) apoya
   siempre sobre blanco; en Outlook la cabecera es blanca. **Pie** según `remitente`: el de Confidentally (copyright,
