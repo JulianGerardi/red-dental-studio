@@ -1,0 +1,3 @@
+import{n as e}from"./rolldown-runtime-DkW27tQK.js";import{t}from"./jsx-runtime-DeHZSEgm.js";import{t as n}from"./primitives-BREUxNC2.js";import{n as r}from"./Patients-B2nSVJnt.js";var i,a,o,s;function c(){return(c=e((()=>{r(),i=t(),a={title:`Pages/Parts/Patients`,parameters:{docs:{jira:[`CON-3910`,`CON-2107`,`CON-2858`]},layout:`padded`}},o={render:()=>(0,i.jsxs)(`div`,{className:`flex gap-2`,children:[(0,i.jsx)(n,{n:3}),(0,i.jsx)(n,{n:12})]})},s=[`CountBubble`],o.parameters={...o.parameters,docs:{...o.parameters?.docs,source:{originalSource:`{
+  render: () => <div className="flex gap-2"><Globo n={3} /><Globo n={12} /></div>
+}`,...o.parameters?.docs?.source}}}})))()}c();export{o as CountBubble,s as __namedExportsOrder,a as default};
