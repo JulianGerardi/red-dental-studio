@@ -1,1 +1,0 @@
-import{n as e}from"./rolldown-runtime-DkW27tQK.js";import{n as t,t as n}from"./createLucideIcon-CKQsau6G.js";var r,i;function a(){return(a=e((()=>{t(),r=[[`line`,{x1:`12`,x2:`12`,y1:`2`,y2:`22`,key:`7eqyqh`}],[`path`,{d:`M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6`,key:`1b0p4s`}]],i=n(`dollar-sign`,r)})))()}export{a as n,i as t};
