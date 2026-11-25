@@ -5,6 +5,16 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-11-25
 
+### Lab Order: rediseño del detalle, New Laboratory y la tabla alineada ([#192](https://github.com/JulianGerardi/red-dental-studio/pull/192))
+- **`LabOrderDetail`** con otro layout y mismo contenido que red.dev: cabecera *LAB ORDER* + estado, PDF y ⋮; la fecha
+  va con ASAP; *Teeth & surface* en su card; *Details* a la derecha; Cancel / Save fijos abajo. Sin íconos decorativos.
+  Editable sólo con encuentro abierto **y** la orden en Pending (CON-2218).
+- Procedimientos (CON-3904): `SearchPicker` + `FilterMenu`, sólo los elegibles; `ui/search-picker` suma `disabled`.
+- **Nuevos `clinical/NewLaboratoryDrawer`** (CON-2285, pasos General · Contact · Address · Credentials) y
+  **`clinical/dental/DentalArch`** (arcadas en U con botones). `PROCEDIMIENTOS_ORDEN` en `data/clinical-mode.ts`.
+- **`LabOrderPanel`** como las tablas generales: sin card, `SettingsSearch` (*Search lab orders* + Search), botones md,
+  *Last update* / *Created date*.
+
 ### PDF de la Lab Order con los datos y el diagrama de la boca de red.dev ([#190](https://github.com/JulianGerardi/red-dental-studio/pull/190))
 - El PDF de la Lab Order (ícono del documento en Pending task) trae lo de red.dev: Provider, Lab Order ID, Patient
   Phone, Email, Expiration Date; Patient Information, Receiving Laboratory, Provider Information, Dental Work Request y
