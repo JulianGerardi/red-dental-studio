@@ -13,6 +13,7 @@ import { EmptyState } from '@/components/ui/empty-state'
 import { DocumentViewer } from '@/components/ui/document-viewer'
 import { DocumentSheet } from '@/components/ui/document-sheet'
 import { MEMBRETE } from '@/data/clinica'
+import { ARCADAS } from '@/data/laboratorios'
 
 /* La Clinical Note que abre Complete this Task en Pending Task, como red.dev (videos de Julián, 2026-11-20): Back to
    History (vuelve a Patient Summary de Clinical Mode), el nombre, View PDF, el documento y Sign Clinical Note, que pide
@@ -45,11 +46,23 @@ export function VistaDocumento({ doc }: { doc: Documento }) {
               </div>
             ))}
           </div>
+        ) : 'dientes' in s ? (
+          <div className="flex flex-col gap-2">
+            {([['Maxillary', ARCADAS[s.dientes.denticion].arriba], ['Mandibular', ARCADAS[s.dientes.denticion].abajo]] as const).map(([nombre, fila]) => (
+              <div key={nombre} className="flex flex-wrap items-center gap-1">
+                <span className="w-20 text-[12px] text-ink-muted">{nombre}</span>
+                {fila.map((d) => (
+                  <span key={d} className={cn('flex size-6 items-center justify-center rounded-md text-[11px] font-semibold tabular-nums', s.dientes.piezas.some(([x]) => x === d) ? 'bg-dash-blue text-white' : 'bg-surface-subtle text-ink-muted')}>{d}</span>
+                ))}
+              </div>
+            ))}
+            <ul>{s.dientes.piezas.map(([d, sup]) => <li key={d}><span className="font-semibold text-ink">Tooth {d}</span>{sup.length ? `: ${sup.join(', ')}` : ''}</li>)}</ul>
+          </div>
         ) : (
           <div className="flex flex-col gap-2">{s.parrafos.map((p) => <p key={p}>{p}</p>)}</div>
         ),
       }))}
-      signatures={[{ role: 'Provider', name: doc.provider, signed: doc.firmado ? { date: doc.firmado, text: doc.provider } : undefined }]}
+      signatures={doc.sinFirma ? undefined : [{ role: 'Provider', name: doc.provider, signed: doc.firmado ? { date: doc.firmado, text: doc.provider } : undefined }]}
       footer={`${CLINICA.nombre} · ${doc.titulo} · ${doc.paciente}`}
     />
   )

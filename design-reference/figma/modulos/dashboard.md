@@ -1161,3 +1161,27 @@ quedaba 28px más corta a la derecha y el vencimiento, el PDF y *Complete this t
 Prescriptions. `TaskRow` ahora reserva siempre el lugar del ⋮ (`size-7`), igual que ya hacía con el PDF: las cuatro
 columnas de la derecha (fecha, PDF, botón, ⋮) quedan en la misma vertical en todas las filas. Vale para el Dashboard y el
 Patient Dashboard, que comparten `PendingTaskList`.
+
+## CON-2643 · El PDF de la Lab Order con los datos de red.dev (2026-11-25)
+
+Pedido de Julián con un video del PDF de la Lab Order en red.dev (el ícono del documento en Pending task). Nuestro PDF
+traía lo mismo que cualquier tarea (paciente, nacimiento, provider, contacto, fechas, estado). Ahora trae lo de red.dev,
+con el diseño de la hoja unificada (2026-11-24):
+
+1. **Resumen:** Provider, Lab Order ID (UUID), Patient Phone, Email (del provider) y Expiration Date: el encabezado
+   derecho de red.dev.
+2. **Secciones:** Patient Information (Name, Phone, Email, Address), Receiving Laboratory (Name, Phone, Email, Address),
+   Provider Information (Name, Email), Dental Work Request y Teeth & Surface Specifications.
+3. **Teeth & Surface:** las dos arcadas con los dientes de la orden en azul y debajo *Tooth A: O* (sin superficies, sólo
+   *Tooth T*), como red.dev. Los dientes van como botones numerados por arcada, igual que en el detalle de la Lab Order
+   (clinical-mode.md, 2026-11-20), en vez del odontograma dibujado.
+4. **Sin firma:** red.dev no la tiene (`Documento.sinFirma`). La Clinical note la sigue llevando.
+5. **Datos mock:** los laboratorios pasan a `data/laboratorios.ts` (nombre, teléfono, mail y dirección; el select del
+   detalle usa los mismos) con `ARCADAS`. El pedido, los dientes y el laboratorio salen fijos por id de la tarea; el mail
+   del provider, como red.dev (inicial + apellido @confidentally.com).
+
+**Anomalías (red.dev):** el resumen no tiene rótulo para el nombre del provider (acá dice *Provider*); no muestra ASAP,
+Case Procedure, Special Instructions ni Attachments, que CON-2215 pide al crear la orden. No se suman: quedan para
+decidir.
+
+**Pendiente:** el detalle de la Lab Order (Complete this task) arranca vacío y no muestra estos mismos datos.
