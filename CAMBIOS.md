@@ -15,6 +15,12 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 - **`LabOrderPanel`** como las tablas generales: sin card, `SettingsSearch` (*Search lab orders* + Search), botones md,
   *Last update* / *Created date*.
 
+### Billing: el tipo de actividad en pestañas, como red.dev ([#191](https://github.com/JulianGerardi/red-dental-studio/pull/191))
+- *Recent billing activity* deja el `FilterMenu`: **All / Payments / Adjustments / Today** van en `ui/tabs` (sm), en la
+  fila del título y a la izquierda de *Columns*. Con un paciente, *Patient view / Guarantor view* va en el mismo lugar.
+- Los controles pasan de `DataTable` (`toolbarStart` / `actions`) al `controls` del `Panel`. `ActividadReciente` ya no
+  recibe `todas`. Accounts sigue con su Filter.
+
 ### PDF de la Lab Order con los datos y el diagrama de la boca de red.dev ([#190](https://github.com/JulianGerardi/red-dental-studio/pull/190))
 - El PDF de la Lab Order (ícono del documento en Pending task) trae lo de red.dev: Provider, Lab Order ID, Patient
   Phone, Email, Expiration Date; Patient Information, Receiving Laboratory, Provider Information, Dental Work Request y
