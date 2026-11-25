@@ -1,5 +1,6 @@
 import type { PendingTask } from './PendingTaskCard'
 import { CLINICA } from '@/data/clinica'
+import { ARCADAS, LABORATORIOS, type Denticion } from '@/data/laboratorios'
 
 /* El documento de una tarea de Pending Task: el mismo contenido arma la vista de la Clinical Note y el PDF. Formato del
    PDF de red.dev que pasó Julián (2026-11-20): encabezado de la clínica, Dental Clinical Note, Medical History,
@@ -11,17 +12,48 @@ export type Seccion =
   | { titulo: string; campos: [string, string][] }
   | { titulo: string; listas: [string, string[]][] }
   | { titulo: string; parrafos: string[] }
+  | { titulo: string; dientes: { denticion: Denticion; piezas: [string, string[]][] } }
 
-export type Documento = { titulo: string; paciente: string; secciones: Seccion[]; provider: string; firmado?: string }
+/** `sinFirma`: la Lab Order no lleva firma (red.dev no la tiene). */
+export type Documento = { titulo: string; paciente: string; secciones: Seccion[]; provider: string; firmado?: string; sinFirma?: boolean }
 
 const MESES = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
 const largo = (d: Date) => `${MESES[d.getMonth()]} ${d.getDate()}, ${d.getFullYear()}`
 
+const suma = (s: string) => [...s].reduce((a, c) => a + c.charCodeAt(0), 0)
+const DIRECCIONES = ['Av Siempreviva 1237, 222, New York, 1232, NY, US', '742 Evergreen Ter, 5, Brooklyn, 11215, NY, US', '19 Hudson St, 12, Jersey City, 07302, NJ, US']
+
 /* Datos del paciente que no trae la tarea: los de la ficha de John Smith y, para el resto, unos fijos por nombre. */
 function paciente(nombre: string) {
-  if (nombre === 'John Smith') return { nacimiento: new Date(1999, 0, 28), telefono: '(555) 234-5678' }
-  const n = [...nombre].reduce((a, c) => a + c.charCodeAt(0), 0)
-  return { nacimiento: new Date(1960 + (n % 45), n % 12, (n % 27) + 1), telefono: `+1 ${200 + (n % 700)} ${String(1000000 + n * 7919).slice(-7)}` }
+  const n = suma(nombre)
+  const email = `${nombre.toLowerCase().replace(/\s+/g, '.')}@email.com`
+  const direccion = DIRECCIONES[n % DIRECCIONES.length]!
+  if (nombre === 'John Smith') return { nacimiento: new Date(1999, 0, 28), telefono: '(555) 234-5678', email, direccion }
+  return { nacimiento: new Date(1960 + (n % 45), n % 12, (n % 27) + 1), telefono: `+1 ${200 + (n % 700)} ${String(1000000 + n * 7919).slice(-7)}`, email, direccion }
+}
+
+/* La orden de laboratorio de la tarea, fija por id: laboratorio, trabajo pedido y dientes. Los datos que muestra el PDF
+   de red.dev (dashboard.md, 2026-11-25). */
+const PEDIDOS: { trabajo: string; denticion: Denticion; piezas: [string, string[]][] }[] = [
+  { trabajo: 'Stainless steel crowns for primary molars, mixed dentition.', denticion: 'Primary', piezas: [['A', ['O']], ['T', []], ['K', ['M', 'D']]] },
+  { trabajo: 'Porcelain-fused-to-metal crown, shade A2.', denticion: 'Permanent', piezas: [['14', ['O', 'MB']]] },
+  { trabajo: 'Zirconia bridge, three units, shade B1.', denticion: 'Permanent', piezas: [['19', []], ['20', ['O']], ['21', ['M', 'D']]] },
+]
+/* FNV-1a: reparte mejor que la suma de caracteres entre ids parecidos. */
+const hash = (s: string) => [...s].reduce((h, c) => Math.imul(h ^ c.charCodeAt(0), 16777619) >>> 0, 2166136261)
+function ordenLab(t: PendingTask) {
+  const n = hash(t.id ?? t.person)
+  /* Un id con el formato de red.dev (UUID), siempre el mismo para la misma tarea. */
+  let x = n
+  const hex = Array.from({ length: 32 }, () => { x = (Math.imul(x, 1103515245) + 12345) >>> 0; return (x >>> 28).toString(16) }).join('')
+  const id = `${hex.slice(0, 8)}-${hex.slice(8, 12)}-${hex.slice(12, 16)}-${hex.slice(16, 20)}-${hex.slice(20)}`
+  return { id, lab: LABORATORIOS[n % LABORATORIOS.length]!, ...PEDIDOS[(n >>> 8) % PEDIDOS.length]! }
+}
+
+/* El mail del provider como en red.dev: inicial y apellido. */
+const mailProvider = (nombre: string) => {
+  const [primero = '', ...resto] = nombre.toLowerCase().split(/\s+/)
+  return `${resto.length ? `${primero[0]}${resto.at(-1)}` : primero}@confidentally.com`
 }
 
 export function documentoTarea(t: PendingTask, firmado?: Date): Documento {
@@ -55,7 +87,30 @@ export function documentoTarea(t: PendingTask, firmado?: Date): Documento {
       ],
     }
   }
-  /* Lab Order, Prescription y Referral: el mismo formato con los datos de la tarea. */
+  /* Lab Order: lo que trae el PDF de red.dev (video de Julián, 2026-11-25): el encabezado con provider, id, teléfono del
+     paciente, mail y vencimiento; Patient Information, Receiving Laboratory, Provider Information, Dental Work Request y
+     Teeth & Surface Specifications. Sin firma. */
+  if (t.kind === 'Lab orders') {
+    const o = ordenLab(t)
+    const mail = mailProvider(provider)
+    return {
+      titulo: 'Lab Order',
+      paciente: t.person,
+      provider,
+      sinFirma: true,
+      secciones: [
+        { titulo: 'Lab Order', campos: [
+          ['Provider', provider], ['Lab Order ID', o.id], ['Patient Phone', p.telefono], ['Email', mail], ['Expiration Date', t.expiration],
+        ] },
+        { titulo: 'Patient Information', campos: [['Name', t.person], ['Phone', p.telefono], ['Email', p.email], ['Address', p.direccion]] },
+        { titulo: 'Receiving Laboratory', campos: [['Name', o.lab.nombre], ['Phone', o.lab.telefono], ['Email', o.lab.email], ['Address', o.lab.direccion]] },
+        { titulo: 'Provider Information', campos: [['Name', provider], ['Email', mail]] },
+        { titulo: 'Dental Work Request', parrafos: [o.trabajo] },
+        { titulo: 'Teeth & Surface Specifications', dientes: { denticion: o.denticion, piezas: o.piezas } },
+      ],
+    }
+  }
+  /* Prescription y Referral: el mismo formato con los datos de la tarea. */
   const tipo = { 'Lab orders': 'Lab Order', Prescriptions: 'Prescription', Referrals: 'Referral' }[t.kind] ?? t.kind
   return {
     titulo: tipo,
@@ -65,6 +120,40 @@ export function documentoTarea(t: PendingTask, firmado?: Date): Documento {
       ['Patient name', t.person], ['Date of birth', nacio], ['Provider', provider], ['Contact', p.telefono],
       ['Register', t.register], ['Expiration date', t.expiration], ['Status', t.state],
     ] }],
+  }
+}
+
+/* ── El diagrama de la boca de la Lab Order (como el PDF de red.dev): las dos arcadas en herradura, la encía rosa, cada
+   diente con su número o letra afuera y los de la orden en azul. Coordenadas en puntos, con y hacia abajo; el PDF y la
+   hoja en pantalla dibujan lo mismo. ── */
+export type DienteDiagrama = { d: string; x: number; y: number; lx: number; ly: number }
+export type ArcadaDiagrama = { nombre: string; cx: number; cy: number; rx: number; ry: number; encia: [number, number][]; dientes: DienteDiagrama[] }
+export function diagramaBoca(denticion: Denticion) {
+  const primaria = denticion === 'Primary'
+  const [rx, ry, tam] = primaria ? [58, 50, 15] : [68, 56, 10.5]
+  const ancho = 200
+  const rad = (g: number) => (g * Math.PI) / 180
+  /* De 195° a -15°: una herradura, con los molares más abajo que la línea del centro. */
+  const angulos = (n: number) => Array.from({ length: n }, (_, i) => 195 - (i * 210) / (n - 1))
+  const arcada = (nombre: string, fila: string[], cy: number, signo: 1 | -1): ArcadaDiagrama => {
+    const cx = ancho / 2
+    const punto = (g: number, ex = 0): [number, number] => [cx + (rx + ex) * Math.cos(rad(g)), cy - signo * (ry + ex) * Math.sin(rad(g))]
+    return {
+      nombre, cx, cy, rx, ry,
+      encia: Array.from({ length: 37 }, (_, i) => punto(198 - i * 6)),
+      dientes: angulos(fila.length).map((g, i) => {
+        const [x, y] = punto(g)
+        const [lx, ly] = punto(g, tam / 2 + 9)
+        return { d: fila[i]!, x, y, lx, ly }
+      }),
+    }
+  }
+  const bajo = ry * Math.sin(rad(15))
+  const arribaCy = 22 + ry
+  const abajoCy = arribaCy + 2 * bajo + 34
+  return {
+    ancho, alto: abajoCy + ry + 24, tam,
+    arcadas: [arcada('Maxillary', ARCADAS[denticion].arriba, arribaCy, 1), arcada('Mandibular', ARCADAS[denticion].abajo, abajoCy, -1)],
   }
 }
 
@@ -82,7 +171,14 @@ const texto = (s: string) =>
 function partir(s: string, tam: number, max: number) {
   const lineas: string[] = []
   let actual = ''
-  for (const p of s.split(' ')) {
+  const palabras = s.split(' ').flatMap((p) => {
+    if (ancho(p, tam) <= max) return [p]
+    const trozos: string[] = []
+    let t = ''
+    for (const c of p) { if (ancho(t + c, tam) > max && t) { trozos.push(t); t = c } else t += c }
+    return [...trozos, t]
+  })
+  for (const p of palabras) {
     const prueba = actual ? `${actual} ${p}` : p
     if (ancho(prueba, tam) > max && actual) { lineas.push(actual); actual = p } else actual = prueba
   }
@@ -101,6 +197,8 @@ const SUAVE: [number, number, number] = [0.25, 0.25, 0.27]
 const GRIS: [number, number, number] = [0.44, 0.44, 0.48]
 const TENUE: [number, number, number] = [0.63, 0.63, 0.67]
 const LINEA: [number, number, number] = [0.906, 0.906, 0.906]
+const ENCIA: [number, number, number] = [0.973, 0.835, 0.82] // --color-encia
+const AZUL_DIENTE: [number, number, number] = [0.39, 0.56, 0.94]
 
 export function pdfDeDocumento(doc: Documento) {
   const ops: string[] = []
@@ -169,6 +267,32 @@ export function pdfDeDocumento(doc: Documento) {
         for (const it of items) { escribir('•', X + 2, y, 9); escribir(it, X + 14, y, 9); y += 14 }
         y += 4
       }
+    } else if ('dientes' in s) {
+      /* El diagrama de la boca en su panel gris y, a la derecha, cada diente con sus superficies (como red.dev). */
+      const { denticion, piezas } = s.dientes
+      const elegidos = new Map(piezas)
+      const g = diagramaBoca(denticion)
+      const [ox, oy] = [X, y - 6]
+      rectRedondo(ox, oy, g.ancho, g.alto, 10, [0.953, 0.957, 0.965])
+      for (const a of g.arcadas) {
+        const pts = a.encia.map(([px, py]) => `${(ox + px).toFixed(1)} ${(ALTO - oy - py).toFixed(1)}`)
+        ops.push(`${col(ENCIA)} RG ${g.tam + 7} w 1 J 1 j ${pts[0]} m ${pts.slice(1).map((q) => `${q} l`).join(' ')} S`)
+        escribir(a.nombre, ox + a.cx - ancho(a.nombre, 8.5) / 2, oy + a.cy + 3, 8.5, 'F1', GRIS)
+        for (const t of a.dientes) {
+          const si = elegidos.has(t.d)
+          rectRedondo(ox + t.x - g.tam / 2 - 0.8, oy + t.y - g.tam / 2 - 0.8, g.tam + 1.6, g.tam + 1.6, g.tam * 0.4, si ? AZUL : TENUE)
+          rectRedondo(ox + t.x - g.tam / 2, oy + t.y - g.tam / 2, g.tam, g.tam, g.tam * 0.35, si ? AZUL_DIENTE : [1, 1, 1])
+          const tamL = denticion === 'Primary' ? 8 : 6.5
+          escribir(t.d, ox + t.lx - ancho(t.d, tamL) / 2, oy + t.ly + tamL / 3, tamL, 'F1', GRIS)
+        }
+      }
+      let yl = y + 4
+      for (const [d, sup] of piezas) {
+        escribir(`Tooth ${d}${sup.length ? ':' : ''}`, X + g.ancho + 16, yl, 9, 'F2', TINTA)
+        if (sup.length) escribir(sup.join(', '), X + g.ancho + 16 + ancho(`Tooth ${d}:`, 9, true) + 5, yl, 9)
+        yl += 14
+      }
+      y = Math.max(oy + g.alto + 8, yl)
     } else {
       for (const p of s.parrafos) {
         for (const l of partir(p, 9, ANCHO)) { escribir(l, X, y, 9); y += 14 }
@@ -178,14 +302,16 @@ export function pdfDeDocumento(doc: Documento) {
     y += 16
   })
 
-  /* La firma del provider. */
-  y += 24
-  const finFirma = X + (ANCHO - 24) / 2
-  if (doc.firmado) escribir(doc.provider, X, y - 6, 16, 'F3', AZUL)
-  else escribir('Pending signature', X, y - 5, 8.5, 'F3', TENUE)
-  linea(X, y, finFirma, y, TINTA, 0.8)
-  escribir(`${doc.provider} · Provider`, X, y + 13, 8, 'F2', TINTA)
-  escribir(doc.firmado ? `Signed electronically · ${doc.firmado}` : 'Not signed yet', X, y + 24, 7.5, 'F1', GRIS)
+  /* La firma del provider (la Lab Order no lleva). */
+  if (!doc.sinFirma) {
+    y += 24
+    const finFirma = X + (ANCHO - 24) / 2
+    if (doc.firmado) escribir(doc.provider, X, y - 6, 16, 'F3', AZUL)
+    else escribir('Pending signature', X, y - 5, 8.5, 'F3', TENUE)
+    linea(X, y, finFirma, y, TINTA, 0.8)
+    escribir(`${doc.provider} · Provider`, X, y + 13, 8, 'F2', TINTA)
+    escribir(doc.firmado ? `Signed electronically · ${doc.firmado}` : 'Not signed yet', X, y + 24, 7.5, 'F1', GRIS)
+  }
 
   /* Pie. */
   linea(X, 796, X + ANCHO, 796, LINEA, 0.8)
