@@ -221,3 +221,84 @@ Pedido de Julián de un solo diseño de filtro (detalle en `settings-accounts.md
 Inactive / System / All** de la lista de templates pasan al `FilterMenu`, al lado del buscador: grupo *Status* de una
 opción, All primero como en Accounts, sin puntos de color y con la cantidad de cada uno. Sigue arrancando en Active
 (no cuenta como filtro aplicado; Clear all vuelve a Active). `ListaTemplates` suma `todos` para las cantidades.
+
+## *New template* en la fila del título (2026-11-20)
+
+Pedido de Julián (*"botón a nivel de título, como en todos"*). *New template* sale de la card Templates y va al lado
+de *Consent templates*, en `md`, como New employee o New location. La card queda con su título, el buscador, Filter y la
+lista. `ListaTemplates` ya no recibe `onNuevo`.
+
+## Mismo patrón que Coverage tables (2026-11-24)
+
+**CON-3719** (Desactivar), **CON-3725** (Activar), **CON-3724** (Listar). Pedido de Julián con un HTML y un PDF de
+estandarización: la pantalla pasa a la pieza común `components/settings/ListaEditor.tsx` (detalle del patrón en
+`settings-billing.md`, misma fecha).
+
+1. Lista de 340 px y editor, 20 px entre las dos cards; en angosto, apiladas (`@3xl` del contenedor, antes 288 px).
+2. **Tarjeta**: nombre 14 px semibold y ⋮ a la derecha; debajo Active/Inactive, System y la cantidad de procedimientos.
+   **Se va el switch** de la tarjeta.
+3. **⋮**: *Deactivate* / *Activate*, línea y *Delete* en rojo. **Se va** el botón *Deactivate template* del editor.
+4. **Reglas de Jira que el HTML no tenía**:
+   - Deactivate (CON-3719) pide confirmación *Deactivate consent template?* con los procedimientos afectados y el texto
+     de la historia (singular o plural). Toast: *The consent template has been successfully deactivated.*
+   - Activate (CON-3725) frena si falta procedimiento o si otro template activo ya tiene alguno de sus procedimientos,
+     con los textos de la historia. Toast: *The consent template has been successfully activated.*
+   - Los **System** no se activan, desactivan ni borran (precondición `system = false`): las dos acciones quedan
+     deshabilitadas y el menú dice por qué. Cambia lo anotado antes (*un template de sistema también se puede desactivar*).
+5. **Delete** (con confirmación *Delete template?* y Undo) sigue el HTML, pero **CON-1484** *[Template] Delete Template*
+   está **cancelada** en Jira: queda como propuesta a confirmar con Julián.
+6. **Editor**: *Edit template* + pill de estado, sin la bajada (*Preview shows the sheet…*) y sin la pill System
+   (queda en la lista). Pie común: Preview a la izquierda, Cancel · Save a la derecha, fijo abajo.
+7. Sin coincidencias: *No matching results* (antes *No templates* con bajada).
+
+8. **Preview más ancho** (pedido de Julián, dos vueltas): el drawer pasa de `lg` (560 px) a `2xl` (1000 px) y la hoja
+   de 520 a 820 px (`className="max-w-[820px] sm:px-10 sm:pt-8"`), sin perder la proporción carta. Sólo en el preview
+   de Settings: el detalle del consentimiento de Clinical Mode sigue con su drawer `xl` y la hoja de 520 px. En el
+   celular ocupa toda la pantalla, como antes.
+
+## Search, pestañas y Preview como red.dev (2026-11-24)
+
+**CON-4094** (preview a pantalla completa), **CON-3724** (listar). Pedido de Julián con dos videos de red.dev
+(`/settings/consents/:id/edit`): replicar la funcionalidad del buscador, las pestañas y el preview, sin tocar el resto
+del patrón estandarizado.
+
+1. **Pestañas Active · System · All** debajo del buscador, a todo el ancho (`ui/tabs`, `fullWidth`, como Coverage). Vuelven
+   las pestañas y se va el *Filter* del 2026-11-20. *Inactive* no tiene pestaña (queda en All), como red.dev.
+2. **Buscador de la lista** con X para borrar (`SearchInput clearable`, en `PanelLista`: vale también para Coverage).
+3. **Search procedure** como red.dev: al hacer foco abre la lista de todos los procedimientos que no están elegidos
+   (`CODE - Description`, con scroll), filtra mientras se escribe, X para borrar y *No results found.* sin coincidencias.
+   Flechas, Enter y Escape. La lista suma el catálogo CDT de la app (`clinical/dental/data` › `PROCEDURES`) a los de los
+   templates.
+4. **Preview a pantalla completa** (`PreviewPaciente`, reemplaza a `DrawerPreview`): tapa la app; arriba *Back to editing*
+   y *Patient View - {título}*; el aviso gris *Preview includes your unsaved changes. Save the template to keep them.*
+   (CON-4094) y la hoja. Escape también vuelve. **Se van** el toggle *Patient view* y el *Save* del preview: red.dev no
+   los tiene y CON-4094 pide que abrir o cerrar el preview no guarde.
+5. **La hoja con el formato del PDF** (`settings/HojaConsentimientoPdf`): *Sample Dental Clinic* y dirección, *Consent
+   created* con la fecha a la derecha, línea, *INFORMED CONSENT*, el título y una card por sección con su rótulo en
+   banda gris: Patient, Provider, Appointment, Procedure, Diagnosis, Clinical findings, el texto del template, Patient
+   acknowledgment y Patient/Guardian Signature (*Date and time [Completed when signed]*). Los datos de ejemplo son los
+   de red.dev; Procedure usa el primer procedimiento elegido (sin ninguno, *D0000 — Sample procedure*).
+   - **Anomalía**: en red.dev el texto del template es una sola card sin rótulo (editor único); acá son dos campos, así
+     que van dos cards, *Nature of procedure* y *Risk and complications*.
+   - `ConsentDocument` (la hoja de Clinical Mode, con firmas) no cambia: convendría alinearla al mismo PDF en otra tanda.
+6. No se replica de red.dev (lo decidido en la estandarización sigue): *+ New* en el panel (va en el título de la
+   pantalla), el título del editor con el nombre del template y su bajada, y *Activate template* en el editor (va en el ⋮).
+
+## El editor dice "New template" (2026-11-24)
+
+Devolución de Julián: el título del editor decía *Edit template* para uno cargado y *New consent template* para uno
+nuevo, mientras el botón dice *New template*. Ahora dice **New template**, igual que el botón.
+
+## El preview en el visor de documentos (2026-11-24)
+
+Propuesta A (regla en `figma/README.md` › *Visor de documentos*). `PreviewPaciente` usa `ui/document-viewer`: mismo
+contenido que antes (*Back to editing*, *Patient View - título*, el aviso gris de cambios sin guardar). La hoja
+(`HojaConsentimientoPdf`) pierde su marco gris propio: el fondo lo pone el visor.
+
+## La hoja unificada (2026-11-24)
+
+Propuesta B (regla en `figma/README.md` › *Hoja de documentos*). El preview vuelve a usar `ConsentDocument`, ahora sobre
+`ui/document-sheet`: la misma hoja que el Procedure consent de Clinical Mode. **Cambia lo decidido hoy más temprano**
+(*Search, pestañas y Preview como red.dev*, punto 5): se va `HojaConsentimientoPdf`, el formato de cards del PDF de
+red.dev. Los datos de ejemplo vuelven a ser los de `ConsentDocument` (Sarah Stone, John Lorem); el membrete es el de la
+clínica (`data/clinica.ts`).

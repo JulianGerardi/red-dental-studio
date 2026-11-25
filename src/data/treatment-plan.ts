@@ -75,7 +75,7 @@ const DEL_PACIENTE: Record<string, Partial<Procedimiento>> = {
 
 const proc = (id: string, estado: Procedimiento['estado'] = 'Planned', consentimiento?: ConsentProcedimiento): Procedimiento => ({
   id,
-  fecha: '2025/01/24',
+  fecha: '01/24/2025',
   superficie: '1',
   pieza: '1',
   ubicacion: '1',

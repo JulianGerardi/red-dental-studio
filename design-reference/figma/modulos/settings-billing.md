@@ -1,5 +1,37 @@
 # Settings → Billing (Fee Schedules, Carriers, Coverage Table)
 
+## Coverage tables y Consents con el mismo patrón (2026-11-24)
+
+**CON-1488** (Delete Coverage Table Template, sin descripción en Jira). Pedido de Julián con un HTML de referencia y un
+PDF (*Estandarización de Coverage tables y Consent templates*): seguir la estructura del HTML tal cual, con el diseño de
+la app. La pieza común es `components/settings/ListaEditor.tsx` (`PanelLista`, `ItemLista`, `EncabezadoEditor`,
+`PieEditor`, `GRILLA_LISTA_EDITOR`, `TARJETA_EDITOR`); Consents usa la misma (ver `consents.md`, misma fecha).
+
+1. **Dos cards**: lista de 340 px a la izquierda y editor con el resto, 20 px entre las dos. La lista no se estira para
+   igualar al editor. Con el contenedor por debajo de 768 px (`@3xl`) bajan una debajo de la otra. Se va la card única
+   con lista de 260 px.
+2. **Lista**: título *Coverage tables* dentro de la card, buscador `sm` que filtra mientras se escribe y, debajo, las
+   pestañas **Percentage / Copayment** (`ui/tabs`, `fullWidth`) en lugar del select de tipo. Buscador y pestaña se
+   combinan: sólo se busca en el tipo elegido (antes la tabla abierta quedaba en la lista aunque fuera del otro tipo).
+   Cambiar de pestaña abre la primera tabla de ese tipo; entrar por link a una del otro tipo mueve la pestaña.
+   Sin coincidencias: *No matching results* (`EmptyState`).
+3. **Ítem**: card con borde (azul suave y borde azul la elegida), nombre en 14 px semibold y ⋮ a la derecha; debajo la
+   pill **Active / Inactive**. Sin segunda línea de relleno. Reemplaza las filas de `MasterList` (que queda sólo para Fee
+   schedules).
+4. **⋮**: *Deactivate* (o *Activate*), una línea y *Delete* en rojo. Delete ahora pide confirmación con el nombre
+   (*Delete coverage table?*) y mantiene el Undo del toast. Activar/desactivar una coverage table es **propuesta**: no hay
+   historia; `TablaCobertura.activo` (sin el campo, activa) todavía no saca la tabla de *Copy from template*.
+5. **Editor**: *Edit coverage table* + pill de estado; Name y Type (fijo, *Set when the table is created.*); *Manage
+   exceptions* y *Add range* justo encima de la tabla, a la derecha; pie con línea, fijo abajo, *Cancel · Save* a la
+   derecha (antes Cancel a la izquierda). El pie es el mismo de Consents (`PieEditor`).
+6. **RangesTable**: *Exc* → *Exceptions*; Coverage % / Copayment y Exceptions alineados a la derecha (`TextField numero`).
+   Las columnas siguen el ancho de la tabla (`@container`, `@3xl`) y no el de la ventana: con la lista al lado, a 1024 px
+   cada rango baja a filas apiladas. **Anomalía respecto del PDF**: pide scroll horizontal cuando la tabla no entra; no se
+   hizo porque el contenedor con scroll corta el menú del select *Deductible type* (se abre como `absolute`). El tacho
+   por rango se mantiene (el PDF lo pide aunque el HTML lo omitió). Vale también en la Coverage del plan.
+7. Borrar la tabla abierta pasa a la primera que queda en la pestaña: la guarda de "tabla inexistente" redirige ahí (un
+   `navigate` después de borrar perdía contra ella: React Router navega en una transición).
+
 ## 2026-10-13 · Casillas de Edit Carrier en la misma fila
 
 Pedido de Julián sobre una captura de Edit Carrier › *Information*: *Do not include Dental Diagnostic Codes* y *Do not bill
@@ -86,6 +118,7 @@ sección › ítem (› plan), como el resto de Settings (decisión 16).
    - *Name* (link al editor, pill *Default*), *Type*, *Assignments*, *Effective* (desde cuándo rige la versión vigente),
      *Last updated*, *Status* y *Actions* (*Edit*, *View assignments*, *Compare fees*).
    - Buscador *Search a Fee Schedule Here...* y *Filters* › *States*; arranca en Active + Inactive (Archived oculto).
+     Desde el 2026-11-24 arranca sin filtro (ver abajo).
    - Al editar se ve la pantalla de red.dev: la lista con su filtro y su ⋮ (*Inactive*/*Active*, *Archive*/*Restore*) y el
      editor a la derecha.
 6. **Type** (UCR · PPO · Medicaid · Discount plan) no existe en red.dev: es obligatorio en el editor para llenar la
@@ -165,3 +198,21 @@ Mismo texto en todos los campos obligatorios vacíos (`OBLIGATORIO`, regla en [f
 2. *Copy from fee schedule* sin elegir y *Increase fees* vacío: *This field is required.*; *Enter an amount other than
    0.* queda para el 0.
 3. Rangos de la Coverage Table: *Required* → *This field is required.* (entra en las celdas, también en celular).
+
+## Tablas estandarizadas v2 (2026-11-24)
+
+Pie, alineación, fechas y avatar con las reglas comunes de todas las tablas: ver `design-reference/figma/README.md`
+(*Tablas estandarizadas v2*, 2026-11-24).
+
+### Fee schedules: Assignments alineada y el Filter sin selección al entrar (2026-11-24)
+
+Devolución de Julián sobre las tablas estandarizadas v2.
+
+1. **Assignments** a la derecha quedaba pegada a *Effective* y el número con link, 6 px corrido del encabezado y del 0
+   (el padding del botón). Toda columna a la derecha de `DataTable` suma `pr-3` (24 px hasta la siguiente, como el HTML) y
+   el botón de `AssignmentsCount` compensa su padding con `-mx-1.5`.
+   - **Corrección (Julián, con referencia):** Assignments va a la **izquierda**, el número al inicio de la columna, debajo
+     de la "A" del encabezado. Excepción a "cantidades a la derecha": es un link que abre el desglose, no un importe.
+2. **Filter › States arranca vacío**: antes abría con Active + Inactive tildados y el botón decía *Filter 2* sin que nadie
+   hubiera filtrado. Sin nada tildado se ve todo, como en el resto de las listas; un fee schedule *Archived* también
+   aparece, con su pill. La lista del editor (a la izquierda) sigue arrancando en Active, como red.dev.

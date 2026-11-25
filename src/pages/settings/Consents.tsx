@@ -1,27 +1,27 @@
-import { SearchInput } from '@/components/ui/search-input'
 import { PADDING_PAGINA } from '@/lib/estilos'
 import { useEffect, useId, useRef, useState } from 'react'
 import { Chip } from '@/components/ui/chip'
-import { Search, Plus, Bold, Italic, Underline, Heading1, Heading2, Pilcrow, List, ListOrdered, Eye, Power, PowerOff, ArrowLeft, Check } from 'lucide-react'
+import { Search, Plus, Bold, Italic, Underline, Heading1, Heading2, Pilcrow, List, ListOrdered, Eye, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { Drawer } from '@/components/ui/drawer'
 import { SettingsPageHeader } from '@/components/settings/SettingsPageHeader'
 import { cn } from '@/lib/utils'
 import { Pill } from '@/components/ui/pill'
-import { Switch } from '@/components/ui/switch'
+import { ConfirmDialog } from '@/components/ui/confirm-dialog'
+import { EncabezadoEditor, GRILLA_LISTA_EDITOR, ItemLista, PanelLista, PieEditor, TARJETA_EDITOR } from '@/components/settings/ListaEditor'
 import { SelectField } from '@/components/patients/form'
-import { EmptyState } from '@/components/ui/empty-state'
 import { aviso } from '@/components/ui/toaster'
 import { ConsentDocument, textoPlano } from '@/components/settings/ConsentDocument'
+import { DocumentViewer } from '@/components/ui/document-viewer'
+import { Tabs } from '@/components/ui/tabs'
+import { PROCEDURES } from '@/components/clinical/dental/data'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
-import { FilterMenu } from '@/components/ui/filter-menu'
 import { OBLIGATORIO } from '@/lib/validacion'
 
 /* Settings → Consents. Figma 4106:170620 ("New consent template"): lista de
    templates a la izquierda y editor del texto -las tres variantes del frame son
    el mismo estado con y sin el error de validación, no pantallas distintas-.
-   El preview, que en el Figma es una tercera columna, se abre en un drawer desde
-   el pie del editor (2026-10-07, ver consents.md).
+   El preview, que en el Figma es una tercera columna, se abre a pantalla completa
+   desde el pie del editor, como red.dev (CON-4094; consents.md, 2026-11-24).
 
    Opción 1 de las tres que planteó Julián para el flujo de consentimientos
    -la única con diseño de Figma-. Reusa piezas del sistema: Pill para los
@@ -37,18 +37,43 @@ import { OBLIGATORIO } from '@/lib/validacion'
    design-reference/figma/modulos/consents.md. */
 
 export type Procedimiento = { codigo: string; nombre: string }
-export const PROCEDIMIENTOS_DISPONIBLES: Procedimiento[] = [
+const DE_LOS_TEMPLATES: Procedimiento[] = [
   { codigo: 'D7240', nombre: 'Removal of impacted tooth' },
   { codigo: 'D3948', nombre: 'Extraction, angled tooth' },
   { codigo: 'D3310', nombre: 'Root canal therapy, anterior' },
   { codigo: 'D3320', nombre: 'Root canal therapy, premolar' },
   { codigo: 'D2740', nombre: 'Crown – porcelain/ceramic' },
 ]
+/* Los de los templates más el catálogo CDT de la app, por código: el buscador los lista todos al abrirse, como red.dev. */
+export const PROCEDIMIENTOS_DISPONIBLES: Procedimiento[] = [
+  ...DE_LOS_TEMPLATES,
+  ...PROCEDURES.filter((p) => !DE_LOS_TEMPLATES.some((t) => t.codigo === p.code)).map((p) => ({ codigo: p.code, nombre: p.label })),
+].sort((a, b) => a.codigo.localeCompare(b.codigo))
 const procedimiento = (codigo: string) => PROCEDIMIENTOS_DISPONIBLES.find((p) => p.codigo === codigo)
+/* "D7240 - Removal of impacted tooth", como en los chips y en los textos de CON-3719 y CON-3725. */
+const conNombre = (codigo: string) => `${codigo} - ${procedimiento(codigo)?.nombre ?? ''}`
+const enLista = (xs: string[]) => (xs.length < 2 ? xs.join('') : `${xs.slice(0, -1).join(', ')}, and ${xs[xs.length - 1]}`)
+
+/* El cuerpo de Deactivate consent template? (CON-3719): los procedimientos que dejan de tener consentimiento automático. */
+function TextoDesactivar({ t }: { t: ConsentTemplate }) {
+  const uno = t.procedimientos.length === 1
+  return (
+    <>
+      <p>This template is currently assigned to the following procedure{uno ? '' : 's'}:</p>
+      <ul className="my-2 flex flex-col gap-0.5 font-medium text-ink">
+        {t.procedimientos.map((c) => <li key={c}>{conNombre(c)}</li>)}
+      </ul>
+      <p>
+        Deactivating this template will disable the automatic consent flow for {uno ? 'this procedure' : 'these procedures'}. No new
+        consent documents will be generated for {uno ? 'it' : 'them'} until an active consent template is assigned.
+      </p>
+    </>
+  )
+}
 
 /* `activo` y `sistema` son independientes: "System" dice de dónde viene el
    template (viene con el producto), "activo" si hoy se ofrece o no. Un
-   template de sistema también se puede desactivar. */
+   template de sistema no se activa, desactiva ni borra (CON-3719, CON-3725). */
 export type ConsentTemplate = {
   id: string
   titulo: string
@@ -109,11 +134,12 @@ const TITULOS_SUGERIDOS = [
   'Crown & Bridge Consent', 'Implant Consent', 'HIPAA Acknowledgment',
 ]
 
-const FILTROS = ['All', 'Active', 'Inactive', 'System'] as const
+/* Las pestañas de la lista, como red.dev: Active, System y All (Inactive queda en All). */
+const FILTROS = ['Active', 'System', 'All'] as const
 export type Filtro = (typeof FILTROS)[number]
 
 const coincideFiltro = (t: ConsentTemplate, f: Filtro) =>
-  f === 'All' || (f === 'Active' && t.activo) || (f === 'Inactive' && !t.activo) || (f === 'System' && t.sistema)
+  f === 'All' || (f === 'Active' && t.activo) || (f === 'System' && t.sistema)
 
 export type Borrador = {
   titulo: string
@@ -185,31 +211,32 @@ export function ToolbarFormato({ aplica = false }: { aplica?: boolean }) {
   )
 }
 
-/* Una tarjeta de la lista: título (hasta dos líneas), estado, System si viene con el producto y cuántos procedimientos
-   usa. El interruptor la activa o desactiva sin abrirla; la elegida lleva el borde azul, como `Seleccionable`. */
-export function TarjetaTemplate({ t, elegida, onElegir, onAlternar }: {
+/* Una tarjeta de la lista (ItemLista, común con Coverage tables): título (hasta dos líneas), estado, System si viene con el
+   producto y cuántos procedimientos usa. Activate / Deactivate y Delete van en el ⋮ (consents.md, 2026-11-24). */
+export function TarjetaTemplate({ t, elegida, onElegir, onAlternar, onBorrar = () => {} }: {
   t: ConsentTemplate
   elegida: boolean
   onElegir: () => void
   onAlternar: () => void
+  onBorrar?: () => void
 }) {
   return (
-    <div className={cn('flex items-start gap-2 self-stretch rounded-lg border px-3 py-2.5 transition-colors', elegida ? 'border-dash-blue bg-info-bg' : 'border-line bg-white hover:bg-surface-subtle')}>
-      <button type="button" onClick={onElegir} aria-current={elegida || undefined} className="flex min-w-0 flex-1 flex-col items-start gap-1 text-left">
-        <span className={cn('line-clamp-2 w-full text-[13px] font-bold', t.activo ? 'text-ink' : 'text-ink-faint')}>{t.titulo}</span>
-        <span className="flex flex-wrap items-center gap-1.5">
-          <Pill tone={t.activo ? 'success' : 'neutral'} size="sm">{t.activo ? 'Active' : 'Inactive'}</Pill>
+    <ItemLista
+      nombre={t.titulo} activo={t.activo} elegido={elegida} onElegir={onElegir} onAlternar={onAlternar} onBorrar={onBorrar}
+      bloqueado={t.sistema ? 'System templates come with the product and can’t be deactivated or deleted.' : undefined}
+      extra={(
+        <>
           {t.sistema && <Pill tone="info" size="sm">System</Pill>}
           <span className="text-[11px] text-ink-muted">{t.procedimientos.length} procedure{t.procedimientos.length === 1 ? '' : 's'}</span>
-        </span>
-      </button>
-      <Switch checked={t.activo} onCheckedChange={onAlternar} aria-label={`${t.activo ? 'Deactivate' : 'Activate'} ${t.titulo}`} className="mt-0.5" />
-    </div>
+        </>
+      )}
+    />
   )
 }
 
-/* El panel de la izquierda: New template, buscador, filtros (Active, Inactive, System, All) y la lista. */
-export function ListaTemplates({ templates, elegidoId, q, onQ, filtro, onFiltro, onElegir, onAlternar, onNuevo, todos }: {
+/* El panel de la izquierda, como red.dev: buscador (con X para borrar) y debajo las pestañas Active, System y All a todo
+   el ancho, y la lista. New template va en el título de la pantalla (consents.md, 2026-11-20 y 2026-11-24). */
+export function ListaTemplates({ templates, elegidoId, q, onQ, filtro, onFiltro, onElegir, onAlternar, onBorrar = () => {} }: {
   templates: ConsentTemplate[]
   elegidoId: string | null
   q: string
@@ -218,50 +245,41 @@ export function ListaTemplates({ templates, elegidoId, q, onQ, filtro, onFiltro,
   onFiltro: (f: Filtro) => void
   onElegir: (t: ConsentTemplate) => void
   onAlternar: (id: string) => void
-  onNuevo: () => void
-  /** Todos los templates, para la cantidad de cada opción del filtro. */
-  todos?: ConsentTemplate[]
+  onBorrar?: (t: ConsentTemplate) => void
 }) {
   return (
-    <section aria-label="Templates" className="flex flex-col gap-3 self-start rounded-lg bg-white shadow-panel p-4">
-      <div className="flex items-center justify-between gap-2">
-        <h2 className="text-sm font-bold text-ink">Templates</h2>
-        <Button size="sm" onClick={onNuevo}><Plus /> New template</Button>
-      </div>
-      {/* Buscador y después Filter, como Accounts (consents.md, 2026-11-20); dentro de la card, en sm (figma/README.md). */}
-      <div className="flex items-center gap-2">
-        <SearchInput size="sm" value={q} onChange={onQ} placeholder="Search templates" aria-label="Search templates" className="sm:max-w-none" />
-        <FilterMenu
-          size="sm"
-          label="Filter templates by status"
-          groups={[{
-            type: 'single', title: 'Status', defaultValue: 'Active', value: filtro, onChange: (v) => onFiltro(v as Filtro),
-            options: FILTROS.map((f) => ({ value: f, count: todos?.filter((t) => coincideFiltro(t, f)).length })),
-          }]}
-        />
-      </div>
-      <div className="flex max-h-[520px] flex-col gap-2 overflow-y-auto">
-        {templates.length === 0 ? (
-          <EmptyState icon={Search} title="No templates" detail="Nothing matches this search or filter." className="py-6" />
-        ) : (
-          templates.map((t) => <TarjetaTemplate key={t.id} t={t} elegida={elegidoId === t.id} onElegir={() => onElegir(t)} onAlternar={() => onAlternar(t.id)} />)
-        )}
-      </div>
-    </section>
+    <PanelLista
+      titulo="Templates" q={q} onQ={onQ} placeholder="Search templates" vacio={templates.length === 0}
+      pestanas={<Tabs aria-label="Template status" size="sm" fullWidth tabs={FILTROS} value={filtro} onChange={onFiltro} />}
+    >
+      {templates.map((t) => (
+        <TarjetaTemplate key={t.id} t={t} elegida={elegidoId === t.id} onElegir={() => onElegir(t)} onAlternar={() => onAlternar(t.id)} onBorrar={() => onBorrar(t)} />
+      ))}
+    </PanelLista>
   )
 }
 
-/* Buscar y sumar procedimientos: el buscador muestra los que coinciden y no están elegidos; los elegidos quedan como
-   chips que se sacan con la X. Obligatorio: con el error, el borde en rojo y el mensaje en lugar de los chips. */
+/* Buscar y sumar procedimientos, como red.dev: al hacer foco abre la lista de todos los que no están elegidos, filtra
+   mientras se escribe (X para borrar) y sin coincidencias dice No results found. Flechas, Enter y Escape. Los elegidos
+   quedan como chips que se sacan con la X. Obligatorio: con el error, el borde en rojo y el mensaje en lugar de los chips. */
 export function SelectorProcedimientos({ elegidos, onCambiar, error }: {
   elegidos: string[]
   onCambiar: (codigos: string[]) => void
   error?: boolean
 }) {
   const [q, setQ] = useState('')
+  const [abierto, setAbierto] = useState(false)
+  const [activo, setActivo] = useState(0)
+  const lista = useRef<HTMLUListElement>(null)
   const opciones = PROCEDIMIENTOS_DISPONIBLES.filter(
     (p) => !elegidos.includes(p.codigo) && `${p.codigo} ${p.nombre}`.toLowerCase().includes(q.trim().toLowerCase()),
   )
+  const elegir = (codigo: string) => { onCambiar([...elegidos, codigo]); setQ(''); setActivo(0) }
+  const mover = (paso: number) => {
+    const i = Math.max(0, Math.min(opciones.length - 1, activo + paso))
+    setActivo(i)
+    lista.current?.children[i]?.scrollIntoView({ block: 'nearest' })
+  }
   return (
     <div className="flex flex-col gap-2">
       <label htmlFor="consent-procedimiento" className="text-xs font-medium text-ink">
@@ -271,28 +289,54 @@ export function SelectorProcedimientos({ elegidos, onCambiar, error }: {
         <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-ink-faint" />
         <input
           id="consent-procedimiento"
+          role="combobox"
+          aria-expanded={abierto}
+          aria-controls="consent-procedimientos"
+          aria-activedescendant={abierto && opciones[activo] ? `consent-proc-${opciones[activo].codigo}` : undefined}
+          autoComplete="off"
           value={q}
-          onChange={(e) => setQ(e.target.value)}
+          onChange={(e) => { setQ(e.target.value); setActivo(0); setAbierto(true) }}
+          onFocus={() => setAbierto(true)}
+          onBlur={() => setAbierto(false)}
+          onKeyDown={(e) => {
+            if (e.key === 'ArrowDown') { e.preventDefault(); if (!abierto) setAbierto(true); else mover(1) }
+            else if (e.key === 'ArrowUp') { e.preventDefault(); mover(-1) }
+            else if (e.key === 'Enter' && abierto && opciones[activo]) { e.preventDefault(); elegir(opciones[activo].codigo) }
+            else if (e.key === 'Escape' && abierto) { e.stopPropagation(); setAbierto(false) }
+          }}
           placeholder="Search procedures"
           aria-invalid={error || undefined}
           className={cn(
-            'h-9 w-full rounded-md border bg-white pr-3 pl-9 text-[13px] shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] placeholder:text-ink-faint focus:outline-none',
+            'h-9 w-full rounded-md border bg-white pl-9 text-[13px] shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] placeholder:text-ink-faint focus:outline-none',
+            q ? 'pr-9' : 'pr-3',
             error ? 'border-field-error' : 'focus:border-dash-blue border-line',
           )}
         />
-        {q && opciones.length > 0 && (
-          <div className="motion-safe:animate-[loc-in_120ms_ease-out] absolute top-[calc(100%+4px)] left-0 z-30 max-h-52 w-full overflow-y-auto rounded-md border border-line bg-white py-1 shadow-lg">
-            {opciones.map((p) => (
-              <button
-                key={p.codigo}
-                type="button"
-                onClick={() => { onCambiar([...elegidos, p.codigo]); setQ('') }}
-                className="flex w-full items-center gap-2 px-3 py-2 text-left text-[13px] hover:bg-surface-muted"
-              >
-                <span className="text-dash-blue font-semibold">{p.codigo}</span>
-                <span className="truncate text-ink-soft">{p.nombre}</span>
-              </button>
-            ))}
+        {q && (
+          <button
+            type="button" aria-label="Clear search" onMouseDown={(e) => e.preventDefault()} onClick={() => { setQ(''); setActivo(0) }}
+            className="absolute top-1/2 right-2 flex size-6 -translate-y-1/2 items-center justify-center rounded text-ink-muted hover:bg-surface-muted"
+          >
+            <X className="size-3.5" />
+          </button>
+        )}
+        {abierto && (
+          <div className="motion-safe:animate-[loc-in_120ms_ease-out] absolute top-[calc(100%+4px)] left-0 z-30 w-full overflow-hidden rounded-md border border-line bg-white shadow-lg">
+            {opciones.length === 0 ? (
+              <p className="px-3 py-10 text-center text-[13px] text-ink-muted">No results found.</p>
+            ) : (
+              <ul ref={lista} id="consent-procedimientos" role="listbox" aria-label="Procedures" className="max-h-[320px] overflow-y-auto">
+                {opciones.map((p, i) => (
+                  <li
+                    key={p.codigo} id={`consent-proc-${p.codigo}`} role="option" aria-selected={i === activo}
+                    onMouseDown={(e) => e.preventDefault()} onClick={() => elegir(p.codigo)} onMouseEnter={() => setActivo(i)}
+                    className={cn('cursor-pointer border-b border-line-row px-3 py-2 text-[13px] text-ink last:border-b-0', i === activo && 'bg-info-bg')}
+                  >
+                    {p.codigo} - {p.nombre}
+                  </li>
+                ))}
+              </ul>
+            )}
           </div>
         )}
       </div>
@@ -383,14 +427,14 @@ function TextoConsentimientoUnico({ texto, onTexto }: { texto: string; onTexto: 
   )
 }
 
-/* El editor. El título dice qué se hace (Edit Template con su estado, o New Consent Template); Activate o Deactivate a
-   la derecha; el aviso rojo arriba si se intentó guardar con faltantes; Preview, Cancel y Save fijos al pie. */
-export function EditorTemplate({ actual, borrador, onBorrador, intentado, onAlternar, onCancelar, onGuardar, onPreview }: {
+/* El editor. El título dice qué se hace (Edit template con su estado, o New template, como el botón), sin bajada; el aviso rojo
+   arriba si se intentó guardar con faltantes; Preview, Cancel y Save fijos al pie. Activate / Deactivate está en el ⋮ de
+   la lista (consents.md, 2026-11-24). */
+export function EditorTemplate({ actual, borrador, onBorrador, intentado, onCancelar, onGuardar, onPreview }: {
   actual?: ConsentTemplate
   borrador: Borrador
   onBorrador: (b: Borrador) => void
   intentado: boolean
-  onAlternar: () => void
   onCancelar: () => void
   onGuardar: () => void
   onPreview: () => void
@@ -398,24 +442,8 @@ export function EditorTemplate({ actual, borrador, onBorrador, intentado, onAlte
   const faltaTitulo = intentado && !borrador.titulo
   const faltaProcedimiento = intentado && borrador.procedimientos.length === 0
   return (
-    <section aria-label="Template editor" className="flex flex-col gap-4 self-start rounded-lg bg-white shadow-panel p-4 sm:p-5">
-      <div className="flex flex-wrap items-start justify-between gap-3">
-        <div className="min-w-[200px] flex-1">
-          <div className="flex flex-wrap items-center gap-2">
-            <h2 className="text-[15px] font-bold text-ink">{actual ? 'Edit template' : 'New consent template'}</h2>
-            {actual && <Pill tone={actual.activo ? 'success' : 'neutral'} size="sm">{actual.activo ? 'Active' : 'Inactive'}</Pill>}
-            {actual?.sistema && <Pill tone="info" size="sm">System</Pill>}
-          </div>
-          <p className="mt-0.5 text-xs text-ink-muted">
-            {actual ? 'Preview shows the sheet with your changes. Save to keep them.' : 'Fill in the details and the text, then save to add it to the list.'}
-          </p>
-        </div>
-        {actual && (
-          <Button variant={actual.activo ? 'secondary' : 'primary'} onClick={onAlternar}>
-            {actual.activo ? <PowerOff /> : <Power />} {actual.activo ? 'Deactivate template' : 'Activate template'}
-          </Button>
-        )}
-      </div>
+    <section aria-label="Template editor" className={TARJETA_EDITOR}>
+      <EncabezadoEditor titulo={actual ? 'Edit template' : 'New template'} activo={actual?.activo} />
 
       {(faltaTitulo || faltaProcedimiento) && (
         <div role="alert" className="rounded-md border border-dash-bad-fg/30 bg-dash-bad-bg px-3 py-2.5 text-[12px] font-medium text-dash-bad-fg">
@@ -443,68 +471,38 @@ export function EditorTemplate({ actual, borrador, onBorrador, intentado, onAlte
         />
       )}
 
-      {/* En angosto Cancel y Save bajan juntos a otra línea y Preview queda arriba. Ver consents.md (2026-10-07). */}
-      <div className="sticky bottom-0 z-10 -mx-4 -mb-4 flex flex-wrap items-center justify-end gap-3 rounded-b-xl border-t border-line bg-white px-4 py-3 sm:-mx-5 sm:-mb-5 sm:px-5">
-        <Button variant="secondary" className="mr-auto" onClick={onPreview}><Eye /> Preview</Button>
-        <div className="flex gap-3">
-          <Button variant="secondary" className="px-6" onClick={onCancelar}>Cancel</Button>
-          <Button className="px-6" onClick={onGuardar}>Save</Button>
-        </div>
-      </div>
+      <PieEditor izquierda={<Button variant="secondary" onClick={onPreview}><Eye /> Preview</Button>} onCancelar={onCancelar} onGuardar={onGuardar} />
     </section>
   )
 }
 
-/* El preview en un drawer, abierto desde el pie del editor: el "escritorio" gris con la hoja que recibe el paciente
-   (ConsentDocument). Patient View saca lo que es sólo de la clínica (diagnóstico y hallazgos). */
-export function DrawerPreview({ abierto, onCerrar, borrador, vistaPaciente, onVistaPaciente, onGuardar }: {
+/* El preview en el visor de documentos (ui/document-viewer), como red.dev (CON-4094, patrón Patient View): Back to
+   editing y "Patient View - título", el aviso gris de que incluye lo que no se guardó y la hoja común (ConsentDocument).
+   No guarda nada: volver deja el formulario como estaba. Escape también vuelve. */
+export function PreviewPaciente({ abierto, onCerrar, borrador }: {
   abierto: boolean
   onCerrar: () => void
   borrador: Borrador
-  vistaPaciente: boolean
-  onVistaPaciente: (v: boolean) => void
-  onGuardar: () => void
 }) {
+  if (!abierto) return null
+  const primero = borrador.procedimientos[0]
   return (
-    <Drawer
-      open={abierto}
-      onClose={onCerrar}
-      title="Preview"
-      description="What the patient receives"
-      size="lg"
-      className="bg-surface-muted"
-      footer={(
-        <>
-          <Button variant="secondary" onClick={onCerrar}><ArrowLeft /> Back to editor</Button>
-          <Button onClick={onGuardar}><Check /> Save</Button>
-        </>
-      )}
+    <DocumentViewer
+      title={`Patient View - ${borrador.titulo || 'Untitled template'}`}
+      backLabel="Back to editing"
+      onBack={onCerrar}
+      notice="Preview includes your unsaved changes. Save the template to keep them."
+      noticeTone="neutral"
     >
-      <div className="flex items-center justify-between gap-2">
-        <p className="text-[11px] text-ink-muted">{vistaPaciente ? 'Without the clinic-only sections.' : 'With diagnosis and clinical findings.'}</p>
-        <button
-          type="button"
-          onClick={() => onVistaPaciente(!vistaPaciente)}
-          aria-pressed={vistaPaciente}
-          className={cn(
-            'flex shrink-0 items-center gap-1.5 rounded-full border px-2.5 py-1 text-[11px] font-semibold transition-colors',
-            vistaPaciente ? 'border-dash-blue bg-dash-blue text-white' : 'border-line bg-white text-ink-slate hover:text-ink-soft',
-          )}
-        >
-          <Eye className="size-3.5" /> Patient view
-        </button>
-      </div>
-      <div className="mt-3">
-        <ConsentDocument
-          titulo={borrador.titulo}
-          procedimiento={borrador.procedimientos.length > 0 ? procedimiento(borrador.procedimientos[0])?.nombre : undefined}
-          naturaleza={borrador.naturaleza}
-          riesgos={borrador.riesgos}
-          texto={EDITOR_UNICO ? borrador.texto : undefined}
-          vistaPaciente={vistaPaciente}
-        />
-      </div>
-    </Drawer>
+      <ConsentDocument
+        titulo={borrador.titulo}
+        procedimiento={primero ? `${primero} · ${procedimiento(primero)?.nombre ?? ''}` : undefined}
+        naturaleza={borrador.naturaleza}
+        riesgos={borrador.riesgos}
+        texto={EDITOR_UNICO ? borrador.texto : undefined}
+        vistaPaciente={false}
+      />
+    </DocumentViewer>
   )
 }
 
@@ -521,26 +519,59 @@ export function SettingsConsents() {
   const [actualId, setActualId] = useState<string | null>(EDITOR_UNICO ? null : 't1')
   const [borrador, setBorrador] = useState<Borrador>(EDITOR_UNICO ? BORRADOR_VACIO : aBorrador(TEMPLATES_INICIALES[0]))
   const [intentado, setIntentado] = useState(false)
-  const [vistaPaciente, setVistaPaciente] = useState(false)
   const [preview, setPreview] = useState(false)
+  const [aBorrar, setABorrar] = useState<ConsentTemplate>()
+  const [aDesactivar, setADesactivar] = useState<ConsentTemplate>()
 
   const visibles = templates.filter(
     (t) => (coincideFiltro(t, filtro) || fijados.includes(t.id)) && t.titulo.toLowerCase().includes(q.trim().toLowerCase()),
   )
   const actual = templates.find((t) => t.id === actualId)
 
+  /* CON-3719: desactivar pide confirmación con los procedimientos afectados. CON-3725: activar no puede dejar un
+     procedimiento con dos templates activos. Los System no se tocan (consents.md, 2026-11-24). */
+  const cambiarActivo = (t: ConsentTemplate, activo: boolean) => {
+    setTemplates((ts) => ts.map((x) => (x.id === t.id ? { ...x, activo } : x)))
+    setFijados((f) => (f.includes(t.id) ? f : [...f, t.id]))
+    aviso.ok(`The consent template has been successfully ${activo ? 'activated' : 'deactivated'}.`)
+  }
+
   const alternarActivo = (id: string) => {
     const t = templates.find((x) => x.id === id)
-    if (!t) return
-    setTemplates((ts) => ts.map((x) => (x.id === id ? { ...x, activo: !x.activo } : x)))
-    setFijados((f) => (f.includes(id) ? f : [...f, id]))
-    aviso.ok(`Consent template ${t.activo ? 'deactivated' : 'activated'}.`)
+    if (!t || t.sistema) return
+    if (t.activo) { setADesactivar(t); return }
+    if (t.procedimientos.length === 0) { aviso.error('At least one procedure must be selected to activate this consent template.'); return }
+    const ocupados = t.procedimientos.filter((c) => templates.some((x) => x.id !== t.id && x.activo && x.procedimientos.includes(c)))
+    if (ocupados.length) {
+      const nombres = ocupados.map(conNombre)
+      aviso.error(nombres.length === 1
+        ? `A procedure can only have one active consent template. The procedure ${nombres[0]} already has an active consent template.`
+        : `A procedure can only have one active consent template. The following procedures already have one: ${enLista(nombres)}.`)
+      return
+    }
+    cambiarActivo(t, true)
   }
 
   const elegir = (t: ConsentTemplate) => {
     setActualId(t.id)
     setBorrador(aBorrador(t))
     setIntentado(false)
+  }
+
+  /* Borrar el que está abierto pasa al primero que queda en la lista; sin ninguno, a un template nuevo. */
+  const borrar = (t: ConsentTemplate) => {
+    setABorrar(undefined)
+    const indice = templates.findIndex((x) => x.id === t.id)
+    const quedan = templates.filter((x) => x.id !== t.id)
+    setTemplates(quedan)
+    if (t.id === actualId) {
+      const siguiente = quedan.find((x) => visibles.some((v) => v.id === x.id))
+      if (siguiente) elegir(siguiente)
+      else nuevoTemplate()
+    }
+    aviso.ok(`${t.titulo} was deleted.`, {
+      label: 'Undo', onClick: () => setTemplates((ts) => [...ts.slice(0, indice), t, ...ts.slice(indice)]),
+    })
   }
 
   const nuevoTemplate = () => {
@@ -573,12 +604,14 @@ export function SettingsConsents() {
 
   return (
     <div className={cn('@container', PADDING_PAGINA)}>
-      <SettingsPageHeader titulo="Consent templates" />
+      <SettingsPageHeader
+        titulo="Consent templates"
+        accion={<Button size="md" onClick={nuevoTemplate}><Plus /> New template</Button>}
+      />
 
-      <div className="mt-4 grid grid-cols-1 gap-4 @3xl:grid-cols-[288px_minmax(0,1fr)]">
+      <div className={GRILLA_LISTA_EDITOR}>
         <ListaTemplates
           templates={visibles}
-          todos={templates}
           elegidoId={actualId}
           q={q}
           onQ={(v) => { setQ(v); setFijados([]) }}
@@ -586,28 +619,35 @@ export function SettingsConsents() {
           onFiltro={(f) => { setFiltro(f); setFijados([]) }}
           onElegir={elegir}
           onAlternar={alternarActivo}
-          onNuevo={nuevoTemplate}
+          onBorrar={setABorrar}
         />
         <EditorTemplate
           actual={actual}
           borrador={borrador}
           onBorrador={setBorrador}
           intentado={intentado}
-          onAlternar={() => actual && alternarActivo(actual.id)}
           onCancelar={cancelar}
           onGuardar={guardar}
           onPreview={() => setPreview(true)}
         />
       </div>
-      {/* Guardar desde el preview lo cierra: si falta algo, los errores quedan a la vista en el editor. */}
-      <DrawerPreview
-        abierto={preview}
-        onCerrar={() => setPreview(false)}
-        borrador={borrador}
-        vistaPaciente={vistaPaciente}
-        onVistaPaciente={setVistaPaciente}
-        onGuardar={() => { setPreview(false); guardar() }}
-      />
+      {aDesactivar && (
+        <ConfirmDialog
+          title="Deactivate consent template?" icon="warning" confirmLabel="Deactivate"
+          onCancel={() => setADesactivar(undefined)} onConfirm={() => { cambiarActivo(aDesactivar, false); setADesactivar(undefined) }}
+        >
+          <TextoDesactivar t={aDesactivar} />
+        </ConfirmDialog>
+      )}
+      {aBorrar && (
+        <ConfirmDialog
+          title="Delete template?" tone="danger" icon="delete" confirmLabel="Delete"
+          onCancel={() => setABorrar(undefined)} onConfirm={() => borrar(aBorrar)}
+        >
+          “{aBorrar.titulo}” will be removed from the list.
+        </ConfirmDialog>
+      )}
+      <PreviewPaciente abierto={preview} onCerrar={() => setPreview(false)} borrador={borrador} />
     </div>
   )
 }

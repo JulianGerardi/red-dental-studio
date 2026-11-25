@@ -181,7 +181,8 @@ export function TaskRow({ task, encuentroAbierto = false, onAccion, hoy = new Da
           </button>
         )}
         <Button size="sm" className="shrink-0" onClick={() => (onAccion ? onAccion(task, 'Complete') : completarTarea(task))}>Complete this task <ArrowRight /></Button>
-        {onAccion && <MenuTarea task={task} abierto={encuentroAbierto} onAccion={onAccion} />}
+        {/* El hueco del ⋮ queda aunque la tarea no tenga acciones (Clinical note): las fechas no se corren (dashboard.md, 2026-11-24). */}
+        {onAccion && <span className="flex size-7 shrink-0 items-center justify-center"><MenuTarea task={task} abierto={encuentroAbierto} onAccion={onAccion} /></span>}
       </span>
     </div>
   )

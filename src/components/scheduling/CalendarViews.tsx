@@ -33,7 +33,7 @@ export function ColumnaHoras() {
     <div className="w-[46px] shrink-0">
       {HORAS.map((h) => (
         <div key={h} style={{ height: HOUR_PX }} className="relative">
-          <span className="absolute -top-2 right-2 text-[11px] text-ink-muted">{fmtHora(h)}</span>
+          <span className="absolute -top-2 right-2 text-[11px] text-ink">{fmtHora(h)}</span>
         </div>
       ))}
     </div>
@@ -118,13 +118,14 @@ export function Cabecera({ dias, hoy }: { dias: Date[]; hoy: Date }) {
       <div className="w-[46px] shrink-0" />
       {dias.map((d, i) => (
         <div key={i} className="flex min-w-0 flex-1 flex-col gap-1 border-l border-line-hair px-3 py-3">
-          <span className="text-[11px] font-semibold tracking-wide text-ink-muted">
+          <span className="text-[11px] font-semibold tracking-wide text-ink">
             {DIAS_CORTOS[d.getDay()]}
           </span>
           <span
             className={cn(
               'flex size-8 items-center justify-center rounded-full text-lg font-semibold',
-              mismoDia(d, hoy) ? 'bg-dash-blue text-white' : 'text-dash-blue',
+              /* Texto del calendario en negro; azul sólo hoy (scheduling.md, 2026-11-20). */
+              mismoDia(d, hoy) ? 'bg-dash-blue text-white' : 'text-ink',
             )}
           >
             {String(d.getDate()).padStart(2, '0')}
@@ -199,7 +200,7 @@ export function VistaMes({ eventos, fecha, onMover, onAbrir }: Props) {
       <div className="md:min-w-[700px]">
         <div className="grid grid-cols-7 border-b border-line-hair">
           {DIAS_CORTOS.map((d) => (
-            <span key={d} className="px-1.5 py-2 text-center text-[10px] font-semibold tracking-wide text-ink-muted md:px-3 md:text-left md:text-[11px]">
+            <span key={d} className="px-1.5 py-2 text-center text-[10px] font-semibold tracking-wide text-ink md:px-3 md:text-left md:text-[11px]">
               {d}
             </span>
           ))}

@@ -493,3 +493,93 @@ Payments / Adjustments / Today** de Recent Billing Activity pasan al `FilterMenu
 de Columns: un grupo *Type* de una opción, cada una con su cantidad. Con un paciente elegido siguen las pestañas
 Patient / Guarantor View (cambian de vista, no filtran). `ActividadReciente` suma `todas` para las cantidades. e2e en
 `tests/billing.e2e.ts` (abre el Filter en vez de tocar las pestañas).
+
+## Ajustes en secundario (2026-11-20)
+
+Con un paciente elegido, *Patient payment* queda en primario y *Credit adjustment* / *Charge adjustment* pasan a
+secundario, igual que el Ledger (ledger.md, misma fecha).
+
+### Corrección: ajustes en azul; pestañas y Columns en una sola barra (2026-11-20)
+
+1. Los ajustes vuelven a azul, como estaban (pedido de Julián).
+2. *Patient view / Guarantor view* (o Filter, sin paciente) bajan del encabezado de *Recent billing activity* a la barra
+   de la tabla, a la izquierda; *Columns* en la otra punta. Van por `DataTable` (`toolbarStart` y `actions`, prop nueva
+   `toolbarStart`): con una barra propia arriba, la tabla dibujaba la suya debajo y quedaban ~25 px entre las pestañas y
+   la tabla. Ahora: título, 12 px, barra, 12 px, tabla (el panel con el título pegado, como Find patient y Today).
+
+### Filter al lado de Columns (2026-11-20)
+
+Pedido de Julián. Sin paciente, Filter va a la derecha, al lado de *Columns* (los dos en `actions` de `DataTable`); con
+paciente, *Patient view / Guarantor view* sigue a la izquierda.
+
+## Métricas v3: una sola card para todas (2026-11-24)
+
+Sin historia de Jira; pedido de Julián con la propuesta `metricas_unificadas_v3.html`. **De la v3 se toma la estructura,
+no el estilo** (Julián: "debe tener el estilo de nuestra app, no la del html"). `ui/stat-card` es la misma card en
+Billing, el Ledger y Edit Account → Subscription; el Dashboard usa su variante compacta (`StatStrip`).
+
+- **Estructura (v3):** ícono, rótulo en sentence case, ⓘ a la derecha y el valor debajo. **Sin bajada:** lo que cuenta
+  cada número va en el ⓘ, y toda métrica lleva el suyo.
+- **Estilo (app):** `TARJETA_PANEL` (sombra, sin borde) sobre la página y `TARJETA_INTERNA` adentro de un panel (Today);
+  sin el borde ni el acento azul de arriba del HTML. Ícono de 18px en caja `info-bg` de 36, como la tira del Dashboard;
+  rótulo de 13px Medium en `ink-muted`; valor de 20px Bold en `dash-blue`, como antes. El ⓘ es `InfoTip` (card blanca),
+  no el tooltip oscuro del HTML.
+- **Billing:** cinco en fila desde 1280px (a 1024 los rótulos quedaban en tres o cuatro líneas); antes, 3 + 2 de borde a
+  borde; en celular, una por fila. Las bajadas (*Across patient and insurance balances*…) se fueron. Info nuevos de la v3
+  para Today: *Sum of adjustment transactions posted today (practice timezone).* y *Credit originated today at this
+  location that is still available.* **Today** deja la fila compacta (número a la derecha) y usa la misma card, apilada.
+- **Anomalía corregida (recomendación de la v3):** *Total A/R* ($2,131.86) era menor que *Guarantor A/R* + *Insurance
+  A/R*. Pasa a ser la suma, con los valores de la v3: $7,411.30 + $9,886.66 = **$17,297.96** (Insurance A/R era
+  $9,896.66). *Unapplied credits* de Today sigue saliendo de los movimientos del día ($100.00, el crédito de Lucía Paz que
+  muestra la tabla), no del $0.00 ilustrativo de la v3.
+- **Reglas de la v3 que ya se cumplen:** un solo azul para ícono y valor (`dash-blue`), sin ámbar, rótulos en sentence
+  case, sin bajadas y ⓘ en todas las métricas.
+- Para validar: si la columna derecha, más alta con Today en cards, molesta frente a la fila compacta de antes.
+
+## Tablas estandarizadas v2 (2026-11-24)
+
+Pie, alineación, fechas y avatar con las reglas comunes de todas las tablas: ver `design-reference/figma/README.md`
+(*Tablas estandarizadas v2*, 2026-11-24).
+
+## La columna derecha termina con la tabla: Find patient justo y Today adaptable (2026-11-24)
+
+Sin historia de Jira: devolución de Julián con la referencia del Figma *Confidentally UI · Design System* (113:1042).
+Find patient medía 440px fijos y sólo entraban cuatro pacientes enteros: quedaba un hueco arriba de *Show N more*. Today,
+con las tres cards apiladas, bajaba unos 200px más que la tabla. En el Figma, Today termina con la tabla pero muestra una
+sola card; Julián pidió mantener las tres.
+
+1. **Desde 1024px la columna derecha mide lo mismo que la tabla.** La columna izquierda no se estira (`lg:self-start`) y
+   su alto es el que se mide (`usePacientesQueEntran` en `Billing.tsx`, con ResizeObserver): Find patient muestra los
+   pacientes enteros que entran dejándole a Today su mínimo, *Show N more* va pegado a la última fila y Today
+   (`lg:flex-1`) se queda con el resto hasta el final de la tabla. Se recalcula al paginar, cambiar *Rows per page*,
+   buscar o elegir un paciente.
+2. **Today, siempre con las tres cards (solución con container query).** El cuerpo de Today es un contenedor de alto
+   (`[container:hoy/size]`). Con menos de 340px, cada `StatCard` pasa a una fila (`filaSiNoEntra`: ícono de 32, rótulo de
+   12px, ⓘ y el valor a la derecha) y las tres se reparten el alto; con lugar (25 filas por página, una búsqueda con
+   pocos resultados), vuelven a ser las cards enteras. Mínimo de las tres en fila: 184px (`MINIMO_HOY`).
+3. **Mínimo de tres pacientes en Find patient.** Con un paciente elegido la tabla queda corta: si Find patient bajara a
+   uno, el elegido quedaba escondido detrás de *Show N more*. Ahí la columna derecha queda más larga que la tabla, como
+   antes.
+4. En el celular y la tablet no cambia nada: Find patient con tres y Today con las cards enteras, debajo de la tabla.
+5. De paso (todas las tablas): el pie de `DataTable` queda fijo al ancho visible. En el celular, *Rows per page* y el
+   paginador quedaban escondidos a la derecha del scroll horizontal de la tabla.
+
+A validar con usuarios: si la fila compacta de Today se lee tan rápido como la card, y si recepción extraña ver más de
+cuatro pacientes recientes a la vez.
+
+## El tipo vuelve a pestañas, en la fila del título (2026-11-25)
+
+Pedido de Julián con un video de red.dev. Sin paciente, el `FilterMenu` de *Recent billing activity* se reemplaza por las
+pestañas **All / Payments / Adjustments / Today** (`ui/tabs` sm, sin cantidades, como el video), a la izquierda de
+*Columns*. Revierte "El tipo de actividad, en el Filter" (2026-11-20) sólo en Billing; Accounts sigue con su Filter.
+
+1. **En la fila del título.** Pestañas y *Columns* pasan de la barra de la `DataTable` al `controls` del `Panel`, como
+   red.dev: la tabla arranca justo abajo del título y no queda una barra aparte. Con un paciente elegido, *Patient view /
+   Guarantor view* va en el mismo lugar, así los controles no cambian de sitio entre las dos vistas.
+2. **Angosto.** El encabezado ya es `flex-wrap`: en tablet entra todo en la fila; en el celular las pestañas bajan abajo
+   del título y *Columns* debajo, sin scroll de costado.
+3. `ActividadReciente` deja la prop `todas` (era para las cantidades del Filter). e2e: `tests/billing.e2e.ts` toca la
+   pestaña (`role=tab`) en vez de abrir el Filter.
+
+**A validar con usuarios:** si recepción usa *Today* como vista diaria; si es así, conviene que recuerde la última
+pestaña elegida.

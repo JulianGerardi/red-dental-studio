@@ -2,7 +2,7 @@ import { PADDING_PAGINA } from '@/lib/estilos'
 import { useState } from 'react'
 import { PageTitle } from '@/components/ui/page-title'
 import { useParams } from 'react-router-dom'
-import { CreditCard, Crown, Building2 } from 'lucide-react'
+import { CreditCard, Crown, Building2, Lock, CalendarDays, CircleCheck } from 'lucide-react'
 import { Card } from '@/components/settings/primitives'
 import { CountryCodeField, SelectField, TextField, DateField, FormFooter } from '@/components/patients/form'
 import { EditableAvatar } from '@/components/ui/editable-avatar'
@@ -57,6 +57,12 @@ const iniciales = (nombre: string) => nombre.trim().split(/\s+/).slice(0, 2).map
 export function SettingsAccount() {
   const { accountId } = useParams()
   const cuenta = accountId ? CUENTAS.find((c) => c.id === accountId) : undefined
+  /* Licenses: en uso (empleados activos y suspendidos) sobre el total; una cuenta sin plan no tiene licencias. */
+  const total = cuenta ? Number(cuenta.licencias) : 170
+  const enUso = cuenta ? cuenta.empleados : 3
+  const licencias = Number.isNaN(total)
+    ? { usadas: '—', info: 'The account has no plan, so it has no licenses yet.' }
+    : { usadas: `${enUso} / ${total} used`, info: `${total - enUso} licenses available. Usage includes active and suspended employees.` }
 
   const [tab, setTab] = useState<Tab>('Information')
   const [logo, setLogo] = usePhoto(cuenta ? `account-logo:${cuenta.id}` : 'account-logo:me')
@@ -139,12 +145,13 @@ export function SettingsAccount() {
           <>
             <div>
               <h2 className="text-[15px] font-bold text-ink">Subscription summary</h2>
-              {/* Las métricas con la card de la app (`ui/stat-card`), como el Ledger y Billing (ledger.md, 2026-11-19). */}
-              <div className="mt-3 grid grid-cols-2 gap-3 lg:grid-cols-4">
-                <StatCard enFila label="Current plan" value={cuenta ? cuenta.plan : 'Prueba Red'} caption="Plan currently assigned to the account" />
-                <StatCard enFila label="Licenses" value={cuenta ? cuenta.licencias : '3 Used / 170 Total'} caption="167 available licenses based on active and suspended employees." />
-                <StatCard enFila label="Expired on" value={cuenta ? (cuenta.vence || '—') : '12/31/2026'} caption="Subscription end date" />
-                <StatCard enFila label="Status" value={cuenta ? (cuenta.estado in ESTADO_TONO_CUENTA ? cuenta.estado : '—') : 'Active'} caption="Current subscription status" />
+              {/* Las métricas con la card de la app (`ui/stat-card`): sin bajada, lo que dice cada una va en el ⓘ. "Expired
+                  on" pasa a "Expires on" y Licenses a "3 / 170 used" (settings-accounts.md, 2026-11-24). */}
+              <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
+                <StatCard enFila icon={CreditCard} label="Current plan" value={cuenta ? cuenta.plan : 'Prueba Red'} info="Plan currently assigned to the account." />
+                <StatCard enFila icon={Lock} label="Licenses" value={licencias.usadas} info={licencias.info} />
+                <StatCard enFila icon={CalendarDays} label="Expires on" value={cuenta ? (cuenta.vence || '—') : '12/31/2026'} info="Subscription end date." />
+                <StatCard enFila icon={CircleCheck} label="Status" value={cuenta ? (cuenta.estado in ESTADO_TONO_CUENTA ? cuenta.estado : '—') : 'Active'} info="Current subscription status." />
               </div>
             </div>
 

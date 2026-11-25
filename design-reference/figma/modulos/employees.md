@@ -89,3 +89,43 @@ Sin historia de Jira: devolución de diseño de Julián sobre Locations, Employe
 
 **A validar:** que recepción y administración no extrañen el clic en el nombre (es el patrón de Patients, que sí lo
 conserva). Si lo extrañan, la salida es la fila entera clickeable, no volver al link.
+
+## CON-4085 · CON-3542 · Sin casillas y *Clinical practitioner* (2026-11-20)
+
+Pedido de Julián; el nombre sale de Jira (CON-4085 nombra la columna `Is clinical practitioner`; CON-3542, *Enable /
+Disable Clinical Practitioner*).
+
+1. **Sin casillas** en la lista: no había ninguna acción sobre varios empleados a la vez (el "N selected" no llevaba a
+   nada). Se van la columna de casillas y la pastilla.
+2. La columna *Provider* pasa a **Clinical practitioner** (160 px para que entre el título). El interruptor de la ficha
+   pasa de *Is provider* a **Is clinical practitioner** y la opción del ⋮ *Remove provider role* a **Disable clinical
+   practitioner**: según CON-3542 deshabilitar el perfil clínico no toca los roles, así que "Remove role" decía otra
+   cosa. Las pestañas *Provider info* quedan: CON-3542 las llama así.
+3. Pendiente (no se pidió): CON-4085 suma "Credentials expired" con un ícono debajo del *Yes* cuando vence una
+   credencial requerida; CON-3542 pide validar turnos y encounters antes de deshabilitar (hoy se deshabilita directo).
+
+### CON-4085 · *Credentials expired* debajo del *Yes* (2026-11-20)
+
+Debajo del *Yes* de *Clinical practitioner*, un ícono de advertencia y "Credentials expired" en el tono warning cuando la
+persona tiene al menos una credencial requerida vencida (`credencialesVencidas` en `data/employees.ts`; en el mock, Julio
+Perez). Sin link: a la ficha se entra por el ⋮ (2026-11-18). Que desaparezca al renovar la credencial depende del
+backend; acá no hay vencimientos calculados.
+
+### Botones de la app en vez de links (2026-11-20)
+
+Pedido de Julián: los "Add" escritos como link azul pasan a `ui/button`. *Add new hour* (Working hours) y *Add role*
+(Roles & location) en primario, como *New room*; *Add credential* en secundario, porque suma una fila adentro del
+formulario. *Select file* del drop de Documents usa `buttonClasses` (era un span pintado a mano). Lo mismo en el resto:
+*Add exception* (Location), *Add another time range* (New hours y Location hours), *Add new subscription* (Insurance) y
+*Add new* (dependientes de Manage subscription). Los links que navegan (*All images*, *Go to procedure ›*) siguen siendo
+links.
+
+## Tablas estandarizadas v2 (2026-11-24)
+
+Pie, alineación, fechas y avatar con las reglas comunes de todas las tablas: ver `design-reference/figma/README.md`
+(*Tablas estandarizadas v2*, 2026-11-24).
+
+### El nombre vuelve a ser link (2026-11-24)
+
+Pedido de Julián con el HTML de tablas estandarizadas v2: el nombre de la fila lleva a la ficha (link azul, como Patients
+y Carriers) y el ⋮ → *Edit* sigue. Corrige el punto 1 del 2026-11-18.

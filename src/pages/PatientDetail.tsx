@@ -156,7 +156,8 @@ export default function PatientDetail({ turnos = APPTS.length }: { turnos?: numb
               </Card>
 
               <Card className="flex min-h-0 flex-1 flex-col p-5">
-                <div className="flex items-center justify-between gap-3">
+                {/* Pestañas a la derecha del título, como en el Dashboard (patient-dashboard.md, 2026-11-24). */}
+                <div className="flex flex-wrap items-center justify-between gap-3">
                   <h2 className="text-[15px] font-bold text-ink">Pending task</h2>
                   <Tabs
                     size="sm" aria-label="Filter tasks"

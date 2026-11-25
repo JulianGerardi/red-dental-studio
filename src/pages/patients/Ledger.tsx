@@ -2,11 +2,11 @@ import { useEffect, useMemo, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { slug } from '@/data/patientsStore'
 import {
-  Receipt, Wallet, HandCoins, MoveHorizontal, FileText, MinusCircle, PlusCircle,
+  Receipt, Wallet, HandCoins, MoveHorizontal, FileText, MinusCircle, PlusCircle, House, UserRound, ShieldCheck, type LucideIcon,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { EmptyState } from '@/components/ui/empty-state'
-import { RowChevron } from '@/components/ui/data-table'
+import { PieTabla, RowChevron } from '@/components/ui/data-table'
 import { PatientSidePanel } from '@/components/patients/PatientSidePanel'
 import { PatientBreadcrumb } from '@/components/patients/PatientBreadcrumb'
 import { TooltipProvider } from '@/components/ui/tooltip'
@@ -27,7 +27,6 @@ import { PROCEDIMIENTOS } from '@/data/clinical-mode'
 import { TARJETA_INTERNA, TARJETA_PANEL } from '@/lib/estilos'
 import { aviso } from '@/components/ui/toaster'
 import { Pill } from '@/components/ui/pill'
-import { Pagination } from '@/components/patients/ledger/Pagination'
 import { ColumnPicker } from '@/components/patients/ledger/ColumnPicker'
 import { useAnchoColumnas, useAnchoVisible, ManijaResize } from '@/components/patients/ledger/useAnchoColumnas'
 import { LedgerRowDetail, LedgerRowModal, BotonExpandirTodo, FilaConTooltip, PillTipo } from '@/components/patients/ledger/LedgerRowDetail'
@@ -185,7 +184,7 @@ export function Household() {
 const VISTAS = ['Patient view', 'Guarantor view'] as const
 type Vista = (typeof VISTAS)[number]
 
-/* Los tres botones de red.dev, en la fila del título; cada uno abre su drawer, el mismo de Billing (ledger.md, 2026-11-19). */
+/* Los tres botones de red.dev, en la fila del título y en azul; cada uno abre su drawer, el mismo de Billing (ledger.md, 2026-11-19). */
 export function AccionesLedger({ onAccion }: { onAccion: (tipo: TipoAjusteBilling) => void }) {
   return (
     <div className="flex flex-wrap items-center gap-2">
@@ -196,7 +195,7 @@ export function AccionesLedger({ onAccion }: { onAccion: (tipo: TipoAjusteBillin
   )
 }
 
-type Metrica = { label: string; value: string; info: string }
+type Metrica = { label: string; value: string; info: string; icon: LucideIcon }
 
 export default function Ledger() {
   const { id = 'john-smith' } = useParams()
@@ -207,6 +206,7 @@ export default function Ledger() {
   const [vista, setVista] = useState<Vista>('Patient view')
   const [accion, setAccion] = useState<TipoAjusteBilling | null>(null)
   const [pagina, setPagina] = useState(1)
+  const [tamPagina, setTamPagina] = useState(10)
   const [expandidas, setExpandidas] = useState<string[]>([])
   const [ocultas, setOcultas] = useState<ColLedger[]>(OCULTAS_DE_ENTRADA)
   const alternarCol = (id: ColLedger) =>
@@ -273,10 +273,9 @@ export default function Ledger() {
   )
 
   const filas = delaVista
-  const TAM_PAGINA = 8
-  const paginas = Math.max(1, Math.ceil(filas.length / TAM_PAGINA))
+  const paginas = Math.max(1, Math.ceil(filas.length / tamPagina))
   const paginaActual = Math.min(pagina, paginas)
-  const filasPagina = filas.slice((paginaActual - 1) * TAM_PAGINA, paginaActual * TAM_PAGINA)
+  const filasPagina = filas.slice((paginaActual - 1) * tamPagina, paginaActual * tamPagina)
 
   /* "todas" es sobre lo que se ve en pantalla, no sobre la cuenta entera:
      abrir 26 filas de golpe en una tabla paginada no le sirve a nadie. */
@@ -300,13 +299,13 @@ export default function Ledger() {
       .reduce((a, m) => a + (m.creditoDisponible ?? 0), 0)
     return [
       cuenta
-        ? { label: 'Guarantor balance', value: moneda(saldo), info: 'Consolidated balance of the household ledger. A negative value means available credit.' }
-        : { label: 'Patient balance', value: moneda(saldo), info: 'What the patient owes in this ledger. A negative value means available credit.' },
+        ? { label: 'Guarantor balance', value: moneda(saldo), icon: House, info: 'Consolidated balance of the household ledger. A negative value means available credit.' }
+        : { label: 'Patient balance', value: moneda(saldo), icon: UserRound, info: 'What the patient owes in this ledger. A negative value means available credit.' },
       cuenta
-        ? { label: 'Guarantor responsibility', value: moneda(responsabilidad), info: 'The portion of the household balance the guarantor is responsible for.' }
-        : { label: 'Patient responsibility', value: moneda(responsabilidad), info: 'The portion of the balance the patient is responsible for.' },
-      { label: 'Unapplied credits', value: moneda(credito), info: cuenta ? 'Household credit that is still available.' : 'Credit originated by this patient that is still available.' },
-      { label: 'Open charges', value: String(abiertos.length), info: 'Charges with a remaining balance greater than zero.' },
+        ? { label: 'Guarantor responsibility', value: moneda(responsabilidad), icon: ShieldCheck, info: 'The portion of the household balance the guarantor is responsible for.' }
+        : { label: 'Patient responsibility', value: moneda(responsabilidad), icon: ShieldCheck, info: 'The portion of the balance the patient is responsible for.' },
+      { label: 'Unapplied credits', value: moneda(credito), icon: PlusCircle, info: cuenta ? 'Household credit that is still available.' : 'Credit originated by this patient that is still available.' },
+      { label: 'Open charges', value: String(abiertos.length), icon: Receipt, info: 'Charges with a remaining balance greater than zero.' },
     ]
   }, [delaVista, vista])
 
@@ -325,7 +324,7 @@ export default function Ledger() {
     const i = filas.findIndex((f) => f.id === x.id)
     if (i < 0) return setEnModal(conSaldoTotal.find((f) => f.id === x.id) ?? null)
     setEnModal(null)
-    setPagina(Math.floor(i / TAM_PAGINA) + 1)
+    setPagina(Math.floor(i / tamPagina) + 1)
     setExpandidas((p) => (p.includes(x.id) ? p : [...p, x.id]))
     setResaltada(x.id)
   }
@@ -348,18 +347,16 @@ export default function Ledger() {
         />
 
         <div className="flex min-w-0 flex-1 flex-col">
-          {/* Como red.dev: título, los tres botones y Patient View / Guarantor View en la misma fila (ledger.md, 2026-11-19). */}
+          {/* Al lado del título, sólo las acciones; la vista va en la barra de la tabla (ledger.md, 2026-11-20). */}
           <div className="flex flex-wrap items-start justify-between gap-3">
             <PageTitle>Ledger</PageTitle>
-            <div className="flex flex-wrap items-center gap-2">
-              <AccionesLedger onAccion={setAccion} />
-              <Tabs className="shrink-0" aria-label="Ledger view" tabs={VISTAS} value={vista} onChange={(v) => { setVista(v); setPagina(1) }} />
-            </div>
+            <AccionesLedger onAccion={setAccion} />
           </div>
 
-          {/* Una card por métrica, como red.dev, Billing y Edit Account (`ui/stat-card`). */}
+          {/* Una card por métrica, como Billing y Edit Account (`ui/stat-card`). El ancho lo decide el contenedor: con el
+              menú y la ficha abiertos, cuatro en fila recién desde 896px (ledger.md, 2026-11-24). */}
           <div className="@container mt-4">
-            <div className="grid grid-cols-2 gap-3 @2xl:grid-cols-4">
+            <div className="grid grid-cols-1 gap-3 @md:grid-cols-2 @4xl:grid-cols-4">
               {stats.map((s) => <StatCard key={s.label} enFila {...s} />)}
             </div>
           </div>
@@ -372,7 +369,10 @@ export default function Ledger() {
           {/* La tabla en su card, con Columns arriba a la derecha como red.dev; sin buscador ni filtro (no están en red.dev
               ni en CON-3753). Sin Export statement: no está en red.dev (ledger.md, 2026-11-20). */}
           <div className="mt-4 flex w-full flex-col overflow-hidden rounded-lg border border-line-row bg-white lg:flex-1">
-          <div className="flex items-center justify-end gap-2 border-b border-line-row px-3 py-2.5">
+          {/* Pestañas a la izquierda, Columns en la otra punta, como Billing (ledger.md, 2026-11-20). */}
+          <div className="flex flex-wrap items-center justify-between gap-2 border-b border-line-row px-3 py-2.5">
+            <Tabs size="sm" className="shrink-0" aria-label="Ledger view" tabs={VISTAS} value={vista} onChange={(v) => { setVista(v); setPagina(1) }} />
+            <div className="flex items-center gap-2">
             {filasPagina.length > 0 && (
               <BotonExpandirTodo todasAbiertas={todasAbiertas} hayAlgunaAbierta={hayAlgunaAbierta}
                 onExpandirTodo={expandirTodo} onColapsarTodo={colapsarTodo} />
@@ -385,6 +385,7 @@ export default function Ledger() {
               onReset={() => setOcultas(OCULTAS_DE_ENTRADA)}
               porDefecto={OCULTAS_DE_ENTRADA}
             />
+            </div>
           </div>
           <div ref={refVisible} data-tabla-scroll className="w-full overflow-x-auto lg:flex lg:flex-1 lg:flex-col">
             <div style={{ minWidth: anchoMinimo }} className="lg:flex lg:flex-1 lg:flex-col">
@@ -477,22 +478,26 @@ export default function Ledger() {
                 })
               )}
 
-              <div className="flex flex-wrap items-center justify-between gap-3 border-t border-line-row px-3 py-3 lg:mt-auto">
-                <span className="flex items-center gap-3 text-xs font-semibold text-ink-muted">
-                  Showing {filas.length ? (paginaActual - 1) * TAM_PAGINA + 1 : 0} to {(paginaActual - 1) * TAM_PAGINA + filasPagina.length} of {filas.length} entries
-                  {anchos.avisando && (
-                    <span className="motion-safe:animate-[col-hint_2.4s_ease-in-out_both] hidden items-center gap-1.5 font-medium text-ink-faint lg:flex">
-                      <MoveHorizontal className="size-3.5" /> Drag column edges to resize · double-click to reset
-                    </span>
-                  )}
-                  {anchos.hayCambios && (
-                    <button type="button" onClick={anchos.resetear} className="text-dash-blue hidden hover:underline lg:inline">
-                      Reset column widths
-                    </button>
-                  )}
-                </span>
-                <Pagination pagina={paginaActual} paginas={paginas} onChange={setPagina} />
-              </div>
+              {/* El pie de todas las tablas: "results", Rows per page y el paginador (tablas estandarizadas v2, 2026-11-24). */}
+              <PieTabla
+                className="px-3 lg:mt-auto"
+                desde={filas.length ? (paginaActual - 1) * tamPagina + 1 : 0}
+                hasta={(paginaActual - 1) * tamPagina + filasPagina.length}
+                total={filas.length}
+                pagina={paginaActual} paginas={paginas} onPagina={setPagina}
+                filasPorPagina={tamPagina} onFilasPorPagina={(n) => { setTamPagina(n); setPagina(1) }}
+              >
+                {anchos.avisando && (
+                  <span className="motion-safe:animate-[col-hint_2.4s_ease-in-out_both] hidden items-center gap-1.5 font-medium text-ink-faint lg:flex">
+                    <MoveHorizontal className="size-3.5" /> Drag column edges to resize · double-click to reset
+                  </span>
+                )}
+                {anchos.hayCambios && (
+                  <button type="button" onClick={anchos.resetear} className="text-dash-blue hidden hover:underline lg:inline">
+                    Reset column widths
+                  </button>
+                )}
+              </PieTabla>
             </div>
           </div>
           </div>

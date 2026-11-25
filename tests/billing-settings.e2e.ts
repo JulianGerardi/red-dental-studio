@@ -164,3 +164,26 @@ test('el select de una celda se abre por encima de la tabla', async ({ app, scre
   await screen.getByRole('button', 'Save').tap()
   await expect(screen.getByText('Fee schedule by location was saved.')).toBeVisible()
 })
+
+/* Estandarización con Consents (2026-11-24): pestañas por tipo, estado en la lista y en el editor, y el ⋮ con Deactivate y
+   Delete (con confirmación). */
+test('Coverage tables: pestañas por tipo y el menú desactiva y borra', async ({ app, screen }) => {
+  await app.open('/settings/finance/coverage-table/standard-ppo/edit')
+  await screen.getByRole('tab', 'Copayment').tap()
+  await expect(screen.getByRole('link', /^DHMO Copay/)).toBeVisible()
+  await expect(screen.getByRole('link', /^Premium PPO/)).toHaveCount(0)
+  await screen.getByRole('tab', 'Percentage').tap()
+
+  await screen.getByRole('button', 'Actions for Premium PPO 100/90/60').tap()
+  await screen.getByRole('menuitem', 'Deactivate').tap()
+  await expect(screen.getByText('Premium PPO 100/90/60 was deactivated.')).toBeVisible()
+  await expect(screen.getByRole('link', /^Premium PPO 100\/90\/60 Inactive/)).toBeVisible()
+
+  await screen.getByRole('button', 'Actions for Standard PPO 100/80/50').tap()
+  await screen.getByRole('menuitem', 'Delete').tap()
+  const dialogo = screen.getByRole('dialog', 'Delete coverage table?')
+  await expect(dialogo.getByText(/Standard PPO 100\/80\/50/)).toBeVisible()
+  await dialogo.getByRole('button', 'Delete').tap()
+  await expect(screen.getByText('Standard PPO 100/80/50 was deleted.')).toBeVisible()
+  await expect(screen.getByRole('link', /^Standard PPO/)).toHaveCount(0)
+})

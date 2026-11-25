@@ -1,12 +1,10 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react'
-import { ArrowLeft, Ban, CircleCheck, Eye, EyeOff, File, FileCheck2, FileClock, FileMinus2, FileText, FileX2, LoaderCircle, Lock, PenLine, type LucideIcon } from 'lucide-react'
+import { Ban, CircleCheck, Eye, EyeOff, File, FileCheck2, FileClock, FileMinus2, FileX2, Lock, PenLine, type LucideIcon } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import { TARJETA_PANEL } from '@/lib/estilos'
 import { aviso } from '@/components/ui/toaster'
 import { Button } from '@/components/ui/button'
-import { Alert } from '@/components/ui/alert'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog'
-import { Drawer } from '@/components/ui/drawer'
+import { DocumentViewer } from '@/components/ui/document-viewer'
 import { Pill, type PillTone } from '@/components/ui/pill'
 import { Tabs } from '@/components/ui/tabs'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
@@ -96,9 +94,9 @@ export function estadoTrasFirma(firmas: FirmasConsentimiento): ConsentProcedimie
   return firmas.Patient && firmas.Provider ? 'Accepted' : 'Requested'
 }
 
-/* El consentimiento de un procedimiento, como en red.dev: arriba Back, el título y View PDF; el documento a todo el ancho
-   (con las afirmaciones que marca el paciente y las firmas estampadas al pie); abajo, Patient Signature y Provider
-   Signature. Ver clinical-mode.md (2026-11-02). */
+/* El consentimiento de un procedimiento en el visor de documentos (ui/document-viewer, a pantalla completa): arriba Back,
+   el título, el estado y View PDF; la hoja (con las afirmaciones que marca el paciente y las firmas estampadas); abajo,
+   Patient Signature y Provider Signature mientras falte alguna. Ver clinical-mode.md (2026-11-02 y 2026-11-24). */
 export function ConsentDetail({ procedimiento: p, pendiente, onVolver, onFirmar }: {
   procedimiento: Procedimiento
   /** Llegó desde Consent required (Sign now): con las firmas se confirma el Start o Complete que se pidió. */
@@ -120,79 +118,72 @@ export function ConsentDetail({ procedimiento: p, pendiente, onVolver, onFirmar 
     return () => window.clearTimeout(t)
   }, [])
 
-  return (
-    <TooltipProvider delayDuration={200}>
-    <div className="flex flex-col gap-4">
-      <div className={cn(TARJETA_PANEL, 'flex flex-wrap items-center gap-x-3 gap-y-2 px-4 py-3')}>
-        <Button variant="ghost" size="md" onClick={onVolver}><ArrowLeft /> Back</Button>
-        <span aria-hidden className="hidden h-6 w-px bg-line sm:block" />
-        <h2 className="min-w-0 flex-1 text-[15px] leading-snug font-bold text-ink">
-          Procedure Consent - {p.codigo} {p.nombre}
-        </h2>
-        <Pill tone={CONSENT[estado].tono}>{estado}</Pill>
-        <Button variant="secondary" size="md" onClick={() => aviso.info('View PDF is not available in this release.')}>
-          <FileText /> View PDF
-        </Button>
-      </div>
-
-      {pendiente && (
-        <Alert tone="info" title={`Sign to ${pendiente.verbo.toLowerCase()} this procedure`}>
+  /* Firmado por los dos o cerrado, no hay nada para hacer: sin barra de abajo (ui/document-viewer). */
+  const pendienteFirma = !cerrado && !(firmas.Patient && firmas.Provider)
+  /* El aviso de arriba: ya no se firma, el pedido de Start o Complete que espera las firmas, o las dos firmas hechas. */
+  const aviso_ = cerrado
+    ? `${AYUDA_CONSENTIMIENTO[estado]} It can no longer be signed.`
+    : pendiente
+      ? (
+        <>
+          <b className="block font-semibold">Sign to {pendiente.verbo.toLowerCase()} this procedure</b>
           Collect both signatures below, then confirm the {pendiente.verbo}. Back leaves the procedure as it was.
           {pendiente.restantes > 0 && ` ${pendiente.restantes} more consent${pendiente.restantes > 1 ? 's' : ''} to sign after this one.`}
-        </Alert>
-      )}
+        </>
+      )
+      : !pendienteFirma ? `Patient signed ${firmas.Patient} · Provider signed ${firmas.Provider}` : undefined
 
-      {/* La hoja a todo el ancho, sobre el escritorio gris como el preview de Consent Templates. */}
-      <div className="rounded-lg bg-surface-muted p-3 sm:p-6">
-        {preparando ? (
-          <div role="status" className="flex min-h-[360px] flex-col items-center justify-center gap-2 bg-white text-[13px] text-ink-muted">
-            <LoaderCircle className="size-6 animate-spin text-dash-blue" aria-hidden /> Preparing document...
-          </div>
-        ) : (
-          <ConsentDocument
-            titulo={`${DOCUMENTO_CONSENTIMIENTO.titulo} – ${p.nombre}`}
-            procedimiento={`${p.codigo} · ${p.nombre}`}
-            naturaleza={DOCUMENTO_CONSENTIMIENTO.naturaleza}
-            riesgos={DOCUMENTO_CONSENTIMIENTO.riesgos}
-            vistaPaciente={false}
-            paciente={PACIENTE}
-            proveedor={p.proveedor}
-            firmas={firmasHoja(p)}
-            reconocidos={marcadas}
-            onReconocer={firmas.Patient || cerrado ? undefined : (r, v) => setMarcadas((m) => (v ? [...m, r] : m.filter((x) => x !== r)))}
-            ancho="completo"
-          />
-        )}
-      </div>
-
-      {/* Las dos firmas al pie, fijas mientras se lee: la del paciente a la izquierda y la del provider a la derecha. */}
-      <div className={cn(TARJETA_PANEL, 'sticky bottom-0 z-10 flex flex-wrap items-center gap-3 px-4 py-3')}>
-        {cerrado ? (
-          <p className="flex min-h-8 items-center text-[13px] text-ink-muted">{AYUDA_CONSENTIMIENTO[estado]} It can no longer be signed.</p>
-        ) : <>
-        {firmas.Patient ? (
-          <Firmado rol="Patient" fecha={firmas.Patient} />
-        ) : (
-          <ConAyuda texto={reconocido ? 'Present the consent to the patient for signature' : 'The patient checks every acknowledgment in the document first.'}>
-            <span>
-              <Button variant="secondary" size="md" disabled={!reconocido} onClick={() => setFirmando('Patient')}>
-                <PenLine /> Patient signature
-              </Button>
-            </span>
-          </ConAyuda>
-        )}
-        {!firmas.Patient && !reconocido && (
-          <span className="text-[12px] text-ink-muted">Check every acknowledgment in the document to enable it.</span>
-        )}
-        <span className="ml-auto">
-          {firmas.Provider ? (
-            <Firmado rol="Provider" fecha={firmas.Provider} />
+  return (
+    <TooltipProvider delayDuration={200}>
+    <DocumentViewer
+      title={`Procedure Consent - ${p.codigo} ${p.nombre}`}
+      subtitle={PACIENTE}
+      status={<Pill tone={CONSENT[estado].tono}>{estado}</Pill>}
+      onBack={onVolver}
+      onPdf={() => aviso.info('View PDF is not available in this release.')}
+      loading={preparando}
+      notice={aviso_}
+      noticeTone={pendiente && !cerrado ? 'info' : 'neutral'}
+      footer={pendienteFirma ? (
+        <>
+          {/* Las dos firmas: la del paciente a la izquierda y la del provider a la derecha. */}
+          {firmas.Patient ? (
+            <Firmado rol="Patient" fecha={firmas.Patient} />
           ) : (
-            <Button size="md" onClick={() => setFirmando('Provider')}><PenLine /> Provider signature</Button>
+            <ConAyuda texto={reconocido ? 'Present the consent to the patient for signature' : 'The patient checks every acknowledgment in the document first.'}>
+              <span>
+                <Button variant="secondary" size="md" disabled={!reconocido} onClick={() => setFirmando('Patient')}>
+                  <PenLine /> Patient signature
+                </Button>
+              </span>
+            </ConAyuda>
           )}
-        </span>
-        </>}
-      </div>
+          {!firmas.Patient && !reconocido && (
+            <span className="text-[12px] text-ink-muted">Check every acknowledgment in the document to enable it.</span>
+          )}
+          <span className="ml-auto">
+            {firmas.Provider ? (
+              <Firmado rol="Provider" fecha={firmas.Provider} />
+            ) : (
+              <Button size="md" onClick={() => setFirmando('Provider')}><PenLine /> Provider signature</Button>
+            )}
+          </span>
+        </>
+      ) : undefined}
+    >
+      <ConsentDocument
+        titulo={`${DOCUMENTO_CONSENTIMIENTO.titulo} – ${p.nombre}`}
+        procedimiento={`${p.codigo} · ${p.nombre}`}
+        naturaleza={DOCUMENTO_CONSENTIMIENTO.naturaleza}
+        riesgos={DOCUMENTO_CONSENTIMIENTO.riesgos}
+        vistaPaciente={false}
+        paciente={PACIENTE}
+        proveedor={p.proveedor}
+        firmas={firmasHoja(p)}
+        reconocidos={marcadas}
+        onReconocer={firmas.Patient || cerrado ? undefined : (r, v) => setMarcadas((m) => (v ? [...m, r] : m.filter((x) => x !== r)))}
+      />
+    </DocumentViewer>
 
       {firmando === 'Patient' && (
         <FirmaPaciente nombre={PACIENTE} descripcion={`Procedure Consent - ${p.codigo} ${p.nombre}`} onClose={() => setFirmando(null)} onFirmar={(r) => { onFirmar('Patient', r); setFirmando(null) }} />
@@ -200,7 +191,6 @@ export function ConsentDetail({ procedimiento: p, pendiente, onVolver, onFirmar 
       {firmando === 'Provider' && (
         <FirmaProveedor nombre={p.proveedor} onClose={() => setFirmando(null)} onFirmar={(r) => { onFirmar('Provider', r); setFirmando(null) }} />
       )}
-    </div>
     </TooltipProvider>
   )
 }
@@ -424,8 +414,8 @@ export function PadFirma({ onCambio }: { onCambio: (imagen: string | null) => vo
   )
 }
 
-/* View consent desde Consent required: el documento que ya existe, en un drawer; Back vuelve al diálogo sin perder el
-   pedido (prototipo de CON-4052). Es el consentimiento del procedimiento, no el del caso. */
+/* View consent desde Consent required: el documento que ya existe, en el visor de documentos (antes un drawer); Back
+   vuelve al diálogo sin perder el pedido (prototipo de CON-4052). Es el consentimiento del procedimiento, no el del caso. */
 export function VistaConsentimiento({ procedimiento: p, onClose, cerrar = 'Close' }: {
   procedimiento: Pick<Procedimiento, 'codigo' | 'nombre'> & Partial<Pick<Procedimiento, 'proveedor' | 'consentimiento' | 'firmas' | 'rubricas'>>
   onClose: () => void
@@ -434,37 +424,25 @@ export function VistaConsentimiento({ procedimiento: p, onClose, cerrar = 'Close
   const proveedor = p.proveedor ?? 'Perez Martinez'
   const firmas = p.firmas ?? {}
   return (
-    <Drawer
-      open
-      onClose={onClose}
-      size="xl"
-      title="Procedure consent"
-      description="Specific consent for this procedure — not the treatment case consent."
-      footer={<Button variant="secondary" onClick={onClose}>{cerrar === 'Back' && <ArrowLeft />} {cerrar}</Button>}
+    <DocumentViewer
+      title={`Procedure Consent - ${p.codigo} ${p.nombre}`}
+      subtitle={`${PACIENTE} · Procedure consent, not the treatment case consent`}
+      status={p.consentimiento ? <Pill tone={CONSENT[p.consentimiento].tono}>{p.consentimiento}</Pill> : undefined}
+      backLabel={cerrar}
+      onBack={onClose}
+      notice={`Patient: ${firmas.Patient ? `signed ${firmas.Patient}` : 'not signed'} · Provider: ${firmas.Provider ? `signed ${firmas.Provider}` : 'not signed'}`}
+      noticeTone="neutral"
     >
-      <div className="flex flex-col gap-4">
-        <dl className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-1 text-[13px]">
-          <dt className="text-ink-muted">Status</dt>
-          <dd>{p.consentimiento ? <EstadoConsentimiento estado={p.consentimiento} /> : '—'}</dd>
-          <dt className="text-ink-muted">Patient</dt>
-          <dd className="text-ink">{firmas.Patient ? `Signed ${firmas.Patient}` : 'Not signed'}</dd>
-          <dt className="text-ink-muted">Provider</dt>
-          <dd className="text-ink">{firmas.Provider ? `Signed ${firmas.Provider}` : 'Not signed'}</dd>
-        </dl>
-        <div className="rounded-lg bg-surface-muted p-3">
-          <ConsentDocument
-            titulo={`${DOCUMENTO_CONSENTIMIENTO.titulo} – ${p.nombre}`}
-            procedimiento={`${p.codigo} · ${p.nombre}`}
-            naturaleza={DOCUMENTO_CONSENTIMIENTO.naturaleza}
-            riesgos={DOCUMENTO_CONSENTIMIENTO.riesgos}
-            vistaPaciente={false}
-            paciente={PACIENTE}
-            proveedor={proveedor}
-            firmas={firmasHoja({ firmas, rubricas: p.rubricas, proveedor })}
-            ancho="completo"
-          />
-        </div>
-      </div>
-    </Drawer>
+      <ConsentDocument
+        titulo={`${DOCUMENTO_CONSENTIMIENTO.titulo} – ${p.nombre}`}
+        procedimiento={`${p.codigo} · ${p.nombre}`}
+        naturaleza={DOCUMENTO_CONSENTIMIENTO.naturaleza}
+        riesgos={DOCUMENTO_CONSENTIMIENTO.riesgos}
+        vistaPaciente={false}
+        paciente={PACIENTE}
+        proveedor={proveedor}
+        firmas={firmasHoja({ firmas, rubricas: p.rubricas, proveedor })}
+      />
+    </DocumentViewer>
   )
 }

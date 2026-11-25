@@ -206,7 +206,6 @@ export default function Insurance() {
                 rowKey={(p) => p.id}
                 rowLabel={(p) => p.plan}
                 reorder={{ onReorder: reordenar, canMove: (p) => planes.some((x) => x.id === p.id) }}
-                itemLabel="insurances"
                 empty={{ icon: CreditCard, title: 'No plans yet', detail: "Add a subscription to start tracking this patient's coverage." }}
               />
 
@@ -230,13 +229,9 @@ export default function Insurance() {
                     emptyText="Subscription not found."
                     error={intentado && !elegida ? (busqueda.trim() ? 'Select a subscription from the list.' : OBLIGATORIO) : undefined}
                   />
-                  <button
-                    type="button"
-                    onClick={() => setModal('nueva')}
-                    className="text-dash-blue mt-2 flex items-center gap-1.5 self-end text-[13px] font-semibold hover:underline"
-                  >
-                    <Plus className="size-4" /> Add new subscription
-                  </button>
+                  <Button variant="secondary" className="mt-2 self-end" onClick={() => setModal('nueva')}>
+                    <Plus /> Add new subscription
+                  </Button>
 
                   {/* Sin elegir: "Select a subscription" y guiones. Elegida: el plan y su estado. */}
                   <div className="mt-4 flex items-center justify-between gap-3">

@@ -3,7 +3,7 @@ import { PADDING_PAGINA } from '@/lib/estilos'
 import { useCallback, useMemo, useState } from 'react'
 import { PageTitle } from '@/components/ui/page-title'
 import { Link, useNavigate, useParams } from 'react-router-dom'
-import { Trash2, FileText, Pencil, Ban, UserMinus, Plus } from 'lucide-react'
+import { Trash2, FileText, Pencil, Ban, UserMinus, Plus, TriangleAlert } from 'lucide-react'
 import { EmptyState } from '@/components/ui/empty-state'
 import { EditableAvatar } from '@/components/ui/editable-avatar'
 import { aviso } from '@/components/ui/toaster'
@@ -18,7 +18,7 @@ import { RolesLocation } from '@/components/settings/RolesLocation'
 import { NewHoursModal } from '@/components/settings/NewHoursModal'
 import { Pill } from '@/components/ui/pill'
 import { DropdownMenuItem } from '@/components/ui/dropdown-menu'
-import { Button } from '@/components/ui/button'
+import { Button, buttonClasses } from '@/components/ui/button'
 import { NewEmployeeDrawer } from '@/components/settings/NewEmployeeDrawer'
 import { DataTable, PersonCell, TextCell } from '@/components/ui/data-table'
 import { Tabs } from '@/components/ui/tabs'
@@ -42,8 +42,18 @@ export function EstadoPill({ estado }: { estado: Empleado['estado'] }) {
   return <Pill tone={estado === 'Active' ? 'success' : 'neutral'}>{estado}</Pill>
 }
 
-export function ProviderPill({ si }: { si: boolean }) {
-  return <Pill tone={si ? 'info' : 'neutral'}>{si ? 'Yes' : 'No'}</Pill>
+export function ProviderPill({ si, vencidas }: { si: boolean; /** Credenciales requeridas vencidas (CON-4085). */ vencidas?: boolean }) {
+  const pill = <Pill tone={si ? 'info' : 'neutral'}>{si ? 'Yes' : 'No'}</Pill>
+  if (!si || !vencidas) return pill
+  /* Debajo del Yes, el aviso de CON-4085: no se lo puede asignar a turnos hasta renovarlas (employees.md, 2026-11-20). */
+  return (
+    <span className="flex flex-col items-start gap-1">
+      {pill}
+      <span className="flex items-center gap-1 text-[11px] font-medium text-warn-fg">
+        <TriangleAlert className="size-3.5 shrink-0" aria-hidden /> Credentials expired
+      </span>
+    </span>
+  )
 }
 
 /* `nuevo`: la ruta /settings/team/new abre la lista con el drawer de New Employee ya abierto. */
@@ -53,7 +63,6 @@ export function SettingsEmployees({ nuevo = false }: { nuevo?: boolean }) {
   const cerrar = () => { setCreando(false); if (nuevo) navigate('/settings/team', { replace: true }) }
   const [q, setQ] = useState('')
   const [filas, setFilas] = useState(EMPLEADOS)
-  const [seleccion, setSeleccion] = useState<string[]>([])
 
   const visibles = useMemo(
     () => filas.filter((e) => `${e.nombre} ${e.email} ${e.cargo}`.toLowerCase().includes(q.trim().toLowerCase())),
@@ -63,18 +72,16 @@ export function SettingsEmployees({ nuevo = false }: { nuevo?: boolean }) {
   const borrar = (e: Empleado) => {
     const indice = filas.findIndex((x) => x.id === e.id)
     setFilas((p) => p.filter((x) => x.id !== e.id))
-    setSeleccion((p) => p.filter((x) => x !== e.id))
     aviso.ok(`${e.nombre} was removed.`, {
       label: 'Undo',
       onClick: () => setFilas((p) => [...p.slice(0, indice), e, ...p.slice(indice)]),
     })
   }
 
-  /* "Remove provider role" no borra a la persona, sólo el rol: si hiciera lo
-     mismo que Delete, dos ítems del mismo menú harían la misma acción. */
+  /* Deshabilita el perfil clínico, no borra a la persona ni sus roles (CON-3542). */
   const quitarRolProvider = (e: Empleado) => {
     setFilas((p) => p.map((x) => (x.id === e.id ? { ...x, esProvider: false } : x)))
-    aviso.ok(`${e.nombre} is no longer a provider.`)
+    aviso.ok(`${e.nombre} is no longer a clinical practitioner.`)
   }
 
   return (
@@ -88,32 +95,22 @@ export function SettingsEmployees({ nuevo = false }: { nuevo?: boolean }) {
         )}
       >
         <SettingsSearch value={q} onChange={setQ} placeholder="Search employees" />
-        {seleccion.length > 0 && (
-          <span className="bg-dash-count-bg text-dash-blue-hover flex h-8 items-center rounded-md px-3 text-[13px] font-semibold">
-            {seleccion.length} selected
-          </span>
-        )}
       </SettingsPageHeader>
 
       <div className="mt-4">
         <DataTable
           columns={[
-            /* A la ficha se entra sólo por el ⋮ → Edit (employees.md, 2026-11-18). */
-            { key: 'nombre', header: 'Name', width: 240, cell: (e) => <PersonCell name={e.nombre} initials={e.iniciales} /> },
+            /* El nombre lleva a la ficha, como en Patients; el ⋮ → Edit también (tablas estandarizadas v2, 2026-11-24). */
+            { key: 'nombre', header: 'Name', width: 240, cell: (e) => <PersonCell name={e.nombre} initials={e.iniciales} to={`/settings/team/${e.id}`} /> },
             { key: 'cumple', header: 'Date of birth', width: 120, cell: (e) => <TextCell>{e.cumpleanos}</TextCell> },
             { key: 'email', header: 'Email', cell: (e) => <TextCell>{e.email}</TextCell> },
-            { key: 'provider', header: 'Provider', width: 100, cell: (e) => <ProviderPill si={e.esProvider} /> },
+            /* "Clinical practitioner", como CON-4085 y CON-3542 (employees.md, 2026-11-20). */
+            { key: 'provider', header: 'Clinical practitioner', width: 160, cell: (e) => <ProviderPill si={e.esProvider} vencidas={e.credencialesVencidas} /> },
             { key: 'estado', header: 'Status', width: 100, cell: (e) => <EstadoPill estado={e.estado} /> },
           ]}
           rows={visibles}
           rowKey={(e) => e.id}
           rowLabel={(e) => e.nombre}
-          selectable
-          selected={seleccion}
-          onSelectedChange={setSeleccion}
-          /* Todos en una página, como antes: el equipo de una práctica es corto. */
-          pageSize={Math.max(visibles.length, 1)}
-          itemLabel="employees"
           empty={filas.length === 0
             ? { title: 'No employees yet', detail: 'Add the people who work at your practice.' }
             : { title: 'No employees found', detail: 'Try a different name or email.' }}
@@ -140,7 +137,7 @@ export function SettingsEmployees({ nuevo = false }: { nuevo?: boolean }) {
                 </DropdownMenuItem>
               ))}
               <DropdownMenuItem variant="destructive" onSelect={() => quitarRolProvider(e)}>
-                <UserMinus className="size-4 shrink-0" /> Remove provider role
+                <UserMinus className="size-4 shrink-0" /> Disable clinical practitioner
               </DropdownMenuItem>
             </>
           )}
@@ -279,7 +276,7 @@ export function SettingsEmployeeDetail() {
                 </div>
                 <span className="flex items-center gap-2">
                   <Toggle on={esProvider} onChange={alternarProvider} />
-                  <span className="text-[13px] text-ink">Is provider</span>
+                  <span className="text-[13px] text-ink">Is clinical practitioner</span>
                 </span>
               </div>
 
@@ -371,13 +368,9 @@ export function SettingsEmployeeDetail() {
                       </button>
                     </div>
                   ))}
-                  <button
-                    type="button"
-                    onClick={() => setCredenciales((p) => [...p, Math.max(0, ...p) + 1])}
-                    className="text-dash-blue flex items-center gap-1.5 self-start text-[13px] font-semibold hover:underline"
-                  >
-                    <Plus className="size-4" /> Add credential
-                  </button>
+                  <Button variant="secondary" className="self-start" onClick={() => setCredenciales((p) => [...p, Math.max(0, ...p) + 1])}>
+                    <Plus /> Add credential
+                  </Button>
                 </div>
               )}
             </Card>
@@ -392,7 +385,7 @@ export function SettingsEmployeeDetail() {
                 <FileText className="text-dash-blue size-8" strokeWidth={1.5} />
                 <span className="text-sm font-bold text-ink">Drag and drop your files</span>
                 <span className="text-[11px] text-ink-faint">JPEG, PND, PDF, and MP4 formats, up to 50MB</span>
-                <span className="bg-dash-blue mt-2 rounded-md px-4 py-2 text-[13px] font-medium text-white">
+                <span className={buttonClasses({ size: 'md', className: 'mt-2' })}>
                   Select file
                 </span>
               </button>
@@ -404,13 +397,8 @@ export function SettingsEmployeeDetail() {
           <Card>
             <div className="flex flex-wrap items-center justify-between gap-3">
               <h2 className="text-sm font-bold text-ink">Coordinated Universal Time (UTC)</h2>
-              <button
-                type="button"
-                onClick={() => setNuevaHora(true)}
-                className="text-dash-blue flex items-center gap-1.5 text-[13px] font-semibold hover:underline"
-              >
-                <Plus className="size-4" /> Add new hour
-              </button>
+              {/* Botón de la app, no link (employees.md, 2026-11-20). */}
+              <Button onClick={() => setNuevaHora(true)}><Plus /> Add new hour</Button>
             </div>
 
             {/* Misma grilla que el calendario de Scheduling: cabecera con el

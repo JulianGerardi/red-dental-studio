@@ -1,5 +1,5 @@
 import { SearchInput } from '@/components/ui/search-input'
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useLayoutEffect, useMemo, useRef, useState, type RefObject } from 'react'
 import {
   CreditCard, X, Download, Wallet, MinusCircle, PlusCircle,
 } from 'lucide-react'
@@ -19,7 +19,6 @@ import { Pill, type PillTone } from '@/components/ui/pill'
 import { AmountCell, DataTable, TextCell, type DataTableColumn } from '@/components/ui/data-table'
 import { CONTENEDOR_PAGINA, ICONO_SUELTO, TARJETA_INTERNA } from '@/lib/estilos'
 import { Tabs } from '@/components/ui/tabs'
-import { FilterMenu } from '@/components/ui/filter-menu'
 import { ShowMore } from '@/components/ui/show-more'
 import { Panel } from '@/components/dashboard/primitives'
 import { StatCard } from '@/components/ui/stat-card'
@@ -48,9 +47,9 @@ function detalleTipo(m: Movimiento): { texto: string; tono: PillTone } {
 /* Los números son la card de métricas de la app (`ui/stat-card`), la misma del Ledger y de Edit Account. */
 export const Stat = StatCard
 
-/* Los cinco números de borde a borde: cinco en fila desde lg; antes, 3 + 2 del mismo ancho por fila; en el celular 2 + 2
-   y el último entero. */
-const LUGAR_NUMERO = ['sm:col-span-2', 'sm:col-span-2', 'sm:col-span-2', 'sm:col-span-3', 'col-span-2 sm:col-span-3']
+/* Los cinco números de borde a borde: cinco en fila desde xl; antes, 3 + 2 del mismo ancho por fila; en el celular, una
+   por fila, como la propuesta v3 (billing.md, 2026-11-24). */
+const LUGAR_NUMERO = ['sm:col-span-2', 'sm:col-span-2', 'sm:col-span-2', 'sm:col-span-3', 'sm:col-span-3']
 
 /* Los filtros de red.dev: Payments junta paciente y seguro; Today, lo del día (billing.md, 2026-11-13). */
 export function coincideFiltro(m: Movimiento, f: FiltroActividad) {
@@ -131,6 +130,7 @@ export function ResultadoPaciente({ paciente, saldo, elegido, onElegir }: {
   return (
     <button
       type="button"
+      data-fila-paciente
       aria-current={elegido || undefined}
       onClick={onElegir}
       className={cn(
@@ -175,11 +175,11 @@ export function PacienteElegido({ paciente, onCerrar }: { paciente: PacienteBill
   )
 }
 
-/* Recent Billing Activity. Sin paciente: toda la clínica, con el Filter de tipo y filas que eligen al paciente. Con uno:
+/* Recent Billing Activity. Sin paciente: toda la clínica, con las pestañas del tipo y filas que eligen al paciente. Con uno:
    su nombre en el título, Patient / Guarantor View y sólo sus movimientos, sin saldos ni columna Balance (son de la cuenta de todas las locations); cada fila se despliega
    con el detalle del Ledger según el tipo (billing.md y ledger.md, 2026-10-14). */
 export function ActividadReciente({
-  filas, sinActividad, filtro, onFiltro, paciente, vista, onVista, onElegir, className, abierta, todas,
+  filas, sinActividad, filtro, onFiltro, paciente, vista, onVista, onElegir, className, abierta,
 }: {
   /** Las filas ya filtradas: por tipo en el resumen, por paciente o garante con uno elegido. */
   filas: (Movimiento & { saldo: number })[]
@@ -197,12 +197,10 @@ export function ActividadReciente({
   className?: string
   /** Con paciente: la fila que arranca desplegada (Storybook). */
   abierta?: string
-  /** Toda la actividad, para la cantidad de cada opción del filtro. */
-  todas?: Movimiento[]
 }) {
   /* View full record y la referencia de una aplicación abren la transacción en el registro de sólo lectura del Ledger. */
   const [enModal, setEnModal] = useState<(Movimiento & { saldo: number }) | null>(null)
-  /* Columns va en el encabezado, al lado del Filter, como red.dev: la tabla recibe las ocultas de afuera. */
+  /* Columns va en el encabezado, al lado de las pestañas del tipo, como red.dev: la tabla recibe las ocultas de afuera. */
   const [ocultas, setOcultas] = useState<string[]>([])
   const columnas = columnasDe(!!paciente && vista === 'Patient view')
   const elegibles = columnas.filter((c) => !c.locked)
@@ -210,22 +208,16 @@ export function ActividadReciente({
   return (
     <Panel
       title={paciente ? `${paciente.nombre} — Recent billing activity` : 'Recent billing activity'}
-      className={cn('min-w-0', className)}
+      /* Título pegado y sin padding arriba del cuerpo, como Find patient y Today (billing.md, 2026-11-20). */
+      className={cn('min-w-0', TITULO_PEGADO, className)}
+      bodyClassName="pt-0"
+      /* Pestañas y Columns en la fila del título, como red.dev: sin paciente, el tipo; con uno, Patient / Guarantor view
+         (billing.md, 2026-11-25). */
       controls={
         <div className="flex flex-wrap items-center gap-2">
           {paciente
             ? <Tabs size="sm" aria-label="Whose activity" tabs={VISTAS_PACIENTE} value={vista} onChange={onVista} />
-            /* El tipo se filtra con el Filter de la app, como Accounts; antes era una tira de pestañas (billing.md, 2026-11-20). */
-            : (
-              <FilterMenu
-                size="sm"
-                label="Filter activity"
-                groups={[{
-                  type: 'single', title: 'Type', defaultValue: 'All', value: filtro, onChange: (v) => onFiltro(v as FiltroActividad),
-                  options: FILTROS_ACTIVIDAD.map((f) => ({ value: f, count: todas?.filter((m) => coincideFiltro(m, f)).length })),
-                }]}
-              />
-            )}
+            : <Tabs size="sm" aria-label="Activity type" tabs={FILTROS_ACTIVIDAD} value={filtro} onChange={onFiltro} />}
           <ColumnPicker
             size="sm"
             columnas={elegibles.map((c) => ({ id: c.key, label: c.header }))}
@@ -249,8 +241,6 @@ export function ActividadReciente({
           <DetalleMovimiento m={{ ...m, saldo: undefined }} aplicaciones={APLICACIONES_BILLING} movimientos={ACTIVIDAD_RECIENTE} onVerTransaccion={ver} />
         ) : undefined}
         density="compact"
-        pageSize={PAGINA_ACTIVIDAD}
-        pageSizeOptions={[PAGINA_ACTIVIDAD, 20, 50]}
         empty={paciente
           ? { icon: CreditCard, title: 'No billing activity yet.', detail: 'Payments and adjustments posted for this patient show up here.' }
           : sinActividad
@@ -266,18 +256,53 @@ export function ActividadReciente({
 
 /* Find Patient: arriba el paciente que se está viendo; abajo el buscador y los resultados como InnerCard, como la lista
    lateral de Patients. */
-/** Filas por página de la actividad: con ocho la pantalla entra entera a 1440 × 900, sin scroll. */
-const PAGINA_ACTIVIDAD = 8
 
-/** Arranque de cuántos pacientes se ven en Find Patient antes de "Show N more": su `ShowMore llenarAlto` mide cuántas
-    filas enteras entran en el alto que le deja el flex-1 (billing.md, 2026-10-19), así que este valor es sólo el
-    primer render, antes de esa medición. */
 /* El título más cerca de lo que sigue (Patients y Billing; billing.md, 2026-10-19). */
 const TITULO_PEGADO = '[&>header]:min-h-10'
+/** Pacientes de Find Patient antes de "Show N more" en el celular y la tablet, y el mínimo desde 1024px, donde los
+    cuenta `usePacientesQueEntran`. */
 const LIMITE_PACIENTES = 3
+/** Alto mínimo de las tres cards de Today en fila (56 + 8 + 56 + 8 + 56): lo que Find Patient le deja siempre. */
+const MINIMO_HOY = 184
 
-export function BuscarPaciente({ busqueda, onBusqueda, paciente, saldoDe, onElegir, onCerrar, className }: {
+/** Desde 1024px la columna derecha mide lo mismo que la tabla: Find Patient muestra los pacientes enteros que entran
+    dejándole a Today su mínimo, con "Show N more" pegado a la última fila, y Today se queda con el resto hasta el final
+    de la tabla (billing.md, 2026-11-24). Cuenta con lo que mide la columna izquierda, que no se estira. */
+function usePacientesQueEntran(izq: RefObject<HTMLElement | null>, buscar: RefObject<HTMLElement | null>, hoy: RefObject<HTMLElement | null>) {
+  const [cuantos, setCuantos] = useState(LIMITE_PACIENTES)
+  useLayoutEffect(() => {
+    const medir = () => {
+      const [a, b, c] = [izq.current, buscar.current, hoy.current]
+      if (!a || !b || !c) return
+      if (!window.matchMedia('(min-width: 1024px)').matches) { setCuantos(LIMITE_PACIENTES); return }
+      const fila = b.querySelector<HTMLElement>('[data-fila-paciente]')
+      const lista = b.querySelector<HTMLElement>('[data-show-more-lista]')
+      const cajaHoy = c.querySelector<HTMLElement>('[data-hoy]')
+      if (!fila || !lista || !cajaHoy) return
+      const gap = 12
+      const paso = fila.offsetHeight + gap
+      /* Encabezado, buscador y aire de Find Patient, sin la lista; y lo de Today sin sus cards. */
+      const fijo = b.offsetHeight - lista.offsetHeight
+      const boton = (b.querySelector<HTMLElement>('[data-show-more]')?.offsetHeight ?? 18) + 8
+      const hoyMinimo = c.offsetHeight - cajaHoy.offsetHeight + MINIMO_HOY
+      const libre = a.offsetHeight - 16 - hoyMinimo - fijo - boton
+      /* Nunca menos de tres: con un paciente elegido la tabla queda corta y el elegido no puede esconderse detrás de
+         "Show N more". Ahí la columna derecha queda más larga que la tabla. */
+      const n = Math.max(LIMITE_PACIENTES, Math.floor((libre + gap) / paso))
+      setCuantos((p) => (p === n ? p : n))
+    }
+    medir()
+    const ro = new ResizeObserver(medir)
+    for (const r of [izq, buscar]) if (r.current) ro.observe(r.current)
+    return () => ro.disconnect()
+  }, [izq, buscar, hoy])
+  return cuantos
+}
+
+export function BuscarPaciente({ busqueda, onBusqueda, paciente, saldoDe, onElegir, onCerrar, filas = LIMITE_PACIENTES, className }: {
   className?: string
+  /** Cuántos pacientes se ven antes de "Show N more". */
+  filas?: number
   busqueda: string
   onBusqueda: (q: string) => void
   paciente?: PacienteBilling
@@ -302,9 +327,9 @@ export function BuscarPaciente({ busqueda, onBusqueda, paciente, saldoDe, onEleg
       {resultados.length === 0 ? (
         <EmptyState title="No recent patients/guarantors to show yet." className="py-6" />
       ) : (
-        /* Se ven tres y "Show N more" abre el resto con scroll adentro, sin estirar el panel: la regla de las listas largas
-           (ui/show-more, como Patients). Al buscar, el scroll vuelve a cero. */
-        <ShowMore key={busqueda} total={resultados.length} limit={LIMITE_PACIENTES} enCaja llenarAlto label="patients" className="flex flex-col gap-3">
+        /* Se ven los que entran y "Show N more" abre el resto con scroll adentro, sin estirar el panel: la regla de las
+           listas largas (ui/show-more, como Patients). Al buscar, el scroll vuelve a cero. */
+        <ShowMore key={`${busqueda}:${filas}`} total={resultados.length} limit={filas} enCaja label="patients" className="flex flex-col gap-3">
           {(cuantos) => resultados.slice(0, cuantos).map((p) => (
             <ResultadoPaciente
               key={p.nombre}
@@ -352,6 +377,10 @@ export default function Billing({ inicial }: {
   const [modal, setModal] = useState<TipoAjusteBilling | null>(null)
   const refElegido = useRef<HTMLDivElement>(null)
   const subir = useRef(false)
+  const refIzq = useRef<HTMLDivElement>(null)
+  const refBuscar = useRef<HTMLDivElement>(null)
+  const refHoy = useRef<HTMLDivElement>(null)
+  const pacientesQueEntran = usePacientesQueEntran(refIzq, refBuscar, refHoy)
 
   const pacienteSeleccionado = seleccionado ? PACIENTES_BILLING.find((p) => p.nombre === seleccionado) : undefined
   const grupo = useMemo(() => (seleccionado ? grupoDeGarante(seleccionado) : []), [seleccionado])
@@ -418,22 +447,21 @@ export default function Billing({ inicial }: {
       </div>
 
       {/* Los cinco números de borde a borde, como red.dev y las métricas del Ledger. */}
-      <div className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-6 lg:grid-cols-5">
-        {STATS_BILLING.map((s, i) => <Stat key={s.label} {...s} enFila className={cn(LUGAR_NUMERO[i], 'lg:col-span-1')} />)}
+      <div className="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-6 xl:grid-cols-5">
+        {STATS_BILLING.map((s, i) => <Stat key={s.label} {...s} enFila className={cn(LUGAR_NUMERO[i], 'xl:col-span-1')} />)}
       </div>
 
-      {/* La actividad a la izquierda; Find Patient y Today a la derecha, como red.dev. Con las métricas a todo el ancho la
-          columna derecha ya no se ata al alto de la izquierda: Find Patient tiene su alto y Today va debajo
-          (billing.md, 2026-11-19). */}
-      <div className="mt-4 grid grid-cols-1 items-start gap-4 lg:grid-cols-[minmax(0,1fr)_280px]">
-        <div className="flex min-w-0 flex-col gap-4">
+      {/* La actividad a la izquierda; Find Patient y Today a la derecha, como red.dev. La columna derecha mide lo mismo que
+          la tabla: Find Patient con los pacientes que entran y Today hasta el final (billing.md, 2026-11-24). La izquierda
+          no se estira: su alto es el que se mide. */}
+      <div className="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,1fr)_280px]">
+        <div ref={refIzq} className="flex min-w-0 flex-col gap-4 lg:self-start">
           <ActividadReciente
             className="flex-1"
             filas={filas}
             sinActividad={actividad.length === 0}
             filtro={filtro}
             onFiltro={setFiltro}
-            todas={actividad}
             paciente={pacienteSeleccionado}
             vista={vista}
             onVista={setVista}
@@ -442,19 +470,28 @@ export default function Billing({ inicial }: {
         </div>
 
         <div className="flex min-w-0 flex-col gap-4">
-          {/* Alto propio: entran unos cinco pacientes y "Show N more" abre el resto con scroll adentro. */}
-          <BuscarPaciente
-            className="h-[440px]"
-            busqueda={busqueda}
-            onBusqueda={setBusqueda}
-            paciente={pacienteSeleccionado}
-            saldoDe={saldoActual}
-            onElegir={elegirDeLaLista}
-            onCerrar={() => setSeleccionado(null)}
-          />
-          <Panel title="Today" className={cn('shrink-0', TITULO_PEGADO)} bodyClassName="gap-3 pt-0">
-            {STATS_HOY.map((s) => <Stat key={s.label} interna compacta {...s} />)}
-          </Panel>
+          <div ref={refBuscar} className="shrink-0">
+            <BuscarPaciente
+              filas={pacientesQueEntran}
+              busqueda={busqueda}
+              onBusqueda={setBusqueda}
+              paciente={pacienteSeleccionado}
+              saldoDe={saldoActual}
+              onElegir={elegirDeLaLista}
+              onCerrar={() => setSeleccionado(null)}
+            />
+          </div>
+          {/* Las tres cards siempre a la vista: con poco alto pasan a una fila cada una y se reparten el alto (el
+              contenedor `hoy` y `filaSiNoEntra` de ui/stat-card); con lugar, enteras. */}
+          <div ref={refHoy} className="flex flex-col lg:flex-1">
+            <Panel title="Today" className={cn('lg:flex-1', TITULO_PEGADO)} bodyClassName="gap-3 pt-0">
+              <div data-hoy className="lg:min-h-[184px] lg:flex-1 lg:[container:hoy/size]">
+                <div className="flex flex-col gap-3 lg:h-full [@container_hoy_(max-height:339px)]:gap-2">
+                  {STATS_HOY.map((s) => <Stat key={s.label} interna filaSiNoEntra {...s} />)}
+                </div>
+              </div>
+            </Panel>
+          </div>
         </div>
       </div>
 

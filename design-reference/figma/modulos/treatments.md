@@ -145,3 +145,8 @@ Comparativa con red.dev (ticket CON-4143, asignado a Abril). Las dos pantallas y
    - La fecha queda en formato "Oct 27, 2026".
 4. **A validar con usuarios**: si se espera que la fila abra el documento (vista previa, CON-2911). Hoy no hace nada en
    ninguna de las dos apps.
+
+## Tablas estandarizadas v2 (2026-11-24)
+
+Pie, alineación, fechas y avatar con las reglas comunes de todas las tablas: ver `design-reference/figma/README.md`
+(*Tablas estandarizadas v2*, 2026-11-24).

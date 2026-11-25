@@ -1171,3 +1171,32 @@ alineado al design system.
 Julián: el ícono de descargar de la barra de la tabla no va. Sale *Export statement*, que estaba por CON-3755 pero no está
 en red.dev; la barra queda con Expand / Collapse all (con una fila abierta) y *Columns*. Mismo criterio que en Billing,
 donde ya había salido.
+
+## Al lado del título, sólo las acciones; los ajustes en secundario (2026-11-20)
+
+Sin historia de Jira (pedido de Julián después del análisis de botones de acción).
+
+1. *Patient view / Guarantor view* sale de la fila del título (no es una acción, cambia qué se ve) y va a la barra de la
+   tabla, en la punta derecha, después de Columns, en `sm` como el resto de esa barra. Es la misma regla que Ledger
+   options: la vista va a la altura de las herramientas de la tabla, en la otra punta.
+2. Tres botones azules juntos no dejaban ver cuál es el principal. *Patient payment* queda en primario; *Credit
+   adjustment* y *Charge adjustment* pasan a secundario (blanco con borde). Los textos e íconos no cambian. Lo mismo en
+   Billing con un paciente elegido.
+
+### Corrección: los tres botones en azul y las pestañas a la izquierda (2026-11-20)
+
+Pedido de Julián: *Credit adjustment* y *Charge adjustment* vuelven a azul, como estaban (se deshace el punto 2 de
+arriba). En la barra de la tabla, *Patient view / Guarantor view* va a la izquierda y Expand all / Columns en la otra punta:
+en toda la app las pestañas van a la izquierda.
+
+## Métricas v3 (2026-11-24)
+
+Las cuatro métricas pasan a la estructura v3 con el estilo de la app (`ui/stat-card`, detalle en billing.md, 2026-11-24):
+ícono por métrica (House /
+UserRound para el saldo, ShieldCheck, PlusCircle, Receipt). El ancho lo decide el contenedor: una por fila hasta 448px, de
+a dos hasta 896px y cuatro en fila desde ahí (con menú y ficha abiertos, a 1024 quedan 2 × 2).
+
+## Tablas estandarizadas v2 (2026-11-24)
+
+Pie, alineación, fechas y avatar con las reglas comunes de todas las tablas: ver `design-reference/figma/README.md`
+(*Tablas estandarizadas v2*, 2026-11-24).

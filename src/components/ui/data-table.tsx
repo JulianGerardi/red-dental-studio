@@ -49,9 +49,9 @@ const PADDING = 32
 
 export function DataTable<T>({
   columns, rows, rowKey, rowLabel, selectable, rowActions, onRowClick, rowDetail, defaultExpanded, reorder,
-  search, filter, columnPicker, hiddenColumns, resizable, actions,
-  llenar, pageSize: pageSizeInicial = 10, pageSizeOptions, pageSizeLabel = 'Rows per page:',
-  itemLabel = 'results', density = 'regular', selected, onSelectedChange,
+  search, filter, columnPicker, hiddenColumns, resizable, actions, toolbarStart,
+  llenar, pageSize: pageSizeInicial = 10, pageSizeOptions = FILAS_POR_PAGINA,
+  density = 'regular', selected, onSelectedChange,
   loading, error, disabled, isRowDisabled,
   empty = { title: 'No results', detail: 'Try a different search or filter.' },
 }: {
@@ -88,14 +88,13 @@ export function DataTable<T>({
   resizable?: boolean
   /** A la derecha de la barra: acción principal, exportar… */
   actions?: ReactNode
+  /** Al principio de la barra, a la izquierda: pestañas o el filtro de afuera (Billing). Una sola barra arriba de la tabla. */
+  toolbarStart?: ReactNode
   /** Con el alto que le sobra a la pantalla (junto a un menú más alto): la tabla se estira y el pie queda abajo. */
   llenar?: boolean
   pageSize?: number
-  /** Selector de filas por página en el pie, por ejemplo [10, 25, 50]. */
+  /** Opciones de "Rows per page" en el pie; por defecto 10, 25 y 50 (tablas estandarizadas v2, 2026-11-24). */
   pageSizeOptions?: number[]
-  pageSizeLabel?: string
-  /** Qué se cuenta en el pie: "Showing 1 to 10 of 24 patients". */
-  itemLabel?: string
   density?: keyof typeof ALTO_FILA
   empty?: { icon?: LucideIcon; title: string; detail?: string }
   /** Cargando: filas grises en lugar de datos, y nada se puede tocar. */
@@ -171,27 +170,30 @@ export function DataTable<T>({
     const w = manual(c) ?? c.width
     return w !== undefined ? { width: w, flexShrink: 0 } : { minWidth: MIN_FLEX }
   }
+  /* Una columna a la derecha suma aire a su derecha: si no, el número queda pegado a la columna que sigue (Fee schedules,
+     tablas estandarizadas v2, 2026-11-24). */
   const celda = (c: DataTableColumn<T>) =>
-    cn('relative flex min-w-0 items-center', ALINEAR[c.align ?? 'left'], elastica(c) && 'flex-1')
+    cn('relative flex min-w-0 items-center', ALINEAR[c.align ?? 'left'], c.align === 'right' && 'pr-3', elastica(c) && 'flex-1')
   /* Si ya no queda columna elástica (se achicó a mano o se ocultó), un
      relleno ocupa lo que sobra y el menú de fila sigue pegado a la derecha. */
   const relleno = !visiblesCols.some(elastica) ? <div aria-hidden className="flex-1" /> : null
 
   /* Ancho mínimo: si no entra, la tabla scrollea dentro de su caja en vez de
      aplastar las columnas. */
-  const extras = (selectable ? 16 : 0) + (rowActions ? 40 : 0) + (rowDetail ? 16 : 0) + (reorder ? 20 : 0)
+  const extras = (selectable ? 16 : 0) + (rowActions ? 56 : 0) + (rowDetail ? 16 : 0) + (reorder ? 20 : 0)
   const huecos = visiblesCols.length - 1 + (selectable ? 1 : 0) + (rowActions ? 1 : 0) + (rowDetail ? 1 : 0) + (reorder ? 1 : 0)
   const minimo = visiblesCols.reduce((a, c) => a + (manual(c) ?? c.width ?? MIN_FLEX), 0) + extras + huecos * GAP + PADDING
 
   const idsAbribles = rowDetail ? ids : []
   const todasAbiertas = idsAbribles.length > 0 && idsAbribles.every((id) => abiertas.includes(id))
-  const hayBarra = !!(search || filter || columnPicker || actions || rowDetail)
+  const hayBarra = !!(search || filter || columnPicker || actions || rowDetail || toolbarStart)
   const reiniciar = () => setPagina(1)
 
   return (
     <div className={cn('flex flex-col gap-3', llenar && 'lg:min-h-0 lg:flex-1')}>
       {hayBarra && (
         <div className={cn('flex flex-wrap items-center gap-2', inactiva && 'pointer-events-none opacity-50')} aria-disabled={inactiva || undefined}>
+          {toolbarStart}
           {search && (
             <div className="relative w-[260px] max-w-full">
               <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-ink-faint" />
@@ -248,7 +250,7 @@ export function DataTable<T>({
               </div>
             ))}
             {relleno}
-            {rowActions && <div role="columnheader" className="w-10 shrink-0 text-center">Actions</div>}
+            {rowActions && <div role="columnheader" className="w-14 shrink-0 text-right">Actions</div>}
           </div>
 
           {loading ? (
@@ -264,7 +266,7 @@ export function DataTable<T>({
                   </div>
                 ))}
                 {relleno}
-                {rowActions && <span className="w-10 shrink-0" />}
+                {rowActions && <span className="w-14 shrink-0" />}
               </div>
             ))
           ) : error ? (
@@ -352,7 +354,7 @@ export function DataTable<T>({
                     {visiblesCols.map((c) => <div key={c.key} role="cell" inert={off || undefined} className={celda(c)} style={ancho(c)}>{c.cell(r)}</div>)}
                     {relleno}
                     {rowActions && (
-                      <div className="flex w-10 shrink-0 justify-center" onClick={(e) => e.stopPropagation()}>
+                      <div className="flex w-14 shrink-0 justify-end" onClick={(e) => e.stopPropagation()}>
                         {off ? <span className="w-8" aria-hidden /> : <RowActionsMenu label={nombre(r)}>{rowActions(r)}</RowActionsMenu>}
                       </div>
                     )}
@@ -367,42 +369,106 @@ export function DataTable<T>({
           )}
 
           {filtradas.length > 0 && !loading && !error && (
-            <div className={cn('flex min-h-[52px] flex-wrap items-center justify-between gap-3 border-t border-line-row px-4 py-2', llenar && 'lg:mt-auto')}>
-              <p className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs font-semibold text-ink-muted">
-                <span>
-                  {selectable && elegidas.length > 0 ? `${elegidas.length} selected · ` : ''}
-                  Showing {desde} to {hasta} of {filtradas.length} {itemLabel}
-                  {filtradas.length !== rows.length && <span className="font-medium text-ink-faint"> (filtered from {rows.length})</span>}
+            <PieTabla
+              /* Fijo al ancho que se ve: con la tabla más ancha que la pantalla (celular), Rows per page y el paginador no
+                 quedan escondidos a la derecha del scroll. */
+              className={cn('sticky left-0 w-[var(--tabla-visible,100%)]', llenar && 'lg:mt-auto')}
+              desde={desde} hasta={hasta} total={filtradas.length}
+              prefijo={selectable && elegidas.length > 0 ? `${elegidas.length} selected · ` : undefined}
+              nota={filtradas.length !== rows.length ? `(filtered from ${rows.length})` : undefined}
+              pagina={actual} paginas={paginas} onPagina={setPagina}
+              filasPorPagina={pageSize} opciones={pageSizeOptions} onFilasPorPagina={(n) => { setPageSize(n); setPagina(1) }}
+            >
+              {resizable && anchos.avisando && (
+                <span className="motion-safe:animate-[col-hint_2.4s_ease-in-out_both] hidden items-center gap-1.5 font-medium text-ink-faint lg:flex">
+                  <MoveHorizontal className="size-3.5" /> Drag column edges to resize · double-click to reset
                 </span>
-                {pageSizeOptions && (
-                  <span className="flex items-center gap-2 font-normal">
-                    {pageSizeLabel}
-                    <select
-                      value={pageSize}
-                      onChange={(e) => { setPageSize(Number(e.target.value)); setPagina(1) }}
-                      aria-label="Rows per page"
-                      className="h-7 rounded-md border border-line bg-white px-2 text-[12px] focus:border-dash-blue focus:outline-none"
-                    >
-                      {pageSizeOptions.map((n) => <option key={n} value={n}>{n}</option>)}
-                    </select>
-                  </span>
-                )}
-                {resizable && anchos.avisando && (
-                  <span className="motion-safe:animate-[col-hint_2.4s_ease-in-out_both] hidden items-center gap-1.5 font-medium text-ink-faint lg:flex">
-                    <MoveHorizontal className="size-3.5" /> Drag column edges to resize · double-click to reset
-                  </span>
-                )}
-                {resizable && anchos.hayCambios && (
-                  <button type="button" onClick={anchos.resetear} className="text-dash-blue hidden hover:underline lg:inline">Reset column widths</button>
-                )}
-              </p>
-              <Pagination pagina={actual} paginas={paginas} onChange={setPagina} />
-            </div>
+              )}
+              {resizable && anchos.hayCambios && (
+                <button type="button" onClick={anchos.resetear} className="text-dash-blue hidden hover:underline lg:inline">Reset column widths</button>
+              )}
+            </PieTabla>
           )}
         </div>
       </div>
     </div>
   )
+}
+
+/** Filas por página de todas las tablas (tablas estandarizadas v2, 2026-11-24). */
+export const FILAS_POR_PAGINA = [10, 25, 50]
+
+/** El pie de toda tabla: a la izquierda "Showing 1 to 10 of 339 results" (siempre "results"); a la derecha "Rows per
+    page" y el paginador, que sólo aparece con más de una página. Lo usan DataTable y las tablas propias (Ledger, Treatment
+    Plan). Ver design-system.md (patrón de tablas). */
+export function PieTabla({
+  desde, hasta, total, pagina, paginas, onPagina, filasPorPagina, opciones = FILAS_POR_PAGINA, onFilasPorPagina,
+  prefijo, nota, children, className,
+}: {
+  desde: number
+  hasta: number
+  total: number
+  pagina: number
+  paginas: number
+  onPagina: (p: number) => void
+  filasPorPagina?: number
+  opciones?: number[]
+  /** Sin esto no hay "Rows per page": la lista no se pagina. */
+  onFilasPorPagina?: (n: number) => void
+  /** Antes del "Showing…": "2 selected · ". */
+  prefijo?: string
+  /** Después del "Showing…", más tenue: "(filtered from 24)". */
+  nota?: string
+  /** Avisos a la izquierda, después del texto (el de las columnas que se arrastran). */
+  children?: ReactNode
+  className?: string
+}) {
+  return (
+    <div className={cn('flex min-h-[52px] flex-wrap items-center justify-between gap-x-3 gap-y-2 border-t border-line-row px-4 py-2', className)}>
+      <p className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs font-semibold text-ink-muted">
+        <span>
+          {prefijo}Showing {desde} to {hasta} of {total} results
+          {nota && <span className="font-medium text-ink-faint"> {nota}</span>}
+        </span>
+        {children}
+      </p>
+      <div className="flex flex-wrap items-center gap-3">
+        {onFilasPorPagina && filasPorPagina !== undefined && (
+          <label className="flex items-center gap-2 text-xs font-semibold text-ink-muted">
+            Rows per page:
+            <select
+              aria-label="Rows per page"
+              value={filasPorPagina}
+              onChange={(e) => onFilasPorPagina(Number(e.target.value))}
+              className="h-7 rounded-md border border-line bg-white px-2 text-[12px] font-normal text-ink focus:border-dash-blue focus:outline-none focus-visible:outline-2 focus-visible:outline-dash-blue"
+            >
+              {opciones.map((n) => <option key={n} value={n}>{n}</option>)}
+            </select>
+          </label>
+        )}
+        <Pagination pagina={pagina} paginas={paginas} onChange={onPagina} />
+      </div>
+    </div>
+  )
+}
+
+/** Paginación de una tabla propia (las que no son DataTable): la página, las filas por página y lo que va al PieTabla.
+    Al buscar o filtrar, quien la usa vuelve a la primera con `setPagina(1)`. */
+export function usePaginas<T>(filas: T[], inicial = 10) {
+  const [porPagina, setPorPagina] = useState(inicial)
+  const [pagina, setPagina] = useState(1)
+  const paginas = Math.max(1, Math.ceil(filas.length / porPagina))
+  const actual = Math.min(pagina, paginas)
+  const visibles = filas.slice((actual - 1) * porPagina, actual * porPagina)
+  const desde = filas.length ? (actual - 1) * porPagina + 1 : 0
+  return {
+    visibles, pagina: actual, setPagina, porPagina,
+    pie: {
+      desde, hasta: desde ? desde + visibles.length - 1 : 0, total: filas.length,
+      pagina: actual, paginas, onPagina: setPagina,
+      filasPorPagina: porPagina, onFilasPorPagina: (n: number) => { setPorPagina(n); setPagina(1) },
+    },
+  }
 }
 
 /* Celdas que se repiten en las tablas de la app. */

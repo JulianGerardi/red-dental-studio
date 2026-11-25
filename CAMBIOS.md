@@ -3,7 +3,165 @@
 Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber el dev. El porqué de cada decisión está en
 `design-reference/figma/modulos/<módulo>.md`; lo anterior al 2026-10-06, en `git log` y en esos mismos archivos.
 
+## 2026-11-25
+
+### Referral: Complete this task abre el detalle ([#194](https://github.com/JulianGerardi/red-dental-studio/pull/194))
+- **Nuevo `clinical/ReferralDetail`** (`ReferralDetail`, `ReferralPanel`): *Complete this task* de una Referral abre
+  Clinical Mode en `?tab=Referral&task=<id>` con la derivación (CON-2321). Una card como el panel de Treatment plan,
+  secciones sin caja, Cancel / Save al pie. Sólo se edita en Pending con encuentro abierto (CON-2323); Procedures sólo
+  Planned; nota de 500; adjuntos PDF/JPG/PNG ≤10MB (CON-2322).
+- **Nuevo `clinical/NewProviderDrawer`**: General, Address, Phone; el provider nuevo queda elegido (CON-2610).
+- **`tareas.accionesDe`**: Referral tiene ⋮ (Pending → Request, Cancel, Delete; Requested → Cancel), también en las filas
+  de Pending task. Request pregunta antes (CON-2394). Mock: `PROVEEDORES_DERIVACION`, `DERIVACION_TAREA`.
+
+### End Encounter: procedimientos del turno con fases en orden ([#193](https://github.com/JulianGerardi/red-dental-studio/pull/193))
+- **Nuevo `clinical/EndEncounterDrawer`** (CON-4153): *Complete encounter* de Clinical Mode abre el drawer con los
+  procedimientos del turno antes de cerrar; sin procedimientos cierra directo. Acción por fila: *Start procedure*,
+  *Complete phase N* o *Complete procedure*, siempre la siguiente fase sin registrar (CON-4154, CON-4155). ⋮ en tres
+  secciones (CON-4156) y *View execution history* en drawer con la nota de cada encuentro (CON-4158).
+- **Nuevo `lib/ejecucion.ts`** (estado y reglas: `accionPrincipal`, `faseDeCierre`, `esAnticipado`) y `data/ejecucion.ts`.
+  `ClinicalNoteDialog` suma `onFirmar` (opcional).
+- Para backend: completar antes de la última fase actualiza a `FINISHED` la fila de la fase de hoy (no crea otra) y no
+  registra fases futuras.
+
+### Lab Order: rediseño del detalle, New Laboratory y la tabla alineada ([#192](https://github.com/JulianGerardi/red-dental-studio/pull/192))
+- **`LabOrderDetail`** con otro layout y mismo contenido que red.dev: cabecera *LAB ORDER* + estado, PDF y ⋮; la fecha
+  va con ASAP; *Teeth & surface* en su card; *Details* a la derecha; Cancel / Save fijos abajo. Sin íconos decorativos.
+  Editable sólo con encuentro abierto **y** la orden en Pending (CON-2218).
+- Procedimientos (CON-3904): `SearchPicker` + `FilterMenu`, sólo los elegibles; `ui/search-picker` suma `disabled`.
+- **Nuevos `clinical/NewLaboratoryDrawer`** (CON-2285, pasos General · Contact · Address · Credentials) y
+  **`clinical/dental/DentalArch`** (arcadas en U con botones). `PROCEDIMIENTOS_ORDEN` en `data/clinical-mode.ts`.
+- **`LabOrderPanel`** como las tablas generales: sin card, `SettingsSearch` (*Search lab orders* + Search), botones md,
+  *Last update* / *Created date*.
+
+### Billing: el tipo de actividad en pestañas, como red.dev ([#191](https://github.com/JulianGerardi/red-dental-studio/pull/191))
+- *Recent billing activity* deja el `FilterMenu`: **All / Payments / Adjustments / Today** van en `ui/tabs` (sm), en la
+  fila del título y a la izquierda de *Columns*. Con un paciente, *Patient view / Guarantor view* va en el mismo lugar.
+- Los controles pasan de `DataTable` (`toolbarStart` / `actions`) al `controls` del `Panel`. `ActividadReciente` ya no
+  recibe `todas`. Accounts sigue con su Filter.
+
+### PDF de la Lab Order con los datos y el diagrama de la boca de red.dev ([#190](https://github.com/JulianGerardi/red-dental-studio/pull/190))
+- El PDF de la Lab Order (ícono del documento en Pending task) trae lo de red.dev: Provider, Lab Order ID, Patient
+  Phone, Email, Expiration Date; Patient Information, Receiving Laboratory, Provider Information, Dental Work Request y
+  **Teeth & Surface Specifications con el diagrama de la boca**. Sin firma (CON-2643).
+- **Nuevo `data/laboratorios.ts`** (`LABORATORIOS`, `ARCADAS`, `Denticion`); el select de `LabOrderDetail` lo usa.
+- `documentoTarea`: sección `dientes`, `Documento.sinFirma` y `diagramaBoca()` (la geometría que dibujan el PDF y el
+  SVG `DiagramaBoca` de `VistaDocumento`). Token nuevo `--color-encia`.
+
+### Pending task: fechas alineadas aunque no haya ⋮ ([#189](https://github.com/JulianGerardi/red-dental-studio/pull/189))
+- **`TaskRow`** (Dashboard y Patient Dashboard) reserva siempre el lugar del ⋮ (28 px), como ya hacía con el PDF: la
+  Clinical note, que no tiene acciones, ya no corre el vencimiento, el PDF ni *Complete this task* (CON-2643).
+- Sin cambios de props, rutas ni datos.
+
+## 2026-11-24
+
+### Visor y hoja de documentos unificados ([#188](https://github.com/JulianGerardi/red-dental-studio/pull/188))
+- **Nuevo `ui/document-viewer`** (`DocumentViewer`): todo documento a pantalla completa, nunca en drawer. Back con
+  destino, título, estado, View PDF, un aviso y la barra de firma sólo si hay algo que firmar. Lo usan la Clinical note,
+  el Procedure consent de Clinical Mode, *View consent* (antes drawer) y el preview de Consent templates.
+- **Nuevo `ui/document-sheet`** (`DocumentSheet`): membrete, tipo y título, resumen en tres columnas, secciones
+  numeradas, firmas y pie. `ConsentDocument` lo usa (**se va la prop `ancho`**) y la Clinical note también.
+  **Se borra `settings/HojaConsentimientoPdf`**. `CLINICA` y `MEMBRETE` en `data/clinica.ts`.
+- **PDF de la Clinical note** (`pdfDeDocumento`) con el mismo diseño. Para backend: es el formato de referencia del PDF.
+
+### Ledger options, New template y la fecha de Dashboard y Scheduling ([#187](https://github.com/JulianGerardi/red-dental-studio/pull/187))
+- **Nuevo `ui/date-nav` (`DateNav`):** ‹ Today › + período con calendario, en un solo bloque. Props `value`, `onChange`,
+  `periodo` (`day` · `week` · `month`), `hoy`, `marked`, `tour`. Lo usan Dashboard (un día) y Scheduling (su vista).
+  **Dejar de usar** `DatePicker variant="toolbar"` + el botón *Today* aparte en esas pantallas.
+- **Scheduling:** la fecha a la izquierda; *Day / Week / Month*, *Status legend* y *Filter* a la derecha.
+- **Ledger options:** pestañas arriba y debajo el buscador y el Filter de la lista (Direction + Impact para Adjustment
+  types; Method type para Payment methods). Name y Description se reparten el ancho.
+- **Consents:** el editor nuevo dice *New template*.
+
+### Consents: search, pestañas y Preview a pantalla completa como red.dev ([#186](https://github.com/JulianGerardi/red-dental-studio/pull/186))
+- **Pestañas Active · System · All** debajo del buscador (reemplazan el Filter); buscadores con X (`PanelLista`, también
+  en Coverage). *Search procedure* abre la lista al hacer foco, filtra, X y *No results found.*
+- **Preview a pantalla completa** (CON-4094): `PreviewPaciente` **reemplaza a `DrawerPreview`**; *Back to editing*,
+  *Patient View - título*, aviso de cambios sin guardar. Sin toggle *Patient view* ni *Save* en el preview.
+- **Nuevo `settings/HojaConsentimientoPdf`**: la hoja con el formato del PDF de red.dev (datos de ejemplo). `Filtro` pasa
+  a `'Active' | 'System' | 'All'`; `ListaTemplates` ya no recibe `todos`.
+
+### Coverage tables y Consents con el mismo patrón de lista + editor ([#185](https://github.com/JulianGerardi/red-dental-studio/pull/185))
+- **Nuevo `settings/ListaEditor`:** `PanelLista`, `ItemLista`, `EncabezadoEditor`, `PieEditor`, `GRILLA_LISTA_EDITOR`,
+  `TARJETA_EDITOR`. Lista de 340 px + editor en dos cards; ⋮ con Activate/Deactivate y Delete (con confirmación); pie
+  fijo con Cancel · Save. Va dentro de un `@container`. `MasterList` queda sólo para Fee schedules.
+- **Coverage:** pestañas Percentage / Copayment (reemplazan el select), `TablaCobertura.activo?` (propuesta, sin
+  historia; no filtra *Copy from template*), *Exc* → *Exceptions* y valores a la derecha (`TextField numero`).
+  `RangesTable` arma columnas según el ancho de la tabla (`@3xl` de contenedor), sin scroll horizontal.
+- **Consents:** sin switch ni *Deactivate template*; Deactivate confirma con los procedimientos (CON-3719), Activate
+  valida que no haya otro template activo para el procedimiento (CON-3725), System bloqueado. Preview en drawer `2xl`
+  con la hoja a 820 px. Delete de templates es propuesta: **CON-1484 está cancelada**.
+
+### Billing: la columna derecha termina con la tabla ([#184](https://github.com/JulianGerardi/red-dental-studio/pull/184))
+- **Find patient** sin alto fijo: los pacientes enteros que entran (mínimo tres) y *Show N more* pegado a la última
+  fila. **Today** (`lg:flex-1`) termina donde termina la tabla y muestra siempre sus tres cards.
+- **`ui/stat-card`:** prop nueva `filaSiNoEntra`: dentro de un contenedor `[container:hoy/size]` de menos de 340px de
+  alto, la card pasa a una fila (ícono, rótulo, ⓘ y valor a la derecha).
+- **`Billing.tsx`:** `usePacientesQueEntran` mide la columna izquierda (`lg:self-start`) y calcula cuántos pacientes
+  entran; `BuscarPaciente` recibe `filas`. Find patient deja `llenarAlto` y los 440px fijos.
+- **Todas las tablas:** el pie de `DataTable` queda fijo al ancho visible (en el celular se escondía en el scroll).
+
+### Tablas estandarizadas v2: pie, alineación, fechas, Tooth/Surface y avatar ([#183](https://github.com/JulianGerardi/red-dental-studio/pull/183))
+- **Pie de toda tabla:** "Showing 1 to 10 of N results" (siempre *results*), *Rows per page* 10 / 25 / 50 a la derecha
+  con el paginador (sólo con más de una página). Todas arrancan en 10 filas.
+- **`ui/data-table`:** nuevos `PieTabla`, `usePaginas` (tablas propias: Ledger, Treatment plan) y `FILAS_POR_PAGINA`.
+  **Dejar de usar `itemLabel` y `pageSizeLabel`** (se fueron); `pageSizeOptions` tiene default `[10, 25, 50]`.
+- **Alineación:** cantidades e importes a la derecha (`align: 'right'` suma `pr-3`), *Actions* a la derecha, toggles a la
+  izquierda. *Assignments* (Fee schedules) a la izquierda: es un link.
+- **Fechas:** *Created date* en Problem list, Procedures y Treatment plan; MM/DD/YYYY en todas (`fechaDMA` → `fechaMDA`).
+- **Treatment plan:** *Created date, Location, Tooth, Surface*; Unassigned paginado. Avatar sólo en Patients y Employees.
+- Employees y Locations: el nombre es link a la ficha. Fee schedules: el Filter arranca vacío. Ledger options usa
+  `DataTable`. Detalle en `design-reference/figma/README.md` (2026-11-24).
+
+### Métricas unificadas: estructura v3 con el estilo de la app ([#182](https://github.com/JulianGerardi/red-dental-studio/pull/182))
+- **Todas las métricas** (Billing, Ledger, Edit account → Subscription y Dashboard): ícono en caja celeste, rótulo en
+  sentence case, ⓘ en todas y **sin bajada**: lo que decía la bajada pasa al ⓘ.
+- **`ui/stat-card`:** props `label`, `value`, `info`, `icon`, `interna` (InnerCard adentro de un panel, como Today de
+  Billing) y `enFila`. **Dejar de usar `caption` y `compacta`** (se fueron). Card con sombra y sin borde (`TARJETA_PANEL`).
+- **`StatStrip` (Dashboard):** en celular las métricas se apilan una por fila con el ⓘ a la derecha; desde 768px, en fila.
+- **Textos y valores:** *Expires on* (era *Expired on*), Licenses "3 / 170 used", ⓘ nuevos de Today y del Dashboard.
+  Total A/R es la suma de Guarantor A/R + Insurance A/R ($17,297.96).
+- **Open encounters (CON-2813):** Planned, In Progress, On Hold, Completed y Discharged, sin Fulfilled, de cualquier día;
+  el mock todavía da un número por día. Appointments sin canceladas (CON-3912); Waiting room: Checked in, On hold y Ready
+  to check out (CON-4178).
+
+### Patient Dashboard: pestañas de vuelta en la fila del título y sin "N to resolve" ([#181](https://github.com/JulianGerardi/red-dental-studio/pull/181))
+- Pending task y Pending documents vuelven a tener las pestañas a la derecha del título, como el Dashboard (se deshace
+  lo del #180 en esta pantalla).
+- Pending documents ya no muestra la pastilla "N to resolve": las pestañas dicen cuántos hay por grupo.
+- **Para el dev:** sólo layout, en `PatientDetail.tsx` y `patients/PendingDocuments.tsx`. Decisión en
+  `modulos/patient-dashboard.md` (2026-11-24).
+
+### Pending task con Filter por provider; pestañas de Pending documents debajo del título ([#180](https://github.com/JulianGerardi/red-dental-studio/pull/180))
+- **Dashboard · Pending task:** las pestañas siguen a la derecha del título y suman un Filter por provider al lado
+  (cada provider ve sus tareas). Las cantidades de las pestañas son las del provider elegido; si no queda nada, "No
+  results match your filters".
+- **Patient Dashboard:** las pestañas de Pending task y de Pending documents van debajo del título, a la izquierda; "N to
+  resolve" a la derecha, a la altura del título.
+- **Para el dev:** el filtro usa `PendingTask.provider` (`FilterMenu` sm, varias opciones). Decisiones en
+  `modulos/dashboard.md` (2026-11-24) y `patient-dashboard.md` (2026-11-20).
+
 ## 2026-11-20
+
+### Acciones al lado del título, pestañas a la izquierda, botones "Add" y Clinical practitioner ([#179](https://github.com/JulianGerardi/red-dental-studio/pull/179))
+- **Regla:** al lado del título van sólo las acciones; las pestañas van a la izquierda de su barra y filtros, fecha y
+  Columns en la otra punta. Scheduling: Day / Week / Month a la izquierda; fecha, Today, Status legend y Filter juntos a
+  la derecha. Ledger del paciente: Patient view / Guarantor view en la barra de la tabla, a la izquierda. Billing: igual
+  con paciente; sin paciente, Filter al lado de Columns. Ledger options: Adjustment types / Payment methods en pestañas
+  debajo del buscador (salieron del Filter).
+- **Scheduling:** *View* usa `FilterTrigger` (blanco, ícono y "Filter"), sin contador porque la grilla todavía no filtra.
+  Texto del calendario en `ink` (horas, días, números; hoy sigue en azul) y Status legend en `ink`.
+- **Employees (CON-4085, CON-3542):** sin casillas; *Provider* pasa a *Clinical practitioner* (columna, interruptor
+  *Is clinical practitioner* y *Disable clinical practitioner* en el ⋮). "Credentials expired" debajo del Yes
+  (`Empleado.credencialesVencidas`).
+- **Botones:** los "Add" que eran links azules pasan a `ui/button` (Add new hour, Add role, Add exception en primario;
+  Add credential, Add another time range, Add new subscription, Add new en secundario). Consent templates: *New
+  template* en la fila del título (`ListaTemplates` ya no recibe `onNuevo`). El salto por letra de Billing profile con el
+  color de `Tabs`.
+- **Exceptions (Location):** mismo diseño que Rooms: caja con encabezado, filas, estado en `Pill`, *Edit exception*.
+- **Para el dev:** `DataTable` suma `toolbarStart` (al principio de su barra; Billing pone ahí las pestañas para no
+  tener dos barras). Decisiones en `modulos/scheduling.md`, `employees.md`, `settings-ledger.md`, `ledger.md`,
+  `billing.md`, `consents.md`, `locations.md` y `billing-profile.md` (2026-11-20).
 
 ### Pending Task con funcionalidad, como red.dev ([#178](https://github.com/JulianGerardi/red-dental-studio/pull/178))
 - **Complete this task:** Lab order, Prescription y Referral abren Clinical Mode en su pestaña (`?tab=…&task=<id>`); la

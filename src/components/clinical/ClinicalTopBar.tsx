@@ -11,6 +11,8 @@ import type { EstadoEncuentro } from '@/lib/encuentro'
 import { BOTON_EXPANDIBLE, ETIQUETA_EXPANDIBLE } from '@/lib/estilos'
 import { aviso } from '@/components/ui/toaster'
 import { setNotaPendiente } from '@/lib/notaClinica'
+import { cerrarEncuentroEjecucion, firmarNotaUltimoEncuentro, useProcedimientosCita } from '@/lib/ejecucion'
+import { EndEncounterDrawer } from '@/components/clinical/EndEncounterDrawer'
 import { CONSTANTES, CONTADORES, type Contador } from '@/data/clinical-mode'
 import { ClinicalBadge, type TipoBadge } from '@/components/clinical/ClinicalBadge'
 import { useWorkflows } from '@/components/clinical/WorkflowsContext'
@@ -136,7 +138,7 @@ export function ResumenWorkflow({ k, progreso, onAbrir }: { k: TipoBadge; progre
    como el resto de la app (antes rearmaba Dialog a mano, clinical-mode.md 2026-10-19); cerrarlo con Esc o el fondo
    cuenta como Remind me later, igual que en cualquier otro ConfirmDialog. Sin firmar, el panel del paciente muestra
    Pending Signature (lib/notaClinica). */
-export function ClinicalNoteDialog({ open, onClose, paciente }: { open: boolean; onClose: () => void; paciente: string }) {
+export function ClinicalNoteDialog({ open, onClose, paciente, onFirmar }: { open: boolean; onClose: () => void; paciente: string; onFirmar?: () => void }) {
   if (!open) return null
   return (
     <ConfirmDialog
@@ -144,7 +146,7 @@ export function ClinicalNoteDialog({ open, onClose, paciente }: { open: boolean;
       confirmLabel="Review and sign"
       cancelLabel="Remind me later"
       onCancel={() => { onClose(); setNotaPendiente(paciente, true); aviso.info('We will remind you to sign the clinical note.') }}
-      onConfirm={() => { onClose(); setNotaPendiente(paciente, false); aviso.ok('Clinical note signed.') }}
+      onConfirm={() => { onClose(); setNotaPendiente(paciente, false); onFirmar?.(); aviso.ok('Clinical note signed.') }}
     >
       <p>The clinical encounter has been completed.<br />You can sign the clinical note now or defer the signature and complete it later.</p>
     </ConfirmDialog>
@@ -203,8 +205,12 @@ export function ClinicalTopBar({
   const [items, setItems] = useState(ITEMS_INICIALES)
   const [clinico, setClinico] = useState<{ cat: Categoria; item?: ClinicalItem } | null>(null)
   const [nota, setNota] = useState(false)
-  /* Complete Encounter cierra el encuentro y ofrece firmar la Clinical Note (Figma 4540:27072). */
-  const completar = () => { onEncuentro('sinEmpezar', 'Encounter completed.'); setNota(true) }
+  /* Complete Encounter cierra el encuentro y ofrece firmar la Clinical Note (Figma 4540:27072). Si el turno tiene
+     procedimientos previstos, antes pasa por el drawer End Encounter (CON-4157, clinical-mode.md 2026-11-25). */
+  const [revisar, setRevisar] = useState(false)
+  const procedimientosCita = useProcedimientosCita()
+  const cerrar = () => { onEncuentro('sinEmpezar', 'Encounter completed.'); setNota(true) }
+  const completar = () => (procedimientosCita.length ? setRevisar(true) : cerrar())
 
   const cuenta = (c: Contador) =>
     CATEGORIA_DE[c.id] ? items[CATEGORIA_DE[c.id]].length : c.items.length
@@ -469,7 +475,12 @@ export function ClinicalTopBar({
           />
         </Flotante>
       )}
-      <ClinicalNoteDialog open={nota} onClose={() => setNota(false)} paciente={volverA.split('/').pop() ?? ''} />
+      <EndEncounterDrawer
+        open={revisar}
+        onClose={() => setRevisar(false)}
+        onEnd={() => { setRevisar(false); cerrarEncuentroEjecucion(); cerrar() }}
+      />
+      <ClinicalNoteDialog open={nota} onClose={() => setNota(false)} paciente={volverA.split('/').pop() ?? ''} onFirmar={firmarNotaUltimoEncuentro} />
     </div>
   )
 }

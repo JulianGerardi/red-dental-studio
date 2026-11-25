@@ -2,11 +2,11 @@ import { PADDING_PAGINA } from '@/lib/estilos'
 import { useMemo, useState } from 'react'
 import { SlidersHorizontal } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import { EmptyState } from '@/components/ui/empty-state'
+import { DataTable, TextCell } from '@/components/ui/data-table'
 import { SettingsSearch } from '@/components/settings/SettingsSearch'
 import { FilterMenu } from '@/components/ui/filter-menu'
-import { Pagination } from '@/components/patients/ledger/Pagination'
 import { SettingsPageHeader } from '@/components/settings/SettingsPageHeader'
+import { Tabs } from '@/components/ui/tabs'
 
 /* Settings → Ledger. Figma 4293:57917.
    Ver design-reference/figma/modulos/settings-ledger.md. */
@@ -68,124 +68,109 @@ const METODOS: Metodo[] = [
 const TABS = ['Adjustment types', 'Payment methods'] as const
 type Tab = (typeof TABS)[number]
 
-const FILTROS_AJUSTE = ['All', 'Charge', 'Credit', 'Production', 'Collections'] as const
-const FILTROS_METODO = ['All', 'Patient', 'Insurance'] as const
+/* El Filter de cada pestaña, con lo que cada lista tiene (settings-ledger.md, 2026-11-24): un adjustment type tiene
+   Direction (Charge / Credit) e Impact (Production / Collections); un payment method, sólo Method type (Patient /
+   Insurance, CON-3363). */
+const DIRECCIONES = ['All', 'Charge', 'Credit'] as const
+const IMPACTOS = ['All', 'Production', 'Collections'] as const
+const TIPOS_METODO = ['All', 'Patient', 'Insurance'] as const
 
-const TAM_PAGINA = 6
+const VACIO = { icon: SlidersHorizontal, title: 'Nothing here', detail: 'Nothing matches the current search or filter.' }
 
-/* Charge/Credit filtran por Direction y Production/Collections por Impact; en Payment Method, por tipo. */
-const coincide = (x: Ajuste | Metodo, f: string) =>
-  f === 'All' || ('direccion' in x ? x.direccion === f || x.impacto === f : x.tipo === f)
+const es = (valor: string, f: string) => f === 'All' || valor === f
 
 export function SettingsLedgerOptions() {
   const [tab, setTab] = useState<Tab>('Adjustment types')
   const [q, setQ] = useState('')
-  const [filtro, setFiltro] = useState<string>('All')
-  const [pagina, setPagina] = useState(1)
+  const [direccion, setDireccion] = useState('All')
+  const [impacto, setImpacto] = useState('All')
+  const [tipoMetodo, setTipoMetodo] = useState('All')
   const [apagados, setApagados] = useState<string[]>([])
 
   const alternar = (id: string) =>
     setApagados((p) => (p.includes(id) ? p.filter((x) => x !== id) : [...p, id]))
 
-  const cambiarTab = (t: Tab) => { setTab(t); setFiltro('All'); setQ(''); setPagina(1) }
-
-  const filtros = tab === 'Adjustment types' ? FILTROS_AJUSTE : FILTROS_METODO
+  const cambiarTab = (t: Tab) => { setTab(t); setDireccion('All'); setImpacto('All'); setTipoMetodo('All'); setQ('') }
 
   const filas = useMemo(() => {
     const texto = q.trim().toLowerCase()
     if (tab === 'Adjustment types') {
-      return AJUSTES.filter((a) => coincide(a, filtro) && `${a.tipo} ${a.descripcion}`.toLowerCase().includes(texto))
+      return AJUSTES.filter((a) => es(a.direccion, direccion) && es(a.impacto, impacto) && `${a.tipo} ${a.descripcion}`.toLowerCase().includes(texto))
     }
-    return METODOS.filter(
-      (m) => coincide(m, filtro) && m.nombre.toLowerCase().includes(texto),
-    )
-  }, [tab, q, filtro])
-
-  const paginas = Math.max(1, Math.ceil(filas.length / TAM_PAGINA))
-  const actual = Math.min(pagina, paginas)
-  const visibles = filas.slice((actual - 1) * TAM_PAGINA, actual * TAM_PAGINA)
+    return METODOS.filter((m) => es(m.tipo, tipoMetodo) && m.nombre.toLowerCase().includes(texto))
+  }, [tab, q, direccion, impacto, tipoMetodo])
 
   return (
     <div className={PADDING_PAGINA}>
-      <SettingsPageHeader
-        titulo="Ledger options"
-        /* La bajada del frame es la de Locations, copiada tal cual. Se
-           replica: el contenido va como está. */
-      >
-        {/* "Search <lo que lista>": el frame decía "Search patients" en las dos pestañas (corregido 2026-11-20). */}
-        <SettingsSearch value={q} onChange={(v) => { setQ(v); setPagina(1) }} placeholder={tab === 'Adjustment types' ? 'Search adjustment types' : 'Search payment methods'} onSearch={() => setPagina(1)} />
-        {/* Qué lista se ve y su filtro, en el Filter de Accounts: antes un select y una tira de pestañas
-            (settings-ledger.md, 2026-11-20). */}
-        <FilterMenu
-          label="Filter ledger options"
-          groups={[
-            { type: 'single', title: 'View', defaultValue: TABS[0], value: tab, onChange: (v) => cambiarTab(v as Tab), options: [...TABS] },
-            {
-              type: 'single', title: 'Type', defaultValue: 'All', value: filtro, onChange: (f) => { setFiltro(f); setPagina(1) },
-              options: filtros.map((f) => ({ value: f, count: (tab === 'Adjustment types' ? AJUSTES : METODOS).filter((x) => coincide(x, f)).length })),
-            },
-          ]}
-        />
-      </SettingsPageHeader>
+      <SettingsPageHeader titulo="Ledger options" />
 
+      {/* Primero qué lista se ve (pestañas) y debajo el buscador y el Filter de esa lista (settings-ledger.md, 2026-11-24). */}
+      <Tabs className="mt-5" aria-label="Ledger options" tabs={TABS} value={tab} onChange={cambiarTab} />
 
-      <div className="mt-4 w-full overflow-x-auto rounded-lg border border-line-row bg-white">
-        <div className={tab === 'Adjustment types' ? 'min-w-[820px]' : 'min-w-[620px]'}>
-          {tab === 'Adjustment types' ? (
-            <div className="flex items-center gap-3 bg-surface-alt px-3 py-3 text-[11px] font-semibold text-ink-muted">
-              <span className="w-[160px] shrink-0">Name</span>
-              <span className="min-w-[180px] flex-1">Description</span>
-              <span className="w-[100px] shrink-0">Category</span>
-              <span className="w-[90px] shrink-0">Direction</span>
-              <span className="w-[100px] shrink-0">Impact</span>
-              <span className="w-[70px] shrink-0 text-right">Enabled</span>
-            </div>
-          ) : (
-            <div className="flex items-center gap-3 bg-surface-alt px-3 py-3 text-[11px] font-semibold text-ink-muted">
-              <span className="min-w-[200px] flex-1">Name</span>
-              <span className="w-[110px] shrink-0">Method type</span>
-              <span className="w-[90px] shrink-0">Status</span>
-              {/* El switch es un estado editable, no una acción: la columna se llama Enabled en las dos pestañas
-                  (propuesta de consistencia, 2026-11-20). */}
-              <span className="w-[70px] shrink-0 text-right">Enabled</span>
-            </div>
-          )}
+      <div className="mt-4 flex flex-wrap items-center gap-3">
+        <SettingsSearch value={q} onChange={setQ} placeholder={tab === 'Adjustment types' ? 'Search adjustment types' : 'Search payment methods'} />
+        {tab === 'Adjustment types' ? (
+          <FilterMenu
+            label="Filter adjustment types"
+            groups={[
+              {
+                type: 'single', title: 'Direction', defaultValue: 'All', value: direccion, onChange: setDireccion,
+                options: DIRECCIONES.map((f) => ({ value: f, count: AJUSTES.filter((a) => es(a.direccion, f)).length })),
+              },
+              {
+                type: 'single', title: 'Impact', defaultValue: 'All', value: impacto, onChange: setImpacto,
+                options: IMPACTOS.map((f) => ({ value: f, count: AJUSTES.filter((a) => es(a.impacto, f)).length })),
+              },
+            ]}
+          />
+        ) : (
+          <FilterMenu
+            label="Filter payment methods"
+            groups={[{
+              type: 'single', title: 'Method type', defaultValue: 'All', value: tipoMetodo, onChange: setTipoMetodo,
+              options: TIPOS_METODO.map((f) => ({ value: f, count: METODOS.filter((m) => es(m.tipo, f)).length })),
+            }]}
+          />
+        )}
+      </div>
 
-          {visibles.length === 0 ? (
-            <EmptyState icon={SlidersHorizontal} title="Nothing here" detail="Nothing matches the current search or filter." />
-          ) : tab === 'Adjustment types' ? (
-            (visibles as Ajuste[]).map((a) => (
-              <div key={a.id} className="flex items-center gap-3 border-t border-line-row px-3 py-3 text-[13px] text-ink-soft">
-                <span className="w-[160px] shrink-0 truncate text-ink" title={a.tipo}>{a.tipo}</span>
-                <span className="min-w-[180px] flex-1 truncate" title={a.descripcion}>{a.descripcion}</span>
-                <span className="w-[100px] shrink-0 truncate">{a.categoria}</span>
-                <span className="w-[90px] shrink-0 truncate">{a.direccion}</span>
-                <span className="w-[100px] shrink-0 truncate">{a.impacto}</span>
-                <span className="flex w-[70px] shrink-0 justify-end">
-                  <Switch on={!apagados.includes(a.id)} onChange={() => alternar(a.id)} label={`Enable ${a.tipo}`} />
-                </span>
-              </div>
-            ))
-          ) : (
-            (visibles as Metodo[]).map((m) => (
-              <div key={m.id} className="flex items-center gap-3 border-t border-line-row px-3 py-3 text-[13px] text-ink-soft">
-                <span className="min-w-[200px] flex-1 truncate text-ink" title={m.nombre}>{m.nombre}</span>
-                <span className="w-[110px] shrink-0 truncate">{m.tipo}</span>
-                <span className="w-[90px] shrink-0 truncate">Active</span>
-                <span className="flex w-[70px] shrink-0 justify-end">
-                  <Switch on={!apagados.includes(m.id)} onChange={() => alternar(m.id)} label={`Enable ${m.nombre}`} />
-                </span>
-              </div>
-            ))
-          )}
-
-          <div className="flex flex-wrap items-center justify-between gap-3 border-t border-line-row px-3 py-3">
-            <span className="text-xs font-semibold text-ink-muted">
-              Showing {filas.length ? (actual - 1) * TAM_PAGINA + 1 : 0} to {(actual - 1) * TAM_PAGINA + visibles.length} of {filas.length} {tab === 'Adjustment types' ? 'adjustment types' : 'payment methods'}
-            </span>
-            <Pagination pagina={actual} paginas={paginas} onChange={setPagina} />
-          </div>
-        </div>
+      {/* La tabla estándar: mismo encabezado y pie que las otras de Settings; el switch Enabled va a la izquierda, como un
+          badge (tablas estandarizadas v2, 2026-11-24). */}
+      <div className="mt-4">
+        {tab === 'Adjustment types' ? (
+          <DataTable<Ajuste>
+            key="ajustes"
+            columns={[
+              /* Name y Description se reparten el ancho: sola, Description se llevaba media tabla (2026-11-24). */
+              { key: 'tipo', header: 'Name', cell: (a) => <TextCell>{a.tipo}</TextCell> },
+              { key: 'descripcion', header: 'Description', cell: (a) => <TextCell>{a.descripcion}</TextCell> },
+              { key: 'categoria', header: 'Category', width: 120, cell: (a) => a.categoria },
+              { key: 'direccion', header: 'Direction', width: 120, cell: (a) => a.direccion },
+              { key: 'impacto', header: 'Impact', width: 120, cell: (a) => a.impacto },
+              { key: 'enabled', header: 'Enabled', width: 80, cell: (a) => <Switch on={!apagados.includes(a.id)} onChange={() => alternar(a.id)} label={`Enable ${a.tipo}`} /> },
+            ]}
+            rows={filas as Ajuste[]}
+            rowKey={(a) => a.id}
+            rowLabel={(a) => a.tipo}
+            empty={VACIO}
+          />
+        ) : (
+          <DataTable<Metodo>
+            key="metodos"
+            columns={[
+              { key: 'nombre', header: 'Name', cell: (m) => <TextCell>{m.nombre}</TextCell> },
+              { key: 'tipo', header: 'Method type', width: 110, cell: (m) => m.tipo },
+              { key: 'estado', header: 'Status', width: 90, cell: () => 'Active' },
+              /* El switch es un estado editable, no una acción: la columna se llama Enabled en las dos pestañas
+                 (propuesta de consistencia, 2026-11-20). */
+              { key: 'enabled', header: 'Enabled', width: 80, cell: (m) => <Switch on={!apagados.includes(m.id)} onChange={() => alternar(m.id)} label={`Enable ${m.nombre}`} /> },
+            ]}
+            rows={filas as Metodo[]}
+            rowKey={(m) => m.id}
+            rowLabel={(m) => m.nombre}
+            empty={VACIO}
+          />
+        )}
       </div>
     </div>
   )

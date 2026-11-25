@@ -6,11 +6,10 @@ import { Button } from '@/components/ui/button'
 import { DataTable, TextCell, type DataTableColumn } from '@/components/ui/data-table'
 import { DropdownMenuItem } from '@/components/ui/dropdown-menu'
 import { Pill, type PillTone } from '@/components/ui/pill'
-import { TARJETA_PANEL } from '@/lib/estilos'
 import { ORDENES, type EstadoOrden, type OrdenLab } from '@/data/clinical-mode'
-import { Avatar } from '@/components/ui/avatar'
 import type { PendingTask } from '@/components/dashboard/PendingTaskCard'
 import { tareaViva, useAccionesTarea, useTareasVivas } from '@/components/dashboard/tareas'
+import { SettingsSearch } from '@/components/settings/SettingsSearch'
 import { LabOrderDetail } from './LabOrderDetail'
 
 /* En el orden del pedido: es también el orden del filtro. */
@@ -27,24 +26,15 @@ const ABIERTAS: EstadoOrden[] = ['Requested', 'Pending', 'Delayed']
    Laboratory" quedan pendientes. "active prescriptions" y "New prescription" son texto de Prescription que quedó pegado
    en el frame (anomalía 85). Ver design-reference/figma/modulos/clinical-mode.md. */
 
-function iniciales(nombre: string) {
-  return nombre.replace(/^Dr\.\s*/, '').split(' ').map((w) => w[0]).slice(0, 2).join('').toUpperCase()
-}
-
-/* El Avatar y el nombre, como PersonCell pero sin link: la orden no lleva a la ficha. */
-const persona = (nombre: string) => (
-  <span className="flex min-w-0 items-center gap-2.5">
-    <Avatar initials={iniciales(nombre)} />
-    <TextCell>{nombre}</TextCell>
-  </span>
-)
+/* Sólo el nombre: el avatar queda para las tablas de personas, Patients y Employees (tablas estandarizadas v2, 2026-11-24). */
+const persona = (nombre: string) => <TextCell>{nombre}</TextCell>
 
 const COLUMNAS: DataTableColumn<OrdenLab>[] = [
   { key: 'proveedor', header: 'Provider', cell: (o) => persona(o.proveedor) },
   { key: 'paciente', header: 'Patient', cell: (o) => persona(o.paciente) },
   { key: 'estado', header: 'Status', width: 110, cell: (o) => <Pill tone={ORDEN_TONO[o.estado]}>{o.estado}</Pill> },
-  { key: 'actualizado', header: 'Updated', width: 110, cell: (o) => o.actualizado },
-  { key: 'creado', header: 'Created', width: 110, cell: (o) => o.creado },
+  { key: 'actualizado', header: 'Last update', width: 120, cell: (o) => o.actualizado },
+  { key: 'creado', header: 'Created date', width: 120, cell: (o) => o.creado },
   /* El frame pinta de rojo las que vencen pronto. */
   { key: 'vence', header: 'Expiration date', width: 120, cell: (o) => <span className={cn(o.urgente && 'font-semibold text-dash-bad-fg')}>{o.vence}</span> },
 ]
@@ -57,6 +47,7 @@ export function LabOrderPanel({ ordenes: inicio = ORDENES, tarea, encuentroAbier
   encuentroAbierto?: boolean
 }) {
   const [ordenes, setOrdenes] = useState(inicio)
+  const [q, setQ] = useState('')
   const [detalle, setDetalle] = useState(tarea?.id)
   /* La tarea con sus cambios: Request o Cancel desde el ⋮ del detalle se ven acá y en Pending Task. */
   useTareasVivas(tarea ? [tarea] : [])
@@ -80,14 +71,17 @@ export function LabOrderPanel({ ordenes: inicio = ORDENES, tarea, encuentroAbier
     aviso.ok(`Lab order for ${o.paciente} canceled.`, { label: 'Undo', onClick: () => setOrdenes(antes) })
   }
 
+  /* Como el resto de las tablas: buscador con su botón Search, sin card alrededor (tablas estandarizadas, 2026-11-25). */
+  const visibles = ordenes.filter((o) => `${o.proveedor} ${o.paciente} ${o.estado}`.toLowerCase().includes(q.trim().toLowerCase()))
+
   return (
-    <div className={cn(TARJETA_PANEL, 'p-4')}>
+    <div>
       <DataTable
         columns={COLUMNAS}
-        rows={ordenes}
+        rows={visibles}
         rowKey={(o) => o.id}
         rowLabel={(o) => o.paciente}
-        search={{ placeholder: 'Search...', match: (o, q) => `${o.proveedor} ${o.paciente} ${o.estado}`.toLowerCase().includes(q.toLowerCase()) }}
+        toolbarStart={<SettingsSearch value={q} onChange={setQ} placeholder="Search lab orders" />}
         filter={{
           label: 'Filter lab orders by status',
           options: ESTADOS.map((e) => ({ value: e, count: ordenes.filter((o) => o.estado === e).length })),
@@ -95,10 +89,10 @@ export function LabOrderPanel({ ordenes: inicio = ORDENES, tarea, encuentroAbier
         }}
         actions={(
           <>
-            <Button variant="secondary" onClick={() => aviso.info('History is not available in this release.')}>
+            <Button variant="secondary" size="md" onClick={() => aviso.info('History is not available in this release.')}>
               <History /> View history
             </Button>
-            <Button onClick={() => aviso.info('New prescription is not available in this release.')}>
+            <Button size="md" onClick={() => aviso.info('New prescription is not available in this release.')}>
               <Plus /> New prescription
             </Button>
           </>
@@ -119,9 +113,9 @@ export function LabOrderPanel({ ordenes: inicio = ORDENES, tarea, encuentroAbier
           </>
         )}
         pageSize={10}
-        pageSizeOptions={[5, 10, 20]}
-        itemLabel="active prescriptions"
-        empty={{ icon: FlaskConical, title: 'No lab orders yet', detail: 'Orders sent to the lab will show up here.' }}
+        empty={ordenes.length === 0
+          ? { icon: FlaskConical, title: 'No lab orders yet', detail: 'Orders sent to the lab will show up here.' }
+          : { icon: FlaskConical, title: 'No lab orders found', detail: 'Try a different provider, patient or status.' }}
       />
     </div>
   )

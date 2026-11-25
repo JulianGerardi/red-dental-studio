@@ -709,3 +709,73 @@ Propuestas funcionales de la misma revisión, **no implementadas** (cambian comp
 - **Employees: sacar los checkboxes de selección.** No hay historia de acciones masivas; la selección hoy no hace nada
   más que contar. Decidir si se saca o si se define la acción.
 - **Fecha con formato en el encabezado ("Date of birth (MM/DD/YYYY)")**: no se aplicó; el formato ya se ve en los datos.
+
+## Tablas estandarizadas v2 (2026-11-24)
+
+Sin historia de Jira: pedido de Julián con el HTML *Tablas estandarizadas v2* (13 tablas). Reglas para todas:
+
+1. **Pie** (`PieTabla` en `ui/data-table`, el mismo en DataTable, Ledger y Treatment Plan): a la izquierda "Showing 1 to
+   10 of 339 results", siempre *results* (se fue la prop `itemLabel`: "patients", "documents", "entries", "active
+   prescriptions", "insurances"); a la derecha *Rows per page* (10 / 25 / 50, `FILAS_POR_PAGINA`) y el paginador, que
+   sólo aparece con más de una página. Toda tabla arranca en 10 filas: Problem list y Procedures (antes 5), Billing
+   (antes 8, que entraba sin scroll a 1440 × 900), Ledger (antes 8), Ledger options (antes 6), Employees y Locations
+   (antes todo en una página). Las tablas propias paginan con `usePaginas`.
+2. **Alineación:** texto, fechas, códigos, badges y toggles a la izquierda; importes, balances y cantidades a la derecha,
+   con el encabezado igual que su contenido. *Actions* a la derecha. Cambian: Employees y Rooms (Locations), Group plans
+   # (Carriers), Assignments (Fee schedules, estaba centrada), Locations / Employees / Licenses (Accounts), Fee (Treatment
+   Plan) y Enabled (Ledger options, estaba a la derecha).
+3. **Fechas:** *Created date* en Problem list, Procedures y Treatment Plan (antes *Date*); *Trans. date* en Ledger y
+   Billing. MM/DD/YYYY en todas: Fee schedules mostraba día/mes/año como red.dev (`fechaDMA` → `fechaMDA`, también en
+   la versión y en Compare fees) y el Treatment Plan "2025/01/24".
+4. **Tooth antes de Surface** en las tablas clínicas: el Treatment Plan iba *Date, Surface, Tooth, Location*; ahora
+   *Created date, Location, Tooth, Surface*, como Procedures.
+5. **Avatar sólo en Patients y Employees.** Documents pasa de la caja azul a un ícono de archivo neutro; Lab order deja
+   el avatar de Provider y Patient (sólo el nombre).
+6. **⋮ sólo como columna final.** Ledger options pasa a `DataTable` (mismo encabezado y pie que el resto de Settings).
+
+Anomalías y decisiones:
+
+- Employees y Locations: el nombre vuelve a ser link a la ficha, como en el HTML (Julián, 2026-11-24). Corrige el punto
+  1 del 2026-11-18 (a la ficha sólo por el ⋮); el ⋮ → *Edit* sigue. Accounts no cambia: no está en el HTML.
+- El pie del Unassigned del Treatment Plan decía "Showing 15 of 15 insurances" (texto del frame, replicado). Ahora pagina
+  y lo que se saca de un caso con *Delete from Tx* entra arriba de todo: al final quedaba en la página 2.
+- Insurance plans conserva *Priority period* aunque el HTML no la muestra (rediseñar no es cambiar el contenido).
+
+## Visor de documentos (2026-11-24)
+
+Propuesta A de Julián (página de propuesta del 2026-11-24, *Un solo visor para los documentos*): todo documento para leer
+o firmar se abre en `ui/document-viewer` (`DocumentViewer`), **siempre a pantalla completa y nunca en un drawer**.
+
+1. **Barra de arriba:** volver con el destino en el texto (*Back*, *Back to history*, *Back to editing*), de quién o qué es
+   (`subtitle`), el título, el estado (Pill) y *View PDF* (`onPdf`; en el celular, sólo el ícono).
+2. **Un solo aviso** debajo (`notice`): qué falta o en qué modo está. `info` (azul) cuando pide algo; `neutral` (gris)
+   cuando sólo informa (cambios sin guardar, quién firmó, ya no se firma).
+3. **La hoja sobre el escritorio gris**, hasta 900 px: la hoja común (ver *Hoja de documentos*, abajo).
+4. **Barra de abajo sólo si hay algo para hacer** (`footer`): firmar. Firmado, cerrado o en preview, no aparece.
+5. *Preparing document...* con `loading`; Escape vuelve como el botón.
+
+Dónde: Clinical note (`pages/ClinicalNote.tsx`), Procedure consent de Clinical Mode (`ConsentDetail`), *View consent*
+desde Consent required (`VistaConsentimiento`, antes drawer) y el preview de Consent templates (`PreviewPaciente`).
+
+## Hoja de documentos (2026-11-24)
+
+Propuesta B de Julián, pedida después del visor (*"los pdf de adentro el diseño también lo cambiaría y unificaría"*):
+todo documento usa `ui/document-sheet` (`DocumentSheet`), y el PDF descargado tiene el mismo diseño.
+
+1. **Membrete:** iniciales de la clínica en un cuadrado azul, nombre, sede y dirección, contacto en otra línea
+   (`data/clinica.ts` › `MEMBRETE`, el mismo en todos los documentos); a la derecha, el rótulo y la fecha (`meta`).
+   Una línea negra de 2 px lo cierra.
+2. **Tipo y título:** el tipo chico, en mayúsculas y azul (lo único con color); el título grande.
+3. **Resumen en tabla de tres columnas** (dos en el celular) en lugar de una card por dato.
+4. **Secciones numeradas** (en un documento legal se citan), sin bandas grises ni rótulos en mayúscula con línea.
+5. **Firmas lado a lado al final:** trazo o nombre sobre la línea, *nombre · rol* y *Signed electronically · fecha* o
+   *Pending signature* / *Not signed yet*.
+6. **Pie:** clínica · documento · paciente y *Page 1 of 1*.
+
+Se usa en `ConsentDocument` (preview de Consent templates, Procedure consent y View consent: la misma hoja en los tres) y
+en la Clinical note (`VistaDocumento`). El PDF de la Clinical note (`documentoTarea` › `pdfDeDocumento`) se dibuja con el
+mismo diseño. Se va `settings/HojaConsentimientoPdf` (el formato de cards de red.dev del preview).
+
+**Para backend:** el PDF real lo genera el servidor; el formato de referencia es este (`pdfDeDocumento` lo muestra en
+una página A4 con Helvetica).
+

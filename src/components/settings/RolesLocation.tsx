@@ -1,4 +1,5 @@
 import { DrawerActions } from '@/components/ui/drawer'
+import { Button } from '@/components/ui/button'
 import { Alert } from '@/components/ui/alert'
 import { useState } from 'react'
 import { Trash2, CirclePlus, ChevronDown, ChevronUp, Plus } from 'lucide-react'
@@ -207,13 +208,7 @@ export function RolesLocation() {
   return (
     <div className="flex flex-col gap-4">
       <div className="flex justify-end">
-        <button
-          type="button"
-          onClick={() => setModal(true)}
-          className="text-dash-blue flex items-center gap-1.5 text-[13px] font-semibold hover:underline"
-        >
-          <Plus className="size-4" /> Add role
-        </button>
+        <Button onClick={() => setModal(true)}><Plus /> Add role</Button>
       </div>
 
       {roles.length === 0 ? (

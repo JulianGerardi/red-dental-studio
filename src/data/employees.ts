@@ -1,7 +1,7 @@
 /* Plantilla del consultorio, para la tabla de Settings → Employees y para la
    ficha de cada persona. Los nombres reusan a los profesionales que ya
    aparecen en el resto del sistema —Scheduling, Clinical Mode—, más un par de
-   roles de mostrador que no son proveedores, para que "Is provider" tenga los
+   roles de mostrador que no son clinical practitioners, para que la columna tenga los
    dos valores en datos de prueba. */
 
 export type EstadoEmpleado = 'Active' | 'Inactive'
@@ -15,6 +15,8 @@ export type Empleado = {
   email: string
   esProvider: boolean
   estado: EstadoEmpleado
+  /** Tiene al menos una credencial requerida vencida (CON-4085). */
+  credencialesVencidas?: boolean
 }
 
 export const EMPLEADOS: Empleado[] = [
@@ -22,7 +24,7 @@ export const EMPLEADOS: Empleado[] = [
   { id: 'emily-chen', nombre: 'Emily Chen', iniciales: 'EC', cargo: 'Dentist', cumpleanos: '09/03/1990', email: 'emily.chen@reddental.com', esProvider: true, estado: 'Active' },
   { id: 'daniel-anderson', nombre: 'Daniel Anderson', iniciales: 'DA', cargo: 'Dentist', cumpleanos: '01/21/1983', email: 'daniel.anderson@reddental.com', esProvider: true, estado: 'Active' },
   { id: 'sarah-stone', nombre: 'Sarah Stone', iniciales: 'SS', cargo: 'Dentist', cumpleanos: '03/30/1979', email: 'sarah.stone@reddental.com', esProvider: true, estado: 'Active' },
-  { id: 'julio-perez', nombre: 'Julio Perez', iniciales: 'JP', cargo: 'Hygienist', cumpleanos: '06/17/1992', email: 'julio.perez@reddental.com', esProvider: true, estado: 'Active' },
+  { id: 'julio-perez', nombre: 'Julio Perez', iniciales: 'JP', cargo: 'Hygienist', cumpleanos: '06/17/1992', email: 'julio.perez@reddental.com', esProvider: true, estado: 'Active', credencialesVencidas: true },
   { id: 'michael-torres', nombre: 'Michael Torres', iniciales: 'MT', cargo: 'Hygienist', cumpleanos: '11/08/1988', email: 'michael.torres@reddental.com', esProvider: true, estado: 'Inactive' },
   { id: 'perez-martinez', nombre: 'Perez Martinez', iniciales: 'PM', cargo: 'Assistant', cumpleanos: '02/25/1995', email: 'perez.martinez@reddental.com', esProvider: false, estado: 'Active' },
   { id: 'salgado', nombre: 'Salgado', iniciales: 'SA', cargo: 'Front desk', cumpleanos: '07/14/1998', email: 'salgado@reddental.com', esProvider: false, estado: 'Active' },

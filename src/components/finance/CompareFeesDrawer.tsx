@@ -3,7 +3,7 @@ import { ModalShell, SelectField } from '@/components/patients/form'
 import { Button } from '@/components/ui/button'
 import { DrawerSection } from '@/components/ui/drawer'
 import { cn } from '@/lib/utils'
-import { PROCEDIMIENTOS, dinero, fechaDMA, versionVigente, type Arancel } from '@/data/finanzas'
+import { PROCEDIMIENTOS, dinero, fechaMDA, versionVigente, type Arancel } from '@/data/finanzas'
 import { TABLA_ENCABEZADO, TABLA_FILA, TABLA_MARCO } from '@/lib/estilos'
 
 /* Compare fees (pedido de Julián): la diferencia es por procedimiento, contra un fee schedule de referencia elegido a la
@@ -49,7 +49,7 @@ export function CompareFeesDrawer({ arancel, aranceles, onClose, onEditar }: {
           <SelectField
             label="Compare with" options={opciones.map((a) => a.nombre)} value={ref?.nombre ?? ''}
             onChange={(n) => setRefId(opciones.find((a) => a.nombre === n)?.id ?? '')}
-            hint={ref ? `Current version from ${fechaDMA(versionVigente(ref).desde)}. ${arancel.nombre}: from ${fechaDMA(versionVigente(arancel).desde)}.` : undefined}
+            hint={ref ? `Current version from ${fechaMDA(versionVigente(ref).desde)}. ${arancel.nombre}: from ${fechaMDA(versionVigente(arancel).desde)}.` : undefined}
           />
           <dl className="grid grid-cols-2 gap-2 sm:grid-cols-4">
             {resumen.map(([k, v]) => (

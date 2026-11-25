@@ -1,9 +1,10 @@
 import { Tabs } from '@/components/ui/tabs'
+import { Pill } from '@/components/ui/pill'
 import { PageTitle } from '@/components/ui/page-title'
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { Chip } from '@/components/ui/chip'
 import { useParams, useSearchParams } from 'react-router-dom'
-import { Pencil, DoorOpen, Plus, CalendarDays, ChevronRight, Trash2 } from 'lucide-react'
+import { Pencil, DoorOpen, Plus, Trash2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { EmptyState } from '@/components/ui/empty-state'
 import { ICONO_SUELTO, PADDING_PAGINA } from '@/lib/estilos'
@@ -381,6 +382,8 @@ export function WorkingHoursTab() {
 /* Rooms (CON-404, CON-1581…1584, CON-1520), con la caja de Working Hours. Desactivar una sala con turnos los muestra:
    cada uno se edita aparte (Edit Appointment, para cambiarle la sala) y Confirm cancela los que quedan y los pasa a la
    lista de espera. Dejar la locación sin salas activas también se pregunta. Ver figma/modulos/locations.md. */
+/* Exceptions usa la misma caja que Rooms (locations.md, 2026-11-20). */
+const FILA_EXCEPCION = 'grid grid-cols-[minmax(0,1fr)_auto_auto] items-center gap-3 px-4 lg:grid-cols-[minmax(0,1fr)_140px_120px_150px]'
 const FILA_SALA = 'grid grid-cols-[minmax(0,1fr)_auto_auto] items-center gap-3 px-4 lg:grid-cols-[minmax(0,1fr)_120px_140px_130px_120px]'
 const fechaTurno = (d: Date) =>
   d.toLocaleString('en-US', { month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit', hour12: false })
@@ -566,57 +569,57 @@ export function ExceptionsTab() {
   const [excepciones, setExcepciones] = useState<Excepcion[]>(EXCEPCIONES_INICIALES)
   const [modal, setModal] = useState<'nueva' | Excepcion | null>(null)
 
-  return (
-    <div className="rounded-xl border border-line bg-white p-4 sm:p-5">
-      <div className="flex items-center justify-end">
-        <button
-          type="button"
-          onClick={() => setModal('nueva')}
-          className="text-dash-blue flex items-center gap-1.5 text-[13px] font-semibold hover:underline"
-        >
-          <Plus className="size-4" /> Add exception
-        </button>
-      </div>
+  const borrar = (e: Excepcion) => {
+    const indice = excepciones.findIndex((x) => x.id === e.id)
+    setExcepciones((p) => p.filter((x) => x.id !== e.id))
+    aviso.ok(`${e.nombre} was removed.`, {
+      label: 'Undo',
+      onClick: () => setExcepciones((p) => [...p.slice(0, indice), e, ...p.slice(indice)]),
+    })
+  }
 
-      {excepciones.length === 0 ? (
-        <EmptyState title="No exceptions" detail="Add a day that breaks from the regular schedule." className="border-0 py-16" />
-      ) : (
-        <div className="mt-4 flex flex-col gap-2">
-          {excepciones.map((e) => (
-            <div key={e.id} className="flex items-center gap-3 rounded-lg border border-line px-3 py-2.5">
-              <span className={cn('size-2 shrink-0 rounded-full', e.estado === 'Active' ? 'bg-green' : 'bg-ink-faint')} />
-              <span className="min-w-0 flex-1 truncate text-[13px] font-medium text-ink">{e.nombre}</span>
-              <span className="flex shrink-0 items-center gap-1.5 text-[12px] text-ink-muted">
-                <CalendarDays className="size-3.5" />
-                {formatMDY(e.fecha)}
-              </span>
+  return (
+    <>
+      {/* El diseño de Rooms y Working hours: botón arriba, caja con encabezado gris y una fila por excepción
+          (locations.md, 2026-11-20). */}
+      <div className="mb-3 flex justify-end">
+        <Button onClick={() => setModal('nueva')}><Plus /> Add exception</Button>
+      </div>
+      <div className="overflow-hidden rounded-xl border border-line bg-white">
+        <div className={cn(FILA_EXCEPCION, 'border-b border-line bg-surface-alt py-3 text-xs font-semibold text-ink-muted max-lg:hidden')}>
+          <span>Exception</span>
+          <span>Date</span>
+          <span>Status</span>
+          <span className="sr-only">Actions</span>
+        </div>
+        {excepciones.length === 0 && (
+          <EmptyState title="No exceptions" detail="Add a day that breaks from the regular schedule." className="border-0 py-16" />
+        )}
+        {excepciones.map((e) => (
+          <div key={e.id} className={cn(FILA_EXCEPCION, 'border-b border-line-soft py-3 last:border-0')}>
+            <span className="min-w-0">
+              <span className="block truncate text-[13px] font-semibold text-ink">{e.nombre}</span>
+              <span className="block text-[12px] text-ink-muted lg:hidden">{formatMDY(e.fecha)}</span>
+            </span>
+            <span className="text-[13px] text-ink-soft max-lg:hidden">{formatMDY(e.fecha)}</span>
+            {/* El estado con su nombre, como en el resto de la app; sin punto de color. */}
+            <span><Pill tone={e.estado === 'Active' ? 'success' : 'neutral'}>{e.estado}</Pill></span>
+            <span className="flex items-center justify-end gap-1">
               <button
                 type="button"
-                aria-label={`Edit ${e.nombre}`}
                 onClick={() => setModal(e)}
-                className={ICONO_SUELTO}
+                aria-label={`Edit ${e.nombre}`}
+                className="text-dash-blue flex min-h-8 items-center gap-1 px-1 text-[12px] font-semibold hover:underline"
               >
-                <ChevronRight className="size-4" />
+                <Pencil className="size-3" /> <span className="max-lg:hidden">Edit exception</span>
               </button>
-              <button
-                type="button"
-                aria-label={`Delete ${e.nombre}`}
-                onClick={() => {
-                  const indice = excepciones.findIndex((x) => x.id === e.id)
-                  setExcepciones((p) => p.filter((x) => x.id !== e.id))
-                  aviso.ok(`${e.nombre} was removed.`, {
-                    label: 'Undo',
-                    onClick: () => setExcepciones((p) => [...p.slice(0, indice), e, ...p.slice(indice)]),
-                  })
-                }}
-                className={ICONO_SUELTO}
-              >
+              <button type="button" aria-label={`Delete ${e.nombre}`} onClick={() => borrar(e)} className={ICONO_SUELTO}>
                 <Trash2 className="size-4" />
               </button>
-            </div>
-          ))}
-        </div>
-      )}
+            </span>
+          </div>
+        ))}
+      </div>
 
       {modal && (
         <NewExceptionModal
@@ -633,7 +636,7 @@ export function ExceptionsTab() {
           }}
         />
       )}
-    </div>
+    </>
   )
 }
 

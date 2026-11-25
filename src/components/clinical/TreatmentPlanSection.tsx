@@ -30,7 +30,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 import { ConAyuda } from '@/components/clinical/dental/ProcedureRow'
 import { BotonExpandirTodo } from '@/components/patients/ledger/LedgerRowDetail'
 import { useAnchoVisible } from '@/components/patients/ledger/useAnchoColumnas'
-import { RowChevron } from '@/components/ui/data-table'
+import { PieTabla, RowChevron, usePaginas } from '@/components/ui/data-table'
 import { DetalleRegistro, NavegacionClinica, registroDePlan, useVerRegistro, type DestinoClinico } from '@/components/clinical/RecordDetail'
 import { EstimateDetails, PrototypeControls, situacionDe, type Escenario } from '@/components/clinical/EstimateDetails'
 import { estimacionesIniciales, type Estimacion } from '@/data/estimaciones'
@@ -40,7 +40,10 @@ import { OBLIGATORIO } from '@/lib/validacion'
    el rail de estados, la tabla de no asignados, el caso con sus visitas y los
    diálogos. */
 
-const COLUMNAS = ['Date', 'Surface', 'Tooth', 'Location', 'Procedure', 'Provider', 'Fee', 'Status']
+/* Mismo orden y nombres que Procedures: Created date y Tooth antes de Surface; Fee y Actions a la derecha (tablas
+   estandarizadas v2, 2026-11-24). */
+const COLUMNAS = ['Created date', 'Location', 'Tooth', 'Surface', 'Procedure', 'Provider', 'Fee', 'Status']
+const A_LA_DERECHA = ['Fee', 'Actions']
 
 /* La caja del total, igual abierta (en la fila de campos) y plegada (en el encabezado). Es un botón: abre Estimate
    details (clinical-mode.md, 2026-10-28). */
@@ -571,7 +574,7 @@ export function TablaProcedimientos({
               </th>
             )}
             {columnas.map((c) => (
-              <th key={c} className="h-10 px-3 text-left text-[11px] font-semibold whitespace-nowrap text-ink-muted">
+              <th key={c} className={cn('h-10 px-3 text-[11px] font-semibold whitespace-nowrap text-ink-muted', A_LA_DERECHA.includes(c) ? 'text-right' : 'text-left')}>
                 {c}
               </th>
             ))}
@@ -616,17 +619,17 @@ export function TablaProcedimientos({
                   />
                 </td>
               )}
-              <td className="h-12 px-3 text-[13px] whitespace-nowrap text-ink-soft">{p.fecha}</td>
-              <td className="px-3 text-[13px] text-ink-soft">{p.superficie}</td>
-              <td className="px-3 text-[13px] text-ink-soft">{p.pieza}</td>
+              <td className="h-12 px-3 text-[13px] whitespace-nowrap text-ink-soft tabular-nums">{p.fecha}</td>
               <td className="px-3 text-[13px] whitespace-nowrap text-ink-soft">{p.ubicacion}</td>
+              <td className="px-3 text-[13px] text-ink-soft">{p.pieza}</td>
+              <td className="px-3 text-[13px] text-ink-soft">{p.superficie}</td>
               {/* La celda corta los nombres largos (D7140 Extraction…) en vez de estirar la tabla; el nombre entero está en
                   el tooltip y en el detalle, como en la tabla del Overview. */}
               <td className="w-full max-w-0 min-w-[120px] px-3 text-[13px] text-ink-soft">
                 <span className="block truncate" title={`${p.codigo} ${p.nombre}`}>{p.codigo} {p.nombre}</span>
               </td>
               <td className="px-3 text-[13px] whitespace-nowrap text-ink-soft">{p.proveedor}</td>
-              <td className="px-3 text-[13px] whitespace-nowrap text-ink-soft tabular-nums">{p.fee}</td>
+              <td className="px-3 text-right text-[13px] whitespace-nowrap text-ink-soft tabular-nums">{p.fee}</td>
               <td className="px-3"><Pill tone={ESTADO_TONO[p.estado]} className="whitespace-nowrap">{p.estado}</Pill></td>
               {consentimiento && (
                 <td className="px-3">
@@ -634,7 +637,7 @@ export function TablaProcedimientos({
                 </td>
               )}
               <td className="px-3">
-                <span className="flex items-center gap-1">
+                <span className="flex items-center justify-end gap-1">
                   {grupos.length > 0 && (
                     <DropdownMenu>
                       <ConAyuda texto="More actions">
@@ -1132,6 +1135,7 @@ export function TreatmentPlanSection({ casoInicial, estimadoInicial, consentimie
      vinculado se abre en el drawer de View full record; el link a un caso lo abre acá mismo. Ver clinical-mode.md. */
   const { contexto, drawer } = useVerRegistro()
   const noAsignadas = useFilasAbiertas(sueltos.map((p) => p.id))
+  const paginaSueltos = usePaginas(sueltos)
   const alternativas = casos.filter((c) => c.grupo === caso.grupo && c.creado === caso.creado)
   const detalle = (deCaso?: Caso) => (p: Procedimiento) => (
     <DetalleRegistro registro={registroDePlan(p, deCaso, deCaso && alternativas)} contexto={contexto} />
@@ -1232,7 +1236,8 @@ export function TreatmentPlanSection({ casoInicial, estimadoInicial, consentimie
     if (suelto) setSueltos((ps) => ps.filter((x) => x.id !== p.id))
     else {
       cambiarCaso({ visitas: caso.visitas.map((v) => ({ ...v, procedimientos: v.procedimientos.filter((x) => x.id !== p.id) })).filter((v) => v.procedimientos.length > 0) })
-      if (alcance === 'caso') setSueltos((ps) => [...ps, p])
+      /* Arriba de todo: con la lista paginada, al final quedaba en otra página (tablas estandarizadas v2, 2026-11-24). */
+      if (alcance === 'caso') { setSueltos((ps) => [p, ...ps]); paginaSueltos.setPagina(1) }
     }
     aviso.ok(alcance === 'caso' ? `${p.codigo} removed from the case and moved to Unassigned.` : `${p.codigo} deleted.`)
   }
@@ -1370,7 +1375,7 @@ export function TreatmentPlanSection({ casoInicial, estimadoInicial, consentimie
             {noAsignadas.boton && <div className="mt-3">{noAsignadas.boton}</div>}
             <div className="mt-4 -mx-4 sm:-mx-5">
               <TablaProcedimientos
-                filas={sueltos}
+                filas={paginaSueltos.visibles}
                 seleccion={seleccion}
                 onSeleccion={setSeleccion}
                 acciones={(p) => accionesDe(p.estado, 'sin-plan')}
@@ -1379,12 +1384,9 @@ export function TreatmentPlanSection({ casoInicial, estimadoInicial, consentimie
                 abiertas={noAsignadas.abiertas}
                 onAlternar={noAsignadas.alternar}
               />
+              {/* El pie de todas las tablas; el frame decía "insurances" (tablas estandarizadas v2, 2026-11-24). */}
+              <PieTabla {...paginaSueltos.pie} />
             </div>
-            {/* El pie del frame dice "insurances" en una tabla de
-                procedimientos. Se replica. */}
-            <p className="mt-3 text-[12px] text-ink-muted">
-              Showing {sueltos.length} of {sueltos.length} insurances
-            </p>
           </div>
         ) : (
           <VistaCaso

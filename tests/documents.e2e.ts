@@ -5,7 +5,7 @@ import { expect } from 'e2e'
 
 test('Documents busca por nombre y avisa cuando no hay nada', async ({ app, screen }) => {
   await app.open('/patients/john-smith/documents')
-  await expect(screen.getByText(/Showing 1 to 10 of 12 documents/)).toBeVisible()
+  await expect(screen.getByText(/Showing 1 to 10 of 12 results/)).toBeVisible()
   await screen.getByPlaceholder('Search documents').fill('Refusal')
   await expect(screen.getByText('Informed Refusal of Dental Treatment – Implant Option')).toBeVisible()
   await screen.getByPlaceholder('Search documents').fill('zzz')
@@ -14,6 +14,6 @@ test('Documents busca por nombre y avisa cuando no hay nada', async ({ app, scre
 
 test('Rows per page muestra los 12 documentos en una página', async ({ app, screen }) => {
   await app.open('/patients/john-smith/documents')
-  await screen.getByRole('combobox', 'Rows per page').selectOption('20')
-  await expect(screen.getByText(/Showing 1 to 12 of 12 documents/)).toBeVisible()
+  await screen.getByRole('combobox', 'Rows per page').selectOption('25')
+  await expect(screen.getByText(/Showing 1 to 12 of 12 results/)).toBeVisible()
 })

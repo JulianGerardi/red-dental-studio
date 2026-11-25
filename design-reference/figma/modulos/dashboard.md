@@ -1049,7 +1049,7 @@ pieza (`PendingTaskList` → `TaskRow`) sirve al Dashboard y al Patient Dashboar
 | **Sign Clinical Note** | *Login to Sign Document*: email y contraseña otra vez (*Sign* se habilita con los dos), Cancel y Sign. |
 | **⋮ Lab Order** | *Options*: Edit, Request, Cancel, Delete. |
 | **⋮ Prescription** | *Options*: Activate, Cancel. |
-| **⋮ Clinical Note / Referral** | La Clinical Note no lleva; el de Referral no aparece en los videos, así que no se puso. |
+| **⋮ Clinical Note / Referral** | La Clinical Note no lleva. Referral, desde el 2026-11-25: Request, Cancel y Delete en Pending, Cancel en Requested (clinical-mode.md). |
 | **PDF** (fila y *View PDF*) | Pestaña nueva con *Preparing document, please wait...* y después el PDF, con el formato de red.dev: encabezado de la clínica (logo, Red Dental Studio, Abril, dirección y contacto), *Dental Clinical Note* (Patient name, Date of birth con la edad, Date of visit, Attending dentist, Contact), *Medical History*, *Additional Notes* y la firma (*Provider*, nombre, *Date:*). Título de la pestaña: *Dental Clinical Note — <paciente>*. En la fila, sólo si ya hay documento (Requested, Fulfilled; no las Pending). |
 
 - **Sin encuentro abierto con el paciente** las opciones del ⋮ se ven apagadas y cada una muestra un tooltip con el
@@ -1085,3 +1085,105 @@ note*, *Login to sign document*); el contenido del documento (vista y PDF) queda
 Note*, *Medical History*…), igual que los demás nombres de documentos.
 
 `tests/pending-tasks.e2e.ts`.
+
+## Métricas v3: la variante compacta (2026-11-24)
+
+Pedido de Julián con la propuesta `metricas_unificadas_v3.html`. `StatStrip` sigue siendo el bloque compacto (rótulo,
+número y ⓘ en una línea, divisores verticales) con la estructura de la v3 y el estilo de la app (sombra `shadow-panel`,
+sin borde, divisores `line-hair`): ícono de 18px en caja celeste de 36, rótulo de 13px Medium en sentence case
+(`ink-muted`) y número de 17px Bold. En celular las tres métricas se apilan, una por fila a todo el ancho, con el ⓘ a la
+derecha (antes iban en columnas sin ícono); desde 768px, en fila. Los textos del ⓘ
+son los de la v3, con lo que dejaba "a confirmar" resuelto en Jira:
+
+- **Appointments** (CON-3912: citas del día, no canceladas): *Appointments scheduled for the selected date, without
+  cancellations.* Sale "N completed" del ⓘ.
+- **Waiting room** (CON-4178: Checked in, On hold y Ready to check out): *Visits checked in, on hold, or ready to check
+  out.*
+- **Open encounters** (CON-2813: Planned, In Progress, On Hold, Completed y Discharged, sin Fulfilled, de cualquier día y
+  de la locación elegida): *Encounters at this location that are not fulfilled yet, from any date.* La v3 decía *Exact
+  included statuses must be confirmed*. **Anomalía:** el mock todavía da un número por día (`dia.encuentros.abiertos`); el
+  real no depende de la fecha elegida.
+
+## Pending task: pestañas debajo del título (2026-11-20)
+
+Pedido de Julián. Las pestañas de Pending task salen del encabezado del panel (estaban a la derecha del título) y van
+debajo, a la izquierda, con el cuerpo del panel sin padding arriba (`bodyClassName="pt-0"`), como Billing.
+
+## Pending task: vuelven las pestañas al encabezado y suma Filter por provider (2026-11-24)
+
+Pedido de Julián. Deshace lo del 2026-11-20: en el Dashboard las pestañas vuelven a la derecha del título, para que el
+panel quede a la par de Appointments y Waiting room (título a la izquierda, controles a la derecha). En el Patient
+Dashboard siguen debajo del título.
+
+Suma un **Filter por provider** al lado de las pestañas (`FilterMenu` sm, varias opciones, cada provider con su
+cantidad): cada provider ve sus tareas. Se aplica primero el provider y después el tipo, así que las cantidades de las
+pestañas son las del provider elegido. Si el filtro deja todo afuera: "No results match your filters" / "Try other
+providers.", como los otros dos paneles. Las opciones salen de las tareas del día (`PendingTask.provider`). Es el camino
+que dejaba abierto la nota del 2026-10-29 (volver a un Filter sólo para Pending task), ahora junto a las pestañas.
+
+## Navegación de fecha compartida: ‹ Today › + calendario (2026-11-24)
+
+Pedido de Julián con el prototipo `dashboard_scheduling_fecha_unificada.html` ("Date navigation"). De ahí se copia la
+distribución; el diseño de la fecha se adapta a la app. Nuevo `ui/date-nav` (`DateNav`), el mismo bloque en Dashboard y
+Scheduling:
+
+1. **Un solo bloque** de 32px (borde `line`, sombra sutil): flecha anterior, *Today*, flecha siguiente y, separado por una
+   línea, el período con el ícono de calendario y un ⌄. Al tocarlo se abre el calendario del DatePicker
+   (`MonthCalendar`, con año). En la vista semanal marca los siete días que se ven.
+2. **Qué mueve y qué dice, según la pantalla:** el Dashboard usa un día ("Feb 28, 2026"). Scheduling usa el período de su
+   vista: Day ("May 31, 2022"), Week ("May 29 – Jun 4, 2022") y Month ("May 2022"); las flechas mueven un día, una
+   semana o un mes (el mes conserva el día).
+3. **Today ya no desaparece:** en hoy queda apagado, así el bloque no cambia de ancho. Scheduling vuelve al día de su
+   demo (`FECHA_ANCLA`).
+4. **Distribución:** Dashboard, la fecha a la izquierda (con el ícono de preguntas frecuentes) y las métricas a la
+   derecha. Scheduling, la fecha a la izquierda y en la otra punta *Day / Week / Month*, *Status legend* y *Filter*
+   (corrige el 2026-11-20: pestañas a la izquierda y la fecha a la derecha).
+5. Sale el botón *Today* aparte con ícono (`CalendarClock`). El demo de Help ("The date drives every panel") muestra el
+   bloque nuevo.
+
+## La Clinical note en el visor de documentos (2026-11-24)
+
+Propuesta A (regla en `figma/README.md` › *Visor de documentos*). La Clinical note de Pending tasks usa `ui/document-viewer`:
+*Back to history*, el título, *View PDF* arriba a la derecha y *Sign clinical note* en la barra de abajo, a la derecha
+(antes centrado). Firmada, la barra desaparece. La hoja (`VistaDocumento`) no cambia.
+
+## La hoja unificada de la Clinical note (2026-11-24)
+
+Propuesta B (regla en `figma/README.md` › *Hoja de documentos*). `VistaDocumento` usa `ui/document-sheet`: la primera
+sección de datos va al resumen y el resto, numerado; la firma del provider al final. El PDF de *View PDF*
+(`pdfDeDocumento`) se dibuja igual: membrete con *RD*, tipo en azul, resumen en tabla, secciones numeradas, firma y pie.
+`CLINICA` se mudó a `data/clinica.ts` (documentoTarea la reexporta).
+
+## Pending task: fechas alineadas aunque no haya ⋮ (2026-11-24)
+
+Pedido de Julián (CON-2643). La Clinical note no tiene acciones en el ⋮ (`MenuTarea` devuelve `null`), así que su fila
+quedaba 28px más corta a la derecha y el vencimiento, el PDF y *Complete this task* se corrían respecto de Lab orders y
+Prescriptions. `TaskRow` ahora reserva siempre el lugar del ⋮ (`size-7`), igual que ya hacía con el PDF: las cuatro
+columnas de la derecha (fecha, PDF, botón, ⋮) quedan en la misma vertical en todas las filas. Vale para el Dashboard y el
+Patient Dashboard, que comparten `PendingTaskList`.
+
+## CON-2643 · El PDF de la Lab Order con los datos de red.dev (2026-11-25)
+
+Pedido de Julián con un video del PDF de la Lab Order en red.dev (el ícono del documento en Pending task). Nuestro PDF
+traía lo mismo que cualquier tarea (paciente, nacimiento, provider, contacto, fechas, estado). Ahora trae lo de red.dev,
+con el diseño de la hoja unificada (2026-11-24):
+
+1. **Resumen:** Provider, Lab Order ID (UUID), Patient Phone, Email (del provider) y Expiration Date: el encabezado
+   derecho de red.dev.
+2. **Secciones:** Patient Information (Name, Phone, Email, Address), Receiving Laboratory (Name, Phone, Email, Address),
+   Provider Information (Name, Email), Dental Work Request y Teeth & Surface Specifications.
+3. **Teeth & Surface:** el diagrama de la boca como red.dev (pedido de Julián al publicar): las dos arcadas en herradura
+   sobre un panel gris, la encía rosa (`--color-encia`), cada diente con su número o letra afuera y los de la orden en
+   azul; a la derecha *Tooth A: O* (sin superficies, sólo *Tooth T*). Lo arma `diagramaBoca` (en `documentoTarea.ts`) y
+   lo dibujan igual el PDF y la hoja en pantalla (`DiagramaBoca`, SVG). Es un dibujo propio, no el odontograma de
+   red.dev; el detalle de la Lab Order sigue con los dientes como botones (clinical-mode.md, 2026-11-20).
+4. **Sin firma:** red.dev no la tiene (`Documento.sinFirma`). La Clinical note la sigue llevando.
+5. **Datos mock:** los laboratorios pasan a `data/laboratorios.ts` (nombre, teléfono, mail y dirección; el select del
+   detalle usa los mismos) con `ARCADAS`. El pedido, los dientes y el laboratorio salen fijos por id de la tarea; el mail
+   del provider, como red.dev (inicial + apellido @confidentally.com).
+
+**Anomalías (red.dev):** el resumen no tiene rótulo para el nombre del provider (acá dice *Provider*); no muestra ASAP,
+Case Procedure, Special Instructions ni Attachments, que CON-2215 pide al crear la orden. No se suman: quedan para
+decidir.
+
+**Pendiente:** el detalle de la Lab Order (Complete this task) arranca vacío y no muestra estos mismos datos.

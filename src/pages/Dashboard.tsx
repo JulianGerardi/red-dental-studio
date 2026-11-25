@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
-import { CalendarDays, Clock, Activity, ShieldQuestionMark, CalendarClock, Pencil, UserX, CalendarX } from 'lucide-react'
+import { CalendarDays, Clock, Activity, ShieldQuestionMark, Pencil, UserX, CalendarX } from 'lucide-react'
 import { Globo, Panel } from '@/components/dashboard/primitives'
 import { EmptyState } from '@/components/ui/empty-state'
 import { FilterMenu } from '@/components/ui/filter-menu'
@@ -9,7 +9,7 @@ import { StatStrip, type Stat } from '@/components/dashboard/StatStrip'
 import type { AccionMenu, Appointment } from '@/components/dashboard/AppointmentCard'
 import { CancelAppointmentDialog, NoShowDialog } from '@/components/dashboard/AppointmentStatusDialogs'
 import { PatientDetailsPopover } from '@/components/dashboard/PatientDetailsPopover'
-import { DatePicker, sameDay } from '@/components/ui/date-picker'
+import { DateNav } from '@/components/ui/date-nav'
 import { OperatoryList } from '@/components/dashboard/OperatoryList'
 import { AppointmentRow } from '@/components/dashboard/DashboardRows'
 import { PendingTaskList } from '@/components/dashboard/PendingTaskList'
@@ -30,7 +30,7 @@ import { HORAS, hora24 } from '@/components/scheduling/AppointmentSlotPicker'
 import { formatDMY } from '@/components/ui/date-picker'
 import { aviso } from '@/components/ui/toaster'
 import { CONTENEDOR_PAGINA } from '@/lib/estilos'
-import { Button, buttonClasses } from '@/components/ui/button'
+import { buttonClasses } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 
 /* Figma 4430:57451 — rediseño del dashboard.
@@ -61,9 +61,8 @@ export function BotonFiltro({
   return <FilterMenu label={label} options={options} value={value} onChange={onChange} size="sm" tour="dash-filter" />
 }
 
-/* La fecha de toda la pantalla, el atajo a hoy y las preguntas frecuentes. Today va en md: la altura del
-   DatePicker (ver dashboard.md, 2026-10-09). El selector va como barra
-   ("Feb 28, 2026"), el mismo campo que el Date filter (dashboard.md, 2026-10-12). */
+/* La fecha de toda la pantalla y las preguntas frecuentes. La fecha es el bloque ‹ Today › + calendario (ui/date-nav),
+   el mismo de Scheduling (dashboard.md, 2026-11-24). */
 export function FiltroFecha({
   value, onChange, marked, className,
 }: {
@@ -73,18 +72,8 @@ export function FiltroFecha({
   className?: string
 }) {
   return (
-    <div className={cn('flex flex-wrap items-center gap-2', className)} data-tour="dash-date">
-      <DatePicker variant="toolbar" value={value} onChange={onChange} marked={marked} />
-      {/* Volver a hoy sin tener que abrir el calendario y buscar el día.
-          Desaparece cuando ya estás en hoy: no tendría nada que hacer. */}
-      {!sameDay(value, new Date()) && (
-        <Button
-          variant="secondary" size="md" onClick={() => onChange(new Date())} title="Go to today"
-          className="shadow-[0_1px_2px_0_rgb(0_0_0/0.05)]"
-        >
-          <CalendarClock /> Today
-        </Button>
-      )}
+    <div className={cn('flex flex-wrap items-center gap-2', className)}>
+      <DateNav value={value} onChange={onChange} marked={marked} tour="dash-date" />
       {/* Las preguntas frecuentes, en Help con el Dashboard abierto (Julián, 2026-10-13). */}
       <Link
         to="/help" aria-label="Frequently asked questions" title="Frequently asked questions"
@@ -138,6 +127,8 @@ export default function Dashboard() {
      redundante con el filtro -ahora el filtro se saca a favor de las tabs, en las dos pantallas que comparten
      PendingTaskList-. */
   const [tipoTarea, setTipoTarea] = useState('All')
+  /* Pending task también se filtra por provider: cada uno ve sus tareas (Julián, 2026-11-24; dashboard.md). */
+  const [providersTarea, setProvidersTarea] = useState<string[]>([])
   /* La Waiting Room se filtra por etapa visible, no por sala (dashboard.md, 2026-11-19). */
   const [etapas, setEtapas] = useState<string[]>([])
   const [selected, setSelected] =
@@ -295,7 +286,8 @@ export default function Dashboard() {
     return { encounter: t?.enCurso ? 'In progress' : t?.completado ? 'Fulfilled' : null, iniciar: false }
   }
 
-  /* Los números salen de las listas del día, no de un mock aparte. */
+  /* Los números salen de las listas del día, no de un mock aparte. Los ⓘ, de la propuesta v3 confirmados en Jira: CON-3912,
+     CON-4178 y CON-2813 (dashboard.md, 2026-11-24). */
   const stats: Stat[] = useMemo(() => {
     const completados = dia.appointments.filter((a) => a.completado).length
     const nuevos = dia.waiting.filter((w) => w.nuevo).length
@@ -304,17 +296,17 @@ export default function Dashboard() {
         /* Una cancelada ya no es una cita del día; un No Show sí (no libera el lugar). */
         label: 'Appointments', value: String(dia.appointments.filter((a) => a.cerrado !== 'Cancelled').length),
         nota: `${completados} completed`, icon: CalendarDays,
-        info: `Appointments for this day, without cancellations. ${completados} completed.`,
+        info: 'Appointments scheduled for the selected date, without cancellations.',
       },
       {
         label: 'Waiting room', value: String(dia.waiting.length),
         nota: `${nuevos} new`, icon: Clock,
-        info: 'Patients who checked in and have not checked out yet.',
+        info: 'Visits checked in, on hold, or ready to check out.',
       },
       {
         label: 'Open encounters', value: String(dia.encuentros.abiertos),
         nota: dia.encuentros.promedio, icon: Activity,
-        info: `Encounters started and not closed yet. ${dia.encuentros.promedio}`,
+        info: 'Encounters at this location that are not fulfilled yet, from any date.',
       },
     ]
   }, [dia])
@@ -334,7 +326,10 @@ export default function Dashboard() {
       : dia.waiting.some((w) => w.name === t.person && w.etapa === 'On hold') ? 'enPausa' as const : undefined
   /* Clinical Mode lee el encuentro compartido: antes de abrir la tarea se deja el de ese paciente. */
   const accionesTarea = useAccionesTarea({ alAbrir: (t) => setEstadoEncuentro(encuentroDe(t) ?? 'sinEmpezar') })
-  const tareas = tipoTarea === 'All' ? todasLasTareas : todasLasTareas.filter((t) => t.kind === tipoTarea)
+  /* Primero el provider (Filter) y después el tipo (pestañas): las cantidades de las pestañas son las del provider elegido. */
+  const tareasDelProvider = todasLasTareas.filter((t) => providersTarea.length === 0 || (!!t.provider && providersTarea.includes(t.provider)))
+  const tareas = tipoTarea === 'All' ? tareasDelProvider : tareasDelProvider.filter((t) => t.kind === tipoTarea)
+  const providersDeTareas = [...new Set(todasLasTareas.map((t) => t.provider).filter((x): x is string => !!x))].sort()
   const enEspera = dia.waiting.filter((w) => etapas.length === 0 || etapas.includes(w.etapa))
 
   return (
@@ -345,7 +340,7 @@ export default function Dashboard() {
       <PageTitle>Dashboard</PageTitle>
       <div className="mt-3 flex flex-wrap items-center justify-between gap-x-6 gap-y-3">
         <FiltroFecha value={date} onChange={setDate} marked={diasConDatos} />
-        <div data-tour="dash-stats">
+        <div data-tour="dash-stats" className="w-full md:w-auto">
           <StatStrip stats={stats} />
         </div>
       </div>
@@ -433,29 +428,45 @@ export default function Dashboard() {
       </div>
 
       {/* Pending Task va abajo, a todo el ancho: arriba queda la fila de tres (Julián, 2026-10-19). */}
+      {/* Pestañas y Filter por provider a la derecha del título, a la par de los Filter de los paneles de arriba
+          (dashboard.md, 2026-11-24). */}
       <Panel
         title="Pending task" className="mt-4"
         controls={
-          <Tabs
-            size="sm" aria-label="Filter tasks"
-            tabs={[
-              { value: 'All', count: todasLasTareas.length },
-              ...TASK_KINDS.map((k) => ({ value: k, count: todasLasTareas.filter((t) => t.kind === k).length })),
-            ]}
-            value={tipoTarea} onChange={setTipoTarea}
-          />
+          <div className="flex flex-wrap items-center gap-2">
+            <Tabs
+              size="sm" aria-label="Filter tasks"
+              tabs={[
+                { value: 'All', count: tareasDelProvider.length },
+                ...TASK_KINDS.map((k) => ({ value: k, count: tareasDelProvider.filter((t) => t.kind === k).length })),
+              ]}
+              value={tipoTarea} onChange={setTipoTarea}
+            />
+            <FilterMenu
+              label="Filter tasks by provider" size="sm"
+              groups={[{
+                title: 'Provider', value: providersTarea, onChange: setProvidersTarea,
+                options: providersDeTareas.map((p) => ({ value: p, count: todasLasTareas.filter((t) => t.provider === p).length })),
+              }]}
+            />
+          </div>
         }
       >
         {tareas.length === 0 ? (
-          <EmptyState
-            icon={Activity}
-            title="Nothing pending"
-            detail={
-              todasLasTareas.length === 0
-                ? 'There are no tasks waiting on this day.'
-                : 'No pending tasks of this type today.'
-            }
-          />
+          /* Como Appointments y Waiting room: vacío de verdad, o con tareas que el filtro deja afuera. */
+          todasLasTareas.length > 0 && providersTarea.length > 0 && tareasDelProvider.length === 0 ? (
+            <EmptyState icon={Activity} title="No results match your filters" detail="Try other providers." />
+          ) : (
+            <EmptyState
+              icon={Activity}
+              title="Nothing pending"
+              detail={
+                todasLasTareas.length === 0
+                  ? 'There are no tasks waiting on this day.'
+                  : 'No pending tasks of this type today.'
+              }
+            />
+          )
         ) : (
           <PendingTaskList tasks={tareas} limit={TOPE.tareas} hoy={date} encuentroAbierto={(t) => !!encuentroDe(t)} onAccion={accionesTarea.hacer} />
         )}

@@ -48,9 +48,11 @@ export const control = (error?: string) =>
 const pie = (error?: string, hint?: React.ReactNode) => (error ? <FieldError>{error}</FieldError> : <FieldHint>{hint}</FieldHint>)
 
 export function TextField({
-  label, placeholder, required, className, value, onChange, error, hint, disabled, hideLabel,
+  label, placeholder, required, className, value, onChange, error, hint, disabled, hideLabel, numero,
 }: {
   label: string
+  /** Un importe o un porcentaje en una tabla: alineado a la derecha, con cifras del mismo ancho. */
+  numero?: boolean
   /** Rótulo sólo para lectores de pantalla: el campo va en una celda de tabla con su encabezado arriba. */
   hideLabel?: boolean
   placeholder?: string
@@ -72,7 +74,7 @@ export function TextField({
         placeholder={placeholder}
         disabled={disabled}
         {...(onChange ? { value: value ?? '', onChange: (e) => onChange(e.target.value) } : value !== undefined ? { defaultValue: value } : {})}
-        className={cn(control(error), 'h-9 px-3')}
+        className={cn(control(error), 'h-9 px-3', numero && 'text-right tabular-nums')}
       />
       {pie(error, hint)}
     </label>

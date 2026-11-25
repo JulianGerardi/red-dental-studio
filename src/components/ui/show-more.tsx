@@ -131,7 +131,7 @@ export function ShowMore({
   }
 
   return (
-    <div className={cn('flex flex-col gap-2', (llenarAlto || alPie) && 'min-h-0 flex-1')}>
+    <div data-show-more-lista className={cn('flex flex-col gap-2', (llenarAlto || alPie) && 'min-h-0 flex-1')}>
       {/* -m-1 p-1: aire para que el scroll no corte la sombra de las cards. */}
       <div
         ref={ref}
