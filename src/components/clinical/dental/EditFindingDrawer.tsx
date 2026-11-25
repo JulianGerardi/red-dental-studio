@@ -12,7 +12,7 @@ import { areaDeTratamiento, type Finding } from './data'
 /* Editar un finding desde el menú de su card. Cada tipo tiene su drawer, con el diseño del Figma *Platform Design* y la
    lógica que ya teníamos (Julián, 2026-10-24):
    - un procedimiento -> Edit Procedure (5294:85084): proveedor, notas y lo que vincula;
-   - una condition en un diente -> EditConditionDrawer (5301:149072): superficies, descriptores y notas;
+   - una condition en un diente -> EditConditionDrawer (5301:149072): superficies y notas, sin descriptores (2026-11-25);
    - el resto de las conditions (Extraoral, Intraoral) -> EditFindingView (5294:107675): los descriptores y las notas.
    Las dos se titulan "Edit finding": una condition cargada siempre es un finding (Julián, 2026-10-27).
    Qué se ve y qué se edita sale de CON-2770 (Edit Finding): fecha, estado, condition, examen y área de tratamiento de
@@ -21,20 +21,20 @@ import { areaDeTratamiento, type Finding } from './data'
    pestañas, para que no queden tan largos.
    Ver design-reference/figma/modulos/clinical-mode.md. */
 export function EditFindingDrawer({
-  finding, findings = [], onClose, onSave,
+  finding, findings = [], onClose, onSave, estado, bloqueoEstimado,
 }: {
   finding: Finding | null
   /** Todos los findings del examen: Edit Procedure los ofrece para vincular. */
   findings?: Finding[]
   onClose: () => void
   onSave: (patch: Partial<Finding>) => void
-}) {
+} & Pick<React.ComponentProps<typeof EditProcedureDrawer>, 'estado' | 'bloqueoEstimado'>) {
   const esCondicion = finding?.kind === 'condition'
   const enDiente = finding?.tooth != null
   const props = { onClose, onSave }
   return (
     <>
-      <EditProcedureDrawer finding={finding && !esCondicion ? finding : null} findings={findings} {...props} />
+      <EditProcedureDrawer finding={finding && !esCondicion ? finding : null} findings={findings} estado={estado} bloqueoEstimado={bloqueoEstimado} {...props} />
       <EditConditionDrawer finding={finding && esCondicion && enDiente ? finding : null} {...props} />
       <EditFindingView finding={finding && esCondicion && !enDiente ? finding : null} {...props} />
     </>
@@ -43,6 +43,8 @@ export function EditFindingDrawer({
 
 export type PestanaEdicion = 'General information' | 'Descriptors'
 export const PESTANAS_EDICION = ['General information', 'Descriptors'] as const
+
+const SIN_DESCRIPTORES = ['Physical', 'ROS']
 
 export function EditFindingView({
   finding, onClose, onSave,
@@ -67,10 +69,13 @@ export function EditFindingView({
   }
 
   const area = finding && areaDeTratamiento(finding)
+  /* Los descriptores son de una lesión: un hallazgo de Physical o ROS (Generally unwell…) no los lleva, y sin ellos
+     queda una sola sección, sin pestañas. */
+  const conDescriptores = !SIN_DESCRIPTORES.includes(finding?.examen ?? '')
   return (
     <Drawer
       open={!!finding} onClose={onClose} title="Edit finding" footer={<DrawerActions onCancel={onClose} onSave={guardar} />}
-      tabs={<Tabs tabs={PESTANAS_EDICION} value={pestana} onChange={setPestana} fullWidth size="sm" aria-label="Edit finding sections" />}
+      tabs={conDescriptores ? <Tabs tabs={PESTANAS_EDICION} value={pestana} onChange={setPestana} fullWidth size="sm" aria-label="Edit finding sections" /> : undefined}
     >
       {finding && pestana === 'General information' && (
         <div className="flex flex-col gap-5">

@@ -1,4 +1,4 @@
-import { Fragment, useContext, useEffect, useState, type ReactNode } from 'react'
+import { Fragment, useContext, useEffect, useMemo, useState, type ReactNode } from 'react'
 import {
   AlertTriangle, Bookmark, Pencil, Plus, MoreVertical, CornerUpLeft, ChevronDown, ChevronRight, Captions, Check, Eye, Save, Link2, ClipboardList, Scan, GripVertical, Trash2, TimerOff, Ban, FilePen, CheckCheck, Presentation, CircleCheck, CircleX, CalendarCheck2, CalendarX2, CalendarDays, type LucideIcon,
 } from 'lucide-react'
@@ -8,10 +8,13 @@ import { ConsentBlock } from '@/components/clinical/ConsentBlock'
 import { ResumenConsentimiento, sinPedir, useFlujoConsentimiento } from '@/components/clinical/ConsentRequiredDialog'
 import { ConsentDetail, EstadoConsentimiento, estadoTrasFirma, hoy, tieneDocumento, type Firmante } from '@/components/clinical/ConsentDetail'
 import {
-  ACCION, BLOQUEO_EJECUCION, DialogoBorrar, conColumnaConsent, DialogoCambioEstado, DialogoEditar, ItemsAcciones, TONO_PROCEDIMIENTO,
+  ACCION, BLOQUEO_EJECUCION, DialogoBorrar, conColumnaConsent, DialogoCambioEstado, ItemsAcciones, TONO_PROCEDIMIENTO,
   accionesDe, completarDe, contextoDeCaso, type AccionProcedimiento, type ItemAccion,
 } from '@/components/clinical/accionesProcedimiento'
-import type { EstadoProcedimiento } from '@/data/clinical-mode'
+import { PROBLEMAS, VINCULOS_PROCEDIMIENTO, type EstadoProcedimiento } from '@/data/clinical-mode'
+import { EditFindingDrawer } from '@/components/clinical/dental/EditFindingDrawer'
+import type { Finding } from '@/components/clinical/dental/data'
+import { bloqueoEstimadoDe, cambiosDeProcedimiento, findingDeProblema, findingDeProcedimiento } from '@/components/clinical/dental/registroComoFinding'
 import {
   AYUDA_CONSENTIMIENTO, CASOS, NO_ASIGNADOS, CATEGORIAS, DIALOGOS, OPCIONES_BORRAR_CASO, MOVER,
   NUEVO_GRUPO, COMPLETAR, MENU_PROCEDIMIENTO, ordenFecha,
@@ -1224,10 +1227,16 @@ export function TreatmentPlanSection({ casoInicial, estimadoInicial, consentimie
     setMenu({ p, a, suelto })
   }
 
-  /* Lo que confirma cada diálogo del menú. */
-  const guardarNota = (p: Procedimiento, nota: string) => {
-    mapear([p.id], (x) => ({ ...x, nota: nota || undefined }))
-    aviso.ok('Procedure notes updated. The status has not changed.')
+  /* Lo que confirma cada diálogo del menú. Edit abre Edit Procedure, el mismo del examen y de Procedures
+     (clinical-mode.md, 2026-11-25); el finding se arma una vez al abrir para que el drawer no se reinicie. */
+  const editando = useMemo(() => {
+    if (menu?.a !== 'edit') return null
+    const vinculo = Object.values(VINCULOS_PROCEDIMIENTO).find((v) => v.caso?.procedimiento === menu.p.id)
+    return findingDeProcedimiento({ ...menu.p, pieza: menu.p.pieza, vinculados: menu.p.vinculados ?? vinculo?.problemas })
+  }, [menu])
+  const guardarEdicion = (p: Procedimiento, patch: Partial<Finding>) => {
+    mapear([p.id], (x) => ({ ...x, ...cambiosDeProcedimiento(patch) }))
+    aviso.ok(`${p.codigo} updated. The status has not changed.`)
   }
   const cambiarDesdeMenu = (p: Procedimiento, a: 'refer' | 'discard' | 'discontinue') => aplicarEstado([p.id], ACCION[a].a!)
   /* Delete: suelto, se borra. En un caso, Delete from Tx lo saca del caso y lo deja en Unassigned (con su
@@ -1416,7 +1425,16 @@ export function TreatmentPlanSection({ casoInicial, estimadoInicial, consentimie
         const { p, a, suelto } = menu
         const cerrar = () => setMenu(null)
         const deCaso = suelto ? undefined : caso.nombre
-        if (a === 'edit') return <DialogoEditar procedimiento={p} nota={p.nota} caso={deCaso} onClose={cerrar} onGuardar={(n) => { cerrar(); guardarNota(p, n) }} />
+        if (a === 'edit' && editando) {
+          return (
+            <EditFindingDrawer
+              finding={editando} findings={PROBLEMAS.map(findingDeProblema)}
+              estado={{ texto: p.estado, tono: p.estado === 'Removed' ? 'neutral' : TONO_PROCEDIMIENTO[p.estado] }}
+              bloqueoEstimado={suelto ? undefined : bloqueoEstimadoDe(caso)}
+              onClose={cerrar} onSave={(patch) => guardarEdicion(p, patch)}
+            />
+          )
+        }
         if (a === 'delete') return <DialogoBorrar procedimiento={p} caso={deCaso} onCancel={cerrar} onConfirm={(al) => { cerrar(); borrarDesdeMenu(p, al, suelto) }} />
         if (a === 'refer' || a === 'discard' || a === 'discontinue') {
           return <DialogoCambioEstado accion={a} procedimiento={p} desde={p.estado} caso={deCaso} onCancel={cerrar} onConfirm={() => { cerrar(); cambiarDesdeMenu(p, a) }} />
