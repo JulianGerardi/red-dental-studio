@@ -236,3 +236,9 @@ armada a mano con *Plan* en `flex-1` y las otras cuatro columnas fijas y angosta
 resto quedaba amontonado a la derecha. Pasa a `ui/data-table` sin anchos fijos, así las cinco columnas (Plan, Status,
 Expired on, License, Created at) se reparten el ancho, con el encabezado y el pie de todas las tablas. Mismos datos y
 textos; la cuenta sin historial usa el vacío de la tabla (*No billing history*).
+
+### Sin Cancel / Save en Subscription (2026-11-25)
+
+Julián: el pie debajo de la tabla no estaba alineado con el resto. Subscription es de lectura: el *Cancel / Save* que
+quedaba suelto debajo de la tabla se va en esa pestaña, como en la pestaña Billing de un empleado. Sigue en Information y
+Owner.

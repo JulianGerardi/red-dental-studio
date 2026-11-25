@@ -43,3 +43,15 @@ de red.dev (`/settings/preferences`, *Account Preferences*). Era un placeholder 
 2. El tema oscuro: tokens oscuros para todo `src/index.css`.
 3. Con usuarios: si el formato es una preferencia de cada persona o de la clínica (red.dev la llama *Account
    Preferences* y el menú dice *Manage user preferences*).
+
+## Rediseño (2026-11-25, segunda vuelta)
+
+Julián: *"me gustaría mejorar ese diseño"*. Cambios, mismos textos y opciones:
+
+1. **Una sola card, una fila por sección**: a la izquierda el título y qué hace (*Choose the theme for your portal.* /
+   *Preferred date format for dates across your portal. Examples reflect the current date.*), a la derecha las opciones.
+   Es el patrón de settings de las apps SaaS: se lee de arriba abajo sin cards sueltas.
+2. **Theme con miniaturas**: cada opción muestra una mini pantalla (rail azul, encabezado y dos cards) con los tokens de
+   la app; Dark sigue deshabilitado con *Coming soon*.
+3. **Formato de fecha como lista**, cada opción con su ejemplo de hoy a la derecha (azul la elegida). La *Live preview*
+   queda en una línea debajo.

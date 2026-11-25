@@ -292,12 +292,15 @@ export function SettingsAccount() {
         )}
       </div>
 
-      <div className="mt-5 flex justify-end gap-3">
-        <FormFooter
-          onCancel={() => aviso.info('Changes discarded.')}
-          onSave={() => aviso.ok('Account information saved.')}
-        />
-      </div>
+      {/* Subscription es de lectura: sin Cancel / Save debajo de la tabla, como Billing en Employee (settings-accounts.md, 2026-11-25). */}
+      {tab !== 'Subscription' && (
+        <div className="mt-5 flex justify-end gap-3">
+          <FormFooter
+            onCancel={() => aviso.info('Changes discarded.')}
+            onSave={() => aviso.ok('Account information saved.')}
+          />
+        </div>
+      )}
     </div>
   )
 }

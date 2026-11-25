@@ -70,3 +70,14 @@ contenido) y el catálogo de permisos por categoría. `usuarios` (empleados acti
 1. Que *Employees › Roles & location* tome los roles de acá (hoy usa su propia lista, `ROLES_DISPONIBLES`).
 2. Con usuarios: si conviene un buscador de permisos adentro del drawer (son 150) y si las categorías plegadas se
    entienden o extrañan verlas abiertas como en red.dev.
+
+## Segunda vuelta de Julián (2026-11-25)
+
+1. **Tabla desproporcionada**: Description se estiraba y empujaba *Permissions* al otro lado. Todas las columnas pasan a
+   ancho fijo (Name 300, Description 420, Permissions 110): lo que sobra queda al final, antes de *Actions*.
+2. **Pestañas de View role / Edit role** como las de Edit appointment: `ui/tabs` md, a su ancho y a la izquierda (antes
+   `fullWidth` sm, a todo el ancho). Edit role usa `DrawerActions` con *Save changes*.
+3. **Expand all / Collapse all** con `BotonExpandirTodo`, el del Ledger y las tablas (antes un link azul suelto). La
+   primera categoría arranca abierta, así el botón aparece y se ve cómo es una categoría.
+4. **Casillas y textos** más chicos y alineados: el nombre del permiso en 12 px medium (antes 13), la descripción en 11 px
+   (antes 12), la casilla a la altura de la primera línea; el nombre de la categoría en 12 px semibold.

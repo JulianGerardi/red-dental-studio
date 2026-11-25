@@ -1,16 +1,14 @@
-import { useState, type KeyboardEvent } from 'react'
-import { CalendarDays, Moon, Sun, type LucideIcon } from 'lucide-react'
+import { useState, type KeyboardEvent, type ReactNode } from 'react'
+import { CalendarDays } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { SettingsPageHeader } from '@/components/settings/SettingsPageHeader'
-import { Card } from '@/components/settings/primitives'
-import { FieldLabel } from '@/components/patients/form'
 import { Pill } from '@/components/ui/pill'
 import { aviso } from '@/components/ui/toaster'
-import { PADDING_PAGINA, TARJETA_INTERNA } from '@/lib/estilos'
+import { PADDING_PAGINA, TARJETA_PANEL } from '@/lib/estilos'
 
 /* Settings → Preferences (red.dev: Account Preferences). Tema y formato de fecha de quien usa la app; se aplican al
-   elegir, sin Save, como en red.dev. Las dos cards de red.dev con la vista previa aparte pasan a una columna, con la
-   vista previa debajo de los formatos. Ver design-reference/figma/modulos/preferences.md. */
+   elegir, sin Save, como en red.dev. Una card con una fila por sección: a la izquierda qué es, a la derecha las
+   opciones. Ver design-reference/figma/modulos/preferences.md (2026-11-25). */
 
 export const FORMATOS_FECHA = [
   { valor: 'MM/DD/YYYY', detalle: 'Month/Day/Year' },
@@ -36,57 +34,65 @@ const leer = (): FormatoFecha => {
   } catch { return 'MM/DD/YYYY' }
 }
 
-/* Una opción como card con su punto, la de OpcionDireccion (Relationships) con título y bajada. */
-function Opcion({ titulo, detalle, icono: Icono, elegida, disabled, extra, onElegir }: {
-  titulo: string
-  detalle: string
-  icono?: LucideIcon
-  elegida: boolean
-  disabled?: boolean
-  extra?: React.ReactNode
-  onElegir: () => void
-}) {
-  return (
-    <button
-      type="button"
-      role="radio"
-      aria-checked={elegida}
-      disabled={disabled}
-      tabIndex={elegida ? 0 : -1}
-      onClick={onElegir}
-      className={cn(
-        'flex min-h-14 items-center gap-3 rounded-lg border bg-white px-3 py-2.5 text-left transition-colors',
-        'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-dash-blue',
-        elegida ? 'border-dash-blue bg-dash-count-bg' : 'border-line hover:bg-surface-subtle',
-        'disabled:cursor-not-allowed disabled:bg-surface-subtle disabled:hover:bg-surface-subtle',
-      )}
-    >
-      <span className={cn('flex size-4 shrink-0 items-center justify-center rounded-full border-2', elegida ? 'border-dash-blue' : 'border-ink-faint')}>
-        {elegida && <span className="size-[7px] rounded-full bg-dash-blue" />}
-      </span>
-      <span className="flex min-w-0 flex-1 flex-col gap-0.5">
-        <span className={cn('flex items-center gap-1.5 text-[13px] font-semibold', disabled ? 'text-ink-muted' : 'text-ink')}>
-          {Icono && <Icono aria-hidden className="size-3.5" />}
-          {titulo}
-        </span>
-        <span className="text-[12px] text-ink-muted">{detalle}</span>
-      </span>
-      {extra}
-    </button>
-  )
-}
-
 /* Flechas para moverse entre las opciones, como un radiogroup nativo. */
 function moverConFlechas(e: KeyboardEvent<HTMLDivElement>) {
   const radios = [...e.currentTarget.querySelectorAll<HTMLButtonElement>('[role="radio"]:not(:disabled)')]
   const i = radios.indexOf(document.activeElement as HTMLButtonElement)
-  if (i < 0) return
   const paso = e.key === 'ArrowRight' || e.key === 'ArrowDown' ? 1 : e.key === 'ArrowLeft' || e.key === 'ArrowUp' ? -1 : 0
-  if (!paso) return
+  if (i < 0 || !paso) return
   e.preventDefault()
   const sig = radios[(i + paso + radios.length) % radios.length]
   sig.focus()
   sig.click()
+}
+
+function Punto({ on }: { on: boolean }) {
+  return (
+    <span className={cn('flex size-4 shrink-0 items-center justify-center rounded-full border-2', on ? 'border-dash-blue' : 'border-ink-faint')}>
+      {on && <span className="size-[7px] rounded-full bg-dash-blue" />}
+    </span>
+  )
+}
+
+const OPCION = cn(
+  'rounded-lg border bg-white text-left transition-colors',
+  'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-dash-blue',
+  'disabled:cursor-not-allowed',
+)
+
+/* Una miniatura de la app con el tema: rail azul, encabezado y dos cards. Sólo dibujo, con los tokens de la app. */
+function Miniatura({ oscuro }: { oscuro?: boolean }) {
+  const linea = oscuro ? 'bg-ink-medium' : 'bg-line'
+  const card = oscuro ? 'bg-ink-soft' : 'bg-white shadow-hairline'
+  return (
+    <span aria-hidden className={cn('flex h-[88px] overflow-hidden rounded-md', oscuro ? 'bg-ink' : 'bg-surface-muted')}>
+      <span className="w-4 shrink-0 bg-dash-blue" />
+      <span className="flex flex-1 flex-col gap-1.5 p-2">
+        <span className={cn('h-2.5 rounded-sm', oscuro ? 'bg-ink-soft' : 'bg-white')} />
+        <span className="grid flex-1 grid-cols-2 gap-1.5">
+          {[0, 1].map((i) => (
+            <span key={i} className={cn('flex flex-col gap-1 rounded-sm p-1.5', card)}>
+              <span className={cn('h-1.5 w-2/3 rounded-full', linea)} />
+              <span className={cn('h-1.5 w-1/2 rounded-full', linea)} />
+              <span className="mt-auto h-1.5 w-1/3 rounded-full bg-dash-blue" />
+            </span>
+          ))}
+        </span>
+      </span>
+    </span>
+  )
+}
+
+function Seccion({ titulo, detalle, children }: { titulo: string; detalle: string; children: ReactNode }) {
+  return (
+    <section className="grid gap-4 p-4 sm:p-5 lg:grid-cols-[240px_minmax(0,1fr)] lg:gap-8">
+      <div className="flex flex-col gap-1">
+        <h2 className="text-sm font-bold text-ink">{titulo}</h2>
+        <p className="text-[12px] leading-relaxed text-ink-muted">{detalle}</p>
+      </div>
+      {children}
+    </section>
+  )
 }
 
 export function SettingsPreferences() {
@@ -101,43 +107,78 @@ export function SettingsPreferences() {
     aviso.ok(`Dates will show as ${formatearFecha(hoy, f)}.`)
   }
 
+  const temas: { valor: Tema; detalle: string; disabled?: boolean }[] = [
+    { valor: 'Light', detalle: 'Light theme' },
+    /* Los colores de la app todavía no tienen su versión oscura: Dark queda a la vista pero sin elegir. */
+    { valor: 'Dark', detalle: 'Dark theme', disabled: true },
+  ]
+
   return (
     <div className={PADDING_PAGINA}>
       <SettingsPageHeader titulo="Account preferences" />
 
-      <div className="mt-4 flex max-w-[880px] flex-col gap-4">
-        <Card title="Appearance">
-          <FieldLabel>Theme</FieldLabel>
-          <div role="radiogroup" aria-label="Theme" onKeyDown={moverConFlechas} className="mt-2 grid gap-3 sm:grid-cols-2">
-            <Opcion titulo="Light" detalle="Light theme" icono={Sun} elegida={tema === 'Light'} onElegir={() => setTema('Light')} />
-            {/* Los colores de la app todavía no tienen su versión oscura: Dark queda a la vista pero sin elegir. */}
-            <Opcion
-              titulo="Dark" detalle="Dark theme" icono={Moon} elegida={tema === 'Dark'} disabled onElegir={() => setTema('Dark')}
-              extra={<Pill tone="neutral" size="sm">Coming soon</Pill>}
-            />
+      <div className={cn(TARJETA_PANEL, 'mt-4 max-w-[960px] divide-y divide-line-row')}>
+        <Seccion titulo="Appearance" detalle="Choose the theme for your portal.">
+          <div role="radiogroup" aria-label="Theme" onKeyDown={moverConFlechas} className="grid max-w-[520px] grid-cols-2 gap-3">
+            {temas.map((t) => {
+              const on = tema === t.valor
+              return (
+                <button
+                  key={t.valor} type="button" role="radio" aria-checked={on} disabled={t.disabled} tabIndex={on ? 0 : -1}
+                  onClick={() => setTema(t.valor)}
+                  className={cn(OPCION, 'flex flex-col gap-2.5 p-2', on ? 'border-dash-blue ring-1 ring-dash-blue' : 'border-line hover:border-line-strong')}
+                >
+                  <span className={cn(t.disabled && 'opacity-60')}><Miniatura oscuro={t.valor === 'Dark'} /></span>
+                  <span className="flex items-center gap-2 px-1 pb-0.5">
+                    <Punto on={on} />
+                    <span className="flex min-w-0 flex-1 flex-col">
+                      <span className={cn('text-[13px] font-semibold', t.disabled ? 'text-ink-muted' : 'text-ink')}>{t.valor}</span>
+                      <span className="text-[11px] text-ink-muted">{t.detalle}</span>
+                    </span>
+                    {t.disabled && <Pill tone="neutral" size="sm">Coming soon</Pill>}
+                  </span>
+                </button>
+              )
+            })}
           </div>
-        </Card>
+        </Seccion>
 
-        <Card title="Localization & regional">
-          <FieldLabel>Preferred date format</FieldLabel>
-          <div role="radiogroup" aria-label="Preferred date format" onKeyDown={moverConFlechas} className="mt-2 grid gap-3 sm:grid-cols-3">
-            {FORMATOS_FECHA.map((f) => (
-              <Opcion key={f.valor} titulo={f.valor} detalle={f.detalle} elegida={formato === f.valor} onElegir={() => elegirFormato(f.valor)} />
-            ))}
-          </div>
+        <Seccion titulo="Localization & regional" detalle="Preferred date format for dates across your portal. Examples reflect the current date.">
+          <div className="flex max-w-[520px] flex-col gap-3">
+            <div role="radiogroup" aria-label="Preferred date format" onKeyDown={moverConFlechas} className="flex flex-col overflow-hidden rounded-lg border border-line">
+              {FORMATOS_FECHA.map((f, i) => {
+                const on = formato === f.valor
+                return (
+                  <button
+                    key={f.valor} type="button" role="radio" aria-checked={on} tabIndex={on ? 0 : -1}
+                    onClick={() => elegirFormato(f.valor)}
+                    className={cn(
+                      'flex min-h-12 items-center gap-3 px-3 py-2 text-left transition-colors',
+                      'focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-dash-blue',
+                      i > 0 && 'border-t border-line-row',
+                      on ? 'bg-dash-count-bg' : 'bg-white hover:bg-surface-subtle',
+                    )}
+                  >
+                    <Punto on={on} />
+                    <span className="flex min-w-0 flex-1 flex-col">
+                      <span className="text-[13px] font-semibold text-ink">{f.valor}</span>
+                      <span className="text-[11px] text-ink-muted">{f.detalle}</span>
+                    </span>
+                    <span className={cn('text-[13px] tabular-nums', on ? 'font-semibold text-dash-blue' : 'text-ink-muted')}>{formatearFecha(hoy, f.valor)}</span>
+                  </button>
+                )
+              })}
+            </div>
 
-          {/* La "Live Preview" de red.dev, debajo de lo que la cambia. */}
-          <div className={cn(TARJETA_INTERNA, 'mt-4 flex items-center gap-3 p-3')} aria-live="polite">
-            <span className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-dash-count-bg text-dash-blue">
-              <CalendarDays aria-hidden className="size-4" />
-            </span>
-            <span className="flex min-w-0 flex-col">
-              <span className="text-[11px] font-semibold tracking-wide text-ink-muted uppercase">Live preview</span>
-              <span className="text-[15px] font-bold text-ink tabular-nums">{formatearFecha(hoy, formato)}</span>
-            </span>
-            <span className="ml-auto text-[12px] text-ink-muted">Reflects current date</span>
+            {/* La "Live Preview" de red.dev: cómo se va a ver hoy, debajo de lo que la cambia. */}
+            <p className="flex items-center gap-2 text-[12px] text-ink-muted" aria-live="polite">
+              <CalendarDays aria-hidden className="size-3.5 text-dash-blue" />
+              Live preview:
+              <span className="font-semibold text-ink tabular-nums">{formatearFecha(hoy, formato)}</span>
+              <span>· Reflects current date</span>
+            </p>
           </div>
-        </Card>
+        </Seccion>
       </div>
     </div>
   )

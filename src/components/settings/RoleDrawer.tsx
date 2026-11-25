@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Check, X } from 'lucide-react'
+import { X } from 'lucide-react'
 import { Drawer, DrawerActions, DrawerSection, DrawerStep } from '@/components/ui/drawer'
 import { Alert } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
@@ -10,8 +10,8 @@ import { PermissionsPicker } from '@/components/settings/PermissionsPicker'
 import { OBLIGATORIO } from '@/lib/validacion'
 import type { Rol } from '@/data/roles'
 
-/* New role y Duplicate role: dos pasos, General y Permissions (CON-3130). Edit role: las mismas dos partes en pestañas y
-   un solo Save changes (CON-3131). Un rol del sistema se abre en sólo lectura, con Close (CON-4065). Ver roles.md. */
+/* New role y Duplicate role: dos pasos, General y Permissions (CON-3130). Edit role: las mismas dos partes en pestañas,
+   las de Edit appointment, y un solo Save changes (CON-3131). Un rol del sistema se abre en sólo lectura, con Close (CON-4065). Ver roles.md. */
 export type ModoRol = 'nuevo' | 'duplicar' | 'editar' | 'ver'
 
 const PASOS = ['General', 'Permissions'] as const
@@ -83,12 +83,7 @@ export function RoleDrawer({
   const pie = soloLectura
     ? <Button variant="secondary" onClick={onClose}><X /> Close</Button>
     : conPestanas
-      ? (
-          <>
-            <Button variant="secondary" onClick={onClose}><X /> Cancel</Button>
-            <Button onClick={guardar}><Check /> Save changes</Button>
-          </>
-        )
+      ? <DrawerActions onCancel={onClose} onSave={guardar} saveLabel="Save changes" />
       : <DrawerActions step={paso} total={PASOS.length} onNext={siguiente} onBack={() => setParte('General')} onCancel={onClose} onSave={guardar} />
 
   return (
@@ -99,7 +94,7 @@ export function RoleDrawer({
       size="xl"
       steps={conPestanas ? undefined : PASOS}
       step={paso}
-      tabs={conPestanas ? <Tabs tabs={PASOS} value={parte} onChange={setParte} fullWidth size="sm" aria-label="Role sections" /> : undefined}
+      tabs={conPestanas ? <Tabs tabs={PASOS} value={parte} onChange={setParte} aria-label="Role sections" /> : undefined}
       footer={pie}
     >
       {incompleto && (

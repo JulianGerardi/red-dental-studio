@@ -144,20 +144,6 @@ test('Compare fees compara por procedimiento contra el Default', async ({ app, s
   await expect(drawer.getByText(/−\$23\.00/)).toBeVisible()
 })
 
-test('Bulk edit con filas tildadas cambia sólo esas', async ({ app, screen }) => {
-  await app.open('/settings/finance/fee-schedule/aetna-2026/edit')
-  await expect(screen.getByText('26 / 26')).toBeVisible()
-  await screen.getByRole('checkbox', 'Select D0120').tap()
-  await screen.getByRole('button', 'Bulk edit').tap()
-  const drawer = screen.getByRole('dialog', 'Increase selected')
-  await drawer.getByLabel(/^Increase selected fees by/).fill('10')
-  await drawer.getByRole('button', 'Confirm').tap()
-  await screen.getByRole('button', 'Save').tap()
-  /* +$10: D0120 pasa de $52 a $62 (el Current fee de la versión nueva); D0140 sigue en $68. */
-  await expect(screen.getByRole('row', /^Select D0120 .* \$62\.00 \$62\.00$/)).toBeVisible()
-  await expect(screen.getByRole('row', /^Select D0140 .* \$68\.00 \$68\.00$/)).toBeVisible()
-})
-
 test('Add range avisa y el breadcrumb sigue la regla de Settings', async ({ app, screen }) => {
   await app.open('/settings/finance/carriers/aetna/edit/insurance-plans/acme-ppo/edit')
   const migas = screen.getByRole('navigation', 'Breadcrumb')

@@ -239,3 +239,13 @@ no tiene.
 
 **A validar con usuarios:** que el alto de la tabla alcance en notebooks de 768 px de alto, y que el aviso al salir no
 moleste a quien sólo miró precios (sólo salta si algo cambió).
+
+### Segunda vuelta de Julián (2026-11-25)
+
+1. **Sin casillas**: *"los check no van, es más formato texto"* (video de red.dev). Se van las casillas por fila, la de
+   "todas", la barra *n selected* y *Increase selected*: Bulk edit vuelve a cambiar todos los fees. Corrige la decisión 10
+   (2026-10-09).
+2. **New fee como texto**: el importe se ve como texto, alineado con *Current fee*, y el borde aparece al pasar o al
+   editar (`MoneyInput comoTexto`). Filas más bajas, como red.dev.
+3. **Filter de la lista** como el del resto: con su ancho (antes estirado a toda la columna) y **sin selección al
+   entrar** (antes Active + Inactive, y el botón azul con "2"). Se ven todos con su punto; los archivados en gris.

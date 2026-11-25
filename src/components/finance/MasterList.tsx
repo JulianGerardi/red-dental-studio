@@ -42,7 +42,8 @@ export function MasterList({
   return (
     <div className="flex flex-col gap-3">
       <div className="flex gap-2"><SettingsSearch value={q} onChange={onQ} placeholder={placeholder} className="sm:max-w-none" /></div>
-      {filtro}
+      {/* El Filter con su ancho, a la izquierda, como en el resto de las listas (no estirado a toda la columna). */}
+      {filtro && <div className="flex">{filtro}</div>}
       <ul aria-label="List" className="flex max-h-[560px] flex-col gap-0.5 overflow-y-auto rounded-lg p-1 shadow-hairline">
         {items.length === 0 && <li className="px-3 py-6 text-center text-[13px] text-ink-muted">{vacio}</li>}
         {items.map((it) => (

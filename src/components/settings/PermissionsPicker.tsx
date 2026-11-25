@@ -5,13 +5,14 @@ import { Checkbox } from '@/components/ui/checkbox'
 import { Count } from '@/components/ui/count'
 import { Switch } from '@/components/ui/switch'
 import { TARJETA_INTERNA } from '@/lib/estilos'
+import { BotonExpandirTodo } from '@/components/patients/ledger/LedgerRowDetail'
 import { CATEGORIAS_PERMISOS } from '@/data/roles'
 
 /* Los permisos de un rol, por categoría (red.dev): cada una se pliega, dice cuántos tiene tildados ("1/6") y lleva el
    switch "All permissions" para tildar o destildar la categoría entera (CON-3411). Sólo lectura en un rol del sistema
    (CON-4065). Ver design-reference/figma/modulos/roles.md. */
 export function PermissionsPicker({
-  value, onChange, readOnly, abiertasIniciales = [],
+  value, onChange, readOnly, abiertasIniciales,
 }: {
   value: string[]
   onChange?: (v: string[]) => void
@@ -19,24 +20,25 @@ export function PermissionsPicker({
   /** Categorías que arrancan desplegadas. */
   abiertasIniciales?: string[]
 }) {
-  const [abiertas, setAbiertas] = useState<string[]>(abiertasIniciales)
+  /* Arranca con la primera abierta: así se ve cómo es una categoría y aparece Expand all / Collapse all. */
+  const [abiertas, setAbiertas] = useState<string[]>(abiertasIniciales ?? [CATEGORIAS_PERMISOS[0].nombre])
   const todasAbiertas = abiertas.length === CATEGORIAS_PERMISOS.length
   const alternar = (nombre: string) => setAbiertas((a) => (a.includes(nombre) ? a.filter((x) => x !== nombre) : [...a, nombre]))
   const cambiar = (ids: string[], on: boolean) => onChange?.(on ? [...new Set([...value, ...ids])] : value.filter((id) => !ids.includes(id)))
 
   return (
     <div className="flex flex-col gap-3">
-      <div className="flex items-center justify-between gap-3">
-        <p className="text-[13px] text-ink-muted">
+      <div className="flex min-h-8 items-center justify-between gap-3">
+        <p className="text-[12px] text-ink-muted">
           <span className="font-semibold text-ink tabular-nums">{value.length}</span> permissions selected
         </p>
-        <button
-          type="button"
-          onClick={() => setAbiertas(todasAbiertas ? [] : CATEGORIAS_PERMISOS.map((c) => c.nombre))}
-          className="rounded text-[13px] font-medium text-dash-blue hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-dash-blue"
-        >
-          {todasAbiertas ? 'Collapse all' : 'Expand all'}
-        </button>
+        {/* El mismo Expand all / Collapse all del Ledger y las tablas. */}
+        <BotonExpandirTodo
+          todasAbiertas={todasAbiertas}
+          hayAlgunaAbierta={abiertas.length > 0}
+          onExpandirTodo={() => setAbiertas(CATEGORIAS_PERMISOS.map((c) => c.nombre))}
+          onColapsarTodo={() => setAbiertas([])}
+        />
       </div>
 
       {CATEGORIAS_PERMISOS.map((c) => {
@@ -56,7 +58,7 @@ export function PermissionsPicker({
                 className="flex min-h-11 min-w-0 flex-1 items-center gap-2 pl-3 text-left focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-dash-blue"
               >
                 <ChevronDown aria-hidden className={cn('size-4 shrink-0 text-ink-muted transition-transform', !abierta && '-rotate-90')} />
-                <span className="truncate text-[13px] font-semibold text-ink">{c.nombre}</span>
+                <span className="truncate text-[12px] font-semibold text-ink">{c.nombre}</span>
                 <Count active={tildados > 0} className="tabular-nums">{tildados}/{ids.length}</Count>
               </button>
               <label className="flex shrink-0 items-center gap-2 text-[12px] text-ink-muted">
@@ -71,21 +73,21 @@ export function PermissionsPicker({
               </label>
             </div>
             {abierta && (
-              <ul id={cuerpo} className="grid gap-x-4 gap-y-3 border-t border-line-row p-3 sm:grid-cols-2">
+              <ul id={cuerpo} className="grid gap-x-4 gap-y-2.5 border-t border-line-row px-3 py-3 sm:grid-cols-2">
                 {c.permisos.map((x) => {
                   const on = value.includes(x.id)
                   return (
-                    <li key={x.id} className="flex items-start gap-2.5">
-                      <Checkbox on={on} onChange={(v) => cambiar([x.id], v)} label={x.nombre} disabled={readOnly} className="mt-0.5" />
+                    <li key={x.id} className="flex items-start gap-2">
+                      <Checkbox on={on} onChange={(v) => cambiar([x.id], v)} label={x.nombre} disabled={readOnly} className="mt-px" />
                       <button
                         type="button"
                         tabIndex={-1}
                         disabled={readOnly}
                         onClick={() => cambiar([x.id], !on)}
-                        className="flex min-w-0 flex-col gap-0.5 text-left disabled:cursor-default"
+                        className="-mt-px flex min-w-0 flex-col text-left disabled:cursor-default"
                       >
-                        <span className="text-[13px] font-medium text-ink">{x.nombre}</span>
-                        <span className="text-[12px] leading-snug text-ink-muted">{x.detalle}</span>
+                        <span className="text-[12px] leading-[18px] font-medium text-ink">{x.nombre}</span>
+                        <span className="text-[11px] leading-snug text-ink-muted">{x.detalle}</span>
                       </button>
                     </li>
                   )
