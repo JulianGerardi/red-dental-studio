@@ -44,8 +44,8 @@ const hash = (s: string) => [...s].reduce((h, c) => Math.imul(h ^ c.charCodeAt(0
 function ordenLab(t: PendingTask) {
   const n = hash(t.id ?? t.person)
   /* Un id con el formato de red.dev (UUID), siempre el mismo para la misma tarea. */
-  let x = n * 2654435761
-  const hex = Array.from({ length: 32 }, () => { x = (x * 1103515245 + 12345) % 2147483648; return (x >> 16 & 15).toString(16) }).join('')
+  let x = n
+  const hex = Array.from({ length: 32 }, () => { x = (Math.imul(x, 1103515245) + 12345) >>> 0; return (x >>> 28).toString(16) }).join('')
   const id = `${hex.slice(0, 8)}-${hex.slice(8, 12)}-${hex.slice(12, 16)}-${hex.slice(16, 20)}-${hex.slice(20)}`
   return { id, lab: LABORATORIOS[n % LABORATORIOS.length]!, ...PEDIDOS[(n >>> 8) % PEDIDOS.length]! }
 }
@@ -123,6 +123,40 @@ export function documentoTarea(t: PendingTask, firmado?: Date): Documento {
   }
 }
 
+/* ── El diagrama de la boca de la Lab Order (como el PDF de red.dev): las dos arcadas en herradura, la encía rosa, cada
+   diente con su número o letra afuera y los de la orden en azul. Coordenadas en puntos, con y hacia abajo; el PDF y la
+   hoja en pantalla dibujan lo mismo. ── */
+export type DienteDiagrama = { d: string; x: number; y: number; lx: number; ly: number }
+export type ArcadaDiagrama = { nombre: string; cx: number; cy: number; rx: number; ry: number; encia: [number, number][]; dientes: DienteDiagrama[] }
+export function diagramaBoca(denticion: Denticion) {
+  const primaria = denticion === 'Primary'
+  const [rx, ry, tam] = primaria ? [58, 50, 15] : [68, 56, 10.5]
+  const ancho = 200
+  const rad = (g: number) => (g * Math.PI) / 180
+  /* De 195° a -15°: una herradura, con los molares más abajo que la línea del centro. */
+  const angulos = (n: number) => Array.from({ length: n }, (_, i) => 195 - (i * 210) / (n - 1))
+  const arcada = (nombre: string, fila: string[], cy: number, signo: 1 | -1): ArcadaDiagrama => {
+    const cx = ancho / 2
+    const punto = (g: number, ex = 0): [number, number] => [cx + (rx + ex) * Math.cos(rad(g)), cy - signo * (ry + ex) * Math.sin(rad(g))]
+    return {
+      nombre, cx, cy, rx, ry,
+      encia: Array.from({ length: 37 }, (_, i) => punto(198 - i * 6)),
+      dientes: angulos(fila.length).map((g, i) => {
+        const [x, y] = punto(g)
+        const [lx, ly] = punto(g, tam / 2 + 9)
+        return { d: fila[i]!, x, y, lx, ly }
+      }),
+    }
+  }
+  const bajo = ry * Math.sin(rad(15))
+  const arribaCy = 22 + ry
+  const abajoCy = arribaCy + 2 * bajo + 34
+  return {
+    ancho, alto: abajoCy + ry + 24, tam,
+    arcadas: [arcada('Maxillary', ARCADAS[denticion].arriba, arribaCy, 1), arcada('Mandibular', ARCADAS[denticion].abajo, abajoCy, -1)],
+  }
+}
+
 /* ── PDF de una página, armado a mano con Helvetica (sin dependencias), con el diseño de la hoja de la pantalla. ── */
 
 /* Anchos de Helvetica (AFM), de " " a "~", en milésimas de em. */
@@ -163,6 +197,8 @@ const SUAVE: [number, number, number] = [0.25, 0.25, 0.27]
 const GRIS: [number, number, number] = [0.44, 0.44, 0.48]
 const TENUE: [number, number, number] = [0.63, 0.63, 0.67]
 const LINEA: [number, number, number] = [0.906, 0.906, 0.906]
+const ENCIA: [number, number, number] = [0.973, 0.835, 0.82] // --color-encia
+const AZUL_DIENTE: [number, number, number] = [0.39, 0.56, 0.94]
 
 export function pdfDeDocumento(doc: Documento) {
   const ops: string[] = []
@@ -232,27 +268,31 @@ export function pdfDeDocumento(doc: Documento) {
         y += 4
       }
     } else if ('dientes' in s) {
-      /* Las dos arcadas con los dientes de la orden en azul, y debajo cada diente con sus superficies. */
+      /* El diagrama de la boca en su panel gris y, a la derecha, cada diente con sus superficies (como red.dev). */
       const { denticion, piezas } = s.dientes
       const elegidos = new Map(piezas)
-      const rotulo = 62
-      for (const [nombre, fila] of [['Maxillary', ARCADAS[denticion].arriba], ['Mandibular', ARCADAS[denticion].abajo]] as const) {
-        escribir(nombre, X, y + 4, 8, 'F1', GRIS)
-        const paso = Math.min(26, (ANCHO - rotulo) / fila.length)
-        fila.forEach((d, i) => {
-          const x = X + rotulo + i * paso
-          const si = elegidos.has(d)
-          rectRedondo(x, y - 9, paso - 4, 18, 3, si ? AZUL : [0.953, 0.957, 0.965])
-          escribir(d, x + (paso - 4) / 2 - ancho(d, 7.5, true) / 2, y + 3, 7.5, 'F2', si ? [1, 1, 1] : GRIS)
-        })
-        y += 24
+      const g = diagramaBoca(denticion)
+      const [ox, oy] = [X, y - 6]
+      rectRedondo(ox, oy, g.ancho, g.alto, 10, [0.953, 0.957, 0.965])
+      for (const a of g.arcadas) {
+        const pts = a.encia.map(([px, py]) => `${(ox + px).toFixed(1)} ${(ALTO - oy - py).toFixed(1)}`)
+        ops.push(`${col(ENCIA)} RG ${g.tam + 7} w 1 J 1 j ${pts[0]} m ${pts.slice(1).map((q) => `${q} l`).join(' ')} S`)
+        escribir(a.nombre, ox + a.cx - ancho(a.nombre, 8.5) / 2, oy + a.cy + 3, 8.5, 'F1', GRIS)
+        for (const t of a.dientes) {
+          const si = elegidos.has(t.d)
+          rectRedondo(ox + t.x - g.tam / 2 - 0.8, oy + t.y - g.tam / 2 - 0.8, g.tam + 1.6, g.tam + 1.6, g.tam * 0.4, si ? AZUL : TENUE)
+          rectRedondo(ox + t.x - g.tam / 2, oy + t.y - g.tam / 2, g.tam, g.tam, g.tam * 0.35, si ? AZUL_DIENTE : [1, 1, 1])
+          const tamL = denticion === 'Primary' ? 8 : 6.5
+          escribir(t.d, ox + t.lx - ancho(t.d, tamL) / 2, oy + t.ly + tamL / 3, tamL, 'F1', GRIS)
+        }
       }
-      y += 6
+      let yl = y + 4
       for (const [d, sup] of piezas) {
-        escribir(`Tooth ${d}${sup.length ? ':' : ''}`, X, y, 9, 'F2', TINTA)
-        if (sup.length) escribir(sup.join(', '), X + ancho(`Tooth ${d}:`, 9, true) + 5, y, 9)
-        y += 14
+        escribir(`Tooth ${d}${sup.length ? ':' : ''}`, X + g.ancho + 16, yl, 9, 'F2', TINTA)
+        if (sup.length) escribir(sup.join(', '), X + g.ancho + 16 + ancho(`Tooth ${d}:`, 9, true) + 5, yl, 9)
+        yl += 14
       }
+      y = Math.max(oy + g.alto + 8, yl)
     } else {
       for (const p of s.parrafos) {
         for (const l of partir(p, 9, ANCHO)) { escribir(l, X, y, 9); y += 14 }

@@ -1172,9 +1172,11 @@ con el diseño de la hoja unificada (2026-11-24):
    derecho de red.dev.
 2. **Secciones:** Patient Information (Name, Phone, Email, Address), Receiving Laboratory (Name, Phone, Email, Address),
    Provider Information (Name, Email), Dental Work Request y Teeth & Surface Specifications.
-3. **Teeth & Surface:** las dos arcadas con los dientes de la orden en azul y debajo *Tooth A: O* (sin superficies, sólo
-   *Tooth T*), como red.dev. Los dientes van como botones numerados por arcada, igual que en el detalle de la Lab Order
-   (clinical-mode.md, 2026-11-20), en vez del odontograma dibujado.
+3. **Teeth & Surface:** el diagrama de la boca como red.dev (pedido de Julián al publicar): las dos arcadas en herradura
+   sobre un panel gris, la encía rosa (`--color-encia`), cada diente con su número o letra afuera y los de la orden en
+   azul; a la derecha *Tooth A: O* (sin superficies, sólo *Tooth T*). Lo arma `diagramaBoca` (en `documentoTarea.ts`) y
+   lo dibujan igual el PDF y la hoja en pantalla (`DiagramaBoca`, SVG). Es un dibujo propio, no el odontograma de
+   red.dev; el detalle de la Lab Order sigue con los dientes como botones (clinical-mode.md, 2026-11-20).
 4. **Sin firma:** red.dev no la tiene (`Documento.sinFirma`). La Clinical note la sigue llevando.
 5. **Datos mock:** los laboratorios pasan a `data/laboratorios.ts` (nombre, teléfono, mail y dirección; el select del
    detalle usa los mismos) con `ARCADAS`. El pedido, los dientes y el laboratorio salen fijos por id de la tarea; el mail
