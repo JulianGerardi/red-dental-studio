@@ -5,6 +5,22 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-11-25
 
+### Mails: cabecera con degradé desde blanco, pie según quién escribe y textos nuevos del Figma ([#PR](https://github.com/JulianGerardi/red-dental-studio/pull/PR))
+- **Cabecera** igual para Confidentally y la clínica: el degradé queda blanco hasta 280 px, así el logo (máx. 240 px) apoya
+  siempre sobre blanco; en Outlook la cabecera es blanca. **Pie** según `remitente`: el de Confidentally (copyright,
+  dirección, legales) y el de la clínica (nombre, `{{practice_address}}`, "Powered by Confidentally", mail y teléfono,
+  legales). Sale el aviso legal largo.
+- **Textos de los 16 mails** según el Figma 📧 Email: título, "Hello {{nombre}},", "Questions? Contact …" y "The … team".
+  Booked, Confirmed y Canceled sin botón. Vuelve la **contraseña temporal** en Patient, Employee y Guardian invitation.
+- **Para el backend, variables nuevas:** `patient_name`, `account_owner_name`, `employee_name`, `guardian_name`,
+  `practice_address`, `previous_appointment_date`, `temporary_password`, `document_link`. **Dejan de usarse:** `*_first_name`,
+  `set_password_link`, `link_expiration`, `support_contact`, `website_url`. Imágenes nuevas en `public/emails/`:
+  `confidentally-mark.png` (pie) y `sample-practice-logo-<color>.png` (pruebas). El detalle va en `emails.json`.
+- Bloque `saludo` pasa a `titulo`; `firma` lleva `equipo` en vez de `lineas`; `origen` es `'figma' | 'propuesta'`.
+- **Vista previa** (`/emails/`): muestras de color del logo de ejemplo en los mails de la clínica.
+- **Figma:** la página 📧 Email documenta la plantilla y los 16 mails (6 flujos, `scripts/figma/flujos/emails.mjs`); la
+  ruta de cada pantalla capturada ahora incluye el hash.
+
 ### Settings: Roles y Preferences, y arreglos de Fee schedule, Account y Working hours ([#195](https://github.com/JulianGerardi/red-dental-studio/pull/195))
 - **Roles** (`/settings/roles`) y **Preferences** (`/settings/preferences`) dejan de ser "Coming soon". Nuevos:
   `data/roles.ts` (permisos por categoría y roles), `settings/PermissionsPicker`, `settings/RoleDrawer`,
