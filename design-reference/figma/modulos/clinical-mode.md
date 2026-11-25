@@ -3524,3 +3524,19 @@ Anomalías y pendientes:
 
 **A validar con usuarios:** si recepción entiende *Request* como "enviar al provider"; si el contador de 500 alcanza; y si
 conviene ver los procedimientos derivados también en la lista de Treatment plan.
+
+### CON-4153 · End Encounter: una sola línea de lo hecho y sin bajada (2026-11-25)
+
+Pedido de Julián sobre una captura del drawer:
+
+1. **Lo hecho hoy, una sola vez:** cada fila muestra sólo la última línea verde. Si en el mismo encuentro se completó la
+   fase 2 y después el procedimiento, queda *Procedure completed* (antes se listaban *Phase 1 completed* y *Procedure
+   completed* juntos). Sin cerrar el procedimiento, se ve la fase más alta registrada. El detalle completo sigue en
+   *View execution history*.
+2. **Sin bajada:** sale el texto *Record the phases or procedures done in this appointment…* y la línea de fecha,
+   hora, provider y cantidad debajo del título, como pide la regla de drawers (título sin bajada). La cantidad sigue en
+   *Appointment procedures · N*.
+3. **Sin el texto del pie** (*You can end the encounter without completing every procedure…*).
+
+**A validar con usuarios:** sin el texto del pie, si se entiende que End Encounter cierra aunque queden fases sin
+registrar y que Back no deshace lo guardado.
