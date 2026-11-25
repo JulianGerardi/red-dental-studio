@@ -566,3 +566,20 @@ sola card; Julián pidió mantener las tres.
 
 A validar con usuarios: si la fila compacta de Today se lee tan rápido como la card, y si recepción extraña ver más de
 cuatro pacientes recientes a la vez.
+
+## El tipo vuelve a pestañas, en la fila del título (2026-11-25)
+
+Pedido de Julián con un video de red.dev. Sin paciente, el `FilterMenu` de *Recent billing activity* se reemplaza por las
+pestañas **All / Payments / Adjustments / Today** (`ui/tabs` sm, sin cantidades, como el video), a la izquierda de
+*Columns*. Revierte "El tipo de actividad, en el Filter" (2026-11-20) sólo en Billing; Accounts sigue con su Filter.
+
+1. **En la fila del título.** Pestañas y *Columns* pasan de la barra de la `DataTable` al `controls` del `Panel`, como
+   red.dev: la tabla arranca justo abajo del título y no queda una barra aparte. Con un paciente elegido, *Patient view /
+   Guarantor view* va en el mismo lugar, así los controles no cambian de sitio entre las dos vistas.
+2. **Angosto.** El encabezado ya es `flex-wrap`: en tablet entra todo en la fila; en el celular las pestañas bajan abajo
+   del título y *Columns* debajo, sin scroll de costado.
+3. `ActividadReciente` deja la prop `todas` (era para las cantidades del Filter). e2e: `tests/billing.e2e.ts` toca la
+   pestaña (`role=tab`) en vez de abrir el Filter.
+
+**A validar con usuarios:** si recepción usa *Today* como vista diaria; si es así, conviene que recuerde la última
+pestaña elegida.
