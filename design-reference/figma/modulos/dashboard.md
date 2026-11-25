@@ -1153,3 +1153,11 @@ Propuesta B (regla en `figma/README.md` › *Hoja de documentos*). `VistaDocumen
 sección de datos va al resumen y el resto, numerado; la firma del provider al final. El PDF de *View PDF*
 (`pdfDeDocumento`) se dibuja igual: membrete con *RD*, tipo en azul, resumen en tabla, secciones numeradas, firma y pie.
 `CLINICA` se mudó a `data/clinica.ts` (documentoTarea la reexporta).
+
+## Pending task: fechas alineadas aunque no haya ⋮ (2026-11-24)
+
+Pedido de Julián (CON-2643). La Clinical note no tiene acciones en el ⋮ (`MenuTarea` devuelve `null`), así que su fila
+quedaba 28px más corta a la derecha y el vencimiento, el PDF y *Complete this task* se corrían respecto de Lab orders y
+Prescriptions. `TaskRow` ahora reserva siempre el lugar del ⋮ (`size-7`), igual que ya hacía con el PDF: las cuatro
+columnas de la derecha (fecha, PDF, botón, ⋮) quedan en la misma vertical en todas las filas. Vale para el Dashboard y el
+Patient Dashboard, que comparten `PendingTaskList`.

@@ -607,3 +607,8 @@ pegado al título). En el celular los controles bajan debajo del título.
 
 Pedido de Julián: se saca la pastilla *N to resolve* de Pending documents. Las pestañas ya muestran cuántos hay en cada
 grupo. Queda título a la izquierda y pestañas a la derecha, como Pending task.
+
+## Pending task: fechas alineadas aunque no haya ⋮ (2026-11-24)
+
+CON-2643. Mismo arreglo que el Dashboard (ver `dashboard.md`, misma fecha): la fila reserva el lugar del ⋮ aunque la
+tarea no tenga acciones, así el vencimiento y *Complete this task* no se corren entre Clinical note y el resto.

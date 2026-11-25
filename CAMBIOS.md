@@ -3,6 +3,13 @@
 Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber el dev. El porqué de cada decisión está en
 `design-reference/figma/modulos/<módulo>.md`; lo anterior al 2026-10-06, en `git log` y en esos mismos archivos.
 
+## 2026-11-25
+
+### Pending task: fechas alineadas aunque no haya ⋮ ([#189](https://github.com/JulianGerardi/red-dental-studio/pull/189))
+- **`TaskRow`** (Dashboard y Patient Dashboard) reserva siempre el lugar del ⋮ (28 px), como ya hacía con el PDF: la
+  Clinical note, que no tiene acciones, ya no corre el vencimiento, el PDF ni *Complete this task* (CON-2643).
+- Sin cambios de props, rutas ni datos.
+
 ## 2026-11-24
 
 ### Visor y hoja de documentos unificados ([#188](https://github.com/JulianGerardi/red-dental-studio/pull/188))
