@@ -10,6 +10,7 @@ import { Pill } from '@/components/ui/pill'
 import { FieldError, FieldLabel, SearchField, TextArea } from '@/components/patients/form'
 import { SurfaceWheel, type Surface } from './dental/SurfaceWheel'
 import { PROCEDURES } from './dental/data'
+import { ARCADAS, LABORATORIOS, type Denticion } from '@/data/laboratorios'
 import { TARJETA_PANEL } from '@/lib/estilos'
 import type { PendingTask } from '@/components/dashboard/PendingTaskCard'
 import { MenuTarea, SIN_ENCUENTRO, TONO_ESTADO, type AccionUI } from '@/components/dashboard/tareas'
@@ -20,12 +21,8 @@ import { MenuTarea, SIN_ENCUENTRO, TONO_ESTADO, type AccionUI } from '@/componen
    encuentro abierto con el paciente se ve en sólo lectura, pero la dentición se puede cambiar para mirar, como en
    red.dev. Ver design-reference/figma/modulos/clinical-mode.md (2026-11-20). */
 
-const LABORATORIOS = ['Olivos Laboratory', 'North Dental Lab', 'Smile Lab Studio']
+const NOMBRES_LAB = LABORATORIOS.map((l) => l.nombre)
 const PROCEDIMIENTOS = PROCEDURES.map((p) => `${p.code} - ${p.label}`)
-const PERMANENTES = { arriba: Array.from({ length: 16 }, (_, i) => String(i + 1)), abajo: Array.from({ length: 16 }, (_, i) => String(32 - i)) }
-const PRIMARIOS = { arriba: 'ABCDEFGHIJ'.split(''), abajo: 'TSRQPONMLK'.split('') }
-
-type Denticion = 'Permanent' | 'Primary'
 
 /* El título de cada caja con su ícono, como red.dev. */
 const Titulo = ({ icono: Icono, children }: { icono: LucideIcon; children: string }) => (
@@ -56,7 +53,7 @@ export function LabOrderDetail({ tarea, abierto, onVolver, onAccion }: {
   const [adjuntos, setAdjuntos] = useState<string[]>([])
   const [errores, setErrores] = useState<Record<string, string>>({})
 
-  const filas = denticion === 'Primary' ? PRIMARIOS : PERMANENTES
+  const filas = ARCADAS[denticion ?? 'Permanent']
   const todos = [...filas.arriba, ...filas.abajo]
   const elegirDenticion = (d: Denticion) => { setDenticion(d); setDientes([]); setActual(null); setSuperficies({}) }
   const tocarDiente = (d: string) => {
@@ -123,7 +120,7 @@ export function LabOrderDetail({ tarea, abierto, onVolver, onAccion }: {
         <section className={cn(TARJETA_PANEL, 'flex flex-col gap-4 p-4 sm:p-5')} aria-label="General information">
           <Titulo icono={FileText}>General information</Titulo>
           <div className="flex items-end gap-2">
-            <SearchField label="Receiving laboratory" required className="min-w-0 flex-1" options={LABORATORIOS} value={lab} onChange={setLab} error={errores.lab} disabled={!abierto} />
+            <SearchField label="Receiving laboratory" required className="min-w-0 flex-1" options={NOMBRES_LAB} value={lab} onChange={setLab} error={errores.lab} disabled={!abierto} />
             <Button variant="secondary" disabled={!abierto} className={cn(errores.lab && 'mb-6')} onClick={() => aviso.info('New laboratory is not available in this release.')}><Plus /> New laboratory</Button>
           </div>
           <label className="flex w-fit items-center gap-2 text-[13px] text-ink">

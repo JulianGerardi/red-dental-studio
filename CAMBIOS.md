@@ -5,6 +5,14 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-11-25
 
+### PDF de la Lab Order con los datos y el diagrama de la boca de red.dev ([#190](https://github.com/JulianGerardi/red-dental-studio/pull/190))
+- El PDF de la Lab Order (ícono del documento en Pending task) trae lo de red.dev: Provider, Lab Order ID, Patient
+  Phone, Email, Expiration Date; Patient Information, Receiving Laboratory, Provider Information, Dental Work Request y
+  **Teeth & Surface Specifications con el diagrama de la boca**. Sin firma (CON-2643).
+- **Nuevo `data/laboratorios.ts`** (`LABORATORIOS`, `ARCADAS`, `Denticion`); el select de `LabOrderDetail` lo usa.
+- `documentoTarea`: sección `dientes`, `Documento.sinFirma` y `diagramaBoca()` (la geometría que dibujan el PDF y el
+  SVG `DiagramaBoca` de `VistaDocumento`). Token nuevo `--color-encia`.
+
 ### Pending task: fechas alineadas aunque no haya ⋮ ([#189](https://github.com/JulianGerardi/red-dental-studio/pull/189))
 - **`TaskRow`** (Dashboard y Patient Dashboard) reserva siempre el lugar del ⋮ (28 px), como ya hacía con el PDF: la
   Clinical note, que no tiene acciones, ya no corre el vencimiento, el PDF ni *Complete this task* (CON-2643).

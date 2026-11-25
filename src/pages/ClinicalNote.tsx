@@ -8,16 +8,41 @@ import { Dialog, DialogContent, DialogDescription, DialogTitle } from '@/compone
 import { FieldLabel, control } from '@/components/patients/form'
 import { buscarTarea } from '@/components/dashboard/dashboard-data'
 import { aplicarAccion } from '@/components/dashboard/tareas'
-import { CLINICA, abrirDocumento, documentoTarea, type Documento } from '@/components/dashboard/documentoTarea'
+import { CLINICA, abrirDocumento, diagramaBoca, documentoTarea, type Documento } from '@/components/dashboard/documentoTarea'
 import { EmptyState } from '@/components/ui/empty-state'
 import { DocumentViewer } from '@/components/ui/document-viewer'
 import { DocumentSheet } from '@/components/ui/document-sheet'
 import { MEMBRETE } from '@/data/clinica'
+import type { Denticion } from '@/data/laboratorios'
 
 /* La Clinical Note que abre Complete this Task en Pending Task, como red.dev (videos de Julián, 2026-11-20): Back to
    History (vuelve a Patient Summary de Clinical Mode), el nombre, View PDF, el documento y Sign Clinical Note, que pide
    el usuario y la contraseña otra vez. En el visor de documentos (ui/document-viewer), a pantalla completa. Ver
    design-reference/figma/modulos/dashboard.md (2026-11-20 y 2026-11-24). */
+
+/* El diagrama de la boca de la Lab Order, el mismo que dibuja el PDF (diagramaBoca). */
+function DiagramaBoca({ denticion, elegidos }: { denticion: Denticion; elegidos: string[] }) {
+  const g = diagramaBoca(denticion)
+  return (
+    <svg viewBox={`0 0 ${g.ancho} ${g.alto}`} className="w-full max-w-[240px] rounded-xl bg-surface-muted" role="img" aria-label={`${denticion} dentition, teeth ${elegidos.join(', ')}`}>
+      {g.arcadas.map((a) => (
+        <g key={a.nombre}>
+          <polyline points={a.encia.map((p) => p.join(',')).join(' ')} fill="none" strokeWidth={g.tam + 7} strokeLinecap="round" strokeLinejoin="round" className="stroke-encia" />
+          <text x={a.cx} y={a.cy + 3} textAnchor="middle" fontSize={8.5} className="fill-ink-muted">{a.nombre}</text>
+          {a.dientes.map((t) => {
+            const si = elegidos.includes(t.d)
+            return (
+              <g key={t.d}>
+                <rect x={t.x - g.tam / 2} y={t.y - g.tam / 2} width={g.tam} height={g.tam} rx={g.tam * 0.35} strokeWidth={0.8} className={si ? 'fill-dash-blue stroke-dash-blue' : 'fill-white stroke-line'} />
+                <text x={t.lx} y={t.ly + 2.5} textAnchor="middle" fontSize={denticion === 'Primary' ? 8 : 6.5} className="fill-ink-muted">{t.d}</text>
+              </g>
+            )
+          })}
+        </g>
+      ))}
+    </svg>
+  )
+}
 
 /* El documento en pantalla, con la hoja común (ui/document-sheet) y el mismo contenido que el PDF (documentoTarea): la
    primera sección de datos va al resumen y el resto, numerado. Firma el provider. */
@@ -45,11 +70,16 @@ export function VistaDocumento({ doc }: { doc: Documento }) {
               </div>
             ))}
           </div>
+        ) : 'dientes' in s ? (
+          <div className="flex flex-wrap items-start gap-6">
+            <DiagramaBoca denticion={s.dientes.denticion} elegidos={s.dientes.piezas.map(([d]) => d)} />
+            <ul>{s.dientes.piezas.map(([d, sup]) => <li key={d}><span className="font-semibold text-ink">Tooth {d}</span>{sup.length ? `: ${sup.join(', ')}` : ''}</li>)}</ul>
+          </div>
         ) : (
           <div className="flex flex-col gap-2">{s.parrafos.map((p) => <p key={p}>{p}</p>)}</div>
         ),
       }))}
-      signatures={[{ role: 'Provider', name: doc.provider, signed: doc.firmado ? { date: doc.firmado, text: doc.provider } : undefined }]}
+      signatures={doc.sinFirma ? undefined : [{ role: 'Provider', name: doc.provider, signed: doc.firmado ? { date: doc.firmado, text: doc.provider } : undefined }]}
       footer={`${CLINICA.nombre} · ${doc.titulo} · ${doc.paciente}`}
     />
   )
