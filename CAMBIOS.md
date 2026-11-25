@@ -5,7 +5,7 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-11-25
 
-### Mails: cabecera con degradé desde blanco, pie según quién escribe y textos nuevos del Figma ([#PR](https://github.com/JulianGerardi/red-dental-studio/pull/PR))
+### Mails: cabecera con degradé desde blanco, pie según quién escribe y textos nuevos del Figma ([#196](https://github.com/JulianGerardi/red-dental-studio/pull/196))
 - **Cabecera** igual para Confidentally y la clínica: el degradé queda blanco hasta 280 px, así el logo (máx. 240 px) apoya
   siempre sobre blanco; en Outlook la cabecera es blanca. **Pie** según `remitente`: el de Confidentally (copyright,
   dirección, legales) y el de la clínica (nombre, `{{practice_address}}`, "Powered by Confidentally", mail y teléfono,
