@@ -83,11 +83,8 @@ test('Find patient muestra algunos pacientes y Show more abre el resto', async (
 
 test('Filtros, Columns y Export CSV como red.dev', async ({ app, screen }) => {
   await app.open('/billing')
-  /* El tipo se elige en el Filter de la app (billing.md, 2026-11-20). */
-  const filtrar = async (tipo: string) => {
-    await screen.getByRole('button', /Filter activity/).tap()
-    await screen.getByRole('menuitemradio', new RegExp(`^${tipo}`)).tap()
-  }
+  /* El tipo se elige en las pestañas al lado de Columns, como red.dev (billing.md, 2026-11-25). */
+  const filtrar = (tipo: string) => screen.getByRole('tab', tipo).tap()
   await filtrar('Payments')
   await expect(screen.getByText(/Showing 1 to 9 of 9 results/)).toBeVisible()
   await filtrar('Adjustments')
