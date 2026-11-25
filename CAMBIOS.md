@@ -5,6 +5,23 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-11-25
 
+### Clinical Mode: Edit finding / Edit procedure desde las tablas, Estimate y la card del plan (CON-4211, CON-2770) ([#PR](https://github.com/JulianGerardi/red-dental-studio/pull/PR))
+- **El Edit del ⋮ abre los mismos drawers que el examen:** Problem List -> *Edit finding*; Procedures y las filas de
+  Treatment Plan (casos y Unassigned) -> *Edit procedure*. Dejá de usar `DialogoEditar` (sólo la nota) ahí: queda sólo en
+  `EndEncounterDrawer`. Las filas se pasan a `Finding` con `dental/registroComoFinding.ts` (`findingDeProblema`,
+  `findingDeProcedimiento`, `cambiosDe…`); `EditFindingDrawer` suma las props `estado` y `bloqueoEstimado`.
+- **Edit finding con un diente:** sólo General information, sin pestañas ni descriptores. Physical y ROS tampoco llevan
+  la pestaña Descriptors. Títulos en minúscula inicial: "Edit finding" y "Edit procedure".
+- **Edit procedure suma la pestaña Estimate** (`dental/ProcedureEstimate.tsx`): cálculo automático o a mano, y override
+  por seguro (Primary / Secondary). Bloqueado fuera de Planning o sin permiso (como Estimate details). Modelo nuevo
+  `EstimadoProcedimiento` y `resolverEstimado` en `data/estimaciones.ts`; `Finding.estimado` y `Procedimiento.estimado /
+  vinculados / diagnosticos`. **Backend:** guardar el estimado por procedimiento con sus overrides (CON-4211, sin
+  descripción en Jira). Pendiente: que Estimate details use los overrides guardados.
+- **Card del plan del Overview** (`TreatmentPlanList` › `PlanCard`) con el diseño de la de Treatment Plan de la ficha del
+  paciente. `Dato` cambia de caja gris a rótulo + valor con ícono azul. Mismos datos; el Total amount sigue abriendo
+  Estimate details.
+- Nuevo estado de finding *Referred* (`FindingStatus`, pill violeta).
+
 ### Lab order y Referral como Edit account; End Encounter más simple ([#198](https://github.com/JulianGerardi/red-dental-studio/pull/198))
 - **Nuevo `clinical/FichaClinica`**: `EncabezadoFicha` (título de pantalla + estado + acciones) y `Adjuntos` (archivos
   PDF/JPG/PNG ≤10MB con lista). `LabOrderDetail` y `ReferralDetail` los usan, con cards apiladas (`settings` `Card`) y
