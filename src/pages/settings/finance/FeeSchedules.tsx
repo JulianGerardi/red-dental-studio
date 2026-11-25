@@ -1,12 +1,13 @@
 import { useMemo, useState } from 'react'
 import { Link, Navigate, useNavigate, useParams } from 'react-router-dom'
-import { Archive, ArchiveRestore, Copy, GitCompareArrows, Network, Pencil, Plus, Power, ReceiptText, Search, SlidersHorizontal } from 'lucide-react'
+import { Archive, ArchiveRestore, Copy, GitCompareArrows, Network, Pencil, Plus, Power, ReceiptText, Search, SearchX, SlidersHorizontal } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { SettingsPageHeader } from '@/components/settings/SettingsPageHeader'
 import { FieldLabel, SelectField, TextField, control } from '@/components/patients/form'
 import { Alert } from '@/components/ui/alert'
+import { EmptyState } from '@/components/ui/empty-state'
+import { useAvisoSalida } from '@/lib/useAvisoSalida'
 import { Button } from '@/components/ui/button'
-import { Checkbox } from '@/components/ui/checkbox'
 import { DataTable, TextCell, type DataTableColumn } from '@/components/ui/data-table'
 import { DatePicker } from '@/components/ui/date-picker'
 import { FilterMenu } from '@/components/ui/filter-menu'
@@ -67,7 +68,6 @@ export function FeeScheduleEditor({ arancel, onGuardado }: { arancel?: Arancel; 
   const version = arancel?.versiones.find((v) => v.id === versionId) ?? vigente
   const [nombre, setNombre] = useState(arancel?.nombre ?? '')
   const [tipo, setTipo] = useState<TipoArancel | ''>(arancel?.tipo ?? '')
-  const [elegidos, setElegidos] = useState<string[]>([])
   const [renombrando, setRenombrando] = useState(!arancel)
   const [borrador, setBorrador] = useState(arancel ? arancel.estado === 'Inactive' : false)
   const [desde, setDesde] = useState<Date | null>(new Date())
@@ -82,9 +82,10 @@ export function FeeScheduleEditor({ arancel, onGuardado }: { arancel?: Arancel; 
   const cambiado = !arancel || preciosCambiados || nombre.trim() !== arancel.nombre || tipo !== arancel.tipo || borrador !== (arancel.estado === 'Inactive')
   const faltaNombre = intentado && !nombre.trim() ? OBLIGATORIO : undefined
   const faltaTipo = intentado && !tipo ? OBLIGATORIO : undefined
-  const todas = filas.length > 0 && filas.every((p) => elegidos.includes(p.code))
   const faltaFecha = intentado && arancel && preciosCambiados && !desde ? OBLIGATORIO : undefined
   const repetido = !!nombre.trim() && aranceles.some((a) => a.id !== arancel?.id && a.nombre.toLowerCase() === nombre.trim().toLowerCase())
+  /* Con cambios sin guardar, irse (otro fee schedule de la lista, el breadcrumb, Cancel) pregunta antes, como red.dev. */
+  const salida = useAvisoSalida(!!arancel && cambiado)
 
   const elegirVersion = (etiqueta: string) => {
     const v = arancel?.versiones.find((x) => etiquetaVersion(arancel, x) === etiqueta)
@@ -125,7 +126,8 @@ export function FeeScheduleEditor({ arancel, onGuardado }: { arancel?: Arancel; 
   const campoTipo = (
     <SelectField label="Type" required placeholder="Select a type" options={[...TIPOS_ARANCEL]} value={tipo} onChange={(v) => setTipo(v as TipoArancel)} error={faltaTipo} />
   )
-  const columnas = cn('grid items-center gap-3', arancel ? 'grid-cols-[16px_64px_1fr_96px_120px]' : 'grid-cols-[16px_64px_1fr_120px]')
+  /* Sin casillas y con New fee como texto que se edita al tocarlo, como red.dev (settings-billing.md, 2026-11-25). */
+  const columnas = cn('grid items-center gap-3', arancel ? 'grid-cols-[64px_1fr_96px_120px]' : 'grid-cols-[64px_1fr_120px]')
 
   return (
     <div className="flex flex-col gap-4">
@@ -183,47 +185,38 @@ export function FeeScheduleEditor({ arancel, onGuardado }: { arancel?: Arancel; 
         </span>
       </div>
 
-      {elegidos.length > 0 && (
-        <div role="status" className="flex flex-wrap items-center gap-x-3 gap-y-1 rounded-lg bg-info-bg px-3 py-2 text-[13px]">
-          <span className="font-semibold text-ink">{elegidos.length} selected</span>
-          <span className="text-ink-muted">Bulk edit changes only these fees.</span>
-          <button type="button" onClick={() => setElegidos([])} className="ml-auto font-medium text-dash-blue hover:underline">Clear selection</button>
-        </div>
-      )}
-
-      <div role="table" aria-label="Fees" className={TABLA_MARCO}>
-        <div role="row" className={cn(columnas, TABLA_ENCABEZADO)}>
-          <span role="columnheader">
-            <Checkbox
-              on={todas} label="Select all procedures" disabled={filas.length === 0}
-              onChange={(v) => setElegidos((e) => (v ? [...new Set([...e, ...filas.map((p) => p.code)])] : e.filter((c) => !filas.some((p) => p.code === c))))}
-            />
-          </span>
+      {/* La tabla scrollea adentro con el encabezado fijo, así Cancel y Save quedan a la vista (red.dev). */}
+      <div role="table" aria-label="Fees" className={cn(TABLA_MARCO, 'flex flex-col overflow-hidden')}>
+        <div role="row" className={cn(columnas, TABLA_ENCABEZADO, 'shrink-0')}>
           <span role="columnheader">Code</span><span role="columnheader">Description</span>
           {arancel && <span role="columnheader" className="text-right">Current fee</span>}
           <span role="columnheader" className="text-right">New fee</span>
         </div>
+        <div role="rowgroup" className="max-h-[min(480px,60vh)] overflow-y-auto">
         {filas.map((p) => {
-          const elegido = elegidos.includes(p.code)
           const actual = version?.precios[p.code]
           const cambio = !!arancel && (nuevos[p.code] ?? null) !== (actual ?? null)
           return (
-            <div key={p.code} role="row" aria-selected={elegido} className={cn(columnas, TABLA_FILA, elegido && 'bg-dash-count-bg')}>
-              <span role="cell"><Checkbox on={elegido} label={`Select ${p.code}`} onChange={(v) => setElegidos((e) => (v ? [...e, p.code] : e.filter((c) => c !== p.code)))} /></span>
+            <div key={p.code} role="row" className={cn(columnas, TABLA_FILA)}>
               <span role="cell" className="tabular-nums">{p.code}</span>
               <span role="cell" className="min-w-0">{p.label}</span>
               {arancel && <span role="cell" className="text-right tabular-nums">{actual !== undefined ? dinero(actual) : '—'}</span>}
-              <span role="cell"><MoneyInput label={`${p.code} new fee`} value={nuevos[p.code] ?? null} onChange={(v) => setNuevos((n) => ({ ...n, [p.code]: v }))} className={cn(cambio && 'font-semibold text-dash-blue')} /></span>
+              <span role="cell"><MoneyInput label={`${p.code} new fee`} value={nuevos[p.code] ?? null} onChange={(v) => setNuevos((n) => ({ ...n, [p.code]: v }))} comoTexto className={cn(cambio && 'font-semibold text-dash-blue')} /></span>
             </div>
           )
         })}
-        {filas.length === 0 && <p className={cn(TABLA_FILA, 'py-6 text-center text-ink-muted')}>No procedures match “{q}”.</p>}
+        {filas.length === 0 && (
+          <EmptyState icon={SearchX} title="No procedures available" detail="No procedures match your current filters or may not be available at this time." className="border-t border-line-row" />
+        )}
+        </div>
       </div>
 
       <div className="flex justify-between gap-3">
-        <Button variant="secondary" onClick={() => navigate(LISTA_ARANCELES)}>Cancel</Button>
+        <Button variant="secondary" onClick={() => salida.ir(LISTA_ARANCELES)}>Cancel</Button>
         <Button disabled={!cambiado} onClick={guardarTodo}>Save</Button>
       </div>
+
+      {salida.dialogo}
 
       {herramienta === 'copiar' && (
         <CopyFormDrawer
@@ -239,12 +232,12 @@ export function FeeScheduleEditor({ arancel, onGuardado }: { arancel?: Arancel; 
       )}
       {herramienta === 'aumentar' && (
         <IncreaseAllDrawer
-          seleccionados={elegidos.length}
+          seleccionados={0}
           onClose={() => setHerramienta(null)}
           onAplicar={(a) => {
-            const codigos = elegidos.length ? elegidos : PROCEDIMIENTOS.map((p) => p.code)
+            const codigos = PROCEDIMIENTOS.map((p) => p.code)
             setNuevos((n) => ({ ...n, ...Object.fromEntries(codigos.map((c) => [c, aumentar(n[c] ?? 0, a)])) }))
-            aviso.info(elegidos.length ? `${elegidos.length} new fees were updated. Save to keep them.` : 'New fees were updated. Save to keep them.')
+            aviso.info('New fees were updated. Save to keep them.')
           }}
         />
       )}
@@ -336,7 +329,8 @@ export function SettingsFeeScheduleEdit() {
   const navigate = useNavigate()
   const { aranceles, guardar } = useFinanzas()
   const [q, setQ] = useState('')
-  const [estados, setEstados] = useState<string[]>(['Active'])
+  /* Sin filtro al entrar, como todas las listas: se ven todos, cada uno con su punto (settings-billing.md, 2026-11-25). */
+  const [estados, setEstados] = useState<string[]>([])
   const elegido = aranceles.find((a) => a.id === feeId)
 
   const items: ItemMaestro[] = useMemo(() => aranceles

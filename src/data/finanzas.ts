@@ -112,7 +112,8 @@ export const conImporte = (precios: Record<string, number | null>) => PROCEDIMIE
 /* "03/06/2026 - Active", como el select de red.dev (que además muestra una hora). */
 export function etiquetaVersion(a: Arancel, v: VersionArancel, hoy = hoyIso()) {
   const vigente = versionVigente(a, hoy)
-  const estado = v.id === vigente.id ? 'Active' : v.desde > hoy ? 'Scheduled' : 'Expired'
+  /* Una versión que todavía no empezó es Scheduled aunque sea la única (Cigna DPPO 2027 decía Active). */
+  const estado = v.desde > hoy ? 'Scheduled' : v.id === vigente.id ? 'Active' : 'Expired'
   return `${fechaMDA(v.desde)} - ${estado}`
 }
 
