@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react'
-import { X } from 'lucide-react'
+import { Trash2, X } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 /* Chip: algo elegido que se puede sacar (un código CDT, un filtro aplicado). Celeste con texto azul y la ✕ a la derecha.
@@ -13,7 +13,9 @@ const CHIP_TONES: Record<ChipTone, string> = {
   neutral: 'bg-surface-muted text-ink-soft',
 }
 
-export function Chip({ children, onRemove, removeLabel, disabled, className, tone = 'blue', title }: {
+/* La ✕ saca una selección y no borra nada; el tacho borra algo guardado (una franja de Working hours) y pregunta antes,
+   como el de Rooms y el resto de la app (locations.md, 2026-11-25). */
+export function Chip({ children, onRemove, removeLabel, removeIcon = 'remove', disabled, className, tone = 'blue', title }: {
   children: ReactNode
   tone?: ChipTone
   /** Tooltip con el texto completo, por si se corta. */
@@ -22,6 +24,8 @@ export function Chip({ children, onRemove, removeLabel, disabled, className, ton
   onRemove?: () => void
   /** aria-label de la ✕, por ejemplo "Remove D0140". */
   removeLabel?: string
+  /** remove: ✕, saca lo elegido. delete: tacho, borra algo guardado. */
+  removeIcon?: 'remove' | 'delete'
   disabled?: boolean
   className?: string
 }) {
@@ -42,7 +46,7 @@ export function Chip({ children, onRemove, removeLabel, disabled, className, ton
           type="button" aria-label={removeLabel ?? 'Remove'} onClick={onRemove} disabled={disabled}
           className="flex size-4 shrink-0 items-center justify-center rounded-full transition-colors hover:bg-white focus-visible:outline-2 focus-visible:outline-dash-blue disabled:pointer-events-none"
         >
-          <X className="size-3" />
+          {removeIcon === 'delete' ? <Trash2 className="size-3" /> : <X className="size-3" />}
         </button>
       )}
     </span>

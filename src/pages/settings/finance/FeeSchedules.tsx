@@ -1,10 +1,12 @@
 import { useMemo, useState } from 'react'
 import { Link, Navigate, useNavigate, useParams } from 'react-router-dom'
-import { Archive, ArchiveRestore, Copy, GitCompareArrows, Network, Pencil, Plus, Power, ReceiptText, Search, SlidersHorizontal } from 'lucide-react'
+import { Archive, ArchiveRestore, Copy, GitCompareArrows, Network, Pencil, Plus, Power, ReceiptText, Search, SearchX, SlidersHorizontal } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { SettingsPageHeader } from '@/components/settings/SettingsPageHeader'
 import { FieldLabel, SelectField, TextField, control } from '@/components/patients/form'
 import { Alert } from '@/components/ui/alert'
+import { EmptyState } from '@/components/ui/empty-state'
+import { useAvisoSalida } from '@/lib/useAvisoSalida'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
 import { DataTable, TextCell, type DataTableColumn } from '@/components/ui/data-table'
@@ -85,6 +87,8 @@ export function FeeScheduleEditor({ arancel, onGuardado }: { arancel?: Arancel; 
   const todas = filas.length > 0 && filas.every((p) => elegidos.includes(p.code))
   const faltaFecha = intentado && arancel && preciosCambiados && !desde ? OBLIGATORIO : undefined
   const repetido = !!nombre.trim() && aranceles.some((a) => a.id !== arancel?.id && a.nombre.toLowerCase() === nombre.trim().toLowerCase())
+  /* Con cambios sin guardar, irse (otro fee schedule de la lista, el breadcrumb, Cancel) pregunta antes, como red.dev. */
+  const salida = useAvisoSalida(!!arancel && cambiado)
 
   const elegirVersion = (etiqueta: string) => {
     const v = arancel?.versiones.find((x) => etiquetaVersion(arancel, x) === etiqueta)
@@ -191,8 +195,9 @@ export function FeeScheduleEditor({ arancel, onGuardado }: { arancel?: Arancel; 
         </div>
       )}
 
-      <div role="table" aria-label="Fees" className={TABLA_MARCO}>
-        <div role="row" className={cn(columnas, TABLA_ENCABEZADO)}>
+      {/* La tabla scrollea adentro con el encabezado fijo, así Cancel y Save quedan a la vista (red.dev). */}
+      <div role="table" aria-label="Fees" className={cn(TABLA_MARCO, 'flex flex-col overflow-hidden')}>
+        <div role="row" className={cn(columnas, TABLA_ENCABEZADO, 'shrink-0')}>
           <span role="columnheader">
             <Checkbox
               on={todas} label="Select all procedures" disabled={filas.length === 0}
@@ -203,6 +208,7 @@ export function FeeScheduleEditor({ arancel, onGuardado }: { arancel?: Arancel; 
           {arancel && <span role="columnheader" className="text-right">Current fee</span>}
           <span role="columnheader" className="text-right">New fee</span>
         </div>
+        <div role="rowgroup" className="max-h-[min(480px,60vh)] overflow-y-auto">
         {filas.map((p) => {
           const elegido = elegidos.includes(p.code)
           const actual = version?.precios[p.code]
@@ -217,13 +223,18 @@ export function FeeScheduleEditor({ arancel, onGuardado }: { arancel?: Arancel; 
             </div>
           )
         })}
-        {filas.length === 0 && <p className={cn(TABLA_FILA, 'py-6 text-center text-ink-muted')}>No procedures match “{q}”.</p>}
+        {filas.length === 0 && (
+          <EmptyState icon={SearchX} title="No procedures available" detail="No procedures match your current filters or may not be available at this time." className="border-t border-line-row" />
+        )}
+        </div>
       </div>
 
       <div className="flex justify-between gap-3">
-        <Button variant="secondary" onClick={() => navigate(LISTA_ARANCELES)}>Cancel</Button>
+        <Button variant="secondary" onClick={() => salida.ir(LISTA_ARANCELES)}>Cancel</Button>
         <Button disabled={!cambiado} onClick={guardarTodo}>Save</Button>
       </div>
+
+      {salida.dialogo}
 
       {herramienta === 'copiar' && (
         <CopyFormDrawer
@@ -336,7 +347,8 @@ export function SettingsFeeScheduleEdit() {
   const navigate = useNavigate()
   const { aranceles, guardar } = useFinanzas()
   const [q, setQ] = useState('')
-  const [estados, setEstados] = useState<string[]>(['Active'])
+  /* Como red.dev: la lista muestra activos e inactivos (punto rojo); los archivados, desde el filtro. */
+  const [estados, setEstados] = useState<string[]>(['Active', 'Inactive'])
   const elegido = aranceles.find((a) => a.id === feeId)
 
   const items: ItemMaestro[] = useMemo(() => aranceles

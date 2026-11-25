@@ -9,6 +9,7 @@ import { EditableAvatar } from '@/components/ui/editable-avatar'
 import { usePhoto } from '@/lib/usePhoto'
 import { Pill, type PillTone } from '@/components/ui/pill'
 import { EmptyState } from '@/components/ui/empty-state'
+import { DataTable, TextCell, type DataTableColumn } from '@/components/ui/data-table'
 import { aviso } from '@/components/ui/toaster'
 import { CUENTAS, ESTADO_TONO as ESTADO_TONO_CUENTA } from '@/pages/settings/Accounts'
 import { Tabs } from '@/components/ui/tabs'
@@ -47,6 +48,15 @@ const ESTADO_TONO: Record<EstadoSuscripcion, PillTone> = { Active: 'success', Ca
 const HISTORIAL_PROPIO: { plan: string; estado: EstadoSuscripcion; vence: string; licencias: string; creado: string }[] = [
   { plan: 'Prueba Red', estado: 'Active', vence: '12/31/2026', licencias: '3 Used / 167 Total', creado: '08/06/2026' },
   { plan: 'Confidentally Individual User', estado: 'Cancelled', vence: '07/17/2027', licencias: '3 Used / 167 Total', creado: '07/17/2026' },
+]
+
+type FilaHistorial = (typeof HISTORIAL_PROPIO)[number]
+const COLUMNAS_HISTORIAL: DataTableColumn<FilaHistorial>[] = [
+  { key: 'plan', header: 'Plan', cell: (h) => <TextCell strong>{h.plan}</TextCell> },
+  { key: 'estado', header: 'Status', cell: (h) => <Pill tone={ESTADO_TONO[h.estado]} size="sm">{h.estado}</Pill> },
+  { key: 'vence', header: 'Expired on', cell: (h) => <span className="tabular-nums">{h.vence}</span> },
+  { key: 'licencias', header: 'License', cell: (h) => <span className="tabular-nums">{h.licencias}</span> },
+  { key: 'creado', header: 'Created at', cell: (h) => <span className="tabular-nums">{h.creado}</span> },
 ]
 
 const iniciales = (nombre: string) => nombre.trim().split(/\s+/).slice(0, 2).map((p) => p[0]).join('').toUpperCase()
@@ -157,31 +167,16 @@ export function SettingsAccount() {
 
             <div>
               <h2 className="text-[15px] font-bold text-ink">Subscription history</h2>
-              <div className="mt-3 overflow-x-auto rounded-lg border border-line-row bg-white">
-                {cuenta ? (
-                  <EmptyState icon={CreditCard} title="No billing history" detail="This account doesn't have a subscription history yet." className="border-0" />
-                ) : (
-                  <div className="min-w-[620px]">
-                    <div className="flex items-center gap-3 bg-surface-alt px-3 py-2.5 text-[11px] font-semibold text-ink-muted">
-                      <span className="min-w-0 flex-1">Plan</span>
-                      <span className="w-[90px] shrink-0">Status</span>
-                      <span className="w-[100px] shrink-0">Expired on</span>
-                      <span className="w-[140px] shrink-0">License</span>
-                      <span className="w-[100px] shrink-0">Created at</span>
-                    </div>
-                    {HISTORIAL_PROPIO.map((h, i) => (
-                      <div key={i} className="flex items-center gap-3 border-t border-line-row px-3 py-2.5 text-[13px] text-ink-soft">
-                        <span className="min-w-0 flex-1 truncate font-medium text-ink">{h.plan}</span>
-                        <span className="w-[90px] shrink-0">
-                          <Pill tone={ESTADO_TONO[h.estado]} size="sm">{h.estado}</Pill>
-                        </span>
-                        <span className="w-[100px] shrink-0 tabular-nums">{h.vence}</span>
-                        <span className="w-[140px] shrink-0 tabular-nums">{h.licencias}</span>
-                        <span className="w-[100px] shrink-0 tabular-nums">{h.creado}</span>
-                      </div>
-                    ))}
-                  </div>
-                )}
+              {/* Con `DataTable` las cinco columnas se reparten el ancho: Plan ya no se queda con todo el espacio
+                  (settings-accounts.md, 2026-11-25). */}
+              <div className="mt-3">
+                <DataTable
+                  columns={COLUMNAS_HISTORIAL}
+                  rows={cuenta ? [] : HISTORIAL_PROPIO}
+                  rowKey={(h) => `${h.plan}-${h.creado}`}
+                  rowLabel={(h) => h.plan}
+                  empty={{ icon: CreditCard, title: 'No billing history', detail: "This account doesn't have a subscription history yet." }}
+                />
               </div>
             </div>
           </>

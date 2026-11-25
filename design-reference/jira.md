@@ -352,6 +352,32 @@ Documento: [figma/modulos/relationships.md](figma/modulos/relationships.md)
 
 - [CON-2858](https://confidetally.atlassian.net/browse/CON-2858) Add Guardian desde New Patient · epic CON-2879
 
+## preferences
+
+Documento: [figma/modulos/preferences.md](figma/modulos/preferences.md)
+
+Sin epics ni historias de funcionamiento.
+
+## roles
+
+Documento: [figma/modulos/roles.md](figma/modulos/roles.md)
+
+**Epics**
+
+- [CON-3115](https://confidetally.atlassian.net/browse/CON-3115) Roles y Permisos
+- [CON-3506](https://confidetally.atlassian.net/browse/CON-3506) Configuración de permisos
+
+**Historias** (anteriores a abril; las usa la pantalla)
+
+- [CON-3130](https://confidetally.atlassian.net/browse/CON-3130) [Setting] Añadir Rol · epic CON-3115
+- [CON-3131](https://confidetally.atlassian.net/browse/CON-3131) [Setting] Edit Rol · epic CON-3115
+- [CON-3132](https://confidetally.atlassian.net/browse/CON-3132) [Setting] Eliminar Rol · epic CON-3115
+- [CON-3181](https://confidetally.atlassian.net/browse/CON-3181) [Setting] Desactivar Rol · epic CON-3115
+- [CON-3229](https://confidetally.atlassian.net/browse/CON-3229) [Setting] Activar Role · epic CON-3115
+- [CON-3411](https://confidetally.atlassian.net/browse/CON-3411) Agregar check/switch "Select All" · epic CON-3115
+- [CON-3528](https://confidetally.atlassian.net/browse/CON-3528) [Configuración de permisos] Roles · epic CON-3506
+- [CON-4065](https://confidetally.atlassian.net/browse/CON-4065) [Manager] Roles: Consultar Permisos
+
 ## scheduling
 
 Documento: [figma/modulos/scheduling.md](figma/modulos/scheduling.md)

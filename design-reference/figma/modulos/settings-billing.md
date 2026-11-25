@@ -216,3 +216,26 @@ Devolución de Julián sobre las tablas estandarizadas v2.
 2. **Filter › States arranca vacío**: antes abría con Active + Inactive tildados y el botón decía *Filter 2* sin que nadie
    hubiera filtrado. Sin nada tildado se ve todo, como en el resto de las listas; un fee schedule *Archived* también
    aparece, con su pill. La lista del editor (a la izquierda) sigue arrancando en Active, como red.dev.
+
+## Edit Fee Schedule como red.dev: scroll adentro, aviso al salir y vacío (2026-11-25)
+
+Sin historia de abril (epic CON-57): Julián pasó un video de red.dev con lo que estaba mal. Cambios:
+
+1. **La tabla scrollea adentro** con el encabezado fijo (hasta 480 px o el 60 % de la ventana). Antes la página crecía con
+   los 26 procedimientos y *Cancel* / *Save* quedaban abajo de todo; ahora están siempre a la vista, como en red.dev.
+2. **Irse con cambios sin guardar pregunta**: otro fee schedule de la lista, el breadcrumb, el menú o *Cancel* abren
+   *Are you sure you want to leave?* — *You have unsaved changes. Are you sure you want to leave this page without saving
+   them?* — con *Cancel* y *Leave without saving* (textos de red.dev). Recargar o cerrar la pestaña usa el aviso del
+   navegador. Va en `lib/useAvisoSalida`, que sirve para cualquier pantalla con Save.
+3. **Buscar sin resultados** muestra el vacío de red.dev con `ui/empty-state`: *No procedures available* · *No procedures
+   match your current filters or may not be available at this time.* (antes una línea suelta).
+4. **La lista de la izquierda arranca en Active + Inactive**, como red.dev (los inactivos con punto rojo). Corrige lo del
+   2026-11-24: abría sólo en Active y un fee schedule inactivo aparecía al final, sólo cuando estaba abierto.
+5. **Versión que todavía no empezó**: decía *Active* cuando era la única (Cigna DPPO 2027, 01/01/2027). Ahora dice
+   *Scheduled*.
+
+Quedan como estaban, a propósito: *Type*, las casillas para Bulk edit y *Non-zero fees* (decisiones 6, 8 y 10), que red.dev
+no tiene.
+
+**A validar con usuarios:** que el alto de la tabla alcance en notebooks de 768 px de alto, y que el aviso al salir no
+moleste a quien sólo miró precios (sólo salta si algo cambió).

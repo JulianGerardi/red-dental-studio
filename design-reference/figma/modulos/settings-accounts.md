@@ -228,3 +228,11 @@ celular, de a dos desde 640px y cuatro desde 1280px.
 
 Pie, alineación, fechas y avatar con las reglas comunes de todas las tablas: ver `design-reference/figma/README.md`
 (*Tablas estandarizadas v2*, 2026-11-24).
+
+## Subscription history sin el hueco de Plan (2026-11-25)
+
+Sin historia en Jira: pedido de Julián ("la tabla quedó muy larga, la parte de Plan con mucho espacio"). La tabla estaba
+armada a mano con *Plan* en `flex-1` y las otras cuatro columnas fijas y angostas: a 1440 px Plan se llevaba ~800 px y el
+resto quedaba amontonado a la derecha. Pasa a `ui/data-table` sin anchos fijos, así las cinco columnas (Plan, Status,
+Expired on, License, Created at) se reparten el ancho, con el encabezado y el pie de todas las tablas. Mismos datos y
+textos; la cuenta sin historial usa el vacío de la tabla (*No billing history*).

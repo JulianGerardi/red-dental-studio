@@ -17,6 +17,8 @@ import NotFound from '@/pages/NotFound'
 import Scheduling from '@/pages/Scheduling'
 import Billing from '@/pages/Billing'
 import UnderConstruction from '@/pages/UnderConstruction'
+import { SettingsRoles } from '@/pages/settings/Roles'
+import { SettingsPreferences } from '@/pages/settings/Preferences'
 import { SettingsLayout, SettingsGeneral, SettingsPlaceholder } from '@/pages/Settings'
 import { SettingsLocations } from '@/pages/settings/Locations'
 import { SettingsLocationDetail } from '@/pages/settings/LocationDetail'
@@ -33,9 +35,7 @@ import { BillingProfilesProvider } from '@/data/billingProfilesStore'
 import Help from '@/pages/Help'
 import Notifications from '@/pages/Notifications'
 
-const SETTINGS_PLACEHOLDERS = [
-  'roles', 'preferences',
-]
+const SETTINGS_PLACEHOLDERS: string[] = []
 
 /* Las rutas de la app, separadas del router y los providers para que el design
    system pueda montar cada pantalla en un MemoryRouter. */
@@ -89,6 +89,8 @@ export function AppRoutes() {
           <Route path="accounts/:accountId" element={<Navigate to="/settings/account" replace />} />
           <Route path="account" element={<SettingsAccount />} />
           <Route path="consents" element={<SettingsConsents />} />
+          <Route path="roles" element={<SettingsRoles />} />
+          <Route path="preferences" element={<SettingsPreferences />} />
           <Route path="ledger" element={<SettingsLedgerOptions />} />
           {/* Settings → Billing, con las rutas de red.dev. Ver figma/modulos/settings-billing.md. */}
           <Route path="finance" element={<Navigate to="/settings/finance/fee-schedule" replace />} />

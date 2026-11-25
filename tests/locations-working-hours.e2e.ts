@@ -33,7 +33,7 @@ test('Open se guarda sólo con horas válidas y en todos los días elegidos', as
   await expect(screen.getByRole('switch', 'Sunday open')).toHaveAttribute('aria-checked', 'true')
   await expect(screen.getByRole('switch', 'Saturday open')).toHaveAttribute('aria-checked', 'true')
   /* Por el botón de quitar: la copia invisible que mide el ancho de las franjas no cuenta. */
-  await expect(screen.getByRole('button', /^Remove 10:00 AM - 02:00 PM on/)).toHaveCount(2)
+  await expect(screen.getByRole('button', /^Delete 10:00 AM - 02:00 PM on/)).toHaveCount(2)
 })
 
 /* Aplicar el horario a otros días (2026-11-16): el de origen no se saca, pisar otro día abierto se pregunta. */
@@ -96,36 +96,36 @@ test('Turnos fuera de las horas nuevas: se resuelven antes y Confirm pasa el res
   await aviso.getByRole('button', 'Confirm').tap()
 
   await expect(screen.getByText('Hours saved for 3 days. 1 appointment was moved to the waiting list.')).toBeVisible()
-  await expect(screen.getByRole('button', /^Remove 09:00 AM - 02:00 PM on/)).toHaveCount(3)
+  await expect(screen.getByRole('button', /^Delete 09:00 AM - 02:00 PM on/)).toHaveCount(3)
 })
 
 test('Si las franjas entran en la fila, no hay "+N"', async ({ app, screen }) => {
   await app.open('/settings/locations/abril?type=working-hours')
-  await expect(screen.getByRole('button', /^Remove 08:15 PM - 09:00 PM on Monday/)).toBeVisible()
+  await expect(screen.getByRole('button', /^Delete 08:15 PM - 09:00 PM on Monday/)).toBeVisible()
   await expect(screen.getByRole('button', /more hours on Monday/)).toHaveCount(0)
 })
 
 /* CON-4166: borrar una franja con la ✕ pregunta antes y sólo toca ese día. */
 test('Borrar una franja pregunta, Cancel no borra y no toca la misma franja de otro día', async ({ app, screen }) => {
   await app.open('/settings/locations/abril?type=working-hours')
-  await screen.getByRole('button', /^Remove 02:00 PM - 06:00 PM on Tuesday/).tap()
+  await screen.getByRole('button', /^Delete 02:00 PM - 06:00 PM on Tuesday/).tap()
   const pregunta = screen.getByRole('dialog', 'Delete working hours?')
   await expect(pregunta.getByText('This will delete the working hours from 02:00 PM to 06:00 PM on Tuesday. Do you want to continue?')).toBeVisible()
   await pregunta.getByRole('button', 'Cancel').tap()
-  await expect(screen.getByRole('button', /^Remove 02:00 PM - 06:00 PM on Tuesday/)).toBeVisible()
+  await expect(screen.getByRole('button', /^Delete 02:00 PM - 06:00 PM on Tuesday/)).toBeVisible()
 
-  await screen.getByRole('button', /^Remove 02:00 PM - 06:00 PM on Tuesday/).tap()
+  await screen.getByRole('button', /^Delete 02:00 PM - 06:00 PM on Tuesday/).tap()
   await screen.getByRole('dialog', 'Delete working hours?').getByRole('button', 'Confirm').tap()
   await expect(screen.getByText('Working hours deleted from Tuesday.')).toBeVisible()
-  await expect(screen.getByRole('button', /^Remove 02:00 PM - 06:00 PM on Tuesday/)).toHaveCount(0)
-  await expect(screen.getByRole('button', /^Remove 02:00 PM - 06:00 PM on Monday/)).toBeVisible()
+  await expect(screen.getByRole('button', /^Delete 02:00 PM - 06:00 PM on Tuesday/)).toHaveCount(0)
+  await expect(screen.getByRole('button', /^Delete 02:00 PM - 06:00 PM on Monday/)).toBeVisible()
 })
 
 test('Borrar la última franja avisa que el día se cierra y pasa por las citas afectadas', async ({ app, screen }) => {
   await app.open('/settings/locations/abril?type=working-hours')
-  await screen.getByRole('button', /^Remove 02:00 PM - 06:00 PM on Tuesday/).tap()
+  await screen.getByRole('button', /^Delete 02:00 PM - 06:00 PM on Tuesday/).tap()
   await screen.getByRole('dialog', 'Delete working hours?').getByRole('button', 'Confirm').tap()
-  await screen.getByRole('button', /^Remove 08:00 AM - 01:00 PM on Tuesday/).tap()
+  await screen.getByRole('button', /^Delete 08:00 AM - 01:00 PM on Tuesday/).tap()
   const pregunta = screen.getByRole('dialog', 'Delete working hours?')
   await expect(pregunta.getByText(/Tuesday will be closed/)).toBeVisible()
   await pregunta.getByRole('button', 'Confirm').tap()
@@ -160,10 +160,10 @@ test('Cerrar un día pregunta, conserva sus franjas y reabrirlo las recupera', a
 /* CON-4167: una cita afectada en Check in frena todo el cambio. */
 test('Una cita en Check in bloquea el cambio y no se borra nada', async ({ app, screen }) => {
   await app.open('/settings/locations/abril?type=working-hours')
-  await screen.getByRole('button', /^Remove 08:00 AM - 01:00 PM on Monday/).tap()
+  await screen.getByRole('button', /^Delete 08:00 AM - 01:00 PM on Monday/).tap()
   await screen.getByRole('dialog', 'Delete working hours?').getByRole('button', 'Confirm').tap()
   const bloqueo = screen.getByRole('dialog', 'Unable to change working hours')
   await expect(bloqueo.getByText(/Check in or In progress status/)).toBeVisible()
   await bloqueo.getByRole('button', 'Close').tap()
-  await expect(screen.getByRole('button', /^Remove 08:00 AM - 01:00 PM on Monday/)).toBeVisible()
+  await expect(screen.getByRole('button', /^Delete 08:00 AM - 01:00 PM on Monday/)).toBeVisible()
 })
