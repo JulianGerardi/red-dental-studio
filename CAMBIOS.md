@@ -5,7 +5,7 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-11-25
 
-### Billing: el tipo de actividad en pestañas, como red.dev (#PR)
+### Billing: el tipo de actividad en pestañas, como red.dev ([#191](https://github.com/JulianGerardi/red-dental-studio/pull/191))
 - *Recent billing activity* deja el `FilterMenu`: **All / Payments / Adjustments / Today** van en `ui/tabs` (sm), en la
   fila del título y a la izquierda de *Columns*. Con un paciente, *Patient view / Guarantor view* va en el mismo lugar.
 - Los controles pasan de `DataTable` (`toolbarStart` / `actions`) al `controls` del `Panel`. `ActividadReciente` ya no
