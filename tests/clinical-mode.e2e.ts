@@ -381,3 +381,42 @@ test('el encuentro empieza, se pausa, se retoma y se da el alta desde su menú',
   await expect(screen.getByText('Patient discharged.')).toBeVisible()
   await expect(screen.getByRole('button', /Start encounter/).first()).toBeVisible()
 })
+
+/* CON-4153: Complete encounter abre End Encounter con los procedimientos del turno. Las fases van en orden en el mismo
+   encuentro, completar antes de tiempo pide confirmación y el historial muestra lo registrado (clinical-mode.md, 2026-11-25). */
+test('End Encounter registra fases en orden, completa antes de tiempo y cierra el encuentro', async ({ app, screen }) => {
+  await app.open('/patients/patient-0001/clinical-mode')
+  await screen.getByRole('button', /Start encounter/).first().tap()
+  await screen.getByRole('button', /Complete encounter/).first().tap()
+  const drawer = screen.getByRole('dialog', 'End Encounter')
+  await expect(drawer.getByText('Appointment procedures · 5')).toBeVisible()
+
+  // El implante, de tres fases: Start procedure, y en el mismo encuentro la fase 2 y el cierre.
+  await drawer.getByRole('button', 'Start procedure').tap()
+  await expect(screen.getByText(/Phase 1 completed\. Phase 2 is now available/)).toBeVisible()
+  await expect(drawer.getByRole('button', 'Complete phase 2')).toHaveCount(2)
+
+  // La endodoncia termina en la fase 2 de 4: Cancel no cambia nada; confirmar la deja Completed.
+  await drawer.getByRole('button', 'Actions for Endodontic therapy, molar tooth').tap()
+  await screen.getByRole('menuitem', /^Complete procedure$/).tap()
+  const confirmar = screen.getByRole('dialog', 'Complete procedure?')
+  await expect(confirmar.getByText(/It will finish at phase 2 of 4/)).toBeVisible()
+  await confirmar.getByRole('button', 'Cancel').tap()
+  await expect(drawer.getByRole('button', 'Complete phase 2')).toHaveCount(2)
+  await drawer.getByRole('button', 'Actions for Endodontic therapy, molar tooth').tap()
+  await screen.getByRole('menuitem', /^Complete procedure$/).tap()
+  await screen.getByRole('dialog', 'Complete procedure?').getByRole('button', 'Complete procedure').tap()
+  await expect(drawer.getByText(/Last completed: phase 2 of 4 · Completed early/)).toBeVisible()
+
+  // El historial: sólo lo registrado, con la nota de cada encuentro.
+  await drawer.getByRole('button', 'Actions for Endodontic therapy, molar tooth').tap()
+  await screen.getByRole('menuitem', /View execution history/).tap()
+  const historial = screen.getByRole('dialog', 'Execution history')
+  await expect(historial.getByRole('row')).toHaveCount(3)
+  await expect(historial.getByText('Finished')).toBeVisible()
+  await historial.getByRole('button', 'Close').last().tap()
+
+  await drawer.getByRole('button', 'End Encounter').tap()
+  await expect(screen.getByText('Encounter completed.')).toBeVisible()
+  await expect(screen.getByRole('dialog', 'Clinical note')).toBeVisible()
+})

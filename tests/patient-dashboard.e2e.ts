@@ -57,6 +57,8 @@ test('Pending signature aparece al dejar la Clinical note sin firmar y se va al 
   // Encuentro de CON-1612: se empieza y se completa (clinical-mode.md, 2026-11-13).
   await screen.getByRole('button', /Start encounter/).first().tap()
   await screen.getByRole('button', /Complete encounter/).first().tap()
+  // Con procedimientos en el turno, antes pasa por End Encounter (CON-4157).
+  await screen.getByRole('dialog', 'End Encounter').getByRole('button', 'End Encounter').tap()
   await screen.getByRole('button', 'Remind me later').tap()
   await screen.getByRole('link', 'Exit Clinical Mode').tap()
 

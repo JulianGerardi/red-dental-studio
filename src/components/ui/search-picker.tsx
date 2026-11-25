@@ -13,8 +13,10 @@ import { control } from '@/components/patients/form'
    design-reference/figma/modulos/clinical-mode.md (2026-10-24). */
 export function SearchPicker<T>({
   items, getId, getText, renderOption, selected = [], onSelect, onRemove, renderSelected, placeholder = 'Search', ariaLabel,
-  multiple, accion = 'agregar', emptyText = 'No results', tituloElegidos, ocultarElegidos, className,
+  multiple, accion = 'agregar', emptyText = 'No results', tituloElegidos, ocultarElegidos, disabled, className,
 }: {
+  /** Sólo lectura: no se busca ni se saca nada. */
+  disabled?: boolean
   items: T[]
   getId: (item: T) => string
   /** El texto contra el que se busca. */
@@ -64,7 +66,7 @@ export function SearchPicker<T>({
       <div ref={ref} className="relative">
         <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-ink-faint" />
         <input
-          value={query} placeholder={placeholder} aria-label={ariaLabel ?? placeholder}
+          value={query} placeholder={placeholder} aria-label={ariaLabel ?? placeholder} disabled={disabled}
           onChange={(e) => { setQuery(e.target.value); setAbierto(true) }}
           onFocus={() => setAbierto(true)}
           onKeyDown={(e) => { if (e.key === 'Escape' && abierto) { e.stopPropagation(); setAbierto(false) } }}
@@ -100,7 +102,7 @@ export function SearchPicker<T>({
           {selected.map((item) => (
             <div key={getId(item)} className={cn(TARJETA_INTERNA, 'flex items-center gap-2 p-3 ring-1 ring-dash-blue')}>
               <span className="min-w-0 flex-1">{(renderSelected ?? renderOption)(item)}</span>
-              {onRemove && (
+              {onRemove && !disabled && (
                 <button
                   type="button" aria-label={`Remove ${getText(item)}`} title={accion === 'vincular' ? 'Unlink' : 'Remove'} onClick={() => onRemove(item)}
                   className="flex size-7 shrink-0 items-center justify-center rounded-md text-dash-blue hover:bg-surface-muted focus-visible:outline-2 focus-visible:outline-dash-blue"

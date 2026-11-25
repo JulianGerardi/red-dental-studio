@@ -5,6 +5,40 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-11-25
 
+### End Encounter: procedimientos del turno con fases en orden ([#193](https://github.com/JulianGerardi/red-dental-studio/pull/193))
+- **Nuevo `clinical/EndEncounterDrawer`** (CON-4153): *Complete encounter* de Clinical Mode abre el drawer con los
+  procedimientos del turno antes de cerrar; sin procedimientos cierra directo. Acción por fila: *Start procedure*,
+  *Complete phase N* o *Complete procedure*, siempre la siguiente fase sin registrar (CON-4154, CON-4155). ⋮ en tres
+  secciones (CON-4156) y *View execution history* en drawer con la nota de cada encuentro (CON-4158).
+- **Nuevo `lib/ejecucion.ts`** (estado y reglas: `accionPrincipal`, `faseDeCierre`, `esAnticipado`) y `data/ejecucion.ts`.
+  `ClinicalNoteDialog` suma `onFirmar` (opcional).
+- Para backend: completar antes de la última fase actualiza a `FINISHED` la fila de la fase de hoy (no crea otra) y no
+  registra fases futuras.
+
+### Lab Order: rediseño del detalle, New Laboratory y la tabla alineada ([#192](https://github.com/JulianGerardi/red-dental-studio/pull/192))
+- **`LabOrderDetail`** con otro layout y mismo contenido que red.dev: cabecera *LAB ORDER* + estado, PDF y ⋮; la fecha
+  va con ASAP; *Teeth & surface* en su card; *Details* a la derecha; Cancel / Save fijos abajo. Sin íconos decorativos.
+  Editable sólo con encuentro abierto **y** la orden en Pending (CON-2218).
+- Procedimientos (CON-3904): `SearchPicker` + `FilterMenu`, sólo los elegibles; `ui/search-picker` suma `disabled`.
+- **Nuevos `clinical/NewLaboratoryDrawer`** (CON-2285, pasos General · Contact · Address · Credentials) y
+  **`clinical/dental/DentalArch`** (arcadas en U con botones). `PROCEDIMIENTOS_ORDEN` en `data/clinical-mode.ts`.
+- **`LabOrderPanel`** como las tablas generales: sin card, `SettingsSearch` (*Search lab orders* + Search), botones md,
+  *Last update* / *Created date*.
+
+### Billing: el tipo de actividad en pestañas, como red.dev ([#191](https://github.com/JulianGerardi/red-dental-studio/pull/191))
+- *Recent billing activity* deja el `FilterMenu`: **All / Payments / Adjustments / Today** van en `ui/tabs` (sm), en la
+  fila del título y a la izquierda de *Columns*. Con un paciente, *Patient view / Guarantor view* va en el mismo lugar.
+- Los controles pasan de `DataTable` (`toolbarStart` / `actions`) al `controls` del `Panel`. `ActividadReciente` ya no
+  recibe `todas`. Accounts sigue con su Filter.
+
+### PDF de la Lab Order con los datos y el diagrama de la boca de red.dev ([#190](https://github.com/JulianGerardi/red-dental-studio/pull/190))
+- El PDF de la Lab Order (ícono del documento en Pending task) trae lo de red.dev: Provider, Lab Order ID, Patient
+  Phone, Email, Expiration Date; Patient Information, Receiving Laboratory, Provider Information, Dental Work Request y
+  **Teeth & Surface Specifications con el diagrama de la boca**. Sin firma (CON-2643).
+- **Nuevo `data/laboratorios.ts`** (`LABORATORIOS`, `ARCADAS`, `Denticion`); el select de `LabOrderDetail` lo usa.
+- `documentoTarea`: sección `dientes`, `Documento.sinFirma` y `diagramaBoca()` (la geometría que dibujan el PDF y el
+  SVG `DiagramaBoca` de `VistaDocumento`). Token nuevo `--color-encia`.
+
 ### Pending task: fechas alineadas aunque no haya ⋮ ([#189](https://github.com/JulianGerardi/red-dental-studio/pull/189))
 - **`TaskRow`** (Dashboard y Patient Dashboard) reserva siempre el lugar del ⋮ (28 px), como ya hacía con el PDF: la
   Clinical note, que no tiene acciones, ya no corre el vencimiento, el PDF ni *Complete this task* (CON-2643).
