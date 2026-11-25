@@ -188,7 +188,7 @@ export function FranjasDia({ label, rangos, onQuitar, onEditar }: {
   const visibles = abierto ? rangos.length : entran
   const ocultas = rangos.length - visibles
   const chip = (r: string, i: number) => (
-    <Chip key={i} removeIcon="delete" removeLabel={`Delete ${r} on ${label}`} onRemove={() => onQuitar(i)}>{r}</Chip>
+    <Chip key={i} removeLabel={`Remove ${r} on ${label}`} onRemove={() => onQuitar(i)}>{r}</Chip>
   )
   const editar = (
     <button

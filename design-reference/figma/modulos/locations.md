@@ -686,13 +686,11 @@ Pie, alineación, fechas y avatar con las reglas comunes de todas las tablas: ve
 Pedido de Julián con el HTML de tablas estandarizadas v2: el nombre de la fila lleva a la ficha (link azul, como Patients
 y Carriers) y el ⋮ → *Edit* sigue. Corrige el punto 1 del 2026-11-18.
 
-## Working hours y Rooms con el mismo ícono de borrar (2026-11-25)
+## Working hours: el tacho en Set working hours, la ✕ en las franjas (2026-11-25)
 
-Sin historia nueva (el borrado es CON-4165 / CON-4166): pedido de Julián. Rooms borra con el tacho y las franjas de
-Working hours con la ✕ del chip, aunque las dos borran algo guardado y preguntan antes (*Delete working hours?*, que ya
-usaba el tacho en su ícono). Queda el tacho, el de toda la app (Rooms, Exceptions, menús *Delete*):
+Sin historia nueva (el borrado es CON-4165 / CON-4166): pedido de Julián, igualar el ícono de borrar de Working hours con
+el tacho de Rooms y del resto de la app.
 
-- `ui/chip` suma `removeIcon="delete"`: el tacho en lugar de la ✕. La ✕ sigue para sacar una selección sin borrar nada
-  (un código CDT, un filtro), como en el resto de los chips.
-- La franja dice *Delete 08:00 AM - 01:00 PM on Monday* (antes *Remove …*) y, en *Set working hours*, el botón de cada
-  rango pasa de la ✕ al tacho (*Delete time range*), como en *New exception*.
+- En *Set working hours*, el botón de cada rango pasa de la ✕ al tacho (*Delete time range*), como en *New exception*.
+- **Las franjas de la tabla siguen con la ✕ del chip** (Julián, mismo día: "en los badges de los horarios sí vale la
+  pena la X"). Es un chip y la ✕ es la forma de sacarlo; igual pregunta antes (*Delete working hours?*).

@@ -31,7 +31,7 @@ export const DeleteHoursQuestion: Story = {
   name: 'Working Hours · Delete working hours?',
   parameters: { docs: { jira: ['CON-4166'] } },
   render: () => <WorkingHoursTab />,
-  play: secuencia(pulsar(/^Delete 02:00 PM - 06:00 PM on Tuesday/), esperar(/This will delete the working hours from 02:00 PM to 06:00 PM on Tuesday/)),
+  play: secuencia(pulsar(/^Remove 02:00 PM - 06:00 PM on Tuesday/), esperar(/This will delete the working hours from 02:00 PM to 06:00 PM on Tuesday/)),
 }
 export const CloseDayQuestion: Story = {
   name: 'Working Hours · Close working hours?',
@@ -43,7 +43,7 @@ export const ChangeBlocked: Story = {
   name: 'Working Hours · Unable to change',
   parameters: { docs: { jira: ['CON-4167'] } },
   render: () => <WorkingHoursTab />,
-  play: secuencia(pulsar(/^Delete 08:00 AM - 01:00 PM on Monday/), pulsar(/^Confirm$/), esperar(/Unable to change working hours/)),
+  play: secuencia(pulsar(/^Remove 08:00 AM - 01:00 PM on Monday/), pulsar(/^Confirm$/), esperar(/Unable to change working hours/)),
 }
 
 /* Qué hace cada acción de la tabla de Working Hours (2026-11-16). */
