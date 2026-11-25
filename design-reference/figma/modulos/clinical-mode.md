@@ -3524,3 +3524,40 @@ Anomalías y pendientes:
 
 **A validar con usuarios:** si recepción entiende *Request* como "enviar al provider"; si el contador de 500 alcanza; y si
 conviene ver los procedimientos derivados también en la lista de Treatment plan.
+
+### CON-4153 · End Encounter: una sola línea de lo hecho y sin bajada (2026-11-25)
+
+Pedido de Julián sobre una captura del drawer:
+
+1. **Lo hecho hoy, una sola vez:** cada fila muestra sólo la última línea verde. Si en el mismo encuentro se completó la
+   fase 2 y después el procedimiento, queda *Procedure completed* (antes se listaban *Phase 1 completed* y *Procedure
+   completed* juntos). Sin cerrar el procedimiento, se ve la fase más alta registrada. El detalle completo sigue en
+   *View execution history*.
+2. **Sin bajada:** sale el texto *Record the phases or procedures done in this appointment…* y la línea de fecha,
+   hora, provider y cantidad debajo del título, como pide la regla de drawers (título sin bajada). La cantidad sigue en
+   *Appointment procedures · N*.
+3. **Sin el texto del pie** (*You can end the encounter without completing every procedure…*).
+
+**A validar con usuarios:** sin el texto del pie, si se entiende que End Encounter cierra aunque queden fases sin
+registrar y que Back no deshace lo guardado.
+
+## CON-2214 · CON-2321 · Lab order y Referral con la estructura de Edit account (2026-11-25)
+
+Pedido de Julián: el detalle de Lab order y el de Referral tienen que verse como Edit account (Settings), "así es lo
+mismo para todo". Las dos fichas usan ahora las mismas piezas (`clinical/FichaClinica.tsx`):
+
+1. **Título de pantalla** (`EncabezadoFicha`): *Lab order* / *Referral* a 20px SemiBold, como `PageTitle`, con el estado al
+   lado y PDF y ⋮ a la derecha. Sale la barra-card de arriba y el *LAB ORDER* en mayúsculas de red.dev.
+2. **Cards apiladas a todo el ancho** con la card de Settings (`settings/primitives` `Card`, que suma `action` para un
+   control junto al título): Lab order → *General information* (laboratorio + New laboratory | Delivery expiration date,
+   ASAP, Procedures), *Teeth & surface* (la dentición como `action`) y *Details* (Dental work requested | Special
+   instructions, Attachments). Referral → *General information* (provider + New provider | ASAP y Mandatory, Procedures) y
+   *Details* (Referral note | Attachments). Campos de a dos desde 640px; en celular, uno debajo del otro.
+3. **Cancel / Save abajo a la derecha, fuera de las cards** (`FormFooter`), como Edit account. Se van la barra fija de
+   Lab order y el pie dentro de la card de Referral.
+4. **Attachments compartido** (`Adjuntos`): zona de arrastre en una fila y cada archivo con tamaño y ✕. Lab order
+   conserva su aviso (*Only PDF, JPG or PNG files up to 10MB.*); Referral el de Jira (*Invalid file format or size.*).
+5. Referral pierde la línea de paciente / Register / Expiration date debajo del título (ninguna de las dos fichas la
+   tiene, Edit account tampoco).
+
+**A validar:** sin la barra fija, en una Lab order larga Save queda al final de la página; Edit account funciona igual.

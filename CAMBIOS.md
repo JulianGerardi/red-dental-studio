@@ -5,6 +5,14 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-11-25
 
+### Lab order y Referral como Edit account; End Encounter más simple ([#198](https://github.com/JulianGerardi/red-dental-studio/pull/198))
+- **Nuevo `clinical/FichaClinica`**: `EncabezadoFicha` (título de pantalla + estado + acciones) y `Adjuntos` (archivos
+  PDF/JPG/PNG ≤10MB con lista). `LabOrderDetail` y `ReferralDetail` los usan, con cards apiladas (`settings` `Card`) y
+  `FormFooter` abajo a la derecha, como Edit account. Usarlos en toda ficha nueva de Clinical Mode.
+- **`settings/primitives` `Card`** suma `action` (control junto al título). Sin cambios para los usos actuales.
+- **`EndEncounterDrawer`** (CON-4153): una sola línea de lo hecho por procedimiento (*Procedure completed* reemplaza a
+  las fases), sin bajada debajo del título ni texto al pie.
+
 ### Locations: Rooms y Exceptions con columnas parejas ([#197](https://github.com/JulianGerardi/red-dental-studio/pull/197))
 - `FILA_SALA` y `FILA_EXCEPCION` (`pages/settings/LocationDetail.tsx`): las columnas de datos se reparten el ancho por
   igual y las acciones van al final en 160 px, igual en encabezado y filas. En el celular no cambia nada.
