@@ -8,7 +8,7 @@ export default defineConfig({
   /* Las banderas de los Country Code van como archivos aparte, no en el JS (ui/country-flag.tsx). */
   build: {
     assetsInlineLimit: (archivo: string) => (archivo.includes('country-flag-icons') ? false : undefined),
-    /* La página de mails para el backend va aparte de la app, en /emails/ (design-reference/figma/modulos/emails.md). */
-    rollupOptions: { input: { main: 'index.html', emails: 'emails/index.html' } },
+    /* Las páginas de mails y de PDFs para el backend van aparte de la app, en /emails/ y /pdfs/ (modulos/emails.md y pdfs.md). */
+    rollupOptions: { input: { main: 'index.html', emails: 'emails/index.html', pdfs: 'pdfs/index.html' } },
   },
 })

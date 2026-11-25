@@ -21,5 +21,7 @@
   "components/patients/PacienteCampos.tsx#CuentaPortal": "La cuenta del portal ya vinculada, arriba de General en Edit Patient. Se ve en Pages / Parts / Patient modals → Edit Patient.",
   "components/patients/RelationshipDialogs.tsx#AvisoCuentaDesactivada": "La línea de la cuenta que se desactiva, dentro de los pop ups de archivar y quitar Guardian. Se ve en Pages / Parts / Relationships → Archive — last guardian relationship.",
   "emails/Vista.tsx": "Página aparte para el backend (/emails/), fuera de la app: la vista previa de los mails. Se arma con piezas del design system; ver design-reference/figma/modulos/emails.md.",
-  "emails/main.tsx": "Entrada de la página de mails (/emails/), sin interfaz propia."
+  "emails/main.tsx": "Entrada de la página de mails (/emails/), sin interfaz propia.",
+  "pdfs/Vista.tsx": "Página aparte para el backend (/pdfs/), fuera de la app: la vista previa de los PDFs. Se arma con piezas del design system; ver design-reference/figma/modulos/pdfs.md.",
+  "pdfs/main.tsx": "Entrada de la página de PDFs (/pdfs/), sin interfaz propia."
 }
