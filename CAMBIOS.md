@@ -5,7 +5,7 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-11-26
 
-### Mails: descargar el mail en PDF ([#PR](https://github.com/JulianGerardi/red-dental-studio/pull/PR))
+### Mails: descargar el mail en PDF ([#207](https://github.com/JulianGerardi/red-dental-studio/pull/207))
 - **Vista previa** (`/emails/`): botón *Download PDF* al lado de *Download HTML*. Baja `<id>.pdf`, una página del tamaño
   del mail, tal como se ve (ancho, datos o variables y logo). Se arma en el navegador con `html-to-image` y `jspdf`
   (dependencia nueva, carga diferida).
