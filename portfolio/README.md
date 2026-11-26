@@ -33,6 +33,13 @@ portfolio/
 - La marca es un triángulo invertido (aparece suave al cargar y baja apenas al pasar el mouse; en el pie salta y gira) con "Julián Gerardi" en Geist Mono. El favicon es el globo del asistente: negro, con el triángulo en blanco.
 - Todo el diseño está a la escala de ver la página al 90%: el `html` tiene `font-size: 90%` y las medidas en px del CSS están multiplicadas por 0,9.
 
+## Vista previa al compartir (LinkedIn, WhatsApp, Slack, X)
+
+- Cada página lleva etiquetas Open Graph y de Twitter (`social()` en `_build/common.py`): título, descripción, URL canónica e imagen. Sin ellas, LinkedIn armaba la vista previa con el primer título y la primera imagen que encontraba.
+- La imagen es `assets/og.jpg` (1200×630, JPG): el triángulo, "Julián Gerardi", "Senior Product Designer" con el degradé de la marca y el mesh verde/violeta del hero. Su fuente es `_build/og-card.html`: se abre en Chromium a 1200×630 (mejor a 2x y reducida) y se exporta a JPG. El texto va centrado porque LinkedIn y WhatsApp recortan los costados en las miniaturas.
+- Estas URLs son absolutas (`SITE` en `common.py`, hoy `https://juliangerardi.github.io/Portfolio/`); si el sitio cambia de dirección, hay que actualizar esa constante.
+- LinkedIn guarda la vista previa unos días. Para que tome la nueva: pegar el link en https://www.linkedin.com/post-inspector/ y pedir que la vuelva a leer. Los mensajes ya enviados no cambian.
+
 ## Flujo con zoom (Batech)
 
 El flujo to-be se exportó de Figma a 20000 px y se cortó en 30 mosaicos (`assets/img/flow/t-x-y.webp`) más una vista general de 5000 px (`overview.webp`). Con la rueda del mouse se hace zoom sobre el punto del cursor, arrastrando se mueve, y un clic acerca. Los mosaicos nítidos se cargan solo al acercarse, así no se pixela. Si la página se está scrolleando, la rueda sigue scrolleando la página. Tiene pantalla completa y un botón que abre el flujo en Figma.

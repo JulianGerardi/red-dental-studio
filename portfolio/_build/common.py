@@ -13,6 +13,7 @@ EMAIL = "juliangerardi266@gmail.com"
 LINKEDIN = "https://www.linkedin.com/in/julian-gerardi"
 BEHANCE = "https://www.behance.net/Jotainc"
 CV = "assets/Julian_Gerardi_CV.pdf"
+SITE = "https://juliangerardi.github.io/Portfolio/"  # absolute base for link previews
 
 # Cache busting: each build stamps the assets with a hash of their content, so a
 # new version never pairs fresh HTML with a stylesheet the browser kept from before.
@@ -39,7 +40,34 @@ def T(en, es):
     return f'<span lang="en">{en}</span><span lang="es">{es}</span>'
 
 
-def head(title_en, title_es, desc_en, desc_es, p="", noindex=False, extra_scripts=""):
+def social(title, desc, path=""):
+    """Link preview for LinkedIn, WhatsApp, Slack, X: without these tags they
+    guess from the first heading and the first image on the page."""
+    url, img = SITE + path, SITE + "assets/" + V("og.jpg")
+    alt = "Julián Gerardi, Senior Product Designer"
+    return f"""
+<link rel="canonical" href="{url}">
+<meta name="author" content="Julián Gerardi">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Julián Gerardi · Portfolio">
+<meta property="og:title" content="{title}">
+<meta property="og:description" content="{desc}">
+<meta property="og:url" content="{url}">
+<meta property="og:image" content="{img}">
+<meta property="og:image:type" content="image/jpeg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="{alt}">
+<meta property="og:locale" content="en_US">
+<meta property="og:locale:alternate" content="es_LA">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="{title}">
+<meta name="twitter:description" content="{desc}">
+<meta name="twitter:image" content="{img}">
+<meta name="twitter:image:alt" content="{alt}">"""
+
+
+def head(title_en, title_es, desc_en, desc_es, p="", noindex=False, extra_scripts="", path=""):
     robots = '\n<meta name="robots" content="noindex">' if noindex else ""
     return f"""<!doctype html>
 <html lang="en" data-lang="en" data-title-en="{title_en}" data-title-es="{title_es}">
@@ -47,7 +75,7 @@ def head(title_en, title_es, desc_en, desc_es, p="", noindex=False, extra_script
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>{title_en}</title>
-<meta name="description" content="{desc_en}" data-es="{desc_es}">{robots}
+<meta name="description" content="{desc_en}" data-es="{desc_es}">{robots}{social(title_en, desc_en, path)}
 <link rel="icon" href="{p}assets/favicon.svg" type="image/svg+xml">
 <link rel="icon" href="{p}assets/favicon-32.png" sizes="32x32" type="image/png">
 <link rel="apple-touch-icon" href="{p}assets/apple-touch-icon.png">
@@ -426,7 +454,7 @@ def next_row(p, current_file):
 
 
 def case_page(p, fn, title, title_es, desc_en, desc_es, body, noindex=False):
-    return (head(f"{title} · Julián Gerardi", f"{title_es} · Julián Gerardi", desc_en, desc_es, p, noindex)
+    return (head(f"{title} · Julián Gerardi", f"{title_es} · Julián Gerardi", desc_en, desc_es, p, noindex, path=f"work/{fn}")
             + SPRITE + nav(p, on_home=False) + crumbs_bar(p, fn, title)
             + '\n<main id="main" class="case">\n' + body + next_row(p, fn) + '</main>\n' + footer(p) + tail(p, lightbox=True))
 
