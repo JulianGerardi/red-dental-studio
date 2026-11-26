@@ -5,7 +5,7 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-11-26
 
-### Settings: Overview, Roles en cards con una página por rol y atajos de Billing en un ⋮ (CON-3130, CON-3131, CON-4065) ([#PR](https://github.com/JulianGerardi/red-dental-studio/pull/PR))
+### Settings: Overview, Roles en cards con una página por rol y atajos de Billing en un ⋮ (CON-3130, CON-3131, CON-4065) ([#206](https://github.com/JulianGerardi/red-dental-studio/pull/206))
 - **Overview:** la portada de Settings se titula *Overview* y así se llama en el menú (`settings-nav.ts`; antes *General*).
   La ruta sigue siendo `/settings/general`.
 - **Roles en cards:** `settings/RoleCard` (la card de la portada con pills, *n permissions · Updated* y ⋮) reemplaza a la
