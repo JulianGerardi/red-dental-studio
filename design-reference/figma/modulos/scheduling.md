@@ -867,3 +867,8 @@ Scheduling:
    (corrige el 2026-11-20: pestañas a la izquierda y la fecha a la derecha).
 5. Sale el botón *Today* aparte con ícono (`CalendarClock`). El demo de Help ("The date drives every panel") muestra el
    bloque nuevo.
+
+## Today activo en la navegación de fecha (2026-11-26)
+
+En el día de la demo (`FECHA_ANCLA`), todo el bloque queda activo (borde y texto azules sobre celeste, como un filtro aplicado) en vez de *Today* gris apagado; igual en
+el Dashboard. Detalle en `dashboard.md` (2026-11-26).

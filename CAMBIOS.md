@@ -5,6 +5,14 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-11-26
 
+### Dashboard y Scheduling: la navegación de fecha se marca en azul en hoy ([#201](https://github.com/JulianGerardi/red-dental-studio/pull/201))
+- **`ui/date-nav` (`DateNav`):** cuando se está viendo hoy, todo el bloque queda activo con el estado de un filtro
+  aplicado (`ui/filter-menu`): borde y texto `dash-blue` sobre `info-bg`. Fuera de hoy, el bloque blanco de siempre.
+  *Today* ya no se deshabilita: lleva `aria-pressed` y siempre vuelve a `hoy`.
+- **Qué cuenta como hoy:** en Day, el mismo día; en Week y Month, si la semana o el mes que se ve incluye `hoy`.
+- **Dashboard:** pasa `hoy={HOY_DEMO}` (antes comparaba con la fecha real y Today nunca quedaba en hoy). Scheduling
+  sigue con `FECHA_ANCLA`. Si una pantalla nueva usa `DateNav` con datos de demo, pasale su `hoy`.
+
 ### Edit procedure: sin overrides del estimado y con un finding y un diagnóstico por defecto (CON-4211) ([#200](https://github.com/JulianGerardi/red-dental-studio/pull/200))
 - `ProcedureEstimate` ya no lleva *Insurance estimate overrides*: se saca `override` de `EstimadoProcedimiento` y de
   `resolverEstimado` (`data/estimaciones.ts`). Backend: el estimado guarda sólo el modo (automático o a mano) y los montos.

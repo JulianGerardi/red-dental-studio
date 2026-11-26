@@ -1187,3 +1187,15 @@ Case Procedure, Special Instructions ni Attachments, que CON-2215 pide al crear 
 decidir.
 
 **Pendiente:** el detalle de la Lab Order (Complete this task) arranca vacío y no muestra estos mismos datos.
+
+## Today activo en la navegación de fecha (2026-11-26, corrige el punto 3 del 2026-11-24)
+
+Pedido de Julián: *Today* se veía negro en el Dashboard y gris en Scheduling. Era el mismo `ui/date-nav`, pero el
+Dashboard no le pasaba su día de la demo y comparaba con la fecha real: nunca estaba "en hoy".
+
+1. El Dashboard pasa `hoy={HOY_DEMO}` (Feb 28, 2026), como Scheduling pasa `FECHA_ANCLA`. Today vuelve al día de la demo.
+2. **En hoy, todo el bloque queda activo** (pedido de Julián: el componente entero, no sólo Today): el estado de un
+   filtro aplicado de `ui/filter-menu` y `ui/date-filter`, borde y texto azules (`dash-blue`) sobre celeste (`info-bg`).
+   Antes Today quedaba gris apagado, que se leía como deshabilitado. Today lleva `aria-pressed`. En Scheduling cuenta el
+   período: activo si la semana o el mes que se ve incluye hoy. Fuera de hoy, el bloque blanco de siempre.
+3. Sin historia de Jira: es un ajuste visual del componente.
