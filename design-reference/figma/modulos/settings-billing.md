@@ -1,5 +1,16 @@
 # Settings → Billing (Fee Schedules, Carriers, Coverage Table)
 
+
+## Atajos de Billing en un ⋮ y Settings › Overview (2026-11-26)
+
+Julián: *"los accesos rápidos de Billing ponelo en un elipsis, así quedan las cards iguales"*. Los tres atajos de la card
+de Billing (abajo, misma fecha) pasan a un ⋮ arriba a la derecha (`RowActionsMenu`, *Fee schedules / Carriers / Coverage
+tables*): la card mide y se ve como las demás. El resto de la card sigue llevando a Billing.
+
+También: la portada de Settings se llama **Overview** (título y su ítem del menú; antes *General* en el menú y *Settings*
+de título). La ruta sigue siendo `/settings/general` y el primer tramo del breadcrumb sigue diciendo *Settings*, que es la
+sección.
+
 ## Billing con pestañas y atajos desde Settings (2026-11-26)
 
 Julián: *"dentro de Billing tenemos 3 opciones … para acceder debo ir siempre al menú y eso es tedioso; creemos alguna
