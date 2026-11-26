@@ -36,7 +36,7 @@ export function DocumentSheet({ clinic, meta, type, title, summary, sections, si
     <article
       aria-label={`${type} document`}
       className={cn(
-        'mx-auto flex w-full max-w-[816px] flex-col bg-white px-5 py-6 text-[13px] leading-[1.55] text-ink-soft shadow-[0_0_0_1px_rgb(0_0_0/0.06),0_2px_4px_rgb(0_0_0/0.05),0_16px_32px_-12px_rgb(0_0_0/0.22)] sm:px-14 sm:py-12',
+        'mx-auto flex w-full max-w-[816px] flex-col bg-surface px-5 py-6 text-[13px] leading-[1.55] text-ink-soft shadow-[0_0_0_1px_rgb(0_0_0/0.06),0_2px_4px_rgb(0_0_0/0.05),0_16px_32px_-12px_rgb(0_0_0/0.22)] sm:px-14 sm:py-12',
         className,
       )}
     >

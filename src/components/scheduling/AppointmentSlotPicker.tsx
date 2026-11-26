@@ -51,7 +51,7 @@ export function AppointmentSlotPicker({
        pegado y a toda la altura; adentro, a lo ancho y con scroll. */
     <aside
       className={cn(
-        'motion-safe:animate-[loc-in_180ms_ease-out] flex flex-col overflow-hidden rounded-xl border border-line bg-white',
+        'motion-safe:animate-[loc-in_180ms_ease-out] flex flex-col overflow-hidden rounded-xl border border-line bg-surface',
         className,
       )}
     >

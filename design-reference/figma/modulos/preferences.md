@@ -60,3 +60,37 @@ Julián: *"me gustaría mejorar ese diseño"*. Cambios, mismos textos y opciones
 
 Julián: la card y su contenido van a todo el ancho, como las otras pantallas de Settings. Se van el tope de 960 px de la
 card y el de 520 px de las opciones; las miniaturas de tema pasan a 120 px de alto para acompañar el ancho.
+
+## Tema oscuro y sin formato de fecha (2026-11-26)
+
+Sin historia de Jira (igual que la pantalla). Julián: *"account preference, armar el modo dark así [habilitamos] esa
+opción; la parte de la fecha sacala"*.
+
+### Decisiones
+
+1. **Dark funciona**: se va *Coming soon* y el deshabilitado. Elegir un tema lo aplica al instante y sin Save, como
+   red.dev; se guarda en el navegador (`preferences:theme`) hasta que haya backend. `lib/tema.ts` lee, guarda y pone la
+   clase `dark` en `<html>`; `main.tsx` la aplica antes de pintar, así no hay parpadeo claro al entrar.
+2. **Mismos tokens, otro valor**: `:root.dark` en `src/index.css` redefine los tokens (`ink-*`, `line-*`, `surface-*`,
+   `dash-*`, tintes de estado, variables de shadcn). Las pantallas no se tocan una por una.
+3. **`bg-surface` en vez de `bg-white`**: token nuevo `--color-surface` (blanco en claro, `#17191e` en oscuro) para el
+   fondo de cards, campos, menús y drawers. Se reemplazó `bg-white` / `from-white` / `border-white` en 101 archivos de la
+   app; en claro no cambia nada. `bg-white` y `text-white` quedan para lo que va **sobre azul** (texto de botones, los
+   puntos del panel del Login), que es blanco en los dos temas.
+4. **Azul de la marca un poco más claro en oscuro** (`#3b78e7`): el `#1d56bc` sobre gris casi negro no llega a 3:1. Con
+   `#3b78e7` el texto azul sobre la card y el blanco sobre el botón quedan los dos en ~4,2:1; no hay un azul que pase
+   4,5 en los dos (anotado para validar).
+5. **Sombras**: Tailwind compila `shadow-panel` & co. con el valor adentro, así que en oscuro se pisan por clase. Sobre
+   negro la sombra no se ve: la card se separa por el tono y una línea blanca tenue.
+6. **Miniaturas fieles**: cada una se pinta con su tema aunque la app esté en el otro (`tema-claro` / `tema-oscuro` en
+   `index.css`).
+7. **Se va *Localization & regional*** (formato de fecha, live preview y su toast). La card queda con una sola fila,
+   *Appearance*. `FORMATOS_FECHA` / `formatearFecha` no los usaba nadie más.
+
+### Anomalías / pendiente
+
+- El odontograma de Clinical Mode (embed con su propio CSS) y las ilustraciones de Help / Under construction siguen
+  claros en oscuro: son dibujos con colores propios. Pasarlos implica tocar el embed.
+- El Storybook sigue sólo en claro (se documenta cuando Julián lo pida).
+- Validar con usuarios: contraste del azul en oscuro (punto 4) y si el tema es de la persona o del equipo.
+- Para el dev: el tema va guardado por usuario en el backend; leerlo al iniciar sesión.

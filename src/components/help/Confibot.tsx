@@ -195,7 +195,7 @@ export function ConfibotLanzador({
           <TooltipTrigger asChild>
             <button
               type="button" onClick={onRecoger} aria-label="Tuck Confibot away"
-              className="relative flex size-6 items-center justify-center rounded-full border border-line bg-white text-ink-muted shadow-sm before:absolute before:-inset-2 before:content-[''] hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-dash-ring"
+              className="relative flex size-6 items-center justify-center rounded-full border border-line bg-surface text-ink-muted shadow-sm before:absolute before:-inset-2 before:content-[''] hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-dash-ring"
             >
               <PanelRightClose className="size-3.5" />
             </button>
@@ -207,7 +207,7 @@ export function ConfibotLanzador({
           referencia). Ancho fijo -ya no hay nada que crezca-, así que no hace falta elegir de qué lado anclar. */}
       <button
         type="button" {...handlers} aria-label="Open Confibot. Drag to move."
-        className="flex size-11 shrink-0 cursor-grab items-center justify-center rounded-full border border-line bg-white text-ink shadow-floating outline-none active:cursor-grabbing focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-dash-ring"
+        className="flex size-11 shrink-0 cursor-grab items-center justify-center rounded-full border border-line bg-surface text-ink shadow-floating outline-none active:cursor-grabbing focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-dash-ring"
       >
         <span className="bg-dash-count-bg text-dash-blue flex size-7 shrink-0 items-center justify-center rounded-full">
           <Bot className="size-3.5" />
@@ -318,7 +318,7 @@ export function Confibot({
   const esquinas = enDock ? 'rounded-l-2xl rounded-r-none border-r-0' : 'sm:rounded-2xl'
 
   const hoja = (
-    <div style={altoHoja} className={cn('flex h-[min(560px,82svh)] w-full flex-col overflow-hidden rounded-t-2xl border border-line bg-white shadow-floating sm:max-w-[400px]', enDock ? 'w-[400px] max-w-full' : 'motion-safe:[animation:sheet-in_220ms_ease-out]', esquinas)}>
+    <div style={altoHoja} className={cn('flex h-[min(560px,82svh)] w-full flex-col overflow-hidden rounded-t-2xl border border-line bg-surface shadow-floating sm:max-w-[400px]', enDock ? 'w-[400px] max-w-full' : 'motion-safe:[animation:sheet-in_220ms_ease-out]', esquinas)}>
       <span aria-hidden className="mx-auto mt-2 h-1 w-9 shrink-0 rounded-full bg-line sm:hidden" />
 
       <div className="flex items-center gap-3 border-b border-line px-4 py-3.5">
@@ -364,7 +364,7 @@ export function Confibot({
                   <button
                     key={id} type="button"
                     onClick={() => { onShowOnScreen(t.id); onClose() }}
-                    className="group flex w-full items-center gap-2 rounded-lg border border-line bg-white px-3 py-2 text-left hover:border-dash-blue"
+                    className="group flex w-full items-center gap-2 rounded-lg border border-line bg-surface px-3 py-2 text-left hover:border-dash-blue"
                   >
                     <span className="min-w-0 flex-1">
                       <span className="text-dash-blue block text-[11px] font-semibold tracking-wide uppercase">{mod?.label}</span>
@@ -392,7 +392,7 @@ export function Confibot({
           {SUGERENCIAS.map((s) => (
             <button
               key={s} type="button" onClick={() => preguntar(s)}
-              className="hover:border-dash-blue w-full rounded-lg border border-line bg-white px-3 py-2 text-left text-[13px] text-ink-muted hover:text-ink"
+              className="hover:border-dash-blue w-full rounded-lg border border-line bg-surface px-3 py-2 text-left text-[13px] text-ink-muted hover:text-ink"
             >
               {s}
             </button>
@@ -407,7 +407,7 @@ export function Confibot({
         <input
           value={borrador} onChange={(e) => setBorrador(e.target.value)}
           placeholder="Ask me anything about the app" aria-label="Ask Confibot"
-          className="focus:border-dash-blue h-9 min-w-0 flex-1 rounded-lg border border-line bg-white px-3 text-[13px] text-ink placeholder:text-ink-faint focus:outline-none"
+          className="focus:border-dash-blue h-9 min-w-0 flex-1 rounded-lg border border-line bg-surface px-3 text-[13px] text-ink placeholder:text-ink-faint focus:outline-none"
         />
         <button
           type="submit" aria-label="Send" disabled={!borrador.trim()}

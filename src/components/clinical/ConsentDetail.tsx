@@ -284,7 +284,7 @@ export function FirmaPaciente({ nombre, descripcion, onClose, onFirmar }: {
           {modo === 'Draw' ? (
             <PadFirma key={pad} onCambio={setDibujada} />
           ) : (
-            <div className="flex h-[160px] flex-col items-center justify-center rounded-lg border border-dashed border-line-strong bg-white px-4 text-center">
+            <div className="flex h-[160px] flex-col items-center justify-center rounded-lg border border-dashed border-line-strong bg-surface px-4 text-center">
               {impreso.trim() ? (
                 <>
                   <span className="font-serif text-[30px] leading-tight text-dash-blue italic">{impreso}</span>
@@ -395,7 +395,7 @@ export function PadFirma({ onCambio }: { onCambio: (imagen: string | null) => vo
 
   return (
     <div className="flex flex-col gap-1.5">
-      <div className="relative rounded-lg border border-dashed border-line-strong bg-white">
+      <div className="relative rounded-lg border border-dashed border-line-strong bg-surface">
         <canvas
           ref={ref}
           role="img"

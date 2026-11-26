@@ -166,7 +166,7 @@ export function ViewFiltersPanel({
       role="group"
       aria-labelledby={idTitulo}
       className={cn(
-        '@container flex max-h-[var(--radix-popover-content-available-height,none)] w-[min(976px,calc(100vw-24px))] flex-col overflow-hidden rounded-xl bg-white text-left shadow-floating',
+        '@container flex max-h-[var(--radix-popover-content-available-height,none)] w-[min(976px,calc(100vw-24px))] flex-col overflow-hidden rounded-xl bg-surface text-left shadow-floating',
         className,
       )}
     >
@@ -206,7 +206,7 @@ export function ViewFiltersPanel({
                 onChange={(e) => setBusqueda(e.target.value)}
                 placeholder="Search by name or specialty"
                 aria-label="Search providers by name or specialty"
-                className="focus:border-dash-blue h-9 w-full rounded-md border border-line bg-white pr-3 pl-9 text-[13px] text-ink placeholder:text-ink-muted focus:outline-none"
+                className="focus:border-dash-blue h-9 w-full rounded-md border border-line bg-surface pr-3 pl-9 text-[13px] text-ink placeholder:text-ink-muted focus:outline-none"
               />
             </label>
             <GrupoFiltro etiqueta="Providers" className="mt-3 flex flex-col gap-1">

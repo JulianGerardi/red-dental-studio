@@ -307,7 +307,7 @@ export function SelectorProcedimientos({ elegidos, onCambiar, error }: {
           placeholder="Search procedures"
           aria-invalid={error || undefined}
           className={cn(
-            'h-9 w-full rounded-md border bg-white pl-9 text-[13px] shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] placeholder:text-ink-faint focus:outline-none',
+            'h-9 w-full rounded-md border bg-surface pl-9 text-[13px] shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] placeholder:text-ink-faint focus:outline-none',
             q ? 'pr-9' : 'pr-3',
             error ? 'border-field-error' : 'focus:border-dash-blue border-line',
           )}
@@ -321,7 +321,7 @@ export function SelectorProcedimientos({ elegidos, onCambiar, error }: {
           </button>
         )}
         {abierto && (
-          <div className="motion-safe:animate-[loc-in_120ms_ease-out] absolute top-[calc(100%+4px)] left-0 z-30 w-full overflow-hidden rounded-md border border-line bg-white shadow-lg">
+          <div className="motion-safe:animate-[loc-in_120ms_ease-out] absolute top-[calc(100%+4px)] left-0 z-30 w-full overflow-hidden rounded-md border border-line bg-surface shadow-lg">
             {opciones.length === 0 ? (
               <p className="px-3 py-10 text-center text-[13px] text-ink-muted">No results found.</p>
             ) : (
@@ -365,7 +365,7 @@ export function TextoConsentimiento({ naturaleza, riesgos, onNaturaleza, onRiesg
   onNaturaleza: (v: string) => void
   onRiesgos: (v: string) => void
 }) {
-  const caja = 'focus:border-dash-blue w-full resize-none rounded-md border border-line bg-white px-3 py-2 text-[13px] focus:outline-none'
+  const caja = 'focus:border-dash-blue w-full resize-none rounded-md border border-line bg-surface px-3 py-2 text-[13px] focus:outline-none'
   return (
     <div className="flex flex-col gap-2">
       <span className="text-xs font-medium text-ink">Consent text</span>
@@ -419,7 +419,7 @@ function TextoConsentimientoUnico({ texto, onTexto }: { texto: string; onTexto: 
             onFocus={() => document.execCommand('defaultParagraphSeparator', false, 'p')}
             onInput={(e) => { escrito.current = e.currentTarget.innerHTML; onTexto(escrito.current) }}
             onPaste={(e) => { e.preventDefault(); document.execCommand('insertText', false, e.clipboardData.getData('text/plain')) }}
-            className={cn('focus:border-dash-blue min-h-[220px] rounded-b-md border border-line bg-white p-3 text-[13px] leading-relaxed text-ink focus:outline-none', PROSA_EDITOR)}
+            className={cn('focus:border-dash-blue min-h-[220px] rounded-b-md border border-line bg-surface p-3 text-[13px] leading-relaxed text-ink focus:outline-none', PROSA_EDITOR)}
           />
         </div>
       </div>

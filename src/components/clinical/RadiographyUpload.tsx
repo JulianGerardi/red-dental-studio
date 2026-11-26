@@ -37,7 +37,7 @@ export function RadiographyUpload({ onCancel, onSave }: { onCancel: () => void; 
           if (n) { sumar(n); aviso.ok(`${n} added to the queue.`) }
         }}
         className={`flex flex-col items-center gap-3 rounded-xl border-2 border-dashed px-6 py-12 text-center transition-colors ${
-          sobre ? 'border-dash-blue bg-dash-count-bg' : 'border-line-strong bg-white'
+          sobre ? 'border-dash-blue bg-dash-count-bg' : 'border-line-strong bg-surface'
         }`}
       >
         <FileText className="size-10 text-ink" strokeWidth={1.5} />
@@ -48,7 +48,7 @@ export function RadiographyUpload({ onCancel, onSave }: { onCancel: () => void; 
             JPEG, PND, PDF, and MP4 formats, up to 50MB
           </span>
         </span>
-        <label className="h-9 cursor-pointer rounded-md border border-line bg-white px-4 text-[13px] leading-9 font-medium hover:bg-surface-subtle">
+        <label className="h-9 cursor-pointer rounded-md border border-line bg-surface px-4 text-[13px] leading-9 font-medium hover:bg-surface-subtle">
           Select file
           <input
             type="file"
@@ -86,7 +86,7 @@ export function RadiographyUpload({ onCancel, onSave }: { onCancel: () => void; 
 
       <div className="flex flex-col gap-2">
         {archivos.map((a) => (
-          <div key={a.id} className="flex items-center gap-3 rounded-lg border border-line bg-white p-3">
+          <div key={a.id} className="flex items-center gap-3 rounded-lg border border-line bg-surface p-3">
             <FileText className="size-6 shrink-0 text-ink" strokeWidth={1.5} />
             <span className="min-w-0 flex-1">
               <span className="block truncate text-[13px] font-bold text-ink">{a.nombre}</span>

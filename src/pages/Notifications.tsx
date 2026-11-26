@@ -145,7 +145,7 @@ export default function Notifications() {
         <DateFilter value={fechas} onChange={setFechas} marked={diasConNotis} label="Filter notifications by date" />
       </div>
 
-      <section aria-label={`${vista} notifications`} className="mt-4 overflow-hidden rounded-lg bg-white shadow-panel">
+      <section aria-label={`${vista} notifications`} className="mt-4 overflow-hidden rounded-lg bg-surface shadow-panel">
         {grupos.length ? (
           grupos.map((g) => (
             <div key={g.titulo}>

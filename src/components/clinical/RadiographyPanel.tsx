@@ -17,7 +17,7 @@ import { ExamLayout } from '@/components/clinical/ExamLayout'
 
 export function Card({ r, onAbrir }: { r: Radiografia; onAbrir: () => void }) {
   return (
-    <div className="group rounded-lg bg-white shadow-panel p-2">
+    <div className="group rounded-lg bg-surface shadow-panel p-2">
       <button
         onClick={onAbrir}
         aria-label={`Open ${r.tipo} from ${r.fecha}`}
@@ -83,7 +83,7 @@ export function RadiographyPanel() {
           onChange={(e) => setQ(e.target.value)}
           placeholder="Search radiographs"
           aria-label="Search images"
-          className="focus:border-dash-blue h-9 w-full rounded-md border border-line bg-white pr-3 pl-9 text-[13px] shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] placeholder:text-ink-faint focus:outline-none"
+          className="focus:border-dash-blue h-9 w-full rounded-md border border-line bg-surface pr-3 pl-9 text-[13px] shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] placeholder:text-ink-faint focus:outline-none"
         />
       </div>
       <Button variant="secondary" size="lg" onClick={() => setVista('subir')}><Plus /> Add image</Button>
@@ -93,7 +93,7 @@ export function RadiographyPanel() {
   return (
     <ExamLayout findings={false} extra={buscador}>
       {filas.length === 0 ? (
-        <div className="rounded-lg bg-white shadow-panel">
+        <div className="rounded-lg bg-surface shadow-panel">
           <EmptyState
             icon={Search}
             title="No images found"

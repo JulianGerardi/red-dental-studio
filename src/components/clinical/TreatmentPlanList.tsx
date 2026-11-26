@@ -80,7 +80,7 @@ export function TreatmentPlanList({ onAbrir, onEstimado, llena }: {
   llena?: boolean
 }) {
   return (
-    <div className={cn('flex flex-col rounded-lg bg-white p-4 shadow-panel', llena && 'lg:absolute lg:inset-0')}>
+    <div className={cn('flex flex-col rounded-lg bg-surface p-4 shadow-panel', llena && 'lg:absolute lg:inset-0')}>
       <div className="flex items-center justify-between gap-2">
         <p className="text-[15px] font-bold text-ink">Treatment plan</p>
         <button onClick={() => onAbrir?.()} className="text-dash-blue flex shrink-0 items-center gap-0.5 text-[12px] font-semibold hover:underline">

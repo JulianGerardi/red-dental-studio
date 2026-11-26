@@ -16,7 +16,7 @@ import { UNIVERSAL_A_FDI } from './estadoOdontograma'
 
 const CUADRANTES = [1, 2, 3, 4].map((q) => UNIVERSAL_A_FDI.slice((q - 1) * 8, q * 8))
 
-const GRUPO = 'inline-flex shrink-0 items-stretch divide-x divide-line overflow-hidden rounded-md border border-line bg-white shadow-[0_1px_2px_0_rgb(0_0_0/0.05)]'
+const GRUPO = 'inline-flex shrink-0 items-stretch divide-x divide-line overflow-hidden rounded-md border border-line bg-surface shadow-[0_1px_2px_0_rgb(0_0_0/0.05)]'
 const SEGMENTO = 'flex h-8 items-center gap-1.5 px-2.5 text-[13px] font-medium text-ink-medium transition-colors hover:bg-surface-subtle hover:text-ink focus-visible:relative focus-visible:z-10 focus-visible:outline-2 focus-visible:outline-dash-blue'
 const ELEGIDO = 'bg-dash-blue text-white hover:bg-dash-blue-hover hover:text-white'
 

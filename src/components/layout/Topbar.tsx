@@ -52,7 +52,7 @@ export function Topbar({
   const ToggleIcon = expanded ? PanelLeftClose : PanelLeftOpen
 
   return (
-    <header className="h-16 shrink-0 bg-white">
+    <header className="h-16 shrink-0 bg-surface">
       <div className={cn(ANCHO_PAGINA, 'flex h-full items-center gap-2 pr-3 pl-[13px] sm:gap-3 sm:pr-4')}>
       {/* Left Section del Figma: greeting a la izquierda, grupo de controles
           empujado contra su borde derecho (justify-between).
@@ -69,7 +69,7 @@ export function Topbar({
           aria-label={expanded ? 'Collapse sidebar' : 'Expand sidebar'}
           aria-expanded={expanded}
           className={cn(
-            'flex size-8 items-center justify-center rounded-md border border-line bg-white',
+            'flex size-8 items-center justify-center rounded-md border border-line bg-surface',
             'text-ink-soft transition-all duration-150 hover:bg-surface-subtle',
             'active:scale-90 motion-reduce:transition-none motion-reduce:active:scale-100',
           )}
@@ -271,7 +271,7 @@ export function GlobalSearch({ showCommandHint }: { showCommandHint: boolean }) 
         onFocus={() => setOpen(true)}
         placeholder="Search..."
         className={cn(
-          'h-7 w-full rounded-md border border-line bg-white pl-8 text-[12px] font-medium',
+          'h-7 w-full rounded-md border border-line bg-surface pl-8 text-[12px] font-medium',
           'shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] placeholder:text-ink-faint',
           'focus:border-dash-blue focus:outline-none',
           showCommandHint ? 'pr-8' : 'pr-3',
@@ -283,7 +283,7 @@ export function GlobalSearch({ showCommandHint }: { showCommandHint: boolean }) 
         </span>
       )}
       {open && q.trim() && (
-        <div className="motion-safe:animate-[loc-in_120ms_ease-out] absolute top-[calc(100%+4px)] left-0 z-50 w-full overflow-hidden rounded-md border border-line bg-white py-1 shadow-lg">
+        <div className="motion-safe:animate-[loc-in_120ms_ease-out] absolute top-[calc(100%+4px)] left-0 z-50 w-full overflow-hidden rounded-md border border-line bg-surface py-1 shadow-lg">
           {resultados.length === 0 ? (
             <p className="px-3 py-2 text-[13px] text-ink-faint">No results for “{q}”</p>
           ) : (

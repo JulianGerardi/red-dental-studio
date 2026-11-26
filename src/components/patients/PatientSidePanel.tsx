@@ -208,7 +208,7 @@ export function PatientSidePanel({
             <span
               tabIndex={0}
               aria-label={`${name}, Active, 50 years`}
-              className="absolute right-0 bottom-0 hidden size-3 rounded-full border-2 border-white bg-green lg:block"
+              className="absolute right-0 bottom-0 hidden size-3 rounded-full border-2 border-surface bg-green lg:block"
             />
           ))}
         </div>
@@ -296,7 +296,7 @@ export function PatientSidePanel({
             colapsado && 'lg:size-9 lg:justify-center lg:gap-0 lg:p-0',
             section === key
               ? 'bg-dash-blue border-dash-blue text-white'
-              : 'border-line bg-white text-ink hover:bg-surface-muted lg:bg-transparent',
+              : 'border-line bg-surface text-ink hover:bg-surface-muted lg:bg-transparent',
           )
           const contenido = (
             <>
@@ -317,7 +317,7 @@ export function PatientSidePanel({
       {/* Degradado que avisa que la tira sigue. */}
       <span
         aria-hidden
-        className="pointer-events-none absolute top-0 right-0 h-full w-8 bg-gradient-to-l from-white to-transparent lg:hidden"
+        className="pointer-events-none absolute top-0 right-0 h-full w-8 bg-gradient-to-l from-surface to-transparent lg:hidden"
       />
       </div>
 

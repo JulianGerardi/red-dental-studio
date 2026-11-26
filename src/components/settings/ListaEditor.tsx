@@ -78,7 +78,7 @@ export function ItemLista({ nombre, activo, elegido, to, onElegir, extra, onAlte
     <li
       className={cn(
         'flex items-start gap-2 rounded-lg border py-2.5 pr-2 pl-3 transition-colors has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-dash-blue/40',
-        elegido ? 'border-dash-blue bg-info-bg' : 'border-line bg-white hover:bg-surface-subtle',
+        elegido ? 'border-dash-blue bg-info-bg' : 'border-line bg-surface hover:bg-surface-subtle',
       )}
     >
       {to ? (
@@ -118,7 +118,7 @@ export function PieEditor({ izquierda, onCancelar, onGuardar, guardarDeshabilita
   guardarDeshabilitado?: boolean
 }) {
   return (
-    <div className="sticky bottom-0 z-10 -mx-4 -mb-4 flex flex-wrap items-center justify-end gap-3 rounded-b-lg border-t border-line bg-white px-4 py-3 sm:-mx-5 sm:-mb-5 sm:px-5">
+    <div className="sticky bottom-0 z-10 -mx-4 -mb-4 flex flex-wrap items-center justify-end gap-3 rounded-b-lg border-t border-line bg-surface px-4 py-3 sm:-mx-5 sm:-mb-5 sm:px-5">
       {izquierda && <div className="mr-auto">{izquierda}</div>}
       <div className="flex gap-3">
         <Button variant="secondary" className="px-6" onClick={onCancelar}>Cancel</Button>

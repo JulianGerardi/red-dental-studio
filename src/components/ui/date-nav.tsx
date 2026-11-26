@@ -72,7 +72,7 @@ export function DateNav({ value, onChange, periodo = 'day', hoy = new Date(), ma
       className={cn(
         'inline-flex h-8 shrink-0 items-stretch overflow-hidden rounded-md border text-[13px] shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] transition-colors',
         /* En hoy, todo el bloque queda activo como un filtro aplicado (ui/filter-menu): borde y texto azules sobre celeste. */
-        enHoy ? 'border-dash-blue bg-info-bg [&_button]:text-dash-blue [&_button:hover]:bg-dash-blue/10' : 'border-line bg-white',
+        enHoy ? 'border-dash-blue bg-info-bg [&_button]:text-dash-blue [&_button:hover]:bg-dash-blue/10' : 'border-line bg-surface',
         className,
       )}
     >

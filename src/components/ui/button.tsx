@@ -12,7 +12,7 @@ export const BUTTON_VARIANTS = {
   /** La acción principal de la pantalla o del diálogo. Una sola por vista. */
   primary: 'bg-dash-blue text-white hover:bg-dash-blue-hover active:bg-dash-blue-active focus-visible:outline-dash-blue',
   /** Acción secundaria al lado de la principal: Cancel, Back, Export. */
-  secondary: 'border border-line bg-white text-ink hover:bg-surface-subtle active:bg-surface-muted focus-visible:outline-dash-blue',
+  secondary: 'border border-line bg-surface text-ink hover:bg-surface-subtle active:bg-surface-muted focus-visible:outline-dash-blue',
   /** Baja jerarquía, sin caja: barras de herramientas y acciones de fila. */
   ghost: 'text-ink-soft hover:bg-surface-muted hover:text-ink active:bg-line focus-visible:outline-dash-blue',
   /** Se lee como un link: navegar o ver más. */

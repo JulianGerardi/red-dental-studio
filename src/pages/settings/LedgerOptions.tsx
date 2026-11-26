@@ -24,7 +24,7 @@ export function Switch({ on, onChange, label }: { on: boolean; onChange: () => v
         on ? 'bg-dash-blue' : 'bg-line-strong',
       )}
     >
-      <span className={cn('absolute top-0.5 size-4 rounded-full bg-white transition-all', on ? 'left-[18px]' : 'left-0.5')} />
+      <span className={cn('absolute top-0.5 size-4 rounded-full bg-surface transition-all', on ? 'left-[18px]' : 'left-0.5')} />
     </button>
   )
 }

@@ -60,7 +60,7 @@ export function Seccion({ titulo, children }: { titulo: string; children: React.
 /* Casilla del recuadro de datos: rótulo con ícono arriba, valor abajo. */
 export function Campo({ icono: Icono, etiqueta, children }: { icono: LucideIcon; etiqueta: string; children: React.ReactNode }) {
   return (
-    <div className="bg-white p-2.5">
+    <div className="bg-surface p-2.5">
       <p className={`${ETIQUETA} flex items-center gap-1 text-ink-muted`}>
         <Icono className="text-dash-blue size-3 shrink-0" /> {etiqueta}
       </p>

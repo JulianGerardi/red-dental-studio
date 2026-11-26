@@ -43,7 +43,7 @@ export function DocumentViewer({
       <DialogPrimitive.Portal>
         <DialogPrimitive.Content
           aria-describedby={undefined}
-          className="fixed inset-0 z-50 flex flex-col bg-white outline-none motion-safe:animate-[loc-in_150ms_ease-out]"
+          className="fixed inset-0 z-50 flex flex-col bg-surface outline-none motion-safe:animate-[loc-in_150ms_ease-out]"
         >
           <header className="flex flex-col gap-3 border-b border-line px-4 py-3 sm:px-6">
             <div className="flex items-center gap-3">
@@ -79,7 +79,7 @@ export function DocumentViewer({
           </div>
 
           {footer && !loading && (
-            <footer className="flex flex-wrap items-center gap-3 border-t border-line bg-white px-4 py-3 sm:px-6">{footer}</footer>
+            <footer className="flex flex-wrap items-center gap-3 border-t border-line bg-surface px-4 py-3 sm:px-6">{footer}</footer>
           )}
         </DialogPrimitive.Content>
       </DialogPrimitive.Portal>

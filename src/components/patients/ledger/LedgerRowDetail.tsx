@@ -364,7 +364,7 @@ export function LedgerRowModal({
         <button
           type="button"
           onClick={onClose}
-          className="h-9 shrink-0 rounded-md border border-line bg-white px-6 text-[13px] font-medium hover:bg-surface-subtle"
+          className="h-9 shrink-0 rounded-md border border-line bg-surface px-6 text-[13px] font-medium hover:bg-surface-subtle"
         >
           Close
         </button>

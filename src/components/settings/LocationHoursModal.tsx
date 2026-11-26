@@ -186,7 +186,7 @@ export function LocationHoursModal({
                     fijo
                       ? 'border-dash-blue bg-dash-blue cursor-default text-white'
                       : on
-                        ? 'border-dash-blue text-dash-blue bg-white'
+                        ? 'border-dash-blue text-dash-blue bg-surface'
                         : 'border-transparent text-ink-faint hover:bg-surface-muted',
                   )}
                 >

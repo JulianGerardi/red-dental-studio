@@ -95,7 +95,7 @@ export function OperatoryCard({ room, turnos, resumen, abierta, onToggle, onSele
         <div className="flex w-full min-w-0 flex-col gap-1.5 px-3.5 py-3">{cabecera}</div>
       )}
       {abierta && (
-        <div className={cn('border-t bg-white', OPERATORY_SURFACES[status].split(' ')[0])}>
+        <div className={cn('border-t bg-surface', OPERATORY_SURFACES[status].split(' ')[0])}>
           <LineaDelDia room={room} turnos={turnos ?? []} onSelect={onSelect} />
         </div>
       )}
@@ -137,7 +137,7 @@ export function LineaDelDia({ room, turnos, onSelect }: {
         )
         const claseCard = cn(
           'flex w-full min-w-0 items-start gap-2 rounded-lg border p-2 text-left',
-          hecho ? 'border-line-row bg-white' : 'border-dash-blue bg-info-bg',
+          hecho ? 'border-line-row bg-surface' : 'border-dash-blue bg-info-bg',
         )
         return (
           <li key={i} className="grid grid-cols-[44px_minmax(0,1fr)] gap-2">
@@ -145,7 +145,7 @@ export function LineaDelDia({ room, turnos, onSelect }: {
               <span className="text-dash-name text-[11px] leading-none font-semibold tabular-nums">{t.time}</span>
               <span
                 aria-hidden
-                className={cn('z-10 mt-1.5 flex size-4 shrink-0 items-center justify-center rounded-full bg-white', hecho ? 'bg-dash-ok-fg text-white' : 'border-dash-blue border-[3px]')}
+                className={cn('z-10 mt-1.5 flex size-4 shrink-0 items-center justify-center rounded-full bg-surface', hecho ? 'bg-dash-ok-fg text-white' : 'border-dash-blue border-[3px]')}
               >
                 {hecho && <Check className="size-2.5" strokeWidth={3} />}
               </span>

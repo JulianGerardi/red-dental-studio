@@ -249,7 +249,7 @@ export function OdontogramEmbed({
      encima. En Odontogram no hay esos tabs -`tabsPerioNodo` da `null`-,
      así que va inline debajo del "Dental chart", como antes. */
   const panelInfo = infoAbierto && (infoNodo || perioNodo) && (
-    <div className="mb-3 w-full rounded-xl border border-line bg-white p-4">
+    <div className="mb-3 w-full rounded-xl border border-line bg-surface p-4">
       <div className="mb-3 flex items-center justify-between">
         <span className="text-[13px] font-semibold text-ink">Tooth information</span>
         <button
@@ -315,7 +315,7 @@ export function OdontogramEmbed({
       )}
 
       {controlesAbiertos && !minimizado && actual && (
-        <div className="mt-3 w-full rounded-t-xl border border-b-0 border-line bg-white p-4">
+        <div className="mt-3 w-full rounded-t-xl border border-b-0 border-line bg-surface p-4">
           <OdontogramPanel
             key={reinicio}
             card={actual.nodo}
@@ -326,7 +326,7 @@ export function OdontogramEmbed({
 
       {controlesAbiertos && pasos.length > 0 && (
         <div className={cn(
-          'flex h-10 w-full items-center gap-2 border border-line bg-white px-2',
+          'flex h-10 w-full items-center gap-2 border border-line bg-surface px-2',
           minimizado ? 'mt-3 rounded-xl' : 'rounded-b-xl border-t-0',
         )}>
           {/* Los dos chevrones van juntos, como un paginador: separados a los

@@ -10,7 +10,7 @@ export function Card({ title, action, children, className }: {
   className?: string
 }) {
   return (
-    <section className={cn('rounded-lg bg-white shadow-panel p-4 sm:p-5', className)} aria-label={title}>
+    <section className={cn('rounded-lg bg-surface shadow-panel p-4 sm:p-5', className)} aria-label={title}>
       {title && (
         <div className="flex flex-wrap items-center gap-3">
           <h2 className="text-sm font-bold text-ink">{title}</h2>
@@ -43,7 +43,7 @@ export function Toggle({
         className="flex items-center gap-2 text-[13px] text-ink"
       >
         <span className={cn('flex h-5 w-9 shrink-0 items-center rounded-full p-0.5 transition-colors', on ? 'bg-dash-blue' : 'bg-line-strong')}>
-          <span className={cn('size-4 rounded-full bg-white transition-transform', on && 'translate-x-4')} />
+          <span className={cn('size-4 rounded-full bg-surface transition-transform', on && 'translate-x-4')} />
         </span>
         {on ? 'Yes' : 'No'}
       </button>

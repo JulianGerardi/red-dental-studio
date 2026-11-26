@@ -27,7 +27,7 @@ export function ClinicalToolbar({
         <button
           type="button"
           onClick={() => onPestana(ultimoExamen.current)}
-          className="flex h-9 shrink-0 items-center rounded-lg border border-line bg-white px-3.5 text-[13px] font-medium whitespace-nowrap text-ink shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] transition-colors hover:bg-surface-subtle"
+          className="flex h-9 shrink-0 items-center rounded-lg border border-line bg-surface px-3.5 text-[13px] font-medium whitespace-nowrap text-ink shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] transition-colors hover:bg-surface-subtle"
         >
           Exams
         </button>
@@ -80,7 +80,7 @@ export function ClinicalToolbar({
                   'lg:grow',
                   on
                     ? 'bg-dash-blue font-semibold text-white'
-                    : 'border border-line bg-white font-medium text-ink shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] hover:bg-surface-subtle',
+                    : 'border border-line bg-surface font-medium text-ink shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] hover:bg-surface-subtle',
                 )}
               >
                 {p}

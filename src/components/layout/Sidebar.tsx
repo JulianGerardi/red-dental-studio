@@ -95,7 +95,7 @@ export function Sidebar({
         className={cn(
           /* El scroll va sólo en mobile: en desktop un overflow acá recorta el
              menú flotante de Settings, que se sale del ancho del rail. */
-          'flex h-svh flex-col bg-white transition-[width,transform] duration-200',
+          'flex h-svh flex-col bg-surface transition-[width,transform] duration-200',
           'max-md:overflow-y-auto md:overflow-visible',
           /* Mobile: panel fijo que entra desde la izquierda. Sigue en 234: tapa el contenido en vez de correrlo. */
           'fixed top-0 left-0 z-50 w-[234px]',
@@ -188,7 +188,7 @@ function useFlotante(forzarAbierto?: boolean) {
   return { abierto: abiertoPropio || !!forzarAbierto, setAbierto, abrir, cerrarConDelay, pathname }
 }
 
-const PANEL_FLOTANTE = 'motion-safe:animate-[loc-in_120ms_ease-out] z-50 rounded-2xl border border-line bg-white p-2 max-md:mt-2 max-md:max-h-[45svh] max-md:overflow-y-auto md:absolute md:left-full md:ml-2 md:w-[236px] md:shadow-floating'
+const PANEL_FLOTANTE = 'motion-safe:animate-[loc-in_120ms_ease-out] z-50 rounded-2xl border border-line bg-surface p-2 max-md:mt-2 max-md:max-h-[45svh] max-md:overflow-y-auto md:absolute md:left-full md:ml-2 md:w-[236px] md:shadow-floating'
 
 /* Settings ya no abre un sidebar propio adentro de la sección: sus pantallas
    cuelgan de un menú flotante que sale al costado del ítem, como en el

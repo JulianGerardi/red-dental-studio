@@ -203,7 +203,7 @@ export function DataTable<T>({
                 onChange={(e) => { setQ(e.target.value); reiniciar() }}
                 placeholder={search.placeholder ?? 'Search'}
                 aria-label={search.placeholder ?? 'Search'}
-                className="h-9 w-full rounded-md border border-line bg-white pr-3 pl-9 text-[13px] shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] placeholder:text-ink-faint focus:border-dash-blue focus:outline-none"
+                className="h-9 w-full rounded-md border border-line bg-surface pr-3 pl-9 text-[13px] shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] placeholder:text-ink-faint focus:border-dash-blue focus:outline-none"
               />
             </div>
           )}
@@ -235,7 +235,7 @@ export function DataTable<T>({
         data-tabla-scroll
         aria-busy={loading || undefined}
         aria-disabled={disabled || undefined}
-        className={cn('overflow-x-auto rounded-lg border border-line-row bg-white', llenar && 'lg:flex lg:flex-1 lg:flex-col', disabled && 'pointer-events-none select-none opacity-60')}
+        className={cn('overflow-x-auto rounded-lg border border-line-row bg-surface', llenar && 'lg:flex lg:flex-1 lg:flex-col', disabled && 'pointer-events-none select-none opacity-60')}
       >
         <div style={{ minWidth: minimo }} className={cn(llenar && 'lg:flex lg:flex-1 lg:flex-col')}>
           <div role="row" data-tabla-header className={cn('group/fila flex h-11 gap-3', TABLA_ENCABEZADO)}>
@@ -440,7 +440,7 @@ export function PieTabla({
               aria-label="Rows per page"
               value={filasPorPagina}
               onChange={(e) => onFilasPorPagina(Number(e.target.value))}
-              className="h-7 rounded-md border border-line bg-white px-2 text-[12px] font-normal text-ink focus:border-dash-blue focus:outline-none focus-visible:outline-2 focus-visible:outline-dash-blue"
+              className="h-7 rounded-md border border-line bg-surface px-2 text-[12px] font-normal text-ink focus:border-dash-blue focus:outline-none focus-visible:outline-2 focus-visible:outline-dash-blue"
             >
               {opciones.map((n) => <option key={n} value={n}>{n}</option>)}
             </select>
