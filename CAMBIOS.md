@@ -13,6 +13,12 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 - **Dashboard:** pasa `hoy={HOY_DEMO}` (antes comparaba con la fecha real y Today nunca quedaba en hoy). Scheduling
   sigue con `FECHA_ANCLA`. Si una pantalla nueva usa `DateNav` con datos de demo, pasale su `hoy`.
 
+### Edit procedure: sin overrides del estimado y con un finding y un diagnóstico por defecto (CON-4211) ([#200](https://github.com/JulianGerardi/red-dental-studio/pull/200))
+- `ProcedureEstimate` ya no lleva *Insurance estimate overrides*: se saca `override` de `EstimadoProcedimiento` y de
+  `resolverEstimado` (`data/estimaciones.ts`). Backend: el estimado guarda sólo el modo (automático o a mano) y los montos.
+- *Link findings* y *Link diagnosis* pierden la bajada; si el procedimiento no tiene vínculos, `EditProcedureDrawer` arranca
+  con un finding (mismo diente o el primero) y su diagnóstico.
+
 ## 2026-11-25
 
 ### Clinical Mode: Edit finding / Edit procedure desde las tablas, Estimate y la card del plan (CON-4211, CON-2770) ([#199](https://github.com/JulianGerardi/red-dental-studio/pull/199))
