@@ -3,6 +3,7 @@ import { Navigate, useNavigate, useParams } from 'react-router-dom'
 import { ListChecks, Plus, ShieldAlert } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { SettingsPageHeader } from '@/components/settings/SettingsPageHeader'
+import { BillingHeader } from '@/components/finance/BillingHeader'
 import { SelectField, TextField } from '@/components/patients/form'
 import { Alert } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
@@ -142,10 +143,7 @@ export function SettingsCoverageTables() {
 
   return (
     <div className={cn('@container', PADDING_PAGINA)}>
-      <SettingsPageHeader
-        titulo="Coverage tables"
-        accion={<Button size="md" onClick={() => navigate(`${LISTA_COBERTURAS}/new`)}><Plus /> New coverage table</Button>}
-      />
+      <BillingHeader accion={<Button size="md" onClick={() => navigate(`${LISTA_COBERTURAS}/new`)}><Plus /> New coverage table</Button>} />
       <div className={GRILLA_LISTA_EDITOR}>
         <PanelLista
           titulo="Coverage tables" q={q} onQ={setQ} placeholder="Search coverage tables" vacio={visibles.length === 0}

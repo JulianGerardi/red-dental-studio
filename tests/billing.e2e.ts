@@ -65,7 +65,8 @@ test('Billing en el menú lateral va directo a su pantalla; sus tablas están s�
   await screen.getByRole('link', 'Settings').hover()
   await screen.getByRole('button', 'Billing options').tap()
   await screen.getByRole('link', 'Carriers').tap()
-  await expect(screen.getByRole('heading', 'Carriers')).toBeVisible()
+  /* Settings › Billing es una pantalla con pestañas (2026-11-26): Carriers queda marcada. */
+  await expect(screen.getByRole('navigation', 'Billing sections').getByRole('link', 'Carriers')).toHaveAttribute('aria-current', 'page')
 })
 
 /* Find patient mide cuántas filas enteras entran en el alto de Recent billing activity (llenarAlto, no un número

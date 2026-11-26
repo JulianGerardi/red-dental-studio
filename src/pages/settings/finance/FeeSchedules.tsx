@@ -3,6 +3,7 @@ import { Navigate, useNavigate, useParams } from 'react-router-dom'
 import { Archive, ArchiveRestore, Copy, GitCompareArrows, Network, Pencil, Plus, Power, ReceiptText, Search, SearchX, SlidersHorizontal } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { SettingsPageHeader } from '@/components/settings/SettingsPageHeader'
+import { BillingHeader } from '@/components/finance/BillingHeader'
 import { FieldLabel, SelectField, TextField, control } from '@/components/patients/form'
 import { Alert } from '@/components/ui/alert'
 import { EmptyState } from '@/components/ui/empty-state'
@@ -263,10 +264,7 @@ export function SettingsFeeSchedules() {
 
   return (
     <div className={cn('@container', PADDING_PAGINA)}>
-      <SettingsPageHeader
-        titulo="Fee schedules"
-        accion={<Button size="md" onClick={() => navigate(`${LISTA_ARANCELES}/new`)}><Plus /> New fee schedule</Button>}
-      />
+      <BillingHeader accion={<Button size="md" onClick={() => navigate(`${LISTA_ARANCELES}/new`)}><Plus /> New fee schedule</Button>} />
       <div className={GRILLA_LISTA_EDITOR}>
         <PanelLista
           titulo="Fee schedules" q={q} onQ={setQ} placeholder="Search fee schedules" vacio={visibles.length === 0}
