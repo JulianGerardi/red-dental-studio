@@ -16,12 +16,12 @@ import { Switch } from '@/components/ui/switch'
 import { aviso } from '@/components/ui/toaster'
 import { DropdownMenuItem } from '@/components/ui/dropdown-menu'
 import { SettingsSearch } from '@/components/settings/SettingsSearch'
-import { MasterList, type ItemMaestro } from '@/components/finance/MasterList'
+import { EncabezadoEditor, GRILLA_LISTA_EDITOR, ItemLista, PanelLista, PieEditor, TARJETA_EDITOR } from '@/components/settings/ListaEditor'
 import { AssignmentsCount, AssignmentsDrawer, asignacionesDe } from '@/components/finance/Assignments'
 import { CompareFeesDrawer } from '@/components/finance/CompareFeesDrawer'
 import { MoneyInput } from '@/components/finance/fields'
 import { CopyFormDrawer, IncreaseAllDrawer, aumentar } from '@/components/finance/FeeScheduleTools'
-import { ICONO_SUELTO, TABLA_ENCABEZADO, TABLA_FILA, TABLA_LINK, TABLA_MARCO, TARJETA_PANEL, PADDING_PAGINA } from '@/lib/estilos'
+import { ICONO_SUELTO, TABLA_ENCABEZADO, TABLA_FILA, TABLA_LINK, TABLA_MARCO, PADDING_PAGINA } from '@/lib/estilos'
 import { useFinanzas } from '@/data/finanzasStore'
 import {
   ESTADOS_ARANCEL, PROCEDIMIENTOS, SIN_ASIGNAR, TIPOS_ARANCEL, TONO_ARANCEL, conImporte, dinero, etiquetaVersion, fechaMDA,
@@ -129,18 +129,18 @@ export function FeeScheduleEditor({ arancel, onGuardado }: { arancel?: Arancel; 
   /* Sin casillas y con New fee como texto que se edita al tocarlo, como red.dev (settings-billing.md, 2026-11-25). */
   const columnas = cn('grid items-center gap-3', arancel ? 'grid-cols-[64px_1fr_96px_120px]' : 'grid-cols-[64px_1fr_120px]')
 
+  /* Misma card, encabezado y pie que el editor de Coverage tables (settings-billing.md, 2026-11-26). */
   return (
-    <div className="flex flex-col gap-4">
+    <section aria-label={arancel ? 'Edit fee schedule' : 'New fee schedule'} className={TARJETA_EDITOR}>
+      {arancel && (
+        <EncabezadoEditor
+          titulo="Edit fee schedule" estado={{ nombre: arancel.estado, tono: TONO_ARANCEL[arancel.estado] }}
+          extra={arancel.porDefecto && <Pill tone="info" size="sm">Default</Pill>}
+        />
+      )}
       {intentado && (!nombre.trim() || !tipo || faltaFecha) && (
         <Alert tone="danger" title="Uncompleted fields">All required fields marked with (*) must be completed before proceeding</Alert>
       )}
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <h2 className="text-sm font-bold text-ink">General information</h2>
-        <div className="flex gap-2">
-          <Button variant="secondary" onClick={() => setHerramienta('copiar')}><Copy /> Copy form</Button>
-          <Button variant="secondary" onClick={() => setHerramienta('aumentar')}><SlidersHorizontal /> Bulk edit</Button>
-        </div>
-      </div>
 
       <div className="grid gap-4 sm:grid-cols-2">
         <div className="flex items-start gap-2">
@@ -175,7 +175,8 @@ export function FeeScheduleEditor({ arancel, onGuardado }: { arancel?: Arancel; 
         {arancel && campoTipo}
       </div>
 
-      <div className="flex flex-wrap items-center justify-between gap-3">
+      {/* Buscador y Non-zero fees a la izquierda; las acciones de la tabla justo encima, a la derecha, como Coverage. */}
+      <div className="-mb-2 flex flex-wrap items-center gap-x-3 gap-y-2">
         <span className="relative block w-full sm:max-w-[320px]">
           <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-ink-faint" />
           <input aria-label="Search procedure" value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search procedures" className={cn(control(), 'h-9 pr-3 pl-9')} />
@@ -183,6 +184,10 @@ export function FeeScheduleEditor({ arancel, onGuardado }: { arancel?: Arancel; 
         <span className="text-[13px] text-ink-muted tabular-nums" title="Procedures whose new fee is more than $0.00">
           Non-zero fees — <span className="font-semibold text-ink">{conImporte(nuevos)} / {PROCEDIMIENTOS.length}</span>
         </span>
+        <div className="flex flex-wrap gap-2 sm:ml-auto">
+          <Button variant="secondary" onClick={() => setHerramienta('copiar')}><Copy /> Copy form</Button>
+          <Button variant="secondary" onClick={() => setHerramienta('aumentar')}><SlidersHorizontal /> Bulk edit</Button>
+        </div>
       </div>
 
       {/* La tabla scrollea adentro con el encabezado fijo, así Cancel y Save quedan a la vista (red.dev). */}
@@ -211,10 +216,7 @@ export function FeeScheduleEditor({ arancel, onGuardado }: { arancel?: Arancel; 
         </div>
       </div>
 
-      <div className="flex justify-between gap-3">
-        <Button variant="secondary" onClick={() => salida.ir(LISTA_ARANCELES)}>Cancel</Button>
-        <Button disabled={!cambiado} onClick={guardarTodo}>Save</Button>
-      </div>
+      <PieEditor onCancelar={() => salida.ir(LISTA_ARANCELES)} onGuardar={guardarTodo} guardarDeshabilitado={!cambiado} />
 
       {salida.dialogo}
 
@@ -241,7 +243,7 @@ export function FeeScheduleEditor({ arancel, onGuardado }: { arancel?: Arancel; 
           }}
         />
       )}
-    </div>
+    </section>
   )
 }
 
@@ -323,50 +325,50 @@ export function SettingsFeeSchedules() {
   )
 }
 
-/* Editar: la lista de red.dev a la izquierda (con su filtro de estados y ⋮ Inactive / Archive) y el editor a la derecha. */
+/* Editar: la lista a la izquierda (con su filtro de estados y ⋮ Inactive / Archive) y el editor a la derecha, en dos cards
+   como Coverage tables (settings-billing.md, 2026-11-26). */
 export function SettingsFeeScheduleEdit() {
   const { feeId } = useParams()
   const navigate = useNavigate()
   const { aranceles, guardar } = useFinanzas()
   const [q, setQ] = useState('')
-  /* Sin filtro al entrar, como todas las listas: se ven todos, cada uno con su punto (settings-billing.md, 2026-11-25). */
+  /* Sin filtro al entrar, como todas las listas: se ven todos, cada uno con su estado (settings-billing.md, 2026-11-25). */
   const [estados, setEstados] = useState<string[]>([])
   const elegido = aranceles.find((a) => a.id === feeId)
 
-  const items: ItemMaestro[] = useMemo(() => aranceles
-    .filter((a) => (estados.length === 0 || estados.includes(a.estado) || a.id === feeId) && a.nombre.toLowerCase().includes(q.trim().toLowerCase()))
-    .map((a) => ({
-      id: a.id, nombre: a.nombre, to: rutaArancel(a.id),
-      etiqueta: a.porDefecto ? <Pill tone="info" size="sm">Default</Pill> : undefined,
-      estado: { nombre: a.estado, tono: TONO_ARANCEL[a.estado] },
-      acciones: accionesArancel(a, (x) => guardar('aranceles', x)),
-    })), [aranceles, estados, q, feeId, guardar])
+  const visibles = aranceles.filter((a) => (estados.length === 0 || estados.includes(a.estado) || a.id === feeId) && a.nombre.toLowerCase().includes(q.trim().toLowerCase()))
 
   if (!elegido) return <Navigate to={LISTA_ARANCELES} replace />
 
   return (
-    <div className={PADDING_PAGINA}>
+    <div className={cn('@container', PADDING_PAGINA)}>
       <SettingsPageHeader
-        titulo="Edit fee schedule"
+        titulo="Fee schedules"
         accion={<Button size="md" onClick={() => navigate(`${LISTA_ARANCELES}/new`)}><Plus /> New fee schedule</Button>}
       />
-      <div className={cn(TARJETA_PANEL, 'mt-5 grid gap-6 p-4 sm:p-5 lg:grid-cols-[260px_minmax(0,1fr)] lg:items-start')}>
-        <MasterList
-          items={items} elegido={feeId} q={q} onQ={setQ} placeholder="Search fee schedules"
-          vacio="No fee schedules match the search or filters."
+      <div className={GRILLA_LISTA_EDITOR}>
+        <PanelLista
+          titulo="Fee schedules" q={q} onQ={setQ} placeholder="Search fee schedules" vacio={visibles.length === 0}
           filtro={(
             <FilterMenu
-              label="Filters" align="start"
+              label="Filters" size="sm" align="end"
               groups={[{
                 title: 'States', value: estados, onChange: setEstados,
                 options: ESTADOS_ARANCEL.map((e) => ({ value: e, count: aranceles.filter((a) => a.estado === e).length })),
               }]}
             />
           )}
-        />
-        <div className="min-w-0">
-          <FeeScheduleEditor key={`${elegido.id}-${elegido.versiones.length}`} arancel={elegido} />
-        </div>
+        >
+          {visibles.map((a) => (
+            <ItemLista
+              key={a.id} nombre={a.nombre} activo={a.estado === 'Active'} estado={{ nombre: a.estado, tono: TONO_ARANCEL[a.estado] }}
+              elegido={a.id === feeId} to={rutaArancel(a.id)}
+              extra={a.porDefecto && <Pill tone="info" size="sm">Default</Pill>}
+              acciones={accionesArancel(a, (x) => guardar('aranceles', x))}
+            />
+          ))}
+        </PanelLista>
+        <FeeScheduleEditor key={`${elegido.id}-${elegido.versiones.length}`} arancel={elegido} />
       </div>
     </div>
   )
@@ -376,9 +378,7 @@ export function SettingsNewFeeSchedule() {
   return (
     <div className={PADDING_PAGINA}>
       <SettingsPageHeader titulo="New fee schedule" />
-      <div className={cn(TARJETA_PANEL, 'mt-5 p-4 sm:p-5')}>
-        <FeeScheduleEditor />
-      </div>
+      <div className="mt-5"><FeeScheduleEditor /></div>
     </div>
   )
 }
