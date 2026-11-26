@@ -59,6 +59,10 @@ export function DateNav({ value, onChange, periodo = 'day', hoy = new Date(), ma
   /* En la semana, el calendario marca los siete días que se ven. */
   const desde = periodo === 'week' ? inicioSemana(value) : value
   const hasta = periodo === 'week' ? sumar(desde, 6) : value
+  /* Hoy está en lo que se ve: el mismo día, la misma semana o el mismo mes. */
+  const enHoy = periodo === 'day' ? sameDay(value, hoy)
+    : periodo === 'week' ? sameDay(inicioSemana(value), inicioSemana(hoy))
+    : value.getFullYear() === hoy.getFullYear() && value.getMonth() === hoy.getMonth()
 
   return (
     <div
@@ -70,9 +74,15 @@ export function DateNav({ value, onChange, periodo = 'day', hoy = new Date(), ma
       <button type="button" aria-label={`Previous ${NOMBRE[periodo]}`} onClick={() => onChange(moverPeriodo(value, periodo, -1))} className={cn(BOTON, 'w-8')}>
         <ChevronLeft className="size-4" />
       </button>
-      {/* Ya en hoy, Today queda apagado: dice dónde estás sin mover el bloque. */}
-      <button type="button" onClick={() => onChange(hoy)} disabled={sameDay(value, hoy)} className={cn(BOTON, 'px-2 font-medium')}>
-        Today
+      {/* En hoy, Today queda activo como la pestaña activa de ui/tabs (azul, texto blanco); dice dónde estás sin mover el
+          bloque (dashboard.md, 2026-11-26). */}
+      <button
+        type="button"
+        aria-pressed={enHoy}
+        onClick={() => onChange(hoy)}
+        className={cn(BOTON, 'px-1 font-medium', enHoy && 'hover:bg-white')}
+      >
+        <span className={cn('rounded-md px-2 py-1 leading-4 transition-colors', enHoy && 'bg-dash-blue text-white')}>Today</span>
       </button>
       <button type="button" aria-label={`Next ${NOMBRE[periodo]}`} onClick={() => onChange(moverPeriodo(value, periodo, 1))} className={cn(BOTON, 'w-8')}>
         <ChevronRight className="size-4" />
