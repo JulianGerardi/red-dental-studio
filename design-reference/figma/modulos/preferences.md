@@ -141,3 +141,28 @@ Reemplaza los valores de la segunda vuelta; el research sigue valiendo para el t
    quedaban blancos con letra blanca. `--color-tooltip` vale `#09090b` en claro (lo mismo que se veía) y `#2a2b31` en
    oscuro, con una línea blanca tenue para despegarse del negro. Se cambió en `ui/tooltip` y en los 16 `TooltipContent`
    que lo pisaban. Para el dev: los tooltips van con `bg-tooltip`, no con `bg-ink`.
+
+### Cuarta vuelta: guía de UX Design Institute (2026-11-26)
+
+Julián pasó una guía (*Dark mode design: a practical guide*, UX Design Institute) y una nota de inspiración (Webflow,
+*5 dark mode websites*). Reemplaza los valores de la tercera vuelta; el token `bg-tooltip` se queda.
+
+**Qué dice la guía y cómo se aplicó**
+
+1. *Nada de colores puros*: fondo `#121212` (gris muy oscuro, no negro) y texto `#E0E0E0` (no blanco). Página `#121212`,
+   cards `#1e1e1e`, menús y tooltips `#2c2c2c`: más arriba, más claro. Grises neutros, sin tinte.
+2. *Bajar la saturación*: su ejemplo de azul, `#357ABD`, es el relleno de botones y chips (blanco encima a 4,5:1). El
+   texto azul va un tono más claro, `#86a9d9`. Estados en tonos apagados al estilo Material 200/300 (verde `#74c69d`,
+   rojo `#e57373`, ámbar `#e6b85c`, violeta `#b39ddb`) sobre fondos tintados tenues.
+3. *Contraste*: texto ≥ 4,5:1 en todos los tokens (`ink` 12,6:1, `ink-muted` 5,2:1 sobre la card). `ink-faint` (3,1:1)
+   queda para placeholders y deshabilitados, como en claro.
+4. *Sin sombras: bordes y brillos*: `shadow-panel` y `shadow-inner-card` pasan a un borde blanco tenue. El botón primario
+   suma `dark:shadow-glow`: un brillo azul del 30% y un filo de luz arriba, lo que la guía sugiere para un CTA.
+5. *Texto legible*: Inter en regular, medium y bold, sin pesos finos; nombres y títulos (`dash-name`) un punto más
+   claros que el cuerpo, para la jerarquía.
+6. *Toggle*: queda en Preferences. Un acceso directo (en el menú del usuario) sería nuevo: se propone aparte.
+7. De Webflow: una transición suave al cambiar de tema. `guardarTema` usa `document.startViewTransition` (fundido del
+   navegador) y lo saltea con *reduced motion*.
+
+**A validar**: probar con la luz real de recepción y de un consultorio (la guía pide probar con luz fuerte, tenue y a
+oscuras).
