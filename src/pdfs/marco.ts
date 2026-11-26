@@ -131,13 +131,13 @@ p { margin: 0 0 4pt; }
 .meta { text-align: right; white-space: nowrap; }
 .meta b { display: block; color: ${COLOR.tinta}; font-weight: 600; }
 .tipo { margin: 18pt 0 2pt; font-size: 7.5pt; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: ${COLOR.marca}; }
-h1 { margin: 0; font-size: 15pt; line-height: 1.25; color: ${COLOR.tinta}; }
+h1 { margin: 0; font-size: 15pt; line-height: 1.25; font-weight: 700; color: ${COLOR.tinta}; }
 .resumen { display: grid; grid-template-columns: repeat(3, 1fr); margin-top: 13pt; border: .75pt solid ${COLOR.linea}; border-radius: 4pt; overflow: hidden; }
 .resumen div { padding: 6pt 8pt; border-right: .75pt solid ${COLOR.linea}; border-bottom: .75pt solid ${COLOR.linea}; margin: 0 -.75pt -.75pt 0; min-width: 0; }
 .resumen dt { font-size: 6.5pt; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: ${COLOR.apagado}; }
 .resumen dd { margin: 1pt 0 0; font-weight: 500; color: ${COLOR.tinta}; overflow-wrap: anywhere; }
 section { margin-top: 18pt; }
-h2 { display: flex; gap: 7pt; margin: 0 0 5pt; font-size: 10.5pt; color: ${COLOR.tinta}; break-after: avoid; }
+h2 { display: flex; gap: 7pt; margin: 0 0 5pt; font-size: 10.5pt; font-weight: 700; color: ${COLOR.tinta}; break-after: avoid; }
 h2 span { color: ${COLOR.marca}; font-weight: 600; }
 .campos { margin: 0; }
 .campos div { margin-bottom: 2pt; }

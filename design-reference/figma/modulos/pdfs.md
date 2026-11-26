@@ -97,3 +97,18 @@ La vista previa marca cada uno con *Same as the app* o *Proposal · pending appr
 - Con odontólogos: si el PDF periodontal en tabla se lee bien, o si esperan el gráfico (charting) como en la pantalla.
 - Con el backend: qué motor HTML→PDF usan y si soporta `@page` con pie y número de página; si no, el pie va por la
   opción de pie del motor (Puppeteer `footerTemplate`).
+
+## 2026-11-26 · Documentación en Figma (CON-4115)
+
+Pedido de Julián: armar los PDF en Figma como los mails. Página **📄 PDFs** (`597:4`) del archivo *Screens & Flows*, con el
+flujo en `scripts/figma/flujos/pdfs.mjs`.
+
+- **Cuatro flujos y 13 pantallas:** *Template & preview* (sample data, sin firmar y variables, con el consentimiento del
+  procedimiento) y un flujo por categoría: Clinical records, Orders y Treatment & consent. Cada pantalla es `/pdfs/#<id>` y
+  su nota dice cuándo se genera, quién firma y si el diseño es de la app o propuesta. Las historias de Jira salen de cada
+  documento.
+- **Plantilla:** los títulos (`h1`, `h2`) llevan `font-weight: 700` explícito: el preflight de la página los reseteaba al
+  copiar la hoja y salían sin negrita. Los PDF de ejemplo se rehicieron (se ven igual).
+- **Anomalías:** la firma escrita usa Times New Roman Italic, que Figma no tiene (quedó en Playfair Display Italic); en la
+  pantalla *Variables* el cuadro de iniciales de la clínica queda con `{{practice_initials}}` cortado, igual que en la vista
+  previa; la pestaña PDF no está en el Figma.
