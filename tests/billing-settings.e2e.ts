@@ -147,11 +147,16 @@ test('Compare fees compara por procedimiento contra el Default', async ({ app, s
 test('Add range avisa y el breadcrumb sigue la regla de Settings', async ({ app, screen }) => {
   await app.open('/settings/finance/carriers/aetna/edit/insurance-plans/acme-ppo/edit')
   const migas = screen.getByRole('navigation', 'Breadcrumb')
-  await expect(migas.getByRole('link', 'Billing')).toBeVisible()
+  /* Billing no tiene pantalla propia: es texto, no link (2026-11-26). */
+  await expect(migas.getByText('Billing')).toBeVisible()
+  await expect(migas.getByRole('link', 'Billing')).toHaveCount(0)
   await expect(migas.getByRole('link', 'Aetna Dental Plans')).toBeVisible()
   await expect(migas.getByRole('link', 'Acme Corp')).toHaveCount(0)
 
+  /* Lista y editor en una pantalla: el rastro termina en la sección, como Consents, y coincide con el título. */
   await app.open('/settings/finance/coverage-table/medicaid-adults/edit')
+  await expect(migas.getByText('Coverage tables')).toBeVisible()
+  await expect(migas.getByText('Medicaid Adults')).toHaveCount(0)
   await screen.getByRole('button', 'Add range').tap()
   await expect(screen.getByText('A new range was added at the end. Complete it and Save.')).toBeVisible()
   await expect(screen.getByPlaceholder('R. min').last()).toBeVisible()

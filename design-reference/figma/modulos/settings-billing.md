@@ -1,5 +1,25 @@
 # Settings → Billing (Fee Schedules, Carriers, Coverage Table)
 
+## Breadcrumb de Billing coherente (2026-11-26)
+
+Julián: *"los breadcrumbs funcionan mal, son incoherentes"*. Relevadas las 25 rutas de Settings (breadcrumb, título y
+destino de cada link). Lo que no cerraba en Billing:
+
+1. **Billing llevaba a Fee schedules.** `/settings/finance` redirige a Fee schedules, así que desde Carriers o Coverage
+   tables el tramo *Billing* abría otra sección, y en Fee schedules apuntaba a la misma pantalla. Billing no tiene pantalla
+   propia: pasa a **texto sin link** (`Settings / Billing / Carriers`). No se inventa una página de Billing.
+2. **Lista y editor en una pantalla, dos reglas.** Consents termina en la sección (`Settings / Consents`) elija lo que
+   elija; Fee schedules y Coverage tables sumaban el ítem elegido (`… / Fee schedules / Aetna 2026`) con el título
+   *Fee schedules* debajo, y el tramo *Fee schedules* volvía a la misma pantalla sin nada elegido. Ahora terminan en la
+   sección, como Consents: el último tramo coincide con el título y el ítem elegido se ve marcado en la lista.
+3. Sin cambios: Carriers sí lleva el nombre (`… / Carriers / Aetna Dental Plans / Acme Corp`), porque el carrier y el plan
+   son pantallas aparte; *Aetna Dental Plans* vuelve a la pestaña de planes. *New fee schedule* y *New coverage table*
+   cuelgan de su lista.
+
+**Queda para decidir (no se tocó, es texto de la pantalla):** el título no dice lo mismo que el último tramo en Consents
+(*Consent templates*), Ledger (*Ledger options*), Preferences (*Account preferences*), Account (*Edit account*) y el carrier
+(*Edit carrier* bajo *Aetna Dental Plans*) y el plan (*Edit insurance plan* bajo *Acme Corp*).
+
 ## Edit Fee Schedule con el diseño de Coverage tables (2026-11-26)
 
 Sin historia de abril (epic CON-57). Pedido de Julián: *"que fee scheduling tenga el mismo diseño que coverage table"*. Edit

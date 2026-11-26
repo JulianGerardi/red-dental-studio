@@ -33,7 +33,10 @@ const TITULOS_FINANZAS: Record<string, string> = { 'fee-schedule': 'Fee schedule
 const NUEVO_FINANZAS: Record<string, string> = { 'fee-schedule': 'New fee schedule', 'coverage-table': 'New coverage table' }
 
 /* Billing sigue la regla del resto de Settings (Julián, 2026-10-09): Settings › Billing › sección › ítem, con el nombre del
-   menú y sin un tramo "Edit"; el último no es link. El plan cuelga de su carrier. Ver settings-billing.md. */
+   menú y sin un tramo "Edit"; el último no es link. El plan cuelga de su carrier. Billing no es link: no tiene pantalla
+   propia. Fee schedules y Coverage tables (lista y editor en una pantalla, como Consents) terminan en la sección. Ver
+   settings-billing.md (2026-11-26). */
+const LISTA_Y_EDITOR = new Set(['fee-schedule', 'coverage-table'])
 function migasFinanzas(pathname: string, nombre: (seccion: string, id: string) => string | undefined): Miga[] | null {
   const m = pathname.match(/^\/settings\/finance\/(fee-schedule|carriers|coverage-table)(?:\/(.*))?$/)
   if (!m) return null
@@ -42,12 +45,12 @@ function migasFinanzas(pathname: string, nombre: (seccion: string, id: string) =
   const lista = `/settings/finance/${seccion}`
   const migas: Miga[] = [
     { label: 'Settings', to: '/settings/general' },
-    { label: 'Billing', to: '/settings/finance' },
+    { label: 'Billing' },
     { label: TITULOS_FINANZAS[seccion], to: lista },
   ]
   if (partes[0] === 'new') {
     if (NUEVO_FINANZAS[seccion]) migas.push({ label: NUEVO_FINANZAS[seccion] })
-  } else if (partes[0]) {
+  } else if (partes[0] && !LISTA_Y_EDITOR.has(seccion)) {
     migas.push({ label: nombre(seccion, partes[0]) ?? partes[0], to: `${lista}/${partes[0]}/edit/insurance-plans` })
     if (partes[2] === 'insurance-plans' && partes[3] && partes[3] !== 'new') migas.push({ label: nombre('planes', partes[3]) ?? partes[3] })
   }
