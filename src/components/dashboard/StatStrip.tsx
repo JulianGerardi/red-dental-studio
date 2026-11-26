@@ -36,7 +36,7 @@ export function StatStripApilada({ stats }: { stats: Stat[] }) {
   return (
     <div className="@container w-full">
       <div className={cn(
-        'shadow-panel grid w-full rounded-xl bg-white',
+        'shadow-panel grid w-full rounded-xl bg-surface',
         stats.length === 4 ? 'grid-cols-2 @2xl:grid-cols-4' : 'grid-cols-3',
       )}>
         {stats.map(({ label, value, nota, info, icon: Icon }, i) => (
@@ -74,7 +74,7 @@ export function StatStripApilada({ stats }: { stats: Stat[] }) {
 export function StatStrip({ stats = STATS, apilada = false }: { stats?: Stat[]; apilada?: boolean }) {
   if (apilada) return <StatStripApilada stats={stats} />
   return (
-    <div className="shadow-panel flex w-full flex-col rounded-xl bg-white md:w-fit md:max-w-full md:flex-row md:items-center md:px-2">
+    <div className="shadow-panel flex w-full flex-col rounded-xl bg-surface md:w-fit md:max-w-full md:flex-row md:items-center md:px-2">
       {stats.map(({ label, value, info, icon: Icon }, i) => (
         <div
           key={label}

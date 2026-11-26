@@ -17,6 +17,21 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
   lo de adentro cuelga de *Billing* con link a la pestaña de origen (`Settings / Billing / Aetna Dental Plans / Acme Corp`).
   Se va el tramo de la sección.
 - Pendiente del design system: `BillingHeader` y `TabLinks` están en `exentos.json` hasta documentarlos en Storybook.
+### My account: switch de Dark mode ([#204](https://github.com/JulianGerardi/red-dental-studio/pull/204))
+- El menú de la cuenta (`MenuCuenta`, Topbar) suma la fila **Dark mode**: sol o luna y el `ui/switch`. Atajo al tema de
+  Preferences, sincronizado con `useTema` (`lib/tema.ts`).
+- Toda la fila es el control (`role="menuitemcheckbox"`, `aria-checked`); el `Switch` es sólo el dibujo. No cierra el
+  menú al tocarlo (`preventDefault` en `onSelect`).
+
+### Preferences: modo oscuro y sin formato de fecha ([#203](https://github.com/JulianGerardi/red-dental-studio/pull/203))
+- **Dark funciona** (Settings › Preferences): se aplica al elegir, con un fundido corto. `lib/tema.ts` guarda el tema en
+  `localStorage` (`preferences:theme`) y pone la clase `dark` en `<html>`; con backend, guardarlo por usuario.
+  Se va *Localization & regional* (formato de fecha).
+- **Tokens oscuros** en `:root.dark` (`src/index.css`): mismos nombres, otro valor. Fondo `#121212`, texto `#E0E0E0`,
+  azul `#357ABD` para rellenos; bordes en vez de sombras (se pisan por clase en `index.css`).
+- **Usá `bg-surface`, no `bg-white`,** para cards, campos, menús y drawers (`bg-white` / `text-white`, sólo sobre azul).
+  **Tooltips con `bg-tooltip`,** no `bg-ink`.
+- Sigue claro en oscuro: el odontograma de Clinical Mode y las ilustraciones de Help / Under construction.
 
 ### Settings › Fee schedules con el diseño de Coverage tables (CON-57) ([#202](https://github.com/JulianGerardi/red-dental-studio/pull/202))
 - **Una sola pantalla** para `/settings/finance/fee-schedule` y `…/:feeId/edit`: `SettingsFeeSchedules` arma lista y editor

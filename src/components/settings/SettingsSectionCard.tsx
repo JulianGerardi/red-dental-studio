@@ -33,7 +33,7 @@ export function SettingsSectionCard({
           {atajos.map((a) => (
             <Link
               key={a.to} to={a.to}
-              className="rounded-md border border-line bg-white px-2.5 py-1 text-[12px] font-semibold text-dash-blue transition-colors hover:bg-info-bg focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-dash-blue"
+              className="rounded-md border border-line bg-surface px-2.5 py-1 text-[12px] font-semibold text-dash-blue transition-colors hover:bg-info-bg focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-dash-blue"
             >
               {a.label}
             </Link>

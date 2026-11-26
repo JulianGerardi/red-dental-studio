@@ -16,7 +16,7 @@ export function Stage({ children, className = '' }: { children: React.ReactNode;
 
 export function Panel({ title, children, className = '' }: { title?: string; children?: React.ReactNode; className?: string }) {
   return (
-    <div className={`rounded-lg border border-line bg-white p-2.5 shadow-sm ${className}`}>
+    <div className={`rounded-lg border border-line bg-surface p-2.5 shadow-sm ${className}`}>
       {title && <p className="text-[10px] font-bold text-ink">{title}</p>}
       {children}
     </div>
@@ -36,7 +36,7 @@ export function DateDrivesPanelsDemo() {
   return (
     <Stage className="p-3">
       <span
-        className="flex w-fit items-center gap-1.5 rounded-lg border border-line bg-white px-2 py-1 text-[10px] font-semibold text-ink shadow-sm"
+        className="flex w-fit items-center gap-1.5 rounded-lg border border-line bg-surface px-2 py-1 text-[10px] font-semibold text-ink shadow-sm"
         style={{ animation: 'tour-pulse 4s ease-in-out infinite' }}
       >
         {/* El bloque de fecha del Dashboard (ui/date-nav): ‹ Today › y el día. */}
@@ -97,7 +97,7 @@ export function ReschedulePopoverDemo() {
     <Stage className="p-3">
       <Panel title="10:00 AM · Noah Smith" className="w-[150px]" />
       <div
-        className="absolute top-[70px] left-6 w-[160px] rounded-lg border border-line bg-white p-2 shadow-md"
+        className="absolute top-[70px] left-6 w-[160px] rounded-lg border border-line bg-surface p-2 shadow-md"
         style={{ animation: 'tour-card-in 4s .6s ease-out infinite' }}
       >
         <p className="text-[9px] font-semibold text-ink">Reschedule</p>
@@ -117,8 +117,8 @@ export function AddPatientDemo() {
         <Plus className="size-3" /> New patient
       </span>
       <div className="w-[150px] space-y-1.5 overflow-hidden" style={{ animation: 'tour-expand 4s ease-in-out infinite' }}>
-        <div className="h-5 rounded-md border border-line bg-white px-1.5 text-[8px] leading-5 text-ink-faint">First name</div>
-        <div className="h-5 rounded-md border border-line bg-white px-1.5 text-[8px] leading-5 text-ink-faint">Last name</div>
+        <div className="h-5 rounded-md border border-line bg-surface px-1.5 text-[8px] leading-5 text-ink-faint">First name</div>
+        <div className="h-5 rounded-md border border-line bg-surface px-1.5 text-[8px] leading-5 text-ink-faint">Last name</div>
       </div>
     </Stage>
   )
@@ -128,12 +128,12 @@ export function PatientSearchDemo() {
   const filas = ['Noah Smith', 'Maria Viola']
   return (
     <Stage className="p-3">
-      <div className="relative flex h-7 items-center rounded-md border border-line bg-white px-2 text-[10px] text-ink" style={{ animation: 'tour-pulse 4s ease-in-out infinite' }}>
+      <div className="relative flex h-7 items-center rounded-md border border-line bg-surface px-2 text-[10px] text-ink" style={{ animation: 'tour-pulse 4s ease-in-out infinite' }}>
         <Search className="mr-1.5 size-3 text-ink-faint" /> Noa
       </div>
       <div className="mt-2 space-y-1.5">
         {filas.map((f, i) => (
-          <div key={f} className="rounded-md border border-line bg-white px-2 py-1 text-[9px] font-medium text-ink" style={{ animation: `tour-card-in 4s ${0.4 + i * 0.2}s ease-out infinite` }}>
+          <div key={f} className="rounded-md border border-line bg-surface px-2 py-1 text-[9px] font-medium text-ink" style={{ animation: `tour-card-in 4s ${0.4 + i * 0.2}s ease-out infinite` }}>
             {f}
           </div>
         ))}
@@ -178,7 +178,7 @@ export function AddRelationshipDemo() {
 export function CalendarOverviewDemo() {
   return (
     <Stage>
-      <div className="absolute inset-0 flex bg-white">
+      <div className="absolute inset-0 flex bg-surface">
         <div className="w-8 shrink-0 pt-1">
           {['08', '09', '10', '11'].map((h) => <div key={h} className="h-9 pr-1.5 text-right text-[8px] text-ink-faint">{h}</div>)}
         </div>
@@ -221,7 +221,7 @@ export function ClinicalTakeoverDemo() {
         <div className="shrink-0 space-y-1.5 overflow-hidden bg-[#0b1220] p-2" style={{ animation: 'tour-rail-collapse 4s ease-in-out infinite' }}>
           {[0, 1, 2].map((i) => <div key={i} className="h-2 w-24 rounded-full bg-white/15" />)}
         </div>
-        <div className="flex flex-1 items-center justify-center bg-white">
+        <div className="flex flex-1 items-center justify-center bg-surface">
           <LayoutGrid className="size-6 text-ink-faint" style={{ animation: 'tour-card-in 4s .5s ease-out infinite' }} />
         </div>
       </div>
@@ -232,11 +232,11 @@ export function ClinicalTakeoverDemo() {
 export function ClinicalSectionsDemo() {
   return (
     <Stage className="flex flex-col justify-center gap-2 p-3">
-      <div className="flex items-center gap-2 rounded-lg border border-line bg-white p-2" style={{ animation: 'tour-card-in 4s .2s ease-out infinite' }}>
+      <div className="flex items-center gap-2 rounded-lg border border-line bg-surface p-2" style={{ animation: 'tour-card-in 4s .2s ease-out infinite' }}>
         <ClipboardList className="size-3.5 shrink-0 text-dash-blue" />
         <span className="text-[10px] font-semibold text-ink">Treatment plan</span>
       </div>
-      <div className="flex items-center gap-2 rounded-lg border border-line bg-white p-2" style={{ animation: 'tour-card-in 4s .4s ease-out infinite' }}>
+      <div className="flex items-center gap-2 rounded-lg border border-line bg-surface p-2" style={{ animation: 'tour-card-in 4s .4s ease-out infinite' }}>
         <FileCheck2 className="size-3.5 shrink-0 text-dash-blue" />
         <span className="text-[10px] font-semibold text-ink">Consent</span>
       </div>
@@ -250,7 +250,7 @@ export function NewLocationDemo() {
       <span className="bg-dash-blue flex items-center gap-1.5 rounded-md px-3 py-1.5 text-[10px] font-medium text-white" style={{ animation: 'tour-pulse 4s ease-in-out infinite' }}>
         <Plus className="size-3" /> New location
       </span>
-      <div className="flex w-[170px] items-center justify-between rounded-md border border-line bg-white px-2 py-1.5" style={{ animation: 'tour-card-in 4s .5s ease-out infinite' }}>
+      <div className="flex w-[170px] items-center justify-between rounded-md border border-line bg-surface px-2 py-1.5" style={{ animation: 'tour-card-in 4s .5s ease-out infinite' }}>
         <span className="text-[9px] font-semibold text-dash-blue">Downtown Clinic</span>
         <span className="text-[8px] text-ink-muted">0 staff</span>
       </div>
@@ -284,7 +284,7 @@ export function SettingsMenuDemo({ resaltarComingSoon = false }: { resaltarComin
   const items = ['General', 'Locations', 'Employees', 'Finance']
   return (
     <Stage className="p-2.5">
-      <div className="w-[140px] rounded-lg border border-line bg-white p-1">
+      <div className="w-[140px] rounded-lg border border-line bg-surface p-1">
         {items.map((it, i) => (
           <div
             key={it}

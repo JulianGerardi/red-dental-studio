@@ -327,7 +327,7 @@ export function OpcionDrawer({ on, onMarcar, onElegir, children }: { on: boolean
       onClick={onMarcar}
       onDoubleClick={onElegir}
       className={cn(
-        'flex items-start justify-between gap-3 rounded-lg border bg-white p-3 text-left transition-colors',
+        'flex items-start justify-between gap-3 rounded-lg border bg-surface p-3 text-left transition-colors',
         on ? 'border-dash-blue bg-info-bg' : 'border-line hover:bg-surface-subtle',
       )}
     >

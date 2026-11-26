@@ -191,7 +191,7 @@ export function LabOrderDetail({ tarea, abierto, onVolver, onAccion }: {
                 key={d} type="button" aria-pressed={denticion === d} onClick={() => elegirDenticion(d)}
                 className={cn(
                   'flex h-7 items-center rounded-md px-3 text-[12px] font-medium transition-colors focus-visible:outline-2 focus-visible:outline-dash-blue',
-                  denticion === d ? 'bg-white text-dash-blue shadow-sm' : 'text-ink-muted hover:text-ink',
+                  denticion === d ? 'bg-surface text-dash-blue shadow-sm' : 'text-ink-muted hover:text-ink',
                 )}
               >
                 {d}

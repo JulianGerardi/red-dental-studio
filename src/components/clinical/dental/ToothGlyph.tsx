@@ -113,7 +113,7 @@ export function OcclusalView({
     <svg
       viewBox={`0 0 ${W} ${H}`}
       className={cn(
-        'h-[34px] w-10 rounded-[5px] border bg-white transition-colors',
+        'h-[34px] w-10 rounded-[5px] border bg-surface transition-colors',
         seleccionado ? 'border-primary ring-primary/40 ring-2' : 'border-line-strong',
         ausente && 'opacity-40',
       )}

@@ -117,7 +117,7 @@ export function Tabs<T extends string>({
             {t.count !== undefined && t.count > 0 && <span className={cn('tabular-nums', activa ? 'text-white/80' : 'text-ink-faint')}>({t.count})</span>}
             {t.alerta && (
               <>
-                <span aria-hidden className={cn('size-1.5 shrink-0 rounded-full', activa ? 'bg-white ring-2 ring-field-error' : 'bg-field-error')} />
+                <span aria-hidden className={cn('size-1.5 shrink-0 rounded-full', activa ? 'bg-surface ring-2 ring-field-error' : 'bg-field-error')} />
                 <span className="sr-only">has errors</span>
               </>
             )}

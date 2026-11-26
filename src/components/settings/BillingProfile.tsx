@@ -264,7 +264,7 @@ export function ContractedWith({
   }
 
   return (
-    <section className="rounded-lg bg-white p-4 shadow-panel sm:p-5">
+    <section className="rounded-lg bg-surface p-4 shadow-panel sm:p-5">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <h2 className="text-sm font-bold text-ink">Contracted with</h2>

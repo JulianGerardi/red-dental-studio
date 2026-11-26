@@ -102,7 +102,7 @@ export function NewHoursModal({ onClose }: { onClose: () => void }) {
                   className={cn(
                     'flex size-8 items-center justify-center rounded-md border text-[13px] font-semibold transition-colors',
                     on
-                      ? 'border-dash-blue text-dash-blue bg-white'
+                      ? 'border-dash-blue text-dash-blue bg-surface'
                       : 'border-transparent text-ink-faint hover:bg-surface-muted',
                   )}
                 >

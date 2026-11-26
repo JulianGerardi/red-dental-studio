@@ -71,7 +71,7 @@ export function Flotante({
       role="dialog"
       aria-label={titulo}
       style={{ left, top: ancla.bottom + 6, width: ancho }}
-      className="motion-safe:animate-[loc-in_120ms_ease-out] fixed z-50 rounded-lg border border-line bg-white p-3 shadow-floating"
+      className="motion-safe:animate-[loc-in_120ms_ease-out] fixed z-50 rounded-lg border border-line bg-surface p-3 shadow-floating"
     >
       <p className="text-[13px] font-bold text-ink">{titulo}</p>
       {children}

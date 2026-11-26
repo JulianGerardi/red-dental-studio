@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import {
   PanelLeftOpen, PanelLeftClose, Search, BellDot, ChevronDown,
-  CircleUserRound, CreditCard, CircleHelp, Info, LogOut, EyeOff, ArrowRight, CheckCheck,
+  CircleUserRound, CreditCard, CircleHelp, Info, LogOut, EyeOff, ArrowRight, CheckCheck, Moon, Sun,
 } from 'lucide-react'
 import { LocationSelector } from './LocationSelector'
 import { Saludo } from './Saludo'
@@ -15,6 +15,8 @@ import { aviso } from '@/components/ui/toaster'
 import { cn } from '@/lib/utils'
 import { ANCHO_PAGINA } from '@/lib/estilos'
 import { Avatar } from '@/components/ui/avatar'
+import { Switch } from '@/components/ui/switch'
+import { useTema } from '@/lib/tema'
 
 /* Figma 3636:57489 (Secretary) y 3605:56446 (Provider). Alto 64, fondo blanco.
    El glifo ⌘ del buscador aparece solo en el frame Provider — en recepcionista
@@ -52,7 +54,7 @@ export function Topbar({
   const ToggleIcon = expanded ? PanelLeftClose : PanelLeftOpen
 
   return (
-    <header className="h-16 shrink-0 bg-white">
+    <header className="h-16 shrink-0 bg-surface">
       <div className={cn(ANCHO_PAGINA, 'flex h-full items-center gap-2 pr-3 pl-[13px] sm:gap-3 sm:pr-4')}>
       {/* Left Section del Figma: greeting a la izquierda, grupo de controles
           empujado contra su borde derecho (justify-between).
@@ -69,7 +71,7 @@ export function Topbar({
           aria-label={expanded ? 'Collapse sidebar' : 'Expand sidebar'}
           aria-expanded={expanded}
           className={cn(
-            'flex size-8 items-center justify-center rounded-md border border-line bg-white',
+            'flex size-8 items-center justify-center rounded-md border border-line bg-surface',
             'text-ink-soft transition-all duration-150 hover:bg-surface-subtle',
             'active:scale-90 motion-reduce:transition-none motion-reduce:active:scale-100',
           )}
@@ -117,6 +119,8 @@ const CUENTA = [
 
 export function MenuCuenta() {
   const navigate = useNavigate()
+  const [tema, setTema] = useTema()
+  const oscuro = tema === 'Dark'
 
   return (
     <DropdownMenu>
@@ -140,6 +144,18 @@ export function MenuCuenta() {
             <Icon className="size-4 shrink-0" /> {label}
           </DropdownMenuItem>
         ))}
+        <DropdownMenuSeparator />
+        {/* Atajo al tema de Preferences: toda la fila es el switch y el menú queda abierto para ver el cambio
+            (preferences.md, 2026-11-26). El Switch es sólo el dibujo. */}
+        <DropdownMenuItem
+          role="menuitemcheckbox" aria-checked={oscuro}
+          onSelect={(e) => { e.preventDefault(); setTema(oscuro ? 'Light' : 'Dark') }}
+          className="gap-2.5 py-2 text-[13px]"
+        >
+          {oscuro ? <Moon className="size-4 shrink-0" /> : <Sun className="size-4 shrink-0" />}
+          <span className="flex-1">Dark mode</span>
+          <Switch checked={oscuro} tabIndex={-1} aria-hidden className="pointer-events-none" />
+        </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem onSelect={() => navigate('/help')} className="gap-2.5 py-2 text-[13px]">
           <Info className="size-4 shrink-0" /> Help center
@@ -271,7 +287,7 @@ export function GlobalSearch({ showCommandHint }: { showCommandHint: boolean }) 
         onFocus={() => setOpen(true)}
         placeholder="Search..."
         className={cn(
-          'h-7 w-full rounded-md border border-line bg-white pl-8 text-[12px] font-medium',
+          'h-7 w-full rounded-md border border-line bg-surface pl-8 text-[12px] font-medium',
           'shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] placeholder:text-ink-faint',
           'focus:border-dash-blue focus:outline-none',
           showCommandHint ? 'pr-8' : 'pr-3',
@@ -283,7 +299,7 @@ export function GlobalSearch({ showCommandHint }: { showCommandHint: boolean }) 
         </span>
       )}
       {open && q.trim() && (
-        <div className="motion-safe:animate-[loc-in_120ms_ease-out] absolute top-[calc(100%+4px)] left-0 z-50 w-full overflow-hidden rounded-md border border-line bg-white py-1 shadow-lg">
+        <div className="motion-safe:animate-[loc-in_120ms_ease-out] absolute top-[calc(100%+4px)] left-0 z-50 w-full overflow-hidden rounded-md border border-line bg-surface py-1 shadow-lg">
           {resultados.length === 0 ? (
             <p className="px-3 py-2 text-[13px] text-ink-faint">No results for “{q}”</p>
           ) : (

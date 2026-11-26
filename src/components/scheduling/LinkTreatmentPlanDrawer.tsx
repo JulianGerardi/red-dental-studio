@@ -28,7 +28,7 @@ export function LinkTreatmentPlanDrawer({ onClose }: { onClose: () => void }) {
         role="dialog"
         aria-label="Link to treatment plan visit"
         onClick={(e) => e.stopPropagation()}
-        className="flex h-full w-[480px] max-w-full flex-col overflow-y-auto bg-white p-6 shadow-2xl"
+        className="flex h-full w-[480px] max-w-full flex-col overflow-y-auto bg-surface p-6 shadow-2xl"
       >
         <div className="flex items-start justify-between gap-2">
           <h2 className="text-xl font-bold text-ink">Link to treatment plan visit</h2>
@@ -51,7 +51,7 @@ export function LinkTreatmentPlanDrawer({ onClose }: { onClose: () => void }) {
                 )}
               >
                 <div className="flex items-center justify-between gap-2">
-                  <span className="rounded-full border border-dash-ok-fg bg-white px-2 py-[2px] text-[11px] font-semibold text-dash-ok-fg">
+                  <span className="rounded-full border border-dash-ok-fg bg-surface px-2 py-[2px] text-[11px] font-semibold text-dash-ok-fg">
                     Check in
                   </span>
                   <span className="text-[13px] font-bold text-ink">{p.date}</span>
@@ -118,7 +118,7 @@ export function LinkTreatmentPlanDrawer({ onClose }: { onClose: () => void }) {
         <div className="mt-6 flex justify-end gap-3 pb-2">
           <button
             onClick={onClose}
-            className="h-9 rounded-md border border-line bg-white px-6 text-[13px] font-medium hover:bg-surface-subtle"
+            className="h-9 rounded-md border border-line bg-surface px-6 text-[13px] font-medium hover:bg-surface-subtle"
           >
             Cancel
           </button>

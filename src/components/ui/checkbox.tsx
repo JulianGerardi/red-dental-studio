@@ -24,7 +24,7 @@ export function Checkbox({
         'flex size-4 shrink-0 items-center justify-center rounded border transition-colors',
         'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-dash-blue',
         'disabled:cursor-not-allowed disabled:border-line disabled:bg-surface-muted disabled:text-ink-faint',
-        on ? 'border-dash-blue bg-dash-blue text-white' : 'border-line-strong bg-white hover:border-ink-faint',
+        on ? 'border-dash-blue bg-dash-blue text-white' : 'border-line-strong bg-surface hover:border-ink-faint',
         className,
       )}
     >

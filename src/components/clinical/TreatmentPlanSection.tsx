@@ -159,7 +159,7 @@ export function AccionCaso({
           </button>
         </span>
       </TooltipTrigger>
-      <TooltipContent side="top" sideOffset={4} className="bg-ink text-white">
+      <TooltipContent side="top" sideOffset={4} className="bg-tooltip text-white">
         {habilitado ? tooltip : tooltipDeshabilitado}
       </TooltipContent>
     </Tooltip>
@@ -426,7 +426,7 @@ export function Rail({
   }, [casoId, vista])
 
   return (
-    <nav aria-label="Treatment plans" className="flex shrink-0 flex-col self-start rounded-lg bg-white shadow-panel p-2 lg:max-h-[720px] lg:w-[300px]">
+    <nav aria-label="Treatment plans" className="flex shrink-0 flex-col self-start rounded-lg bg-surface shadow-panel p-2 lg:max-h-[720px] lg:w-[300px]">
       <button
         onClick={onUnassigned}
         aria-current={vista === 'unassigned' ? 'page' : undefined}
@@ -464,7 +464,7 @@ export function Rail({
                       <li key={c.id} className="relative before:absolute before:top-1/2 before:-left-3 before:w-2.5 before:border-t before:border-line">
                         {/* El punto del estado va sobre la línea del árbol, al inicio de cada caso. */}
                         <ConAyuda texto={c.estado}>
-                          <span aria-label={c.estado} className={cn('absolute top-1/2 -left-[16.5px] z-10 size-2 -translate-y-1/2 rounded-full ring-2 ring-white', PUNTO_CASO[c.estado])} />
+                          <span aria-label={c.estado} className={cn('absolute top-1/2 -left-[16.5px] z-10 size-2 -translate-y-1/2 rounded-full ring-2 ring-surface', PUNTO_CASO[c.estado])} />
                         </ConAyuda>
                         <button
                           onClick={() => onCaso(c.id)}
@@ -512,7 +512,7 @@ export function Casilla({ on, onChange, label }: { on: boolean; onChange: (v: bo
       onClick={() => onChange(!on)}
       className={cn(
         'flex size-4 shrink-0 items-center justify-center rounded border transition-colors',
-        on ? 'border-dash-blue bg-dash-blue text-white' : 'border-line-strong bg-white hover:border-ink-faint',
+        on ? 'border-dash-blue bg-dash-blue text-white' : 'border-line-strong bg-surface hover:border-ink-faint',
       )}
     >
       {on && <Check className="size-3" strokeWidth={3} />}
@@ -744,7 +744,7 @@ function moverEnVisitas(visitas: Visita[], id: string, destino: string | null): 
 /* El turno de la visita (como "No appointment" en la app real): sin turno, avisa que el encuentro no tiene uno activo;
    con turno, muestra la fecha y abre el detalle. */
 export function CitaVisita({ cita }: { cita?: Cita }) {
-  const boton = 'flex h-7 shrink-0 items-center gap-1.5 rounded-md border border-line bg-white px-2.5 text-[12px] font-medium shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] transition-colors hover:bg-surface-subtle'
+  const boton = 'flex h-7 shrink-0 items-center gap-1.5 rounded-md border border-line bg-surface px-2.5 text-[12px] font-medium shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] transition-colors hover:bg-surface-subtle'
   if (!cita) {
     return (
       <button type="button" onClick={() => aviso.error('No active appointment. There is no active appointment in the current encounter.')} className={cn(boton, 'text-ink-medium')}>
@@ -839,7 +839,7 @@ export function VistaCaso({
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="rounded-lg bg-white shadow-panel p-4 sm:p-5">
+      <div className="rounded-lg bg-surface shadow-panel p-4 sm:p-5">
         {caso.sinPermiso && (
           <Alert tone="warning" title="Limited access to this treatment case" className="mb-4">
             You do not have permission to update treatment plans for this location.
@@ -852,7 +852,7 @@ export function VistaCaso({
             aria-pressed={favorito}
             className={cn(
               'flex size-9 shrink-0 items-center justify-center rounded-lg transition-colors',
-              favorito ? 'bg-dash-blue text-white' : 'border border-line bg-white text-ink hover:bg-surface-subtle',
+              favorito ? 'bg-dash-blue text-white' : 'border border-line bg-surface text-ink hover:bg-surface-subtle',
             )}
           >
             <Bookmark className="size-4" fill={favorito ? 'currentColor' : 'none'} />
@@ -1003,7 +1003,7 @@ export function VistaCaso({
             onDragOver={planificando ? sobre(v.id) : undefined}
             onDragLeave={planificando ? () => setSoltando(null) : undefined}
             onDrop={planificando ? soltar(v.id) : undefined}
-            className={cn('overflow-hidden rounded-xl border bg-white transition-colors', soltando === v.id ? 'border-dash-blue ring-dash-blue/30 ring-2' : 'border-line')}
+            className={cn('overflow-hidden rounded-xl border bg-surface transition-colors', soltando === v.id ? 'border-dash-blue ring-dash-blue/30 ring-2' : 'border-line')}
           >
             <div className="bg-dash-blue px-4 py-2 text-[13px] font-semibold text-white">
               {v.nombre} - {v.total}
@@ -1335,7 +1335,7 @@ export function TreatmentPlanSection({ casoInicial, estimadoInicial, consentimie
         )}
 
         {vista === 'unassigned' ? (
-          <div className="rounded-lg bg-white shadow-panel p-4 sm:p-5">
+          <div className="rounded-lg bg-surface shadow-panel p-4 sm:p-5">
             <div className="flex flex-wrap items-center gap-3">
               <p className="min-w-0 flex-1 text-[17px] font-bold text-ink">Unassigned</p>
               {['New case group', 'New alternative case'].map((t) => (

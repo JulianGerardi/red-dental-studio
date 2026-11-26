@@ -39,7 +39,7 @@ const TAMANO = {
 export const filterTriggerClasses = (size: keyof typeof TAMANO = 'md', aplicado = false) => cn(
   'focus-visible:outline-dash-blue inline-flex shrink-0 items-center rounded-md border font-medium whitespace-nowrap shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] transition-colors disabled:pointer-events-none disabled:opacity-50',
   TAMANO[size],
-  aplicado ? 'border-dash-blue bg-info-bg text-dash-blue' : 'data-[state=open]:border-dash-blue border-line bg-white text-ink hover:bg-surface-subtle',
+  aplicado ? 'border-dash-blue bg-info-bg text-dash-blue' : 'data-[state=open]:border-dash-blue border-line bg-surface text-ink hover:bg-surface-subtle',
 )
 
 /* El botón del filtro. Solo, sin menú, sirve para los filtros que todavía no filtran. */
@@ -133,7 +133,7 @@ export function FilterMenu({
                   /* El menú busca por la letra que se toca: acá las teclas son del campo. */
                   onKeyDown={(e) => e.stopPropagation()}
                   placeholder={search.placeholder ?? 'Search...'}
-                  className="focus:border-dash-blue h-8 w-full rounded-md border border-line bg-white pr-2 pl-8 text-[12px] placeholder:text-ink-faint focus:outline-none"
+                  className="focus:border-dash-blue h-8 w-full rounded-md border border-line bg-surface pr-2 pl-8 text-[12px] placeholder:text-ink-faint focus:outline-none"
                 />
               </span>
             </label>

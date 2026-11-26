@@ -28,7 +28,7 @@ export function NotificationBanner({
       <div className="flex w-full items-center justify-center border-b border-warn-fg/25 bg-warn-bg">
         <button
           type="button" onClick={() => setColapsado(false)}
-          className="flex items-center gap-1.5 px-3 py-1 text-[11px] font-semibold text-attn-fg hover:bg-white/60"
+          className="flex items-center gap-1.5 px-3 py-1 text-[11px] font-semibold text-attn-fg hover:bg-surface/60"
         >
           {items.length} pending {items.length === 1 ? 'notification' : 'notifications'}
           <ChevronDown aria-hidden className="size-3.5" />
@@ -39,7 +39,7 @@ export function NotificationBanner({
 
   const contenido = (
     <>
-      <span className="flex size-7 shrink-0 items-center justify-center rounded-full bg-white text-attn-fg">
+      <span className="flex size-7 shrink-0 items-center justify-center rounded-full bg-surface text-attn-fg">
         <Icono className="size-3.5" />
       </span>
       <span className="min-w-0">
@@ -48,17 +48,17 @@ export function NotificationBanner({
       </span>
       <Link
         to={actual.to}
-        className="shrink-0 rounded-full border border-attn-fg/30 bg-white px-2.5 py-0.5 text-[12px] font-semibold text-attn-fg transition-colors hover:border-attn-fg"
+        className="shrink-0 rounded-full border border-attn-fg/30 bg-surface px-2.5 py-0.5 text-[12px] font-semibold text-attn-fg transition-colors hover:border-attn-fg"
       >
         {actual.accion}
       </Link>
       {items.length > 1 && (
         <span className="flex shrink-0 items-center gap-0.5 border-l border-attn-fg/20 pl-2">
-          <button type="button" onClick={() => mover(-1)} aria-label="Previous notification" className="flex size-6 items-center justify-center rounded-md text-attn-fg hover:bg-white">
+          <button type="button" onClick={() => mover(-1)} aria-label="Previous notification" className="flex size-6 items-center justify-center rounded-md text-attn-fg hover:bg-surface">
             <ChevronLeft className="size-4" />
           </button>
           <span className="text-[11px] font-semibold whitespace-nowrap text-attn-fg tabular-nums">{cursor + 1} of {items.length}</span>
-          <button type="button" onClick={() => mover(1)} aria-label="Next notification" className="flex size-6 items-center justify-center rounded-md text-attn-fg hover:bg-white">
+          <button type="button" onClick={() => mover(1)} aria-label="Next notification" className="flex size-6 items-center justify-center rounded-md text-attn-fg hover:bg-surface">
             <ChevronRight className="size-4" />
           </button>
         </span>
@@ -66,13 +66,13 @@ export function NotificationBanner({
       <span className="ml-auto flex shrink-0 items-center gap-0.5">
         <button
           type="button" onClick={() => setColapsado(true)} aria-label="Collapse banner" title="Collapse — shows again with the arrow"
-          className="flex size-6 items-center justify-center rounded-md text-attn-fg/70 hover:bg-white hover:text-attn-fg"
+          className="flex size-6 items-center justify-center rounded-md text-attn-fg/70 hover:bg-surface hover:text-attn-fg"
         >
           <ChevronUp className="size-4" />
         </button>
         <button
           type="button" onClick={() => onOcultar(actual.id)} aria-label={`Hide from banner: ${actual.titulo}`} title="Hide from banner — stays in notifications"
-          className="flex size-6 items-center justify-center rounded-md text-attn-fg/70 hover:bg-white hover:text-attn-fg"
+          className="flex size-6 items-center justify-center rounded-md text-attn-fg/70 hover:bg-surface hover:text-attn-fg"
         >
           <X className="size-4" />
         </button>

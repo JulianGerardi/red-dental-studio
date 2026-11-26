@@ -198,7 +198,7 @@ export function EstimateDetails({ caso, estimacion, onVolver, onCalcular }: {
                       </tr>
                       {abierta && g.filas.map((f) => (
                         <tr key={f.id} className="border-t border-line-row text-ink-soft">
-                          <td className={cn(FIJA, 'max-w-0 bg-white px-4 py-3')}>
+                          <td className={cn(FIJA, 'max-w-0 bg-surface px-4 py-3')}>
                             <span className="block truncate" title={`${f.codigo} ${f.nombre}`}>
                               <span className="mr-1.5 font-semibold text-ink">{f.codigo}</span>{f.nombre}
                             </span>
@@ -264,7 +264,7 @@ export function PrototypeControls({ situacion, onEscenario, onSimular, fallar, o
 }) {
   const calculando = situacion === 'calculando'
   return (
-    <div className="flex flex-wrap items-center gap-x-4 gap-y-2.5 rounded-lg border border-dashed border-line-strong bg-white/60 px-4 py-3">
+    <div className="flex flex-wrap items-center gap-x-4 gap-y-2.5 rounded-lg border border-dashed border-line-strong bg-surface/60 px-4 py-3">
       <span className="text-[11px] font-semibold tracking-wide text-ink-muted uppercase">Prototype controls</span>
       <SelectField
         label="Estimate scenario"

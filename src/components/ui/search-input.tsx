@@ -38,7 +38,7 @@ export const SearchInput = React.forwardRef<HTMLInputElement, SearchInputProps>(
           placeholder={placeholder}
           aria-label={ariaLabel ?? placeholder}
           className={cn(
-            'focus:border-dash-blue w-full rounded-md border border-line bg-white shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] placeholder:text-ink-faint focus:outline-none disabled:cursor-not-allowed disabled:bg-surface-muted',
+            'focus:border-dash-blue w-full rounded-md border border-line bg-surface shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] placeholder:text-ink-faint focus:outline-none disabled:cursor-not-allowed disabled:bg-surface-muted',
             t.caja, clearable && value ? 'pr-8' : 'pr-3',
           )}
           {...props}

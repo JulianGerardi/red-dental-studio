@@ -28,7 +28,7 @@ export function LedgerAllocationTable({
   return (
     <section aria-label="Ledger transactions" className="flex flex-col gap-3">
       <h2 className="text-sm font-bold text-ink">Ledger transactions</h2>
-      <div className="overflow-x-auto rounded-lg border border-line bg-white" aria-busy={cargando || undefined}>
+      <div className="overflow-x-auto rounded-lg border border-line bg-surface" aria-busy={cargando || undefined}>
         <div className="min-w-[940px]">
           <div className={cn('grid bg-surface-alt py-2.5 text-[12px] font-semibold text-ink-muted', COLUMNAS)}>
             {['Txn date', 'Patient', 'Provider', 'Code', 'Description'].map((t) => <span key={t} className={celda}>{t}</span>)}
@@ -68,7 +68,7 @@ export function LedgerAllocationTable({
                       aria-label={`Applied to ${c.descripcion}`}
                       aria-invalid={excedido || undefined}
                       className={cn(
-                        'h-8 w-full rounded-md border bg-white px-2 text-right text-[13px] tabular-nums shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] placeholder:text-ink-faint focus:outline-none',
+                        'h-8 w-full rounded-md border bg-surface px-2 text-right text-[13px] tabular-nums shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] placeholder:text-ink-faint focus:outline-none',
                         excedido ? 'border-field-error' : 'border-line focus:border-dash-blue',
                       )}
                     />
@@ -83,7 +83,7 @@ export function LedgerAllocationTable({
             <span className="text-[12px] font-semibold text-ink-muted">
               Showing {cargando ? '…' : cargos.length} open {cargos.length === 1 ? 'transaction' : 'transactions'}
             </span>
-            <dl className="w-fit overflow-hidden rounded-md border border-line bg-white text-[13px]">
+            <dl className="w-fit overflow-hidden rounded-md border border-line bg-surface text-[13px]">
               <div className="flex items-center">
                 <dt className="w-40 bg-surface-alt px-3 py-2 text-right font-medium whitespace-nowrap text-ink-soft">Amount not applied</dt>
                 <dd className="w-24 px-3 py-2 text-right font-semibold tabular-nums text-ink">{moneda(noAplicado)}</dd>

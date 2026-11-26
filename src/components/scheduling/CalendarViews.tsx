@@ -145,7 +145,7 @@ export function VistaHoras({ dias, ...props }: Props & { dias: Date[] }) {
   return (
     /* Una sola columna entra en cualquier pantalla; siete necesitan un ancho
        mínimo y scroll propio. */
-    <div className="mt-4 overflow-x-auto rounded-lg border border-line bg-white">
+    <div className="mt-4 overflow-x-auto rounded-lg border border-line bg-surface">
       <div className={dias.length > 1 ? 'min-w-[760px]' : 'min-w-0'}>
         <Cabecera dias={dias} hoy={props.fecha} />
         <div className="relative flex">
@@ -194,7 +194,7 @@ export function VistaMes({ eventos, fecha, onMover, onAbrir }: Props) {
   const hoy = new Date()
 
   return (
-    <div className="mt-4 overflow-x-auto rounded-lg border border-line bg-white">
+    <div className="mt-4 overflow-x-auto rounded-lg border border-line bg-surface">
       {/* En celular el mes entra completo: las celdas muestran un punto por
           turno en vez del chip con nombre, como hace Google Calendar. */}
       <div className="md:min-w-[700px]">

@@ -14,7 +14,7 @@ export function FindingCard({
 }) {
   const style = STATUS_STYLE[finding.status]
   return (
-    <div className={`flex flex-col gap-2.5 rounded-md border-l-[3px] bg-white px-2.5 py-3 shadow-sm ${style.rail} ${className}`}>
+    <div className={`flex flex-col gap-2.5 rounded-md border-l-[3px] bg-surface px-2.5 py-3 shadow-sm ${style.rail} ${className}`}>
       <div className="flex w-full items-center justify-between gap-2">
         <div className="flex min-w-0 flex-wrap items-center gap-2">
           <span className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-semibold ${style.badge}`}>

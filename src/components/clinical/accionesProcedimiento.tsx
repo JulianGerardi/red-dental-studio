@@ -98,7 +98,7 @@ export function ItemsAcciones({ grupos, onElegir }: { grupos: ItemAccion[][]; on
             return (
               <Tooltip key={accion}>
                 <TooltipTrigger asChild>{item}</TooltipTrigger>
-                <TooltipContent side="left" className="max-w-[260px] bg-ink leading-snug text-white">{BLOQUEO_EJECUCION}</TooltipContent>
+                <TooltipContent side="left" className="max-w-[260px] bg-tooltip leading-snug text-white">{BLOQUEO_EJECUCION}</TooltipContent>
               </Tooltip>
             )
           })}
