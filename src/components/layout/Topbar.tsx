@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import {
   PanelLeftOpen, PanelLeftClose, Search, BellDot, ChevronDown,
-  CircleUserRound, CreditCard, CircleHelp, Info, LogOut, EyeOff, ArrowRight, CheckCheck,
+  CircleUserRound, CreditCard, CircleHelp, Info, LogOut, EyeOff, ArrowRight, CheckCheck, Moon, Sun,
 } from 'lucide-react'
 import { LocationSelector } from './LocationSelector'
 import { Saludo } from './Saludo'
@@ -15,6 +15,8 @@ import { aviso } from '@/components/ui/toaster'
 import { cn } from '@/lib/utils'
 import { ANCHO_PAGINA } from '@/lib/estilos'
 import { Avatar } from '@/components/ui/avatar'
+import { Switch } from '@/components/ui/switch'
+import { useTema } from '@/lib/tema'
 
 /* Figma 3636:57489 (Secretary) y 3605:56446 (Provider). Alto 64, fondo blanco.
    El glifo ⌘ del buscador aparece solo en el frame Provider — en recepcionista
@@ -117,6 +119,8 @@ const CUENTA = [
 
 export function MenuCuenta() {
   const navigate = useNavigate()
+  const [tema, setTema] = useTema()
+  const oscuro = tema === 'Dark'
 
   return (
     <DropdownMenu>
@@ -140,6 +144,18 @@ export function MenuCuenta() {
             <Icon className="size-4 shrink-0" /> {label}
           </DropdownMenuItem>
         ))}
+        <DropdownMenuSeparator />
+        {/* Atajo al tema de Preferences: toda la fila es el switch y el menú queda abierto para ver el cambio
+            (preferences.md, 2026-11-26). El Switch es sólo el dibujo. */}
+        <DropdownMenuItem
+          role="menuitemcheckbox" aria-checked={oscuro}
+          onSelect={(e) => { e.preventDefault(); setTema(oscuro ? 'Light' : 'Dark') }}
+          className="gap-2.5 py-2 text-[13px]"
+        >
+          {oscuro ? <Moon className="size-4 shrink-0" /> : <Sun className="size-4 shrink-0" />}
+          <span className="flex-1">Dark mode</span>
+          <Switch checked={oscuro} tabIndex={-1} aria-hidden className="pointer-events-none" />
+        </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem onSelect={() => navigate('/help')} className="gap-2.5 py-2 text-[13px]">
           <Info className="size-4 shrink-0" /> Help center

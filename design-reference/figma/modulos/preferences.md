@@ -166,3 +166,16 @@ Julián pasó una guía (*Dark mode design: a practical guide*, UX Design Instit
 
 **A validar**: probar con la luz real de recepción y de un consultorio (la guía pide probar con luz fuerte, tenue y a
 oscuras).
+
+## Atajo al tema en My account (2026-11-26)
+
+Julián: *"agregale un switch en My account así lo cambio más rápido, que diga light / dark o con algún ícono"*. Era la
+propuesta aparte de la cuarta vuelta (la guía pide un toggle "a un clic").
+
+1. **Una fila *Dark mode* en el menú de la cuenta** (`MenuCuenta`, Topbar), en su propio grupo entre Support y Help
+   center: sol o luna a la izquierda según el tema activo y el `ui/switch` de la app a la derecha. Un switch y no dos
+   botones Light / Dark: el cambio es al instante y son dos estados, el caso del switch en el design system.
+2. **Toda la fila es el control** (`role="menuitemcheckbox"`, `aria-checked`): se usa con mouse, flechas y Enter como el
+   resto del menú. El `Switch` es sólo el dibujo (`aria-hidden`, sin foco), para no anidar un botón en otro.
+3. **El menú no se cierra al tocarlo** (`preventDefault` en `onSelect`): se ve el cambio y se puede volver atrás.
+4. Usa `useTema` de `lib/tema.ts`, igual que Preferences: los dos quedan sincronizados.
