@@ -69,7 +69,7 @@ export function EstadoConsentimiento({ estado, onAbrir, de, nombre }: {
       {contenido}
     </button>
       </TooltipTrigger>
-      <TooltipContent side="top" className="max-w-[320px] flex-col items-start gap-0.5 bg-ink leading-snug text-white">
+      <TooltipContent side="top" className="max-w-[320px] flex-col items-start gap-0.5 bg-tooltip leading-snug text-white">
         {nombre && <span className="block font-semibold">Procedure Consent - {nombre}</span>}
         {ayuda}
       </TooltipContent>

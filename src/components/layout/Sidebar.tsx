@@ -31,7 +31,7 @@ export function ConTooltip({
   return (
     <Tooltip open={abierto || undefined}>
       <TooltipTrigger asChild>{children}</TooltipTrigger>
-      <TooltipContent side="right" sideOffset={10} className="bg-ink text-white">{label}</TooltipContent>
+      <TooltipContent side="right" sideOffset={10} className="bg-tooltip text-white">{label}</TooltipContent>
     </Tooltip>
   )
 }

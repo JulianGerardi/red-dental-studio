@@ -159,7 +159,7 @@ export function AccionCaso({
           </button>
         </span>
       </TooltipTrigger>
-      <TooltipContent side="top" sideOffset={4} className="bg-ink text-white">
+      <TooltipContent side="top" sideOffset={4} className="bg-tooltip text-white">
         {habilitado ? tooltip : tooltipDeshabilitado}
       </TooltipContent>
     </Tooltip>

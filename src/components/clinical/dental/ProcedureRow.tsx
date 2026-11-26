@@ -31,7 +31,7 @@ export function ConAyuda({ texto, children }: { texto: string; children: React.R
   return (
     <Tooltip>
       <TooltipTrigger asChild>{children}</TooltipTrigger>
-      <TooltipContent side="top" sideOffset={4} className="bg-ink text-white">{texto}</TooltipContent>
+      <TooltipContent side="top" sideOffset={4} className="bg-tooltip text-white">{texto}</TooltipContent>
     </Tooltip>
   )
 }

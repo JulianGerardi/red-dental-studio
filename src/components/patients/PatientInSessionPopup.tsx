@@ -320,7 +320,7 @@ export function PatientInSessionPopup({ onRect }: {
               <PanelRightClose className="size-3.5" />
             </button>
           </TooltipTrigger>
-          <TooltipContent side="left" className="bg-ink text-white">Hide</TooltipContent>
+          <TooltipContent side="left" className="bg-tooltip text-white">Hide</TooltipContent>
         </Tooltip>
       </TooltipProvider>
       {/* El ancho (y, si hace falta, el alto) son lo único que anima: crece desde la pestaña (46px) hasta la card

@@ -200,7 +200,7 @@ export function ConfibotLanzador({
               <PanelRightClose className="size-3.5" />
             </button>
           </TooltipTrigger>
-          <TooltipContent side="left" className="bg-ink text-white">Tuck away</TooltipContent>
+          <TooltipContent side="left" className="bg-tooltip text-white">Tuck away</TooltipContent>
         </Tooltip>
       </TooltipProvider>
       {/* Sólo el ícono, sin el texto "Confibot" que aparecía al hover (Julián, 2026-10-26: así es en el video de

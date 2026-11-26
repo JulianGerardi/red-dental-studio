@@ -203,7 +203,7 @@ export function ExamLayout({ findings: conFindings = true, examen, extra, onCond
                   <span className={ETIQUETA_EXPANDIBLE}>{label}</span>
                 </button>
               </TooltipTrigger>
-              <TooltipContent side="bottom" sideOffset={6} className="bg-ink text-white">{ayuda}</TooltipContent>
+              <TooltipContent side="bottom" sideOffset={6} className="bg-tooltip text-white">{ayuda}</TooltipContent>
             </Tooltip>
           ))}
           <ProblemListFlotante />

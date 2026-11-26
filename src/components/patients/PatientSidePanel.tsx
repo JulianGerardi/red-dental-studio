@@ -165,7 +165,7 @@ export function PatientSidePanel({
     colapsado ? (
       <Tooltip open={vista.tooltip === texto || undefined}>
         <TooltipTrigger asChild>{hijo}</TooltipTrigger>
-        <TooltipContent side="right" className="bg-ink text-white">
+        <TooltipContent side="right" className="bg-tooltip text-white">
           {texto}
         </TooltipContent>
       </Tooltip>

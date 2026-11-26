@@ -34,7 +34,7 @@ export function ProblemListFlotante({ procedimientoInicial }: {
               </button>
             </PopoverTrigger>
           </TooltipTrigger>
-          <TooltipContent side="bottom" sideOffset={6} className="bg-ink text-white">Open the patient&apos;s problem list</TooltipContent>
+          <TooltipContent side="bottom" sideOffset={6} className="bg-tooltip text-white">Open the patient&apos;s problem list</TooltipContent>
         </Tooltip>
         {/* Ancho para que la tabla entre entera, y alto hasta el borde de la pantalla con scroll adentro: con una fila
             abierta se salía por abajo. Ver clinical-mode.md (2026-10-09). */}

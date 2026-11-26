@@ -193,7 +193,7 @@ export function AppointmentDetailsDrawer({
                   <Pencil className="size-4" />
                 </button>
               </TooltipTrigger>
-              <TooltipContent className="max-w-[240px] bg-ink leading-snug text-white">{editable ? 'Edit appointment' : BLOQUEO_EDITAR}</TooltipContent>
+              <TooltipContent className="max-w-[240px] bg-tooltip leading-snug text-white">{editable ? 'Edit appointment' : BLOQUEO_EDITAR}</TooltipContent>
             </Tooltip>
           </TooltipProvider>
         )}
@@ -253,7 +253,7 @@ export function AppointmentDetailsDrawer({
                     <Trash2 /> Delete
                   </Button>
                 </TooltipTrigger>
-                <TooltipContent className="max-w-[240px] bg-ink leading-snug text-white">{BLOQUEO_BORRAR}</TooltipContent>
+                <TooltipContent className="max-w-[240px] bg-tooltip leading-snug text-white">{BLOQUEO_BORRAR}</TooltipContent>
               </Tooltip>
               <span id={idBloqueo} className="sr-only">{BLOQUEO_BORRAR}</span>
             </TooltipProvider>

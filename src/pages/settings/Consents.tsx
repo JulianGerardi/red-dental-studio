@@ -202,7 +202,7 @@ export function ToolbarFormato({ aplica = false }: { aplica?: boolean }) {
                 <f.icono className="size-3.5" />
               </button>
             </TooltipTrigger>
-            <TooltipContent side="top" sideOffset={4} className="bg-ink text-white">{f.label}</TooltipContent>
+            <TooltipContent side="top" sideOffset={4} className="bg-tooltip text-white">{f.label}</TooltipContent>
           </Tooltip>
         ))}
       </TooltipProvider>

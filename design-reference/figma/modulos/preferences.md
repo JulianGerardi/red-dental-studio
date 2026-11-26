@@ -126,3 +126,18 @@ Atlassian, la paleta de Google en Gerrit/Android, el rediseño de Linear):
 
 **A validar con usuarios**: si recepción, que pasa el día con la pantalla, lo prefiere así o más oscuro. Si aparecen
 las dos preferencias, se puede sumar un tercer tema, como GitHub (Dark / Dark dimmed).
+
+### Tercera vuelta: base negra y tooltips (2026-11-26)
+
+Julián: *"no me gusta, buscaría el negro, si no queda muy apagado"* y *"los tooltips quedaron en blanco y no se ven"*.
+Reemplaza los valores de la segunda vuelta; el research sigue valiendo para el texto y los colores.
+
+1. **Base negra, como Vercel o Linear**: página `#050506`, cards `#111113`, menús un escalón más claros. Neutros sin
+   tinte azul (zinc), para que el negro se lea negro.
+2. **Texto `#ececee`**, no blanco puro (lo que sí se queda del research): sobre la card da 16:1 sin "vibrar".
+3. **Colores vivos**: relleno azul `#356fdc` (blanco 4,7:1), texto azul `#7aa7f7`; estados en tonos claros y saturados
+   (verde `#4fd08a`, rojo `#f47272`, ámbar `#f2b84b`) sobre fondos tintados oscuros.
+4. **Tooltips con token propio `bg-tooltip`**: eran `bg-ink text-white` y en oscuro `ink` es el texto claro, así que
+   quedaban blancos con letra blanca. `--color-tooltip` vale `#09090b` en claro (lo mismo que se veía) y `#2a2b31` en
+   oscuro, con una línea blanca tenue para despegarse del negro. Se cambió en `ui/tooltip` y en los 16 `TooltipContent`
+   que lo pisaban. Para el dev: los tooltips van con `bg-tooltip`, no con `bg-ink`.

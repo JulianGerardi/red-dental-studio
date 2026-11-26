@@ -64,7 +64,7 @@ export function OperatoryCard({ room, turnos, resumen, abierta, onToggle, onSele
                   {cuantos}<span className="sr-only"> {cuantos === 1 ? 'appointment' : 'appointments'} today</span>
                 </span>
               </TooltipTrigger>
-              <TooltipContent className="bg-ink text-white">{cuantos} {cuantos === 1 ? 'appointment' : 'appointments'} today</TooltipContent>
+              <TooltipContent className="bg-tooltip text-white">{cuantos} {cuantos === 1 ? 'appointment' : 'appointments'} today</TooltipContent>
             </Tooltip>
           </TooltipProvider>
         </span>

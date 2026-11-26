@@ -81,7 +81,7 @@ export function BotoneraDientes({ raiz }: { raiz: HTMLElement | null }) {
     return (
       <Tooltip key={label}>
         <TooltipTrigger asChild>{boton}</TooltipTrigger>
-        <TooltipContent side="top" sideOffset={4} className={cn('bg-ink text-white', o.angosto && 'min-[1400px]:hidden')}>{label}</TooltipContent>
+        <TooltipContent side="top" sideOffset={4} className={cn('bg-tooltip text-white', o.angosto && 'min-[1400px]:hidden')}>{label}</TooltipContent>
       </Tooltip>
     )
   }

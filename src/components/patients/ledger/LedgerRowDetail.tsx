@@ -37,7 +37,7 @@ export function FilaConTooltip({
           tabla, así que un tooltip vertical le tapa sí o sí los datos de la
           fila vecina. `side="right"` no tiene lugar y Radix lo voltea al
           margen izquierdo, fuera de la tabla. */}
-      <TooltipContent side="right" align="center" sideOffset={8} collisionPadding={12} className="max-w-sm bg-ink text-white">
+      <TooltipContent side="right" align="center" sideOffset={8} collisionPadding={12} className="max-w-sm bg-tooltip text-white">
         <span className="flex flex-col gap-0.5">
           <span className="font-semibold">{m.descripcion}</span>
           <span className="text-white/70">
