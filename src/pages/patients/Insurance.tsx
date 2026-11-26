@@ -66,7 +66,7 @@ export function Switch({ on, onChange, label }: { on: boolean; onChange: (v: boo
       className="flex items-center gap-2 text-[13px] text-ink"
     >
       <span className={cn('flex h-4 w-7 shrink-0 items-center rounded-full p-0.5 transition-colors', on ? 'bg-dash-blue' : 'bg-line-strong')}>
-        <span className={cn('size-3 rounded-full bg-white transition-transform', on && 'translate-x-3')} />
+        <span className={cn('size-3 rounded-full bg-surface transition-transform', on && 'translate-x-3')} />
       </span>
       {label}
     </button>

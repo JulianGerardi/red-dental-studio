@@ -3,7 +3,96 @@
 Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber el dev. El porqué de cada decisión está en
 `design-reference/figma/modulos/<módulo>.md`; lo anterior al 2026-10-06, en `git log` y en esos mismos archivos.
 
+## 2026-11-26
+
+### Mails: descargar el mail en PDF ([#207](https://github.com/JulianGerardi/red-dental-studio/pull/207))
+- **Vista previa** (`/emails/`): botón *Download PDF* al lado de *Download HTML*. Baja `<id>.pdf`, una página del tamaño
+  del mail, tal como se ve (ancho, datos o variables y logo). Se arma en el navegador con `html-to-image` y `jspdf`
+  (dependencia nueva, carga diferida).
+- El PDF es imagen: el texto no se selecciona y los links no funcionan. No cambia nada de lo que se le entrega al backend.
+
+### Settings: Overview, Roles en cards con una página por rol y atajos de Billing en un ⋮ (CON-3130, CON-3131, CON-4065) ([#206](https://github.com/JulianGerardi/red-dental-studio/pull/206))
+- **Overview:** la portada de Settings se titula *Overview* y así se llama en el menú (`settings-nav.ts`; antes *General*).
+  La ruta sigue siendo `/settings/general`.
+- **Roles en cards:** `settings/RoleCard` (la card de la portada con pills, *n permissions · Updated* y ⋮) reemplaza a la
+  `DataTable`. Los roles viven en `data/rolesStore` (`RolesProvider` en la ruta de Settings, `useRoles`).
+- **Página de cada rol** (`SettingsRole`): `/settings/roles/:id`, `/settings/roles/new` y `/settings/roles/new?from=<id>`
+  (Duplicate). Como la ficha de una Location: pestañas *General* / *Permissions*, cards y `FormFooter`; sin pasos. Los del
+  sistema, en sólo lectura. Dejá de usar `RoleDrawer` (sin uso; se saca al documentar).
+- **Billing en Overview:** los atajos pasan al ⋮ de la card (`SettingsSectionCard` › `atajos`), que queda igual a las demás.
+- `RoleCard` queda en `exentos.json` hasta documentarla en Storybook.
+
+### Settings › Billing: pestañas entre secciones, atajos desde Settings y breadcrumb coherente (CON-57) ([#205](https://github.com/JulianGerardi/red-dental-studio/pull/205))
+- **Billing es una pantalla con pestañas**, como Ledger options: `finance/BillingHeader` (título *Billing*, la acción de la
+  sección y *Fee schedules · Carriers · Coverage tables*) reemplaza al `SettingsPageHeader` de las tres listas. Las rutas no
+  cambian: cada pestaña es la suya.
+- **`ui/tabs` › `TabLinks`**: el look de `Tabs` con links y `aria-current`, para pestañas que cambian de pantalla (así las
+  frena `useAvisoSalida`). Usá `Tabs` para vistas de un mismo bloque y `TabLinks` para pantallas hermanas.
+- **`SettingsSectionCard`** suma `atajos`: links directos a las pantallas de la sección (Settings General los saca de los
+  `children` de `settings-nav.ts`; hoy, Billing). Con atajos, la card deja de ser un `<a>` entero: el título estira su área.
+- **Breadcrumb** (`pages/Settings.tsx`): las tres pestañas terminan en `Settings / Billing`, también con un ítem elegido;
+  lo de adentro cuelga de *Billing* con link a la pestaña de origen (`Settings / Billing / Aetna Dental Plans / Acme Corp`).
+  Se va el tramo de la sección.
+- Pendiente del design system: `BillingHeader` y `TabLinks` están en `exentos.json` hasta documentarlos en Storybook.
+### My account: switch de Dark mode ([#204](https://github.com/JulianGerardi/red-dental-studio/pull/204))
+- El menú de la cuenta (`MenuCuenta`, Topbar) suma la fila **Dark mode**: sol o luna y el `ui/switch`. Atajo al tema de
+  Preferences, sincronizado con `useTema` (`lib/tema.ts`).
+- Toda la fila es el control (`role="menuitemcheckbox"`, `aria-checked`); el `Switch` es sólo el dibujo. No cierra el
+  menú al tocarlo (`preventDefault` en `onSelect`).
+
+### Preferences: modo oscuro y sin formato de fecha ([#203](https://github.com/JulianGerardi/red-dental-studio/pull/203))
+- **Dark funciona** (Settings › Preferences): se aplica al elegir, con un fundido corto. `lib/tema.ts` guarda el tema en
+  `localStorage` (`preferences:theme`) y pone la clase `dark` en `<html>`; con backend, guardarlo por usuario.
+  Se va *Localization & regional* (formato de fecha).
+- **Tokens oscuros** en `:root.dark` (`src/index.css`): mismos nombres, otro valor. Fondo `#121212`, texto `#E0E0E0`,
+  azul `#357ABD` para rellenos; bordes en vez de sombras (se pisan por clase en `index.css`).
+- **Usá `bg-surface`, no `bg-white`,** para cards, campos, menús y drawers (`bg-white` / `text-white`, sólo sobre azul).
+  **Tooltips con `bg-tooltip`,** no `bg-ink`.
+- Sigue claro en oscuro: el odontograma de Clinical Mode y las ilustraciones de Help / Under construction.
+
+### Settings › Fee schedules con el diseño de Coverage tables (CON-57) ([#202](https://github.com/JulianGerardi/red-dental-studio/pull/202))
+- **Una sola pantalla** para `/settings/finance/fee-schedule` y `…/:feeId/edit`: `SettingsFeeSchedules` arma lista y editor
+  con `components/settings/ListaEditor` (dos cards, como Coverage tables). Se van la `DataTable` de la entrada y
+  `SettingsFeeScheduleEdit`; sin elegido, el editor muestra *No fee schedule selected*.
+- **Lista:** `ItemLista` con la pill del estado (`TONO_ARANCEL`) y *Default*. El ⋮: *View assignments*, *Compare fees*,
+  *Inactive / Active*, *Archive / Restore*. `ItemLista` suma `estado` (pill que no sea Active / Inactive) y `acciones`
+  (reemplaza Deactivate / Delete); `EncabezadoEditor` suma `estado` y `extra`.
+- **Editor (`FeeScheduleEditor`):** es su propia card (`TARJETA_EDITOR`) con *Edit fee schedule* + estado; *Copy form* y
+  *Bulk edit* encima de la tabla, a la derecha; pie `PieEditor` con *Cancel · Save* a la derecha. `MasterList` queda sin
+  uso (sólo su story).
+
+### Dashboard y Scheduling: la navegación de fecha se marca en azul en hoy ([#201](https://github.com/JulianGerardi/red-dental-studio/pull/201))
+- **`ui/date-nav` (`DateNav`):** cuando se está viendo hoy, todo el bloque queda activo con el estado de un filtro
+  aplicado (`ui/filter-menu`): borde y texto `dash-blue` sobre `info-bg`. Fuera de hoy, el bloque blanco de siempre.
+  *Today* ya no se deshabilita: lleva `aria-pressed` y siempre vuelve a `hoy`.
+- **Qué cuenta como hoy:** en Day, el mismo día; en Week y Month, si la semana o el mes que se ve incluye `hoy`.
+- **Dashboard:** pasa `hoy={HOY_DEMO}` (antes comparaba con la fecha real y Today nunca quedaba en hoy). Scheduling
+  sigue con `FECHA_ANCLA`. Si una pantalla nueva usa `DateNav` con datos de demo, pasale su `hoy`.
+
+### Edit procedure: sin overrides del estimado y con un finding y un diagnóstico por defecto (CON-4211) ([#200](https://github.com/JulianGerardi/red-dental-studio/pull/200))
+- `ProcedureEstimate` ya no lleva *Insurance estimate overrides*: se saca `override` de `EstimadoProcedimiento` y de
+  `resolverEstimado` (`data/estimaciones.ts`). Backend: el estimado guarda sólo el modo (automático o a mano) y los montos.
+- *Link findings* y *Link diagnosis* pierden la bajada; si el procedimiento no tiene vínculos, `EditProcedureDrawer` arranca
+  con un finding (mismo diente o el primero) y su diagnóstico.
+
 ## 2026-11-25
+
+### Clinical Mode: Edit finding / Edit procedure desde las tablas, Estimate y la card del plan (CON-4211, CON-2770) ([#199](https://github.com/JulianGerardi/red-dental-studio/pull/199))
+- **El Edit del ⋮ abre los mismos drawers que el examen:** Problem List -> *Edit finding*; Procedures y las filas de
+  Treatment Plan (casos y Unassigned) -> *Edit procedure*. Dejá de usar `DialogoEditar` (sólo la nota) ahí: queda sólo en
+  `EndEncounterDrawer`. Las filas se pasan a `Finding` con `dental/registroComoFinding.ts` (`findingDeProblema`,
+  `findingDeProcedimiento`, `cambiosDe…`); `EditFindingDrawer` suma las props `estado` y `bloqueoEstimado`.
+- **Edit finding con un diente:** sólo General information, sin pestañas ni descriptores. Physical y ROS tampoco llevan
+  la pestaña Descriptors. Títulos en minúscula inicial: "Edit finding" y "Edit procedure".
+- **Edit procedure suma la pestaña Estimate** (`dental/ProcedureEstimate.tsx`): cálculo automático o a mano, y override
+  por seguro (Primary / Secondary). Bloqueado fuera de Planning o sin permiso (como Estimate details). Modelo nuevo
+  `EstimadoProcedimiento` y `resolverEstimado` en `data/estimaciones.ts`; `Finding.estimado` y `Procedimiento.estimado /
+  vinculados / diagnosticos`. **Backend:** guardar el estimado por procedimiento con sus overrides (CON-4211, sin
+  descripción en Jira). Pendiente: que Estimate details use los overrides guardados.
+- **Card del plan del Overview** (`TreatmentPlanList` › `PlanCard`) con el diseño de la de Treatment Plan de la ficha del
+  paciente. `Dato` cambia de caja gris a rótulo + valor con ícono azul. Mismos datos; el Total amount sigue abriendo
+  Estimate details.
+- Nuevo estado de finding *Referred* (`FindingStatus`, pill violeta).
 
 ### Lab order y Referral como Edit account; End Encounter más simple ([#198](https://github.com/JulianGerardi/red-dental-studio/pull/198))
 - **Nuevo `clinical/FichaClinica`**: `EncabezadoFicha` (título de pantalla + estado + acciones) y `Adjuntos` (archivos

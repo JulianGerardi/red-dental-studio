@@ -34,7 +34,7 @@ export function StatusLegend() {
         onClick={() => setOpen((v) => !v)}
         aria-expanded={open}
         className={cn(
-          'flex h-8 items-center gap-1.5 rounded-md border border-line bg-white px-3 text-[13px] font-medium text-ink shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] transition-colors [&_svg]:size-4',
+          'flex h-8 items-center gap-1.5 rounded-md border border-line bg-surface px-3 text-[13px] font-medium text-ink shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] transition-colors [&_svg]:size-4',
           open ? 'border-dash-blue' : 'hover:bg-surface-subtle',
         )}
       >
@@ -43,7 +43,7 @@ export function StatusLegend() {
       </button>
 
       {open && (
-        <div className="motion-safe:animate-[loc-in_120ms_ease-out] absolute top-[calc(100%+6px)] left-0 z-40 w-[228px] rounded-lg border border-line bg-white p-2 shadow-lg">
+        <div className="motion-safe:animate-[loc-in_120ms_ease-out] absolute top-[calc(100%+6px)] left-0 z-40 w-[228px] rounded-lg border border-line bg-surface p-2 shadow-lg">
           {LEGEND.map(({ state, dot }) => {
             const s = BLOCK_STYLE[state]
             return (

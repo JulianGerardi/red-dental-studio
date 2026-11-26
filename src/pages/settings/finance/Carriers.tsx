@@ -2,6 +2,7 @@ import { useMemo, useRef, useState } from 'react'
 import { Link, Navigate, useNavigate, useParams } from 'react-router-dom'
 import { Hash, Landmark, Pencil, Plus, Power, ShieldCheck, Trash2 } from 'lucide-react'
 import { SettingsPageHeader } from '@/components/settings/SettingsPageHeader'
+import { BillingHeader } from '@/components/finance/BillingHeader'
 import { SettingsSearch } from '@/components/settings/SettingsSearch'
 import { Card } from '@/components/settings/primitives'
 import { OptionCheckbox, SelectField, TextField } from '@/components/patients/form'
@@ -68,12 +69,9 @@ export function SettingsCarriers({ nuevo = false }: { nuevo?: boolean }) {
 
   return (
     <div className={PADDING_PAGINA}>
-      <SettingsPageHeader
-        titulo="Carriers"
-        accion={<Button size="md" onClick={() => setCreando(true)}><Plus /> New carrier</Button>}
-      >
+      <BillingHeader accion={<Button size="md" onClick={() => setCreando(true)}><Plus /> New carrier</Button>}>
         <SettingsSearch value={q} onChange={setQ} placeholder="Search carriers by name or payer ID" />
-      </SettingsPageHeader>
+      </BillingHeader>
 
       <div className="mt-4">
         <DataTable

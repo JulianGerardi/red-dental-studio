@@ -47,7 +47,7 @@ export function Accion({ label, icon: Icon, onClick }: { label: string; icon: Lu
             <Icon className="size-4" />
           </button>
         </TooltipTrigger>
-        <TooltipContent side="top" sideOffset={4} className="bg-ink text-white">{label}</TooltipContent>
+        <TooltipContent side="top" sideOffset={4} className="bg-tooltip text-white">{label}</TooltipContent>
       </Tooltip>
     </TooltipProvider>
   )
@@ -145,7 +145,7 @@ export default function Notifications() {
         <DateFilter value={fechas} onChange={setFechas} marked={diasConNotis} label="Filter notifications by date" />
       </div>
 
-      <section aria-label={`${vista} notifications`} className="mt-4 overflow-hidden rounded-lg bg-white shadow-panel">
+      <section aria-label={`${vista} notifications`} className="mt-4 overflow-hidden rounded-lg bg-surface shadow-panel">
         {grupos.length ? (
           grupos.map((g) => (
             <div key={g.titulo}>

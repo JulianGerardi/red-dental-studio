@@ -163,7 +163,7 @@ export function AplicarCreditoModal({
                           inputMode="decimal"
                           placeholder="0.00"
                           aria-label={`Applied to ${c.descripcion}`}
-                          className="focus:border-dash-blue h-7 w-full rounded-md border border-line bg-white px-2 text-right text-[12px] tabular-nums placeholder:text-ink-faint focus:outline-none disabled:bg-surface-muted disabled:text-ink-faint"
+                          className="focus:border-dash-blue h-7 w-full rounded-md border border-line bg-surface px-2 text-right text-[12px] tabular-nums placeholder:text-ink-faint focus:outline-none disabled:bg-surface-muted disabled:text-ink-faint"
                         />
                       </span>
                       <span className="w-[96px] shrink-0 text-right font-medium tabular-nums">{moneda(despues)}</span>

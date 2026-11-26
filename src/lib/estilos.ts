@@ -7,10 +7,10 @@
 
    `BOTON_ICONO` (cuadrado) queda para los flotantes que no son redondos. */
 export const BOTON_ICONO =
-  'flex size-9 shrink-0 items-center justify-center rounded-md border border-line bg-white text-ink shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] transition-colors hover:bg-surface-subtle'
+  'flex size-9 shrink-0 items-center justify-center rounded-md border border-line bg-surface text-ink shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] transition-colors hover:bg-surface-subtle'
 
 export const BOTON_ICONO_REDONDO =
-  'flex size-10 shrink-0 items-center justify-center rounded-full border border-line bg-white text-ink shadow-[0_2px_8px_rgb(0_0_0/0.12)] transition-colors hover:bg-surface-subtle'
+  'flex size-10 shrink-0 items-center justify-center rounded-full border border-line bg-surface text-ink shadow-[0_2px_8px_rgb(0_0_0/0.12)] transition-colors hover:bg-surface-subtle'
 
 /** Ícono suelto dentro de una card o una tabla: sin caja, pero **en negro**.
     Un ícono que hace algo —el kebab, el history, el ojo— se dibuja con el
@@ -41,16 +41,16 @@ export const PADDING_PAGINA = 'px-4 py-6 sm:px-6'
 /* La card que va sobre el fondo gris de la página (los paneles del Dashboard, las cards del Patient Dashboard y de las
    pantallas del paciente): blanca, con sombra y **sin borde** (Julián, 2026-10-06). Las cards que van adentro de una de
    estas usan InnerCard (dashboard/primitives): borde fino y sombra suave. */
-export const TARJETA_PANEL = 'rounded-lg bg-white shadow-panel'
+export const TARJETA_PANEL = 'rounded-lg bg-surface shadow-panel'
 
 /* La card que va adentro de otra (InnerCard): stroke de medio pixel en un gris tenue y sombra suave, los dos en
    shadow-inner-card (Julián, 2026-10-06: "el stroke de las cards, un gris más tenue y la línea más finita"). */
-export const TARJETA_INTERNA = 'rounded-lg bg-white shadow-inner-card'
+export const TARJETA_INTERNA = 'rounded-lg bg-surface shadow-inner-card'
 
 /* Botón de ícono que al pasar el mouse (o con el foco) muestra su caja y se abre con el texto adentro: Exit clinical Mode,
    Overwiev y las acciones del examen en Clinical Mode. El texto va en un span con ETIQUETA_EXPANDIBLE. */
 export const BOTON_EXPANDIBLE =
-  'group/btn flex h-9 shrink-0 items-center justify-center rounded-lg border border-transparent px-2 text-[13px] font-medium text-ink transition-colors hover:border-line hover:bg-white hover:shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] focus-visible:border-line focus-visible:bg-white'
+  'group/btn flex h-9 shrink-0 items-center justify-center rounded-lg border border-transparent px-2 text-[13px] font-medium text-ink transition-colors hover:border-line hover:bg-surface hover:shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] focus-visible:border-line focus-visible:bg-surface'
 /* El texto está siempre en el DOM, sólo sin ancho: se abre con el hover o con el foco del teclado. El tope (128) apenas
    pasa la etiqueta más larga (View Problem List, 111): con más aire la animación tardaba en arrancar al cerrarse. */
 export const ETIQUETA_EXPANDIBLE =
@@ -62,7 +62,7 @@ export const ETIQUETA_EXPANDIBLE =
    El marco no recorta (sin overflow-hidden): las listas de los SelectField de una celda se abren por encima de la tabla.
    Por eso las esquinas redondeadas las ponen el encabezado y la última fila. */
 export const TABLA_TEXTO = 'text-[13px] text-ink-soft'
-export const TABLA_MARCO = 'rounded-lg border border-line-row bg-white'
+export const TABLA_MARCO = 'rounded-lg border border-line-row bg-surface'
 export const TABLA_ENCABEZADO = 'min-h-11 items-center rounded-t-[7px] bg-surface-alt px-4 text-[11px] font-semibold text-ink-muted'
 export const TABLA_FILA = `items-center border-t border-line-row px-4 py-2 last:rounded-b-[7px] ${TABLA_TEXTO}`
 export const TABLA_LINK = 'truncate font-semibold text-dash-blue hover:underline'

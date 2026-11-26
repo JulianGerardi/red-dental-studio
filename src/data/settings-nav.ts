@@ -11,7 +11,7 @@ export type SettingsNavItem = {
 /* Las mismas secciones que el overview de Settings: sin Parameters, Libraries, Patient Portal ni Security
    (settings-accounts.md, 2026-11-19). */
 export const SETTINGS_NAV: SettingsNavItem[] = [
-  { to: '/settings/general', label: 'General', icon: 'house' },
+  { to: '/settings/general', label: 'Overview', icon: 'house' },
   /* Una clínica ve sólo su cuenta: Account abre Edit Account, como en la app real (video de Julián, 2026-11-20). La
      lista de cuentas (Accounts overview) se fue; /settings/accounts redirige acá. Ver settings-accounts.md. */
   { to: '/settings/account', label: 'Account', icon: 'user-cog' },

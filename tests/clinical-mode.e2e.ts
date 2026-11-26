@@ -83,11 +83,11 @@ test('Add condition con descriptores: se eligen al crear y se corrigen desde Edi
   // Una condition cargada siempre es un finding: el drawer se titula Edit finding; el diente encabeza la rueda.
   const editar = screen.getByRole('dialog', 'Edit finding')
   await expect(editar.getByText('13 · Permanent')).toBeVisible()
-  // General information y Descriptors van en dos pestañas.
-  await editar.getByRole('tab', 'Descriptors').tap()
-  await editar.getByRole('button', 'Painless').tap()
+  // Con un diente no van descriptores: sólo General information, sin pestañas (2026-11-25).
+  await expect(editar.getByRole('tab', 'Descriptors')).toHaveCount(0)
+  await editar.getByLabel('Notes').fill('Check again at next visit.')
   await editar.getByRole('button', /^Save/).tap()
-  await expect(screen.getByText('Descriptors: Painless, Round')).toBeVisible()
+  await expect(screen.getByText('Descriptors: Painful, Round')).toBeVisible()
 })
 
 test('Overview: el chart de DentAssmt muestra la última condición y sigue a Add condition', async ({ app, screen }) => {
@@ -219,16 +219,17 @@ test('Procedures: Start con la firma pendiente, Cancel no cambia nada y Continue
   await expect(screen.getByRole('cell', 'In progress')).toBeVisible()
 })
 
-test('Procedures: Edit guarda la nota y Refer pide confirmar', async ({ app, screen }) => {
+test('Procedures: Edit abre Edit procedure, guarda la nota y Refer pide confirmar', async ({ app, screen }) => {
   await app.open('/patients/patient-0001/clinical-mode')
   await screen.getByRole('button', 'View problem list').tap()
   await screen.getByRole('tab', 'Procedures').tap()
   await screen.getByPlaceholder('Search problem list').fill('D2954')
   await screen.getByRole('button', /Actions for D2954/).tap()
   await screen.getByRole('menuitem', /Edit/).tap()
+  // El mismo Edit procedure del examen, con el estimado en su pestaña (2026-11-25).
   const editar = screen.getByRole('dialog', 'Edit procedure')
-  await editar.getByLabel('Procedure notes').fill('Wait for the core buildup to set.')
-  await editar.getByRole('button', /Save notes/).tap()
+  await editar.getByLabel('Notes').fill('Wait for the core buildup to set.')
+  await editar.getByRole('button', /^Save/).tap()
   await expect(screen.getByRole('button', /Note: Wait for the core buildup to set\./)).toBeVisible()
 
   await screen.getByRole('button', /Actions for D2954/).tap()
@@ -349,7 +350,37 @@ test('Edit procedure: pestañas General information, Findings y Diagnostic', asy
   await expect(editar.getByText('Link findings')).toBeVisible()
   await editar.getByRole('tab', 'Diagnostic').tap()
   await expect(editar.getByText('Link diagnosis')).toBeVisible()
+  // Link findings y Link diagnosis arrancan con uno cargado y sin bajada.
+  await editar.getByRole('tab', 'Findings').tap()
+  await expect(editar.getByText('Linked findings')).toBeVisible()
+  await editar.getByRole('tab', 'Diagnostic').tap()
+  await expect(editar.getByText('Linked diagnoses')).toBeVisible()
+  // Estimate (CON-4211): un monto del seguro que supera el cargo no deja guardar.
+  await editar.getByRole('tab', 'Estimate').tap()
+  await expect(editar.getByText('Outstanding insurance estimates')).toBeVisible()
+  await editar.getByRole('checkbox', 'Calculate insurance estimates automatically').tap()
+  await editar.getByLabel('Primary insurance portion').fill('99999')
+  await editar.getByLabel('Primary insurance portion').press('Tab')
   await editar.getByRole('button', /^Save/).tap()
+  await expect(editar.getByText(/can't add up to more than the amount charged/)).toBeVisible()
+  await editar.getByLabel('Primary insurance portion').fill('10')
+  await editar.getByLabel('Primary insurance portion').press('Tab')
+  await editar.getByRole('button', /^Save/).tap()
+  await expect(screen.getByRole('dialog', 'Edit procedure')).toHaveCount(0)
+})
+
+/* Problem List: Edit del ⋮ abre el mismo Edit finding del examen (2026-11-25). */
+test('Problem list: Edit abre Edit finding y guarda la nota', async ({ app, screen }) => {
+  await app.open('/patients/patient-0001/clinical-mode')
+  await screen.getByRole('button', 'View problem list').tap()
+  await screen.getByPlaceholder('Search problem list').fill('calculus')
+  await screen.getByRole('button', /Actions for Dental calculus/).tap()
+  await screen.getByRole('menuitem', /Edit/).tap()
+  const editar = screen.getByRole('dialog', 'Edit finding')
+  await expect(editar.getByText('22 · Permanent')).toBeVisible()
+  await editar.getByLabel('Notes').fill('Scaling done on the lingual side.')
+  await editar.getByRole('button', /^Save/).tap()
+  await expect(screen.getByRole('button', /Note: Scaling done on the lingual side\./)).toBeVisible()
 })
 
 /* New procedure: el buscador es independiente de la lista (red.dev): busca en todo el catálogo y elegir un resultado lo

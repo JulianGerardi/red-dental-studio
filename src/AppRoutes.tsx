@@ -17,7 +17,7 @@ import NotFound from '@/pages/NotFound'
 import Scheduling from '@/pages/Scheduling'
 import Billing from '@/pages/Billing'
 import UnderConstruction from '@/pages/UnderConstruction'
-import { SettingsRoles } from '@/pages/settings/Roles'
+import { SettingsRole, SettingsRoles } from '@/pages/settings/Roles'
 import { SettingsPreferences } from '@/pages/settings/Preferences'
 import { SettingsLayout, SettingsGeneral, SettingsPlaceholder } from '@/pages/Settings'
 import { SettingsLocations } from '@/pages/settings/Locations'
@@ -26,11 +26,12 @@ import { SettingsEmployees, SettingsEmployeeDetail } from '@/pages/settings/Empl
 import { SettingsAccount } from '@/pages/settings/Account'
 import { SettingsConsents } from '@/pages/settings/Consents'
 import { SettingsLedgerOptions } from '@/pages/settings/LedgerOptions'
-import { SettingsFeeSchedules, SettingsFeeScheduleEdit, SettingsNewFeeSchedule } from '@/pages/settings/finance/FeeSchedules'
+import { SettingsFeeSchedules, SettingsNewFeeSchedule } from '@/pages/settings/finance/FeeSchedules'
 import { SettingsCarriers, SettingsCarrierEdit } from '@/pages/settings/finance/Carriers'
 import { SettingsInsurancePlan } from '@/pages/settings/finance/InsurancePlan'
 import { SettingsCoverageTables, SettingsNewCoverageTable } from '@/pages/settings/finance/CoverageTables'
 import { FinanzasProvider } from '@/data/finanzasStore'
+import { RolesProvider } from '@/data/rolesStore'
 import { BillingProfilesProvider } from '@/data/billingProfilesStore'
 import Help from '@/pages/Help'
 import Notifications from '@/pages/Notifications'
@@ -75,7 +76,7 @@ export function AppRoutes() {
         <Route path="notifications" element={<Notifications />} />
 
         {/* El store de Billing envuelve todo Settings: el breadcrumb lee de ahí el nombre de un carrier o un fee schedule. */}
-        <Route path="settings" element={<FinanzasProvider><BillingProfilesProvider><SettingsLayout /></BillingProfilesProvider></FinanzasProvider>}>
+        <Route path="settings" element={<FinanzasProvider><BillingProfilesProvider><RolesProvider><SettingsLayout /></RolesProvider></BillingProfilesProvider></FinanzasProvider>}>
           <Route index element={<Navigate to="/settings/general" replace />} />
           <Route path="general" element={<SettingsGeneral />} />
           <Route path="locations" element={<SettingsLocations />} />
@@ -90,13 +91,15 @@ export function AppRoutes() {
           <Route path="account" element={<SettingsAccount />} />
           <Route path="consents" element={<SettingsConsents />} />
           <Route path="roles" element={<SettingsRoles />} />
+          <Route path="roles/new" element={<SettingsRole />} />
+          <Route path="roles/:roleId" element={<SettingsRole />} />
           <Route path="preferences" element={<SettingsPreferences />} />
           <Route path="ledger" element={<SettingsLedgerOptions />} />
           {/* Settings → Billing, con las rutas de red.dev. Ver figma/modulos/settings-billing.md. */}
           <Route path="finance" element={<Navigate to="/settings/finance/fee-schedule" replace />} />
           <Route path="finance/fee-schedule" element={<SettingsFeeSchedules />} />
           <Route path="finance/fee-schedule/new" element={<SettingsNewFeeSchedule />} />
-          <Route path="finance/fee-schedule/:feeId/edit" element={<SettingsFeeScheduleEdit />} />
+          <Route path="finance/fee-schedule/:feeId/edit" element={<SettingsFeeSchedules />} />
           <Route path="finance/fee-schedule/:feeId" element={<RedirigirAEdit />} />
           <Route path="finance/carriers" element={<SettingsCarriers />} />
           <Route path="finance/carriers/new" element={<SettingsCarriers nuevo />} />

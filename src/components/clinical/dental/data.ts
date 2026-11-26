@@ -1,20 +1,22 @@
 import { MAXILLARY, MANDIBULAR } from '@/data/odontogram'
+import type { EstimadoProcedimiento } from '@/data/estimaciones'
 
 /* Vocabulario compartido por DentAssmt, Intra Oral y Extra Oral. Ver
    design-reference/figma/modulos/clinical-mode.md. */
 
 export type FindingStatus =
   | 'Active' | 'Monitoring' | 'In treatment' | 'Treated' | 'Externally treated'
-  | 'No treatment needed' | 'Patient declined' | 'Clinic declined' | 'Discarded'
+  | 'No treatment needed' | 'Patient declined' | 'Clinic declined' | 'Discarded' | 'Referred'
 
 const GREEN = { badge: 'bg-dash-ok-bg text-dash-ok-fg', rail: 'border-l-dash-ok-fg', dot: 'bg-dash-ok-fg', text: 'text-dash-ok-fg', good: true }
 const BLUE = { badge: 'bg-dash-count-bg text-dash-blue', rail: 'border-l-dash-blue', dot: 'bg-dash-blue', text: 'text-dash-blue', good: true }
 const RED = { badge: 'bg-[#fef2f2] text-field-error', rail: 'border-l-field-error', dot: 'bg-field-error', text: 'text-field-error', good: false }
+const PURPLE = { badge: 'bg-purple-bg text-purple-fg', rail: 'border-l-purple-fg', dot: 'bg-purple-fg', text: 'text-purple-fg', good: false }
 const AMBER = { badge: 'bg-warn-bg text-warn-fg', rail: 'border-l-warn-fg', dot: 'bg-warn-fg', text: 'text-warn-fg', good: false }
 
 export const STATUS_STYLE: Record<FindingStatus, { badge: string; rail: string; dot: string; text: string; good: boolean }> = {
   Active: GREEN, Monitoring: AMBER, 'In treatment': BLUE, Treated: GREEN, 'Externally treated': GREEN,
-  'No treatment needed': RED, 'Patient declined': RED, 'Clinic declined': RED, Discarded: RED,
+  'No treatment needed': RED, 'Patient declined': RED, 'Clinic declined': RED, Discarded: RED, Referred: PURPLE,
 }
 
 /* Las categorías y el catálogo como en la app real (red.dev, New Procedure): cada procedimiento con su área de tratamiento,
@@ -112,6 +114,8 @@ export type Finding = {
   /** El área de tratamiento con que se guardó: tipo y valor (CON-3700, `findings.specs`). null: sin área. Si falta, la
      deduce `areaDeTratamiento`. */
   treatmentArea?: AreaTratamiento | null
+  /** El estimado del seguro que se editó en Edit Procedure › Estimate (CON-4211). Sin esto, se calcula solo. */
+  estimado?: EstimadoProcedimiento
 }
 
 /* El área de tratamiento de un finding o procedimiento (CON-3700): el tipo -Tooth, Range, Quadrant, Arch, Mouth, o la

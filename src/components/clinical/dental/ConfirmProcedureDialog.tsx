@@ -51,7 +51,7 @@ export function ConfirmProcedureDialog({
                   <FindingCard
                     finding={c}
                     action={
-                      <span aria-hidden className={`flex size-4 shrink-0 items-center justify-center rounded-full border transition-colors ${on ? 'bg-dash-blue border-dash-blue text-white' : 'border-line-strong bg-white'}`}>
+                      <span aria-hidden className={`flex size-4 shrink-0 items-center justify-center rounded-full border transition-colors ${on ? 'bg-dash-blue border-dash-blue text-white' : 'border-line-strong bg-surface'}`}>
                         {on && <Check className="size-2.5" strokeWidth={3} />}
                       </span>
                     }

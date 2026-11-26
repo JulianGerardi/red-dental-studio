@@ -199,7 +199,7 @@ export default function Login() {
   const Widget = WIDGETS[slide]
 
   return (
-    <div className="flex min-h-svh bg-white">
+    <div className="flex min-h-svh bg-surface">
       {/* Panel del Figma: azul de punta a punta. */}
       <div className="relative hidden w-[46%] shrink-0 flex-col items-center overflow-hidden bg-[linear-gradient(150deg,#1d56bc_0%,#2f74f5_45%,#0043c7_100%)] px-10 py-12 lg:flex">
         <span aria-hidden className="pointer-events-none absolute -top-24 -left-24 size-[420px] rounded-full bg-white/10 blur-3xl" />
@@ -274,7 +274,7 @@ export default function Login() {
 
           <label className="mt-7 flex flex-col gap-2">
             <span className="text-xs font-medium text-ink">Email<span className="text-required">*</span></span>
-            <span className="focus-within:border-dash-blue flex h-10 items-center gap-2.5 rounded-md border border-line bg-white px-3 shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] transition-colors">
+            <span className="focus-within:border-dash-blue flex h-10 items-center gap-2.5 rounded-md border border-line bg-surface px-3 shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] transition-colors">
               <Mail className="size-4 shrink-0 text-ink-faint" />
               <input
                 type="email"
@@ -297,7 +297,7 @@ export default function Login() {
                 Forgot your password?
               </Link>
             </span>
-            <span className="focus-within:border-dash-blue flex h-10 items-center gap-2.5 rounded-md border border-line bg-white px-3 shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] transition-colors">
+            <span className="focus-within:border-dash-blue flex h-10 items-center gap-2.5 rounded-md border border-line bg-surface px-3 shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] transition-colors">
               <Lock className="size-4 shrink-0 text-ink-faint" />
               <input
                 type={verClave ? 'text' : 'password'}

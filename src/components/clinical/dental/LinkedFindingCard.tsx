@@ -13,7 +13,7 @@ export function LinkedFindingCard({
   const style = STATUS_STYLE[finding.status]
   const nombre = finding.condition.charAt(0).toUpperCase() + finding.condition.slice(1)
   return (
-    <div className={`flex items-center gap-2 rounded-md border border-l-[3px] border-line bg-white px-3 py-2.5 ${style.rail} ${linked ? 'border-dash-blue' : ''}`}>
+    <div className={`flex items-center gap-2 rounded-md border border-l-[3px] border-line bg-surface px-3 py-2.5 ${style.rail} ${linked ? 'border-dash-blue' : ''}`}>
       <div className="min-w-0 flex-1">
         <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5">
           <span className={`flex items-center gap-1 text-[11px] font-semibold ${style.text}`}>
@@ -60,7 +60,7 @@ export function LinkedDiagnosisCard({
 }) {
   const nombre = surfaces.length ? `${code} - ${surfaces.join(', ')}` : code
   return (
-    <div className={`flex items-center gap-2 rounded-md border bg-white px-3 py-2.5 ${linked ? 'border-dash-blue' : 'border-line'}`}>
+    <div className={`flex items-center gap-2 rounded-md border bg-surface px-3 py-2.5 ${linked ? 'border-dash-blue' : 'border-line'}`}>
       <p className="min-w-0 flex-1 text-[13px] leading-tight font-bold text-ink tabular-nums">
         {code}
         {surfaces.length > 0 && <span className="font-semibold text-ink-medium"> - {surfaces.join(', ')}</span>}

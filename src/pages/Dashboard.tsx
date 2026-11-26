@@ -73,7 +73,7 @@ export function FiltroFecha({
 }) {
   return (
     <div className={cn('flex flex-wrap items-center gap-2', className)}>
-      <DateNav value={value} onChange={onChange} marked={marked} tour="dash-date" />
+      <DateNav value={value} onChange={onChange} hoy={HOY_DEMO} marked={marked} tour="dash-date" />
       {/* Las preguntas frecuentes, en Help con el Dashboard abierto (Julián, 2026-10-13). */}
       <Link
         to="/help" aria-label="Frequently asked questions" title="Frequently asked questions"

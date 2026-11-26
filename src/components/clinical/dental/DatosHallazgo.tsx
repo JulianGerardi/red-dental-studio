@@ -9,7 +9,7 @@ import { NOMBRE_AREA, type AreaTratamiento, type FindingStatus } from './data'
    cuadradito, el rótulo en semibold y el valor a la derecha. La píldora del Figma mide 6,5 px de texto: acá usa la
    `Pill` chica del sistema (10 px), que sí se lee. Ver design-reference/figma/modulos/clinical-mode.md (2026-10-24). */
 
-const TARJETA = 'flex items-center gap-1.5 rounded-md border-l-[3px] border-dash-blue bg-white px-2.5 py-3 pl-3.5 shadow-[0_1px_1.5px_rgb(0_0_0/0.1),0_1px_1px_rgb(0_0_0/0.1)]'
+const TARJETA = 'flex items-center gap-1.5 rounded-md border-l-[3px] border-dash-blue bg-surface px-2.5 py-3 pl-3.5 shadow-[0_1px_1.5px_rgb(0_0_0/0.1),0_1px_1px_rgb(0_0_0/0.1)]'
 
 export function FilaDato({ icono, rotulo, children }: { icono: ReactNode; rotulo: string; children?: ReactNode }) {
   return (
@@ -23,7 +23,7 @@ export function FilaDato({ icono, rotulo, children }: { icono: ReactNode; rotulo
   )
 }
 
-const CUADRADO = 'flex size-[22px] shrink-0 items-center justify-center rounded-[4px] bg-white text-ink [&_svg]:size-[13px]'
+const CUADRADO = 'flex size-[22px] shrink-0 items-center justify-center rounded-[4px] bg-surface text-ink [&_svg]:size-[13px]'
 export const IconoFecha = () => <span className={CUADRADO}><CalendarDays /></span>
 export const IconoProveedor = () => <span className={CUADRADO}><User /></span>
 export const IconoExamen = () => <span className={CUADRADO}><FileSpreadsheet /></span>
@@ -55,7 +55,7 @@ export const mayuscula = (t: string) => t.charAt(0).toUpperCase() + t.slice(1)
 /** El tono de la píldora de estado: el mismo criterio de color que la card del finding. */
 export const TONO_ESTADO: Record<FindingStatus, PillTone> = {
   Active: 'success', Monitoring: 'warning', 'In treatment': 'info', Treated: 'success', 'Externally treated': 'success',
-  'No treatment needed': 'danger', 'Patient declined': 'danger', 'Clinic declined': 'danger', Discarded: 'danger',
+  'No treatment needed': 'danger', 'Patient declined': 'danger', 'Clinic declined': 'danger', Discarded: 'danger', Referred: 'purple',
 }
 
 /** El área de tratamiento: el ícono de su tipo en el cuadrado azul (como el del diente), el tipo y su valor. */

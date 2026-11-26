@@ -40,7 +40,7 @@ export function Chip({ children, onRemove, removeLabel, disabled, className, ton
       {onRemove && (
         <button
           type="button" aria-label={removeLabel ?? 'Remove'} onClick={onRemove} disabled={disabled}
-          className="flex size-4 shrink-0 items-center justify-center rounded-full transition-colors hover:bg-white focus-visible:outline-2 focus-visible:outline-dash-blue disabled:pointer-events-none"
+          className="flex size-4 shrink-0 items-center justify-center rounded-full transition-colors hover:bg-surface focus-visible:outline-2 focus-visible:outline-dash-blue disabled:pointer-events-none"
         >
           <X className="size-3" />
         </button>

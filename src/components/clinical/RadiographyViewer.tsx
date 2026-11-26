@@ -67,14 +67,14 @@ export function FichaHallazgo({ h, onBorrar }: { h: Hallazgo; onBorrar: () => vo
           <button
             onClick={onBorrar}
             aria-label={`Delete finding on ${h.zona}`}
-            className="flex size-7 items-center justify-center rounded-md bg-white text-ink transition-colors hover:bg-dash-bad-bg hover:text-dash-bad-fg"
+            className="flex size-7 items-center justify-center rounded-md bg-surface text-ink transition-colors hover:bg-dash-bad-bg hover:text-dash-bad-fg"
           >
             <Trash2 className="size-3.5" />
           </button>
           <button
             onClick={() => aviso.info('Editing a finding is not available in this release.')}
             aria-label={`Edit finding on ${h.zona}`}
-            className="flex size-7 items-center justify-center rounded-md bg-white text-ink transition-colors hover:bg-line-soft"
+            className="flex size-7 items-center justify-center rounded-md bg-surface text-ink transition-colors hover:bg-line-soft"
           >
             <Pencil className="size-3.5" />
           </button>
@@ -211,7 +211,7 @@ export function RadiographyViewer({
 
   return (
     <div className="flex flex-col gap-4 lg:flex-row">
-      <div className="flex flex-col rounded-xl border border-line bg-white lg:w-[330px] lg:shrink-0">
+      <div className="flex flex-col rounded-xl border border-line bg-surface lg:w-[330px] lg:shrink-0">
         <div className="flex flex-wrap items-center gap-2 px-4 pt-4">
           <p className="min-w-0 flex-1 text-[17px] font-bold text-ink">Findings</p>
           {/* Los dos botones del componente: el azul apagado para revisar y el

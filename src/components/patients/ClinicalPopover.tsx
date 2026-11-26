@@ -85,7 +85,7 @@ export function ClinicalPopover({
         {items.map((it) => (
           <div
             key={it.id}
-            className="group rounded-md border border-transparent bg-white px-3 py-2 transition-colors hover:border-dash-blue hover:bg-info-bg"
+            className="group rounded-md border border-transparent bg-surface px-3 py-2 transition-colors hover:border-dash-blue hover:bg-info-bg"
           >
             {/* El nombre va en su propia línea. Compartiendo fila con la pill,
                 el "Since" y los dos íconos, en un panel angosto se truncaba

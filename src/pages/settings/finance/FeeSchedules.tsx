@@ -1,27 +1,26 @@
-import { useMemo, useState } from 'react'
-import { Link, Navigate, useNavigate, useParams } from 'react-router-dom'
+import { useState } from 'react'
+import { Navigate, useNavigate, useParams } from 'react-router-dom'
 import { Archive, ArchiveRestore, Copy, GitCompareArrows, Network, Pencil, Plus, Power, ReceiptText, Search, SearchX, SlidersHorizontal } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { SettingsPageHeader } from '@/components/settings/SettingsPageHeader'
+import { BillingHeader } from '@/components/finance/BillingHeader'
 import { FieldLabel, SelectField, TextField, control } from '@/components/patients/form'
 import { Alert } from '@/components/ui/alert'
 import { EmptyState } from '@/components/ui/empty-state'
 import { useAvisoSalida } from '@/lib/useAvisoSalida'
 import { Button } from '@/components/ui/button'
-import { DataTable, TextCell, type DataTableColumn } from '@/components/ui/data-table'
 import { DatePicker } from '@/components/ui/date-picker'
 import { FilterMenu } from '@/components/ui/filter-menu'
 import { Pill } from '@/components/ui/pill'
 import { Switch } from '@/components/ui/switch'
 import { aviso } from '@/components/ui/toaster'
-import { DropdownMenuItem } from '@/components/ui/dropdown-menu'
-import { SettingsSearch } from '@/components/settings/SettingsSearch'
-import { MasterList, type ItemMaestro } from '@/components/finance/MasterList'
-import { AssignmentsCount, AssignmentsDrawer, asignacionesDe } from '@/components/finance/Assignments'
+import { DropdownMenuItem, DropdownMenuSeparator } from '@/components/ui/dropdown-menu'
+import { EncabezadoEditor, GRILLA_LISTA_EDITOR, ItemLista, PanelLista, PieEditor, TARJETA_EDITOR } from '@/components/settings/ListaEditor'
+import { AssignmentsDrawer, asignacionesDe } from '@/components/finance/Assignments'
 import { CompareFeesDrawer } from '@/components/finance/CompareFeesDrawer'
 import { MoneyInput } from '@/components/finance/fields'
 import { CopyFormDrawer, IncreaseAllDrawer, aumentar } from '@/components/finance/FeeScheduleTools'
-import { ICONO_SUELTO, TABLA_ENCABEZADO, TABLA_FILA, TABLA_LINK, TABLA_MARCO, TARJETA_PANEL, PADDING_PAGINA } from '@/lib/estilos'
+import { ICONO_SUELTO, TABLA_ENCABEZADO, TABLA_FILA, TABLA_MARCO, PADDING_PAGINA } from '@/lib/estilos'
 import { useFinanzas } from '@/data/finanzasStore'
 import {
   ESTADOS_ARANCEL, PROCEDIMIENTOS, SIN_ASIGNAR, TIPOS_ARANCEL, TONO_ARANCEL, conImporte, dinero, etiquetaVersion, fechaMDA,
@@ -29,9 +28,8 @@ import {
 } from '@/data/finanzas'
 import { OBLIGATORIO } from '@/lib/validacion'
 
-/* Settings → Billing → Fee Schedules: la tabla (Name, Type, Assignments, Effective, Last updated, Status, Actions) y,
-   al editar, la lista y el editor de red.dev con sus versiones. New Fee Schedule es una página sin la lista. Ver
-   settings-billing.md. */
+/* Settings → Billing → Fee Schedules: la lista de lo creado y el editor con sus versiones, como Coverage tables. New Fee
+   Schedule es una página sin la lista. Ver settings-billing.md. */
 
 export const LISTA_ARANCELES = '/settings/finance/fee-schedule'
 export const rutaArancel = (id: string) => `${LISTA_ARANCELES}/${id}/edit`
@@ -129,18 +127,18 @@ export function FeeScheduleEditor({ arancel, onGuardado }: { arancel?: Arancel; 
   /* Sin casillas y con New fee como texto que se edita al tocarlo, como red.dev (settings-billing.md, 2026-11-25). */
   const columnas = cn('grid items-center gap-3', arancel ? 'grid-cols-[64px_1fr_96px_120px]' : 'grid-cols-[64px_1fr_120px]')
 
+  /* Misma card, encabezado y pie que el editor de Coverage tables (settings-billing.md, 2026-11-26). */
   return (
-    <div className="flex flex-col gap-4">
+    <section aria-label={arancel ? 'Edit fee schedule' : 'New fee schedule'} className={TARJETA_EDITOR}>
+      {arancel && (
+        <EncabezadoEditor
+          titulo="Edit fee schedule" estado={{ nombre: arancel.estado, tono: TONO_ARANCEL[arancel.estado] }}
+          extra={arancel.porDefecto && <Pill tone="info" size="sm">Default</Pill>}
+        />
+      )}
       {intentado && (!nombre.trim() || !tipo || faltaFecha) && (
         <Alert tone="danger" title="Uncompleted fields">All required fields marked with (*) must be completed before proceeding</Alert>
       )}
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <h2 className="text-sm font-bold text-ink">General information</h2>
-        <div className="flex gap-2">
-          <Button variant="secondary" onClick={() => setHerramienta('copiar')}><Copy /> Copy form</Button>
-          <Button variant="secondary" onClick={() => setHerramienta('aumentar')}><SlidersHorizontal /> Bulk edit</Button>
-        </div>
-      </div>
 
       <div className="grid gap-4 sm:grid-cols-2">
         <div className="flex items-start gap-2">
@@ -175,7 +173,8 @@ export function FeeScheduleEditor({ arancel, onGuardado }: { arancel?: Arancel; 
         {arancel && campoTipo}
       </div>
 
-      <div className="flex flex-wrap items-center justify-between gap-3">
+      {/* Buscador y Non-zero fees a la izquierda; las acciones de la tabla justo encima, a la derecha, como Coverage. */}
+      <div className="-mb-2 flex flex-wrap items-center gap-x-3 gap-y-2">
         <span className="relative block w-full sm:max-w-[320px]">
           <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-ink-faint" />
           <input aria-label="Search procedure" value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search procedures" className={cn(control(), 'h-9 pr-3 pl-9')} />
@@ -183,6 +182,10 @@ export function FeeScheduleEditor({ arancel, onGuardado }: { arancel?: Arancel; 
         <span className="text-[13px] text-ink-muted tabular-nums" title="Procedures whose new fee is more than $0.00">
           Non-zero fees — <span className="font-semibold text-ink">{conImporte(nuevos)} / {PROCEDIMIENTOS.length}</span>
         </span>
+        <div className="flex flex-wrap gap-2 sm:ml-auto">
+          <Button variant="secondary" onClick={() => setHerramienta('copiar')}><Copy /> Copy form</Button>
+          <Button variant="secondary" onClick={() => setHerramienta('aumentar')}><SlidersHorizontal /> Bulk edit</Button>
+        </div>
       </div>
 
       {/* La tabla scrollea adentro con el encabezado fijo, así Cancel y Save quedan a la vista (red.dev). */}
@@ -211,10 +214,7 @@ export function FeeScheduleEditor({ arancel, onGuardado }: { arancel?: Arancel; 
         </div>
       </div>
 
-      <div className="flex justify-between gap-3">
-        <Button variant="secondary" onClick={() => salida.ir(LISTA_ARANCELES)}>Cancel</Button>
-        <Button disabled={!cambiado} onClick={guardarTodo}>Save</Button>
-      </div>
+      <PieEditor onCancelar={() => salida.ir(LISTA_ARANCELES)} onGuardar={guardarTodo} guardarDeshabilitado={!cambiado} />
 
       {salida.dialogo}
 
@@ -241,76 +241,66 @@ export function FeeScheduleEditor({ arancel, onGuardado }: { arancel?: Arancel; 
           }}
         />
       )}
-    </div>
+    </section>
   )
 }
 
-/* La tabla de la lista. Actions: Edit, View assignments y Compare fees (pedido de Julián). */
+/* Fee schedules como Coverage tables: lo creado a la izquierda y el elegido en el editor; al entrar, sin elegido. La tabla
+   de antes se fue por redundante (Julián, 2026-11-26): View assignments y Compare fees pasan al ⋮ de cada ítem. */
 export function SettingsFeeSchedules() {
+  const { feeId } = useParams()
   const navigate = useNavigate()
-  const { aranceles, planes, aseguradoras } = useFinanzas()
+  const { aranceles, planes, aseguradoras, guardar } = useFinanzas()
   const [q, setQ] = useState('')
-  /* Arranca sin filtro, como todas las listas (Julián, 2026-11-24; antes Active + Inactive y el Filter decía 2). */
+  /* Sin filtro al entrar, como todas las listas: se ven todos, cada uno con su estado (settings-billing.md, 2026-11-25). */
   const [estados, setEstados] = useState<string[]>([])
   const [drawer, setDrawer] = useState<{ tipo: 'asignaciones' | 'comparar'; a: Arancel } | null>(null)
+  const elegido = aranceles.find((a) => a.id === feeId)
 
-  const filas = useMemo(
-    () => aranceles.filter((a) => (estados.length === 0 || estados.includes(a.estado)) && `${a.nombre} ${a.tipo}`.toLowerCase().includes(q.trim().toLowerCase())),
-    [aranceles, estados, q],
-  )
+  const visibles = aranceles.filter((a) => (estados.length === 0 || estados.includes(a.estado) || a.id === feeId) && a.nombre.toLowerCase().includes(q.trim().toLowerCase()))
 
-  const columnas: DataTableColumn<Arancel>[] = [
-    {
-      key: 'nombre', header: 'Name', locked: true,
-      cell: (a) => (
-        <span className="flex min-w-0 items-center gap-2">
-          <Link to={rutaArancel(a.id)} className={TABLA_LINK}>{a.nombre}</Link>
-          {a.porDefecto && <Pill tone="info" size="sm">Default</Pill>}
-        </span>
-      ),
-    },
-    { key: 'tipo', header: 'Type', width: 120, cell: (a) => <TextCell>{a.tipo}</TextCell> },
-    {
-      /* A la izquierda, al inicio de la columna: es un link que abre el desglose, no un importe (Julián, 2026-11-24). */
-      key: 'asignaciones', header: 'Assignments', width: 120,
-      cell: (a) => <AssignmentsCount asignaciones={asignacionesDe(a, planes, aseguradoras)} onVer={() => setDrawer({ tipo: 'asignaciones', a })} />,
-    },
-    { key: 'vigencia', header: 'Effective', width: 110, cell: (a) => <span className="tabular-nums">{fechaMDA(versionVigente(a).desde)}</span> },
-    { key: 'actualizado', header: 'Last updated', width: 120, cell: (a) => <span className="tabular-nums">{fechaMDA(a.actualizado)}</span> },
-    { key: 'estado', header: 'Status', width: 100, cell: (a) => <Pill tone={TONO_ARANCEL[a.estado]}>{a.estado}</Pill> },
-  ]
+  /* Un fee schedule que ya no está (un link viejo): la lista sin elegido. */
+  if (feeId && !elegido) return <Navigate to={LISTA_ARANCELES} replace />
 
   return (
-    <div className={PADDING_PAGINA}>
-      <SettingsPageHeader
-        titulo="Fee schedules"
-        accion={<Button size="md" onClick={() => navigate(`${LISTA_ARANCELES}/new`)}><Plus /> New fee schedule</Button>}
-      >
-        <SettingsSearch value={q} onChange={setQ} placeholder="Search fee schedules" />
-        <FilterMenu
-          label="Filters"
-          groups={[{
-            title: 'States', value: estados, onChange: setEstados,
-            options: ESTADOS_ARANCEL.map((e) => ({ value: e, count: aranceles.filter((a) => a.estado === e).length })),
-          }]}
-        />
-      </SettingsPageHeader>
-
-      <div className="mt-4">
-        <DataTable
-          columns={columnas}
-          rows={filas}
-          rowKey={(a) => a.id}
-          rowLabel={(a) => a.nombre}
-          empty={{ icon: ReceiptText, title: 'No fee schedule found', detail: 'Try another name or state, or create a new one with New fee schedule.' }}
-          rowActions={(a) => (
-            <>
-              <DropdownMenuItem onSelect={() => navigate(rutaArancel(a.id))}><Pencil className="size-4 shrink-0" /> Edit</DropdownMenuItem>
-              <DropdownMenuItem onSelect={() => setDrawer({ tipo: 'asignaciones', a })}><Network className="size-4 shrink-0" /> View assignments</DropdownMenuItem>
-              <DropdownMenuItem onSelect={() => setDrawer({ tipo: 'comparar', a })}><GitCompareArrows className="size-4 shrink-0" /> Compare fees</DropdownMenuItem>
-            </>
+    <div className={cn('@container', PADDING_PAGINA)}>
+      <BillingHeader accion={<Button size="md" onClick={() => navigate(`${LISTA_ARANCELES}/new`)}><Plus /> New fee schedule</Button>} />
+      <div className={GRILLA_LISTA_EDITOR}>
+        <PanelLista
+          titulo="Fee schedules" q={q} onQ={setQ} placeholder="Search fee schedules" vacio={visibles.length === 0}
+          filtro={(
+            <FilterMenu
+              label="Filters" size="sm" align="end"
+              groups={[{
+                title: 'States', value: estados, onChange: setEstados,
+                options: ESTADOS_ARANCEL.map((e) => ({ value: e, count: aranceles.filter((a) => a.estado === e).length })),
+              }]}
+            />
           )}
-        />
+        >
+          {visibles.map((a) => (
+            <ItemLista
+              key={a.id} nombre={a.nombre} activo={a.estado === 'Active'} estado={{ nombre: a.estado, tono: TONO_ARANCEL[a.estado] }}
+              elegido={a.id === feeId} to={rutaArancel(a.id)}
+              extra={a.porDefecto && <Pill tone="info" size="sm">Default</Pill>}
+              acciones={(
+                <>
+                  <DropdownMenuItem onSelect={() => setDrawer({ tipo: 'asignaciones', a })}><Network className="size-4 shrink-0" /> View assignments</DropdownMenuItem>
+                  <DropdownMenuItem onSelect={() => setDrawer({ tipo: 'comparar', a })}><GitCompareArrows className="size-4 shrink-0" /> Compare fees</DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  {accionesArancel(a, (x) => guardar('aranceles', x))}
+                </>
+              )}
+            />
+          ))}
+        </PanelLista>
+        {elegido
+          ? <FeeScheduleEditor key={`${elegido.id}-${elegido.versiones.length}`} arancel={elegido} />
+          : (
+            <div className={TARJETA_EDITOR}>
+              <EmptyState icon={ReceiptText} title="No fee schedule selected" detail="Select a fee schedule from the list on the left or create one with New fee schedule." className="py-16" />
+            </div>
+          )}
       </div>
 
       {drawer?.tipo === 'asignaciones' && (
@@ -323,62 +313,11 @@ export function SettingsFeeSchedules() {
   )
 }
 
-/* Editar: la lista de red.dev a la izquierda (con su filtro de estados y ⋮ Inactive / Archive) y el editor a la derecha. */
-export function SettingsFeeScheduleEdit() {
-  const { feeId } = useParams()
-  const navigate = useNavigate()
-  const { aranceles, guardar } = useFinanzas()
-  const [q, setQ] = useState('')
-  /* Sin filtro al entrar, como todas las listas: se ven todos, cada uno con su punto (settings-billing.md, 2026-11-25). */
-  const [estados, setEstados] = useState<string[]>([])
-  const elegido = aranceles.find((a) => a.id === feeId)
-
-  const items: ItemMaestro[] = useMemo(() => aranceles
-    .filter((a) => (estados.length === 0 || estados.includes(a.estado) || a.id === feeId) && a.nombre.toLowerCase().includes(q.trim().toLowerCase()))
-    .map((a) => ({
-      id: a.id, nombre: a.nombre, to: rutaArancel(a.id),
-      etiqueta: a.porDefecto ? <Pill tone="info" size="sm">Default</Pill> : undefined,
-      estado: { nombre: a.estado, tono: TONO_ARANCEL[a.estado] },
-      acciones: accionesArancel(a, (x) => guardar('aranceles', x)),
-    })), [aranceles, estados, q, feeId, guardar])
-
-  if (!elegido) return <Navigate to={LISTA_ARANCELES} replace />
-
-  return (
-    <div className={PADDING_PAGINA}>
-      <SettingsPageHeader
-        titulo="Edit fee schedule"
-        accion={<Button size="md" onClick={() => navigate(`${LISTA_ARANCELES}/new`)}><Plus /> New fee schedule</Button>}
-      />
-      <div className={cn(TARJETA_PANEL, 'mt-5 grid gap-6 p-4 sm:p-5 lg:grid-cols-[260px_minmax(0,1fr)] lg:items-start')}>
-        <MasterList
-          items={items} elegido={feeId} q={q} onQ={setQ} placeholder="Search fee schedules"
-          vacio="No fee schedules match the search or filters."
-          filtro={(
-            <FilterMenu
-              label="Filters" align="start"
-              groups={[{
-                title: 'States', value: estados, onChange: setEstados,
-                options: ESTADOS_ARANCEL.map((e) => ({ value: e, count: aranceles.filter((a) => a.estado === e).length })),
-              }]}
-            />
-          )}
-        />
-        <div className="min-w-0">
-          <FeeScheduleEditor key={`${elegido.id}-${elegido.versiones.length}`} arancel={elegido} />
-        </div>
-      </div>
-    </div>
-  )
-}
-
 export function SettingsNewFeeSchedule() {
   return (
     <div className={PADDING_PAGINA}>
       <SettingsPageHeader titulo="New fee schedule" />
-      <div className={cn(TARJETA_PANEL, 'mt-5 p-4 sm:p-5')}>
-        <FeeScheduleEditor />
-      </div>
+      <div className="mt-5"><FeeScheduleEditor /></div>
     </div>
   )
 }

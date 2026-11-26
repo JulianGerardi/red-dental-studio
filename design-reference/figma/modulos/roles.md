@@ -8,6 +8,31 @@
   Desactivar rol, CON-3229 Activar rol, CON-3411 "Select All", CON-3528 permisos de Roles, CON-3337 y CON-4065 roles del
   sistema en sólo lectura.
 
+
+## Cards y página de cada rol, como una Location (2026-11-26) · CON-3130, CON-3131, CON-4065
+
+Julián: *"que esas cards estén en la parte de roles en vez de una tabla … y en vez de steps debería abrirse estilo
+formulario como hacemos con location"*. Corrige las decisiones 1 y 3 del 2026-11-25.
+
+1. **Cards en vez de tabla**: la card de la portada de Settings (`settings/RoleCard`): ícono, nombre, descripción (hasta dos
+   líneas), pill *Active / Inactive*, *System role*, *n permissions · Updated MM/DD/YYYY* y el ⋮ de siempre. Toda la card
+   abre el rol; el ⋮ va por encima (el título estira su área: un botón adentro de un link no vale). Tres columnas en
+   escritorio, dos en tablet, una en celular, como red.dev. Buscador y *Filter* siguen arriba.
+2. **Cada rol es una página** (`/settings/roles/:id`), como la ficha de una Location: título con el nombre y sus pills,
+   pestañas **General** y **Permissions** (con el contador), cards *General information* (Name y Description de a dos) y
+   *Permissions*, y *Cancel · Save changes* al pie. Sin pasos. Save se habilita con un cambio.
+3. **New role** es la misma página en `/settings/roles/new`; **Duplicate**, `/settings/roles/new?from=<id>` precargada
+   (CON-3130). Save sin lo obligatorio muestra *Uncompleted fields*, marca con punto rojo la pestaña que falla y va a ella.
+   Al crear vuelve a la lista con el toast.
+4. **Rol del sistema**: la misma página en sólo lectura, sin pie y con *Duplicate* arriba a la derecha (CON-4065).
+5. Con cambios sin guardar, salir (Cancel, breadcrumb, menú) pregunta antes (`useAvisoSalida`).
+6. Los roles pasan a `data/rolesStore` (en la ruta de Settings, como Billing) para que la lista y la página compartan los
+   datos. Breadcrumb: `Settings / Roles / <rol>` o `New role`.
+7. `RoleDrawer` queda sin uso en la app (sólo su story): se saca al documentar la tanda.
+
+**A validar con usuarios:** si con 19 roles las cards se recorren bien o se extraña la tabla para comparar, y si los
+permisos en una pestaña aparte se encuentran al crear un rol.
+
 ## Pantalla nueva desde red.dev (2026-11-25) · CON-3130, CON-3131, CON-3132, CON-3181, CON-3229, CON-3411, CON-4065
 
 Julián: *"armemos la pantalla de Roles en base a nuestro design system, componentes, textos y tamaños"*, con un video de

@@ -1,4 +1,5 @@
 import { useRef, type ReactNode } from 'react'
+import { Link } from 'react-router-dom'
 import type { LucideIcon } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
@@ -116,7 +117,7 @@ export function Tabs<T extends string>({
             {t.count !== undefined && t.count > 0 && <span className={cn('tabular-nums', activa ? 'text-white/80' : 'text-ink-faint')}>({t.count})</span>}
             {t.alerta && (
               <>
-                <span aria-hidden className={cn('size-1.5 shrink-0 rounded-full', activa ? 'bg-white ring-2 ring-field-error' : 'bg-field-error')} />
+                <span aria-hidden className={cn('size-1.5 shrink-0 rounded-full', activa ? 'bg-surface ring-2 ring-field-error' : 'bg-field-error')} />
                 <span className="sr-only">has errors</span>
               </>
             )}
@@ -124,5 +125,40 @@ export function Tabs<T extends string>({
         )
       })}
     </div>
+  )
+}
+
+/* El mismo control, pero cada opción es una pantalla: links con aria-current, no role=tab. Así respeta el aviso de cambios
+   sin guardar (useAvisoSalida frena links) y se puede abrir en otra pestaña. Billing: Fee schedules · Carriers · Coverage
+   tables (settings-billing.md, 2026-11-26). */
+export function TabLinks({ items, actual, size = 'md', className, 'aria-label': ariaLabel }: {
+  items: readonly { to: string; label: string }[]
+  /** El `to` de la pantalla actual. */
+  actual?: string
+  size?: keyof typeof TAMANO
+  className?: string
+  'aria-label'?: string
+}) {
+  return (
+    <nav aria-label={ariaLabel} className={cn('flex w-fit max-w-full items-center gap-1 overflow-x-auto rounded-lg bg-surface-slate p-1', className)}>
+      {items.map((t) => {
+        const activa = t.to === actual
+        return (
+          <Link
+            key={t.to}
+            to={t.to}
+            aria-current={activa ? 'page' : undefined}
+            className={cn(
+              'flex shrink-0 items-center justify-center gap-1.5 rounded-md font-medium whitespace-nowrap transition-colors',
+              'focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-dash-blue',
+              TAMANO[size],
+              activa ? 'bg-dash-blue text-white' : 'text-ink-slate hover:text-ink-soft',
+            )}
+          >
+            {t.label}
+          </Link>
+        )
+      })}
+    </nav>
   )
 }

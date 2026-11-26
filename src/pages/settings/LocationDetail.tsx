@@ -69,7 +69,7 @@ export function SwitchOpenClose({ on, onChange, labels = ['Open', 'Close'], labe
       className="flex items-center gap-2 text-[13px]"
     >
       <span className={cn('flex h-5 w-9 shrink-0 items-center rounded-full p-0.5 transition-colors', on ? 'bg-dash-blue' : 'bg-line-strong')}>
-        <span className={cn('size-4 rounded-full bg-white transition-transform', on && 'translate-x-4')} />
+        <span className={cn('size-4 rounded-full bg-surface transition-transform', on && 'translate-x-4')} />
       </span>
       {/* Azul, no verde: el switch ya es azul cuando está en Open, y el
           texto va del mismo color en vez de meter un segundo significado
@@ -303,7 +303,7 @@ export function WorkingHoursTab() {
   }
 
   return (
-    <div className="overflow-hidden rounded-xl border border-line bg-white">
+    <div className="overflow-hidden rounded-xl border border-line bg-surface">
       <div className="grid grid-cols-[1fr_auto] gap-3 border-b border-line bg-surface-alt px-4 py-3 text-xs font-semibold text-ink-muted sm:grid-cols-[140px_140px_1fr]">
         <span>Day</span>
         <span>Status</span>
@@ -455,7 +455,7 @@ export function RoomsTab() {
         <Button onClick={() => setModal('nueva')}><Plus /> New room</Button>
       </div>
       {/* Misma caja que Working Hours: encabezado gris, switch en la fila y la inactiva en gris. */}
-      <div className="overflow-hidden rounded-xl border border-line bg-white">
+      <div className="overflow-hidden rounded-xl border border-line bg-surface">
         <div className={cn(FILA_SALA, 'border-b border-line bg-surface-alt py-3 text-xs font-semibold text-ink-muted max-lg:hidden')}>
           <span>Room</span>
           <span>Abbreviation</span>
@@ -586,7 +586,7 @@ export function ExceptionsTab() {
       <div className="mb-3 flex justify-end">
         <Button onClick={() => setModal('nueva')}><Plus /> Add exception</Button>
       </div>
-      <div className="overflow-hidden rounded-xl border border-line bg-white">
+      <div className="overflow-hidden rounded-xl border border-line bg-surface">
         <div className={cn(FILA_EXCEPCION, 'border-b border-line bg-surface-alt py-3 text-xs font-semibold text-ink-muted max-lg:hidden')}>
           <span>Exception</span>
           <span>Date</span>

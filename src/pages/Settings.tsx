@@ -16,6 +16,7 @@ import { LOCACIONES } from '@/pages/settings/Locations'
 import { EMPLEADOS } from '@/data/employees'
 import { CUENTAS } from '@/pages/settings/Accounts'
 import { useFinanzas } from '@/data/finanzasStore'
+import { useRoles } from '@/data/rolesStore'
 
 export const SETTINGS_ICONS: Record<string, LucideIcon> = {
   'user-cog': UserCog, building: Building2, users: Users, 'shield-check': ShieldCheck,
@@ -29,25 +30,24 @@ export const SETTINGS_ICONS: Record<string, LucideIcon> = {
    de otro modo obliga a abrir el menú flotante del rail. */
 /* Settings → Billing lleva el breadcrumb de red.dev: Settings › Finance › Carriers › Aetna Dental Plans › Edit ›
    Insurance plans › Acme Corp › Edit. Un /new que abre un drawer sobre la lista termina en la lista. */
-const TITULOS_FINANZAS: Record<string, string> = { 'fee-schedule': 'Fee schedules', carriers: 'Carriers', 'coverage-table': 'Coverage tables' }
 const NUEVO_FINANZAS: Record<string, string> = { 'fee-schedule': 'New fee schedule', 'coverage-table': 'New coverage table' }
 
 /* Billing sigue la regla del resto de Settings (Julián, 2026-10-09): Settings › Billing › sección › ítem, con el nombre del
-   menú y sin un tramo "Edit"; el último no es link. El plan cuelga de su carrier. Ver settings-billing.md. */
+   menú y sin un tramo "Edit"; el último no es link. El plan cuelga de su carrier. Desde el 2026-11-26 las tres secciones
+   son pestañas de una pantalla, Billing (como Ledger options): sus listas terminan en Billing y lo de adentro cuelga de
+   Billing, con link a la pestaña de donde viene. Fee schedules y Coverage tables (lista y editor en una pantalla, como
+   Consents) terminan en Billing aunque haya uno elegido. Ver settings-billing.md (2026-11-26). */
+const LISTA_Y_EDITOR = new Set(['fee-schedule', 'coverage-table'])
 function migasFinanzas(pathname: string, nombre: (seccion: string, id: string) => string | undefined): Miga[] | null {
   const m = pathname.match(/^\/settings\/finance\/(fee-schedule|carriers|coverage-table)(?:\/(.*))?$/)
   if (!m) return null
   const [, seccion, resto = ''] = m
   const partes = resto.split('/').filter(Boolean)
   const lista = `/settings/finance/${seccion}`
-  const migas: Miga[] = [
-    { label: 'Settings', to: '/settings/general' },
-    { label: 'Billing', to: '/settings/finance' },
-    { label: TITULOS_FINANZAS[seccion], to: lista },
-  ]
+  const migas: Miga[] = [{ label: 'Settings', to: '/settings/general' }, { label: 'Billing', to: lista }]
   if (partes[0] === 'new') {
     if (NUEVO_FINANZAS[seccion]) migas.push({ label: NUEVO_FINANZAS[seccion] })
-  } else if (partes[0]) {
+  } else if (partes[0] && !LISTA_Y_EDITOR.has(seccion)) {
     migas.push({ label: nombre(seccion, partes[0]) ?? partes[0], to: `${lista}/${partes[0]}/edit/insurance-plans` })
     if (partes[2] === 'insurance-plans' && partes[3] && partes[3] !== 'new') migas.push({ label: nombre('planes', partes[3]) ?? partes[3] })
   }
@@ -55,7 +55,7 @@ function migasFinanzas(pathname: string, nombre: (seccion: string, id: string) =
   return migas
 }
 
-function migasDe(pathname: string, nombreFinanzas: (seccion: string, id: string) => string | undefined): Miga[] {
+function migasDe(pathname: string, nombreFinanzas: (seccion: string, id: string) => string | undefined, nombreRol: (id: string) => string | undefined): Miga[] {
   if (pathname === '/settings/general') return []
   const finanzas = migasFinanzas(pathname, nombreFinanzas)
   if (finanzas) return finanzas
@@ -65,8 +65,8 @@ function migasDe(pathname: string, nombreFinanzas: (seccion: string, id: string)
     (n) => pathname === n.to || pathname.startsWith(`${n.to}/`),
   )
   if (item) {
-    /* .../new es la lista con el drawer de alta abierto. */
-    const hoja = pathname === item.to || pathname === `${item.to}/new`
+    /* .../new es la lista con el drawer de alta abierto; en Roles, una página propia (roles.md, 2026-11-26). */
+    const hoja = pathname === item.to || (pathname === `${item.to}/new` && item.to !== '/settings/roles')
     migas.push({ label: item.label, to: hoja ? undefined : item.to })
     const hijo = item.children?.find((c) => pathname === c.to || pathname.startsWith(`${c.to}/`))
     if (hijo) migas.push({ label: hijo.label })
@@ -85,6 +85,9 @@ function migasDe(pathname: string, nombreFinanzas: (seccion: string, id: string)
     const emp = EMPLEADOS.find((e) => e.id === detalleEmpleado[1])
     migas.push({ label: emp?.nombre ?? detalleEmpleado[1] })
   }
+  /* La página de un rol (roles.md, 2026-11-26): su nombre, o New role. */
+  const detalleRol = pathname.match(/^\/settings\/roles\/([^/]+)$/)
+  if (detalleRol) migas.push({ label: detalleRol[1] === 'new' ? 'New role' : nombreRol(detalleRol[1]!) ?? detalleRol[1]! })
   const detalleCuenta = pathname.match(/^\/settings\/accounts\/([^/]+)$/)
   if (detalleCuenta) {
     const cuenta = CUENTAS.find((c) => c.id === detalleCuenta[1])
@@ -97,7 +100,8 @@ export function SettingsLayout() {
   const { pathname } = useLocation()
   const { aranceles, aseguradoras, coberturas, planes } = useFinanzas()
   const listas: Record<string, { id: string; nombre: string }[]> = { 'fee-schedule': aranceles, carriers: aseguradoras, 'coverage-table': coberturas, planes }
-  const migas = migasDe(pathname, (seccion, id) => listas[seccion]?.find((x) => x.id === id)?.nombre)
+  const { roles } = useRoles()
+  const migas = migasDe(pathname, (seccion, id) => listas[seccion]?.find((x) => x.id === id)?.nombre, (id) => roles.find((r) => r.id === id)?.nombre)
   return (
     /* El sidebar propio de Settings se fue —sus pantallas cuelgan del menú
        flotante del rail—. El breadcrumb vive acá y en ningún otro lado: cuando
@@ -121,13 +125,17 @@ export function SettingsLayout() {
 export function SettingsGeneral() {
   return (
     <div className={PADDING_PAGINA}>
-      <PageTitle>Settings</PageTitle>
+      {/* Overview, como su ítem del menú (Julián, 2026-11-26; antes General y el título Settings). */}
+      <PageTitle>Overview</PageTitle>
 
       <div className="mt-6 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
         {SETTINGS_SECTIONS.map((s) => {
           const Icon = SETTINGS_ICONS[s.icon] ?? SlidersHorizontal
           return (
-            <SettingsSectionCard key={s.to} to={s.to} icon={Icon} title={s.title} description={s.desc} />
+            <SettingsSectionCard
+              key={s.to} to={s.to} icon={Icon} title={s.title} description={s.desc}
+              atajos={SETTINGS_NAV.find((n) => n.to === s.to)?.children}
+            />
           )
         })}
       </div>

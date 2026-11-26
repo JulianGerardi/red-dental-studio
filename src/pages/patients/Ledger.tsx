@@ -368,7 +368,7 @@ export default function Ledger() {
           <TooltipProvider delayDuration={500} skipDelayDuration={0}>
           {/* La tabla en su card, con Columns arriba a la derecha como red.dev; sin buscador ni filtro (no están en red.dev
               ni en CON-3753). Sin Export statement: no está en red.dev (ledger.md, 2026-11-20). */}
-          <div className="mt-4 flex w-full flex-col overflow-hidden rounded-lg border border-line-row bg-white lg:flex-1">
+          <div className="mt-4 flex w-full flex-col overflow-hidden rounded-lg border border-line-row bg-surface lg:flex-1">
           {/* Pestañas a la izquierda, Columns en la otra punta, como Billing (ledger.md, 2026-11-20). */}
           <div className="flex flex-wrap items-center justify-between gap-2 border-b border-line-row px-3 py-2.5">
             <Tabs size="sm" className="shrink-0" aria-label="Ledger view" tabs={VISTAS} value={vista} onChange={(v) => { setVista(v); setPagina(1) }} />

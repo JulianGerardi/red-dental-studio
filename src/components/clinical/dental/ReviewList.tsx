@@ -24,7 +24,7 @@ export function ReviewList({ reviews }: { reviews: ExamReview[] }) {
     <>
       <div className="flex w-full flex-col gap-3">
         {reviews.map((r) => (
-          <div key={r.id} className="flex w-full flex-col gap-2.5 rounded-xl border border-line bg-white p-3">
+          <div key={r.id} className="flex w-full flex-col gap-2.5 rounded-xl border border-line bg-surface p-3">
             <div className="flex w-full items-start justify-between gap-2">
               <span className="flex flex-col rounded-lg bg-surface-subtle px-2.5 py-1.5">
                 <span className="text-[11px] text-ink-muted">Last reviewed</span>

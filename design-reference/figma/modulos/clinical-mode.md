@@ -3561,3 +3561,68 @@ mismo para todo". Las dos fichas usan ahora las mismas piezas (`clinical/FichaCl
    tiene, Edit account tampoco).
 
 **A validar:** sin la barra fija, en una Lab order larga Save queda al final de la página; Edit account funciona igual.
+
+## CON-4211 · CON-2770 · Los Edit desde las tablas, Estimate en Edit procedure y la card del plan (2026-11-25)
+
+**CON-4211 ([Procedure] Insurance Estimate), CON-2770 (Edit Finding), CON-3142 (VOL 2 Edit Procedure), CON-2529.**
+CON-4211, CON-3142 y CON-1598 no tienen descripción en Jira: el estimado sale de la captura de la app anterior que mandó
+Julián (Edit Procedure › Insurance Estimates) y del vocabulario de Estimate details. Julián: "cuando tenés un tooth no
+van los descriptors, sólo general information"; "cuando edito un procedure debería estar también el estimate"; "el edit
+del ⋮ de la tabla (procedure o problem list) y el de Actions del treatment plan deberían ser estos drawers"; "el
+treatment plan del clinical mode debe estar alineado en diseño al treatment plan del patient dashboard". El video que
+mencionó no llegó: si el diseño del estimado era otro, se ajusta.
+
+- **Títulos**: *Edit finding* (toda condition: con diente, Extraoral/Intraoral, Physical…) y *Edit procedure*. En
+  minúscula inicial, como el resto de los drawers de la app ("New condition", "Edit relationship"); el mockup decía
+  "Edit Finding" y el Figma 5301:149072 "Edit Condition" (anomalía: se sigue la regla de la app).
+- **Edit finding con un diente**: sin pestañas ni descriptores, sólo General information (datos, rueda de superficies y
+  notas). Consecuencia: los descriptores de una condition en un diente se eligen al cargarla y después no se editan.
+  **A validar** con odontólogos si alguna vez corrigen un descriptor después.
+- **Edit finding de Physical y ROS** (Generally unwell, Abnormal weight gain): sin la pestaña Descriptors, que son de una
+  lesión. Extraoral e Intraoral la conservan.
+- **Edit procedure suma la pestaña Estimate** (`dental/ProcedureEstimate.tsx`):
+  - Arriba, sin editar: *Amount charged* (el fee), *Allowable amount* y *Coverage*, con las filas de `DatosHallazgo`.
+  - *Outstanding insurance estimates*: "Calculate insurance estimates automatically" (casilla y no switch: se guarda
+    con Save, regla de `ui/switch`). Con la casilla, Primary / Secondary insurance portion e Insurance write-off son el
+    cálculo y no se tocan; sin ella se cargan a mano. *Patient portion* siempre es el resto (cargo − seguros − write-off).
+    Volver a automático reemplaza lo cargado a mano.
+  - *Insurance estimate overrides*: Primary y Secondary, cada uno con su casilla y su monto; el override manda sobre lo
+    calculado y arranca con el valor actual. Si los seguros suman más que el cargo, el error se ve abajo y Save vuelve a
+    la pestaña Estimate sin guardar.
+  - **Bloqueado** (se ve, no se toca, con el aviso "Estimate locked" y el candado) cuando el procedimiento está en un
+    caso que salió de Planning o sin permiso sobre la ubicación: la misma regla de Estimate details (CON-2529). Suelto,
+    siempre se edita.
+  - Sin fee: estado vacío "No amount charged" (sin cargo no se estima, CON-2529).
+  - Mock (`resolverEstimado`, `data/estimaciones.ts`): la cobertura por categoría del CDT de Estimate details; el
+    deducible se aplica en el caso, no acá; el mock no tiene seguro secundario (queda en $0). Sin tocar nada no se
+    guarda copia: el procedimiento sigue calculándose solo. **Pendiente**: que Estimate details tome los overrides
+    guardados (hoy recalcula sin ellos).
+- **Edit del ⋮ en las tablas**: Problem List abre *Edit finding* (antes decía "Editing is not available"); Procedures
+  y las filas de Treatment Plan (casos y Unassigned) abren *Edit procedure* (antes, un drawer sólo con la nota,
+  `DialogoEditar`). Las filas se pasan a `Finding` con `dental/registroComoFinding.ts`; el estado que se ve es el de la
+  fila (Planned, Pending…), el fee el del caso o el UCR, y Findings arranca con los vínculos de
+  `VINCULOS_PROCEDIMIENTO`. Lo que se guarda (nota, proveedor, superficies, descriptores, vínculos, estimado) vuelve a
+  la fila. End Encounter sigue con `DialogoEditar` (sólo la nota): **a confirmar** si también pasa a Edit procedure.
+- Las superficies de la Problem List usan también M, D, I y F, que la rueda (MB/B/DB/O/ML/L/DL) no tiene: el chip las
+  nombra igual ("D - Distal"), pero no se marcan en la rueda (anomalía: dos vocabularios de superficies).
+- Nuevo estado de finding *Referred* (pill violeta), para editar una fila de la Problem List derivada.
+- **Card del plan en el Overview** (`TreatmentPlanList`, `PlanCard`): pasa al diseño de la card de Treatment Plan de la
+  ficha del paciente (`pages/patients/Treatments`): profesional y estado arriba; franja gris con el grupo y los
+  procedimientos, el nombre del caso en azul, la barra fina (azul mientras avanza, verde al 100 %, roja si se canceló o
+  venció) y "Overall completion: N % · x of N completed"; pie con Created on y Total amount, que sigue abriendo Estimate
+  details. Mismos datos que antes. Va dentro del panel blanco, así que es `TARJETA_INTERNA`.
+
+A validar con usuarios: si recepción entiende *Insurance write-off* (la app anterior lo llama "Ins write-off") y si el
+override por seguro alcanza o piden override del Patient portion.
+
+Código: `clinical/dental/{ProcedureEstimate,registroComoFinding,EditFindingDrawer,EditConditionDrawer,EditProcedureDrawer,
+data,DatosHallazgo}.tsx`, `clinical/{ProblemList,TreatmentPlanSection,TreatmentPlanList,RecordDetail}.tsx`,
+`data/{estimaciones,treatment-plan}.ts`, `tests/clinical-mode.e2e.ts`. Storybook sin tocar.
+
+### Edit procedure: sin overrides y con un finding y un diagnóstico cargados (2026-11-26)
+
+**CON-4211.** Julián: "el estimate overrides no va"; "el mensaje debajo de Link findings y Link diagnosis sacalo, y debería tener por default un finding cargado y un diagnostic cargado".
+
+- **Estimate sin *Insurance estimate overrides***: queda *Outstanding insurance estimates* (automático o a mano) y el Patient portion como resto. Se saca del modelo (`EstimadoProcedimiento.override`) y de `resolverEstimado`. Revierte lo de 2026-11-25.
+- **Link findings / Link diagnosis sin la bajada** de abajo del título.
+- **Vinculados por defecto**: si el procedimiento no trae nada vinculado, arranca con un finding (el del mismo diente o, si no hay, el primero no descartado) y su diagnóstico. Lo ya vinculado manda y no se pisa. **A validar**: que preseleccionar no lleve a guardar un vínculo que nadie revisó; se puede sacar con la ✕.

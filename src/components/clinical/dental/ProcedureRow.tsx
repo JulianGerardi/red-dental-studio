@@ -10,8 +10,8 @@ export type EstadoFila = 'default' | 'selected' | 'inactive' | 'error' | 'disabl
 export const ESTADOS_FILA: EstadoFila[] = ['default', 'selected', 'inactive', 'error', 'disabled']
 
 const CAJA: Record<EstadoFila, string> = {
-  default: 'border-line bg-white hover:border-line-strong',
-  selected: 'border-dash-blue bg-white',
+  default: 'border-line bg-surface hover:border-line-strong',
+  selected: 'border-dash-blue bg-surface',
   inactive: 'border-input-inactive bg-input-inactive-bg',
   error: 'border-field-error bg-dash-bad-bg',
   disabled: 'border-line bg-surface-muted',
@@ -31,7 +31,7 @@ export function ConAyuda({ texto, children }: { texto: string; children: React.R
   return (
     <Tooltip>
       <TooltipTrigger asChild>{children}</TooltipTrigger>
-      <TooltipContent side="top" sideOffset={4} className="bg-ink text-white">{texto}</TooltipContent>
+      <TooltipContent side="top" sideOffset={4} className="bg-tooltip text-white">{texto}</TooltipContent>
     </Tooltip>
   )
 }

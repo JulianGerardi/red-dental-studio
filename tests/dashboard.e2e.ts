@@ -4,8 +4,6 @@ import { expect } from 'e2e'
 /* Dashboard: la fecha es el bloque ‹ Today › + calendario (ui/date-nav, el mismo de Scheduling); el campo dice
    "Feb 28, 2026". Ver design-reference/figma/modulos/dashboard.md (2026-11-24). */
 
-const largo = (d: Date) => d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
-
 test('La fecha se lee "Feb 28, 2026"; elegir un día lo cambia y Today vuelve a hoy', async ({ app, screen }) => {
   await app.open('/')
   const fecha = screen.getByRole('button', 'Feb 28, 2026')
@@ -17,12 +15,14 @@ test('La fecha se lee "Feb 28, 2026"; elegir un día lo cambia y Today vuelve a 
   await expect(screen.getByRole('dialog')).toHaveCount(0)
   await expect(screen.getByRole('button', 'Feb 27, 2026')).toBeVisible()
 
-  // Las flechas mueven un día; Today vuelve a hoy y queda apagado (ui/date-nav, dashboard.md 2026-11-24).
+  // Las flechas mueven un día; Today vuelve al hoy de la demo y queda activo (ui/date-nav, dashboard.md 2026-11-26).
+  await expect(screen.getByRole('button', 'Today')).toHaveAttribute('aria-pressed', 'false')
   await screen.getByRole('button', 'Next day').tap()
-  await expect(screen.getByRole('button', 'Feb 28, 2026')).toBeVisible()
+  await screen.getByRole('button', 'Next day').tap()
+  await expect(screen.getByRole('button', 'Mar 1, 2026')).toBeVisible()
   await screen.getByRole('button', 'Today').tap()
-  await expect(screen.getByRole('button', largo(new Date()))).toBeVisible()
-  await expect(screen.getByRole('button', 'Today')).toBeDisabled()
+  await expect(screen.getByRole('button', 'Feb 28, 2026')).toBeVisible()
+  await expect(screen.getByRole('button', 'Today')).toHaveAttribute('aria-pressed', 'true')
 })
 
 /* Cada columna muestra unos pocos y "Show N more" abre el resto; el total va en el título (comparativa del 2026-11-19,

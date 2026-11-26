@@ -224,3 +224,19 @@ clínica como en `526:372`, el degradé siempre arrancando en blanco y los texto
    Evans (paciente), John Doe (guardian y empleado).
 5. **"Sign In"** con mayúscula en *Guardian access added* y **"canceled"/"cancelled"**: se unificó en "Sign in" y en
    "canceled" (inglés de EE. UU., como el Figma), también en los asuntos y los nombres de la lista.
+
+## 2026-11-26 · Descargar el mail en PDF (CON-3325)
+
+Pedido de Julián: poder bajar el mail en PDF, sólo el mail.
+
+- **Botón *Download PDF*** al lado de *Download HTML*. El PDF es una sola página del tamaño del mail (fondo gris y
+  tarjeta, sin la página de vista previa alrededor), tal como se ve en ese momento: ancho de escritorio o de celular,
+  datos de ejemplo o variables, y el color del logo elegido. Se llama `<id>.pdf` y lleva el asunto como título.
+- **Se arma en el navegador:** `html-to-image` (ya estaba en el proyecto) saca la imagen del mail al doble de
+  resolución y `jspdf` la pone en la página. jsPDF se carga recién al tocar el botón, así no pesa en la página. Mientras
+  se arma, el botón dice *Creating PDF…* y queda deshabilitado; si falla, un toast avisa "Couldn’t create the PDF. Try
+  again.".
+- **Por qué no "Imprimir → Guardar como PDF":** suma un diálogo del sistema y cada navegador le agrega márgenes y
+  encabezados. **Contra:** el texto del PDF es imagen, no se puede seleccionar ni buscar. Si hace falta texto, la
+  alternativa es generarlos al exportar con Playwright (`page.pdf()`), pero quedarían fijos con los datos de ejemplo.
+- Los links del mail no se pueden tocar en el PDF.

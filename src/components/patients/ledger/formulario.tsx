@@ -78,7 +78,7 @@ export function CampoFecha({ value, onChange, error }: { value: Date | null; onC
     Adjustment Information), sin el ícono ni el plegado de red.dev (pedido de Julián, ledger.md 2026-11-20). */
 export function SeccionLedger({ titulo, children }: { titulo: string; children: ReactNode }) {
   return (
-    <section aria-label={titulo} data-campos="fila" className="@container flex flex-col gap-4 rounded-lg border border-line bg-white p-4 sm:p-5">
+    <section aria-label={titulo} data-campos="fila" className="@container flex flex-col gap-4 rounded-lg border border-line bg-surface p-4 sm:p-5">
       <h3 className="text-sm font-bold text-ink">{titulo}</h3>
       {children}
     </section>

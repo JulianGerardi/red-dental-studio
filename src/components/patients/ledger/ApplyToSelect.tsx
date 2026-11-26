@@ -51,7 +51,7 @@ export function ApplyToSelect({
                     aria-hidden
                     className={cn(
                       'flex size-8 shrink-0 items-center justify-center rounded-md border',
-                      elegida ? 'border-dash-blue/30 bg-white text-dash-blue' : 'border-line bg-surface-muted text-ink-muted',
+                      elegida ? 'border-dash-blue/30 bg-surface text-dash-blue' : 'border-line bg-surface-muted text-ink-muted',
                     )}
                   >
                     <Icono className="size-4" strokeWidth={1.75} />

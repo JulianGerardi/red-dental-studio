@@ -18,7 +18,7 @@ export { DIRECTORIO, type PersonaDirectorio }
    (relationships.md, 2026-11-12). */
 export function PersonaSeleccionada({ p }: { p: PersonaDirectorio }) {
   return (
-    <div className="flex items-center gap-3 rounded-lg border border-dash-blue bg-white p-3">
+    <div className="flex items-center gap-3 rounded-lg border border-dash-blue bg-surface p-3">
       <PersonaFila nombre={p.name} chips={chipsPersona(p.dob, p.email)} />
     </div>
   )
@@ -33,7 +33,7 @@ export function OpcionDireccion({ texto, elegida, onElegir }: { texto: string; e
       aria-checked={elegida}
       onClick={onElegir}
       className={cn(
-        'flex min-h-11 items-center gap-3 rounded-lg border bg-white px-3 py-2 text-left text-[13px] text-ink',
+        'flex min-h-11 items-center gap-3 rounded-lg border bg-surface px-3 py-2 text-left text-[13px] text-ink',
         elegida ? 'border-dash-blue' : 'border-line hover:bg-surface-subtle',
       )}
     >

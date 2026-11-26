@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 import { Power, PowerOff, Search, Trash2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
-import { Pill } from '@/components/ui/pill'
+import { Pill, type PillTone } from '@/components/ui/pill'
 import { SearchInput } from '@/components/ui/search-input'
 import { EmptyState } from '@/components/ui/empty-state'
 import { RowActionsMenu } from '@/components/ui/row-actions-menu'
@@ -47,18 +47,27 @@ export function PanelLista({ titulo, q, onQ, placeholder, filtro, pestanas, vaci
   )
 }
 
+/* Un estado con otro nombre que Active / Inactive (Archived en Fee schedules), con el tono de su pill. */
+export type EstadoLista = { nombre: string; tono: PillTone }
+const pillEstado = (activo: boolean, estado?: EstadoLista) =>
+  estado ?? { nombre: activo ? 'Active' : 'Inactive', tono: activo ? 'success' as const : 'neutral' as const }
+
 /* Un ítem de la lista: nombre y ⋮ en la primera línea, estado y datos secundarios debajo. Se abre con `to` (ruta) u
-   `onElegir`. El menú: Activate o Deactivate y, después de una línea, Delete en rojo. */
-export function ItemLista({ nombre, activo, elegido, to, onElegir, extra, onAlternar, onBorrar, bloqueado, abierto }: {
+   `onElegir`. El menú: Activate o Deactivate y, después de una línea, Delete en rojo; `acciones` lo reemplaza. */
+export function ItemLista({ nombre, activo, estado, elegido, to, onElegir, extra, onAlternar, onBorrar, acciones, bloqueado, abierto }: {
   nombre: string
   activo: boolean
+  /** La pill cuando no es Active / Inactive: los estados de un fee schedule. */
+  estado?: EstadoLista
   elegido: boolean
   to?: string
   onElegir?: () => void
-  /** Debajo del nombre, después del estado: System, cantidad de procedimientos. */
+  /** Debajo del nombre, después del estado: System, cantidad de procedimientos, Default. */
   extra?: ReactNode
-  onAlternar: () => void
-  onBorrar: () => void
+  onAlternar?: () => void
+  onBorrar?: () => void
+  /** Los ítems del ⋮ en lugar de Activate / Delete (Fee schedules: Inactive y Archive). */
+  acciones?: ReactNode
   /** El motivo por el que no se puede activar, desactivar ni borrar (un template System): las acciones quedan deshabilitadas. */
   bloqueado?: string
   /** Sólo para las stories: deja el menú abierto. */
@@ -68,7 +77,7 @@ export function ItemLista({ nombre, activo, elegido, to, onElegir, extra, onAlte
     <>
       <span className={cn('line-clamp-2 w-full text-sm font-semibold', activo ? 'text-ink' : 'text-ink-faint')}>{nombre}</span>
       <span className="flex flex-wrap items-center gap-1.5">
-        <Pill tone={activo ? 'success' : 'neutral'} size="sm">{activo ? 'Active' : 'Inactive'}</Pill>
+        <Pill tone={pillEstado(activo, estado).tono} size="sm">{pillEstado(activo, estado).nombre}</Pill>
         {extra}
       </span>
     </>
@@ -78,7 +87,7 @@ export function ItemLista({ nombre, activo, elegido, to, onElegir, extra, onAlte
     <li
       className={cn(
         'flex items-start gap-2 rounded-lg border py-2.5 pr-2 pl-3 transition-colors has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-dash-blue/40',
-        elegido ? 'border-dash-blue bg-info-bg' : 'border-line bg-white hover:bg-surface-subtle',
+        elegido ? 'border-dash-blue bg-info-bg' : 'border-line bg-surface hover:bg-surface-subtle',
       )}
     >
       {to ? (
@@ -87,6 +96,7 @@ export function ItemLista({ nombre, activo, elegido, to, onElegir, extra, onAlte
         <button type="button" onClick={onElegir} aria-current={elegido || undefined} className={area}>{contenido}</button>
       )}
       <RowActionsMenu label={nombre} abierto={abierto} className="-my-0.5">
+        {acciones ?? <>
         <DropdownMenuItem disabled={!!bloqueado} onSelect={onAlternar}>
           {activo ? <PowerOff className="size-4 shrink-0" /> : <Power className="size-4 shrink-0" />} {activo ? 'Deactivate' : 'Activate'}
         </DropdownMenuItem>
@@ -95,17 +105,20 @@ export function ItemLista({ nombre, activo, elegido, to, onElegir, extra, onAlte
           <Trash2 className="size-4 shrink-0" /> Delete
         </DropdownMenuItem>
         {bloqueado && <p className="max-w-[220px] px-1.5 pt-1 pb-1.5 text-[11px] leading-snug text-ink-muted">{bloqueado}</p>}
+        </>}
       </RowActionsMenu>
     </li>
   )
 }
 
-/* El título del editor con el estado al lado: Edit coverage table / Edit template + Active o Inactive. */
-export function EncabezadoEditor({ titulo, activo }: { titulo: string; activo?: boolean }) {
+/* El título del editor con el estado al lado: Edit coverage table / Edit template + Active o Inactive (o `estado`). */
+export function EncabezadoEditor({ titulo, activo, estado, extra }: { titulo: string; activo?: boolean; estado?: EstadoLista; extra?: ReactNode }) {
+  const pill = activo !== undefined || estado ? pillEstado(activo ?? false, estado) : undefined
   return (
     <div className="flex flex-wrap items-center gap-2">
       <h2 className="text-[15px] font-bold text-ink">{titulo}</h2>
-      {activo !== undefined && <Pill tone={activo ? 'success' : 'neutral'} size="sm">{activo ? 'Active' : 'Inactive'}</Pill>}
+      {pill && <Pill tone={pill.tono} size="sm">{pill.nombre}</Pill>}
+      {extra}
     </div>
   )
 }
@@ -118,7 +131,7 @@ export function PieEditor({ izquierda, onCancelar, onGuardar, guardarDeshabilita
   guardarDeshabilitado?: boolean
 }) {
   return (
-    <div className="sticky bottom-0 z-10 -mx-4 -mb-4 flex flex-wrap items-center justify-end gap-3 rounded-b-lg border-t border-line bg-white px-4 py-3 sm:-mx-5 sm:-mb-5 sm:px-5">
+    <div className="sticky bottom-0 z-10 -mx-4 -mb-4 flex flex-wrap items-center justify-end gap-3 rounded-b-lg border-t border-line bg-surface px-4 py-3 sm:-mx-5 sm:-mb-5 sm:px-5">
       {izquierda && <div className="mr-auto">{izquierda}</div>}
       <div className="flex gap-3">
         <Button variant="secondary" className="px-6" onClick={onCancelar}>Cancel</Button>

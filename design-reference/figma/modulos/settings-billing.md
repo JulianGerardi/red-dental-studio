@@ -1,5 +1,95 @@
 # Settings → Billing (Fee Schedules, Carriers, Coverage Table)
 
+
+## Atajos de Billing en un ⋮ y Settings › Overview (2026-11-26)
+
+Julián: *"los accesos rápidos de Billing ponelo en un elipsis, así quedan las cards iguales"*. Los tres atajos de la card
+de Billing (abajo, misma fecha) pasan a un ⋮ arriba a la derecha (`RowActionsMenu`, *Fee schedules / Carriers / Coverage
+tables*): la card mide y se ve como las demás. El resto de la card sigue llevando a Billing.
+
+También: la portada de Settings se llama **Overview** (título y su ítem del menú; antes *General* en el menú y *Settings*
+de título). La ruta sigue siendo `/settings/general` y el primer tramo del breadcrumb sigue diciendo *Settings*, que es la
+sección.
+
+## Billing con pestañas y atajos desde Settings (2026-11-26)
+
+Julián: *"dentro de Billing tenemos 3 opciones … para acceder debo ir siempre al menú y eso es tedioso; creemos alguna
+idea para que sea de fácil acceso, también desde Settings General"*.
+
+1. **Billing es una pantalla con tres pestañas**, como *Ledger options*: título *Billing*, la acción de la sección a la
+   derecha (*New fee schedule / New carrier / New coverage table*) y debajo **Fee schedules · Carriers · Coverage tables**
+   (`finance/BillingHeader`). Cada pestaña es su ruta de siempre. Se pasa de una a otra sin abrir el menú.
+2. **Las pestañas son links** (`ui/tabs` › `TabLinks`, mismo look que `Tabs`, con `aria-current`): cambian de pantalla,
+   no de vista, y así el aviso de cambios sin guardar del Edit Fee Schedule las frena como a cualquier link.
+3. **Settings General**: la card de Billing suma tres atajos (*Fee schedules*, *Carriers*, *Coverage tables*) que van
+   directo a la sección. La card sigue llevando a Billing (título con el área estirada; los atajos van por encima, porque
+   no se puede anidar un link en otro). Sirve para cualquier sección con `children` en `settings-nav.ts`.
+4. **Breadcrumb**: corrige lo de abajo (misma fecha). Billing vuelve a ser link porque ahora tiene pantalla: las tres
+   pestañas terminan en `Settings / Billing` (coincide con el título) y lo de adentro cuelga de Billing con link a la
+   pestaña de donde viene: `Settings / Billing / New fee schedule`, `Settings / Billing / Aetna Dental Plans / Acme Corp`.
+   El tramo de la sección se va: llevaba a la misma pestaña que Billing.
+
+**A validar con usuarios:** si se descubren los atajos de la card (o se sigue entrando por el menú), y que *Billing* de
+Settings no se confunda con el módulo Billing del menú lateral, que tiene el mismo nombre.
+
+## Breadcrumb de Billing coherente (2026-11-26)
+
+Julián: *"los breadcrumbs funcionan mal, son incoherentes"*. Relevadas las 25 rutas de Settings (breadcrumb, título y
+destino de cada link). Lo que no cerraba en Billing:
+
+1. **Billing llevaba a Fee schedules.** `/settings/finance` redirige a Fee schedules, así que desde Carriers o Coverage
+   tables el tramo *Billing* abría otra sección, y en Fee schedules apuntaba a la misma pantalla. Billing no tiene pantalla
+   propia: pasa a **texto sin link** (`Settings / Billing / Carriers`). No se inventa una página de Billing.
+2. **Lista y editor en una pantalla, dos reglas.** Consents termina en la sección (`Settings / Consents`) elija lo que
+   elija; Fee schedules y Coverage tables sumaban el ítem elegido (`… / Fee schedules / Aetna 2026`) con el título
+   *Fee schedules* debajo, y el tramo *Fee schedules* volvía a la misma pantalla sin nada elegido. Ahora terminan en la
+   sección, como Consents: el último tramo coincide con el título y el ítem elegido se ve marcado en la lista.
+3. Sin cambios: Carriers sí lleva el nombre (`… / Carriers / Aetna Dental Plans / Acme Corp`), porque el carrier y el plan
+   son pantallas aparte; *Aetna Dental Plans* vuelve a la pestaña de planes. *New fee schedule* y *New coverage table*
+   cuelgan de su lista.
+
+**Queda para decidir (no se tocó, es texto de la pantalla):** el título no dice lo mismo que el último tramo en Consents
+(*Consent templates*), Ledger (*Ledger options*), Preferences (*Account preferences*), Account (*Edit account*) y el carrier
+(*Edit carrier* bajo *Aetna Dental Plans*) y el plan (*Edit insurance plan* bajo *Acme Corp*).
+
+## Edit Fee Schedule con el diseño de Coverage tables (2026-11-26)
+
+Sin historia de abril (epic CON-57). Pedido de Julián: *"que fee scheduling tenga el mismo diseño que coverage table"*. Edit
+Fee Schedule deja la card única con `MasterList` y pasa al patrón de `components/settings/ListaEditor.tsx` (ver
+2026-11-24, Coverage tables y Consents). El contenido es el mismo: campos, versiones, tabla, Copy form, Bulk edit,
+*Non-zero fees* y el aviso al salir.
+
+1. **Dos cards**: lista de 340 px (*Fee schedules*, buscador `sm` y *Filter* `sm` al lado) y editor con el resto. Bajan una
+   debajo de la otra por debajo de 768 px de contenedor. El título de la página pasa a *Fee schedules*, como *Coverage
+   tables*; el editor dice *Edit fee schedule* con la pill del estado guardado (y *Default* si lo es).
+2. **Ítem**: la card de `ItemLista` con la pill del estado (*Active / Inactive / Archived*, con los tonos de la tabla:
+   `TONO_ARANCEL`) en lugar del punto de color, y *Default* al lado. El ⋮ sigue siendo el de fee schedules (*Inactive /
+   Active*, *Archive / Restore*, con Undo): `ItemLista` suma `estado` y `acciones` para no forzar Deactivate / Delete.
+   No hay Delete: los fee schedules se archivan.
+3. **Editor**: se va el título *General information* (el encabezado del editor ocupa su lugar). *Copy form* y *Bulk edit*
+   bajan justo encima de la tabla, a la derecha, como *Manage exceptions* y *Add range*; el buscador de procedimientos y
+   *Non-zero fees* quedan a la izquierda en la misma fila.
+4. **Pie** de `PieEditor`: línea, fijo abajo, *Cancel · Save* a la derecha (antes Cancel a la izquierda). *Cancel* sigue
+   pasando por el aviso de cambios sin guardar.
+5. **New fee schedule** usa la misma card del editor, sin encabezado (como *New coverage table*).
+6. `MasterList` queda sin uso en la app (sólo en su story).
+
+### Sin la tabla al entrar (Julián, 2026-11-26)
+
+*"Al inicio no va la tabla directamente, va lo creado, porque si no es redundante."* `/settings/finance/fee-schedule` ya
+no muestra la `DataTable` (Name, Type, Assignments, Effective, Last updated, Status): abre la lista y el editor vacío
+(*No fee schedule selected*), como `/settings/finance/coverage-table`. Una sola pantalla para las dos rutas.
+
+7. **El ⋮ de cada ítem** suma lo que sólo estaba en la tabla: *View assignments* y *Compare fees*, una línea y después
+   *Inactive / Active* y *Archive / Restore*. *Edit* no hace falta: tocar el ítem lo abre.
+8. **Se pierden de la vista** *Assignments* (el número con el desglose al pasar), *Effective* y *Last updated*. Effective
+   se ve en *Fee schedule version*; las asignaciones, en *View assignments*. Si recepción o administración extrañan
+   *Last updated* o el número de asignaciones de un vistazo, sumarlos como `extra` del ítem.
+
+**A validar con usuarios:** que con la lista de 340 px el editor tenga ancho suficiente en notebooks de 1024–1280 px
+(Description se parte en dos líneas antes que antes), y que la pill *Inactive* en rojo no se lea como error al lado del
+gris de Coverage.
+
 ## Coverage tables y Consents con el mismo patrón (2026-11-24)
 
 **CON-1488** (Delete Coverage Table Template, sin descripción en Jira). Pedido de Julián con un HTML de referencia y un

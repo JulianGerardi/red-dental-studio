@@ -43,12 +43,12 @@ export function DentalArch({ arriba, abajo, marcados, actual, conSuperficies, on
         className={cn(
           'absolute flex size-6 items-center justify-center rounded-full border text-[10px] font-semibold tabular-nums transition-colors',
           'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-dash-blue disabled:cursor-not-allowed disabled:opacity-50',
-          marcado ? 'border-dash-blue bg-dash-blue text-white' : 'border-line-strong bg-white text-ink hover:border-dash-blue hover:bg-dash-count-bg',
+          marcado ? 'border-dash-blue bg-dash-blue text-white' : 'border-line-strong bg-surface text-ink hover:border-dash-blue hover:bg-dash-count-bg',
           actual === d && 'ring-2 ring-dash-blue ring-offset-2',
         )}
       >
         {d}
-        {conSuperficies.includes(d) && <span aria-hidden className="absolute -top-0.5 -right-0.5 size-2 rounded-full border border-white bg-warn-fg" />}
+        {conSuperficies.includes(d) && <span aria-hidden className="absolute -top-0.5 -right-0.5 size-2 rounded-full border border-surface bg-warn-fg" />}
       </button>
     )
   }

@@ -47,7 +47,7 @@ const ACCIONES_EXAMEN: { label: string; ayuda: string; icono: LucideIcon; modo: 
   { label: 'Add procedure', ayuda: 'Chart a planned procedure', icono: Plus, modo: 'procedure' },
   { label: 'Add condition', ayuda: 'Chart a condition or work the patient already has', icono: Stethoscope, modo: 'condition' },
 ]
-const BOTON_ACCION = cn(BOTON_EXPANDIBLE, 'border-line bg-white shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] hover:bg-surface-subtle')
+const BOTON_ACCION = cn(BOTON_EXPANDIBLE, 'border-line bg-surface shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] hover:bg-surface-subtle')
 
 function useEstadoFindings() {
   const [findings, setFindings] = useState<Finding[]>(INITIAL_FINDINGS)
@@ -174,7 +174,7 @@ export function ExamLayout({ findings: conFindings = true, examen, extra, onCond
   return (
     <div className="flex w-full flex-col gap-4 lg:flex-row lg:items-stretch">
       {conFindings && (
-        <div className="order-2 flex w-full shrink-0 flex-col gap-3 rounded-lg bg-white shadow-panel p-3 lg:order-1 lg:w-[300px]">
+        <div className="order-2 flex w-full shrink-0 flex-col gap-3 rounded-lg bg-surface shadow-panel p-3 lg:order-1 lg:w-[300px]">
           <ExamPanelHeader tab={reviewState.tab} onTabChange={reviewState.setTab} onNewReview={reviewState.openDialog} />
           <div className="flex w-full flex-col gap-3 lg:max-h-[70vh] lg:overflow-y-auto">
             {reviewState.tab === 'Findings' ? (
@@ -203,7 +203,7 @@ export function ExamLayout({ findings: conFindings = true, examen, extra, onCond
                   <span className={ETIQUETA_EXPANDIBLE}>{label}</span>
                 </button>
               </TooltipTrigger>
-              <TooltipContent side="bottom" sideOffset={6} className="bg-ink text-white">{ayuda}</TooltipContent>
+              <TooltipContent side="bottom" sideOffset={6} className="bg-tooltip text-white">{ayuda}</TooltipContent>
             </Tooltip>
           ))}
           <ProblemListFlotante />

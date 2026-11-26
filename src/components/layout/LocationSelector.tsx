@@ -145,7 +145,7 @@ export function LocationSelector() {
         aria-expanded={open}
         aria-haspopup="dialog"
         className={cn(
-          'flex h-7 items-center gap-2.5 rounded-md border bg-white py-1 pr-[9px] pl-[7px] transition-colors',
+          'flex h-7 items-center gap-2.5 rounded-md border bg-surface py-1 pr-[9px] pl-[7px] transition-colors',
           /* Abierto, el selector toma borde azul (Figma: border-dash-blue). */
           open ? 'border-dash-blue' : 'border-line',
         )}
@@ -168,7 +168,7 @@ export function LocationSelector() {
           role="dialog"
           aria-label="Select location"
           className={cn(
-            'absolute top-[calc(100%+5px)] left-0 z-50 w-[320px] max-w-[calc(100vw-24px)] rounded-xl border border-line bg-white p-4',
+            'absolute top-[calc(100%+5px)] left-0 z-50 w-[320px] max-w-[calc(100vw-24px)] rounded-xl border border-line bg-surface p-4',
             'flex flex-col gap-3 shadow-floating',
             'motion-safe:animate-[loc-in_140ms_ease-out]',
           )}
@@ -189,7 +189,7 @@ export function LocationSelector() {
               value={q}
               onChange={(e) => setQ(e.target.value)}
               placeholder="Search..."
-              className="focus:border-dash-blue h-8 w-full rounded-md border border-line bg-white pr-3 pl-9 text-[13px] font-medium shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] placeholder:text-ink-faint focus:outline-none"
+              className="focus:border-dash-blue h-8 w-full rounded-md border border-line bg-surface pr-3 pl-9 text-[13px] font-medium shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] placeholder:text-ink-faint focus:outline-none"
             />
           </div>
 
