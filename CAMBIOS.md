@@ -5,7 +5,7 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-11-26
 
-### Edit procedure: sin overrides del estimado y con un finding y un diagnóstico por defecto (CON-4211)
+### Edit procedure: sin overrides del estimado y con un finding y un diagnóstico por defecto (CON-4211) ([#200](https://github.com/JulianGerardi/red-dental-studio/pull/200))
 - `ProcedureEstimate` ya no lleva *Insurance estimate overrides*: se saca `override` de `EstimadoProcedimiento` y de
   `resolverEstimado` (`data/estimaciones.ts`). Backend: el estimado guarda sólo el modo (automático o a mano) y los montos.
 - *Link findings* y *Link diagnosis* pierden la bajada; si el procedimiento no tiene vínculos, `EditProcedureDrawer` arranca
