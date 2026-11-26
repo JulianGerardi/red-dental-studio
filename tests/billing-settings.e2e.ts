@@ -192,11 +192,13 @@ test('Coverage tables: pestañas por tipo y el menú desactiva y borra', async (
   await expect(screen.getByRole('link', /^Standard PPO/)).toHaveCount(0)
 })
 
-/* Acceso rápido (2026-11-26): desde Settings General se entra directo a cada sección de Billing, y en Billing se pasa de
-   una a otra con las pestañas, sin abrir el menú. */
-test('Billing: atajos desde Settings y pestañas entre secciones', async ({ app, screen }) => {
+/* Acceso rápido (2026-11-26): desde Overview se entra directo a cada sección de Billing con el ⋮ de su card, y en Billing
+   se pasa de una a otra con las pestañas, sin abrir el menú. */
+test('Billing: atajos desde Overview y pestañas entre secciones', async ({ app, screen }) => {
   await app.open('/settings/general')
-  await screen.getByRole('navigation', 'Billing sections').getByRole('link', 'Carriers').tap()
+  await expect(screen.getByRole('heading', 'Overview')).toBeVisible()
+  await screen.getByRole('button', 'Actions for Billing sections').tap()
+  await screen.getByRole('menuitem', 'Carriers').tap()
   await expect(screen.getByRole('link', 'Aetna Dental Plans')).toBeVisible()
 
   const secciones = screen.getByRole('navigation', 'Billing sections')

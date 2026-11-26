@@ -16,6 +16,7 @@ import { LOCACIONES } from '@/pages/settings/Locations'
 import { EMPLEADOS } from '@/data/employees'
 import { CUENTAS } from '@/pages/settings/Accounts'
 import { useFinanzas } from '@/data/finanzasStore'
+import { useRoles } from '@/data/rolesStore'
 
 export const SETTINGS_ICONS: Record<string, LucideIcon> = {
   'user-cog': UserCog, building: Building2, users: Users, 'shield-check': ShieldCheck,
@@ -54,7 +55,7 @@ function migasFinanzas(pathname: string, nombre: (seccion: string, id: string) =
   return migas
 }
 
-function migasDe(pathname: string, nombreFinanzas: (seccion: string, id: string) => string | undefined): Miga[] {
+function migasDe(pathname: string, nombreFinanzas: (seccion: string, id: string) => string | undefined, nombreRol: (id: string) => string | undefined): Miga[] {
   if (pathname === '/settings/general') return []
   const finanzas = migasFinanzas(pathname, nombreFinanzas)
   if (finanzas) return finanzas
@@ -64,8 +65,8 @@ function migasDe(pathname: string, nombreFinanzas: (seccion: string, id: string)
     (n) => pathname === n.to || pathname.startsWith(`${n.to}/`),
   )
   if (item) {
-    /* .../new es la lista con el drawer de alta abierto. */
-    const hoja = pathname === item.to || pathname === `${item.to}/new`
+    /* .../new es la lista con el drawer de alta abierto; en Roles, una página propia (roles.md, 2026-11-26). */
+    const hoja = pathname === item.to || (pathname === `${item.to}/new` && item.to !== '/settings/roles')
     migas.push({ label: item.label, to: hoja ? undefined : item.to })
     const hijo = item.children?.find((c) => pathname === c.to || pathname.startsWith(`${c.to}/`))
     if (hijo) migas.push({ label: hijo.label })
@@ -84,6 +85,9 @@ function migasDe(pathname: string, nombreFinanzas: (seccion: string, id: string)
     const emp = EMPLEADOS.find((e) => e.id === detalleEmpleado[1])
     migas.push({ label: emp?.nombre ?? detalleEmpleado[1] })
   }
+  /* La página de un rol (roles.md, 2026-11-26): su nombre, o New role. */
+  const detalleRol = pathname.match(/^\/settings\/roles\/([^/]+)$/)
+  if (detalleRol) migas.push({ label: detalleRol[1] === 'new' ? 'New role' : nombreRol(detalleRol[1]!) ?? detalleRol[1]! })
   const detalleCuenta = pathname.match(/^\/settings\/accounts\/([^/]+)$/)
   if (detalleCuenta) {
     const cuenta = CUENTAS.find((c) => c.id === detalleCuenta[1])
@@ -96,7 +100,8 @@ export function SettingsLayout() {
   const { pathname } = useLocation()
   const { aranceles, aseguradoras, coberturas, planes } = useFinanzas()
   const listas: Record<string, { id: string; nombre: string }[]> = { 'fee-schedule': aranceles, carriers: aseguradoras, 'coverage-table': coberturas, planes }
-  const migas = migasDe(pathname, (seccion, id) => listas[seccion]?.find((x) => x.id === id)?.nombre)
+  const { roles } = useRoles()
+  const migas = migasDe(pathname, (seccion, id) => listas[seccion]?.find((x) => x.id === id)?.nombre, (id) => roles.find((r) => r.id === id)?.nombre)
   return (
     /* El sidebar propio de Settings se fue —sus pantallas cuelgan del menú
        flotante del rail—. El breadcrumb vive acá y en ningún otro lado: cuando
@@ -120,7 +125,8 @@ export function SettingsLayout() {
 export function SettingsGeneral() {
   return (
     <div className={PADDING_PAGINA}>
-      <PageTitle>Settings</PageTitle>
+      {/* Overview, como su ítem del menú (Julián, 2026-11-26; antes General y el título Settings). */}
+      <PageTitle>Overview</PageTitle>
 
       <div className="mt-6 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
         {SETTINGS_SECTIONS.map((s) => {
