@@ -3,6 +3,16 @@
 Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber el dev. El porqué de cada decisión está en
 `design-reference/figma/modulos/<módulo>.md`; lo anterior al 2026-10-06, en `git log` y en esos mismos archivos.
 
+## 2026-11-26
+
+### Dashboard y Scheduling: la navegación de fecha se marca en azul en hoy
+- **`ui/date-nav` (`DateNav`):** cuando se está viendo hoy, todo el bloque queda activo con el estado de un filtro
+  aplicado (`ui/filter-menu`): borde y texto `dash-blue` sobre `info-bg`. Fuera de hoy, el bloque blanco de siempre.
+  *Today* ya no se deshabilita: lleva `aria-pressed` y siempre vuelve a `hoy`.
+- **Qué cuenta como hoy:** en Day, el mismo día; en Week y Month, si la semana o el mes que se ve incluye `hoy`.
+- **Dashboard:** pasa `hoy={HOY_DEMO}` (antes comparaba con la fecha real y Today nunca quedaba en hoy). Scheduling
+  sigue con `FECHA_ANCLA`. Si una pantalla nueva usa `DateNav` con datos de demo, pasale su `hoy`.
+
 ## 2026-11-25
 
 ### Clinical Mode: Edit finding / Edit procedure desde las tablas, Estimate y la card del plan (CON-4211, CON-2770) ([#199](https://github.com/JulianGerardi/red-dental-studio/pull/199))
