@@ -5,7 +5,7 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-11-26
 
-### Dashboard y Scheduling: la navegación de fecha se marca en azul en hoy
+### Dashboard y Scheduling: la navegación de fecha se marca en azul en hoy ([#201](https://github.com/JulianGerardi/red-dental-studio/pull/201))
 - **`ui/date-nav` (`DateNav`):** cuando se está viendo hoy, todo el bloque queda activo con el estado de un filtro
   aplicado (`ui/filter-menu`): borde y texto `dash-blue` sobre `info-bg`. Fuera de hoy, el bloque blanco de siempre.
   *Today* ya no se deshabilita: lleva `aria-pressed` y siempre vuelve a `hoy`.
