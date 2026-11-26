@@ -870,5 +870,5 @@ Scheduling:
 
 ## Today activo en la navegación de fecha (2026-11-26)
 
-En el día de la demo (`FECHA_ANCLA`), *Today* queda activo (el chip azul de `ui/tabs`) en vez de gris apagado; igual en
+En el día de la demo (`FECHA_ANCLA`), todo el bloque queda activo (borde y texto azules sobre celeste, como un filtro aplicado) en vez de *Today* gris apagado; igual en
 el Dashboard. Detalle en `dashboard.md` (2026-11-26).

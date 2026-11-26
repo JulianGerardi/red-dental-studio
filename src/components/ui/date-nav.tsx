@@ -69,20 +69,19 @@ export function DateNav({ value, onChange, periodo = 'day', hoy = new Date(), ma
       role="group"
       aria-label="Date navigation"
       data-tour={tour}
-      className={cn('inline-flex h-8 shrink-0 items-stretch overflow-hidden rounded-md border border-line bg-white text-[13px] shadow-[0_1px_2px_0_rgb(0_0_0/0.05)]', className)}
+      className={cn(
+        'inline-flex h-8 shrink-0 items-stretch overflow-hidden rounded-md border text-[13px] shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] transition-colors',
+        /* En hoy, todo el bloque queda activo como un filtro aplicado (ui/filter-menu): borde y texto azules sobre celeste. */
+        enHoy ? 'border-dash-blue bg-info-bg [&_button]:text-dash-blue [&_button:hover]:bg-dash-blue/10' : 'border-line bg-white',
+        className,
+      )}
     >
       <button type="button" aria-label={`Previous ${NOMBRE[periodo]}`} onClick={() => onChange(moverPeriodo(value, periodo, -1))} className={cn(BOTON, 'w-8')}>
         <ChevronLeft className="size-4" />
       </button>
-      {/* En hoy, Today queda activo como la pestaña activa de ui/tabs (azul, texto blanco); dice dónde estás sin mover el
-          bloque (dashboard.md, 2026-11-26). */}
-      <button
-        type="button"
-        aria-pressed={enHoy}
-        onClick={() => onChange(hoy)}
-        className={cn(BOTON, 'px-1 font-medium', enHoy && 'hover:bg-white')}
-      >
-        <span className={cn('rounded-md px-2 py-1 leading-4 transition-colors', enHoy && 'bg-dash-blue text-white')}>Today</span>
+      {/* Today dice si se está viendo hoy (dashboard.md, 2026-11-26). */}
+      <button type="button" aria-pressed={enHoy} onClick={() => onChange(hoy)} className={cn(BOTON, 'px-2 font-medium')}>
+        Today
       </button>
       <button type="button" aria-label={`Next ${NOMBRE[periodo]}`} onClick={() => onChange(moverPeriodo(value, periodo, 1))} className={cn(BOTON, 'w-8')}>
         <ChevronRight className="size-4" />
@@ -92,11 +91,11 @@ export function DateNav({ value, onChange, periodo = 'day', hoy = new Date(), ma
         <PopoverTrigger asChild>
           <button
             type="button"
-            className={cn(BOTON, 'min-w-0 gap-2 border-l border-line px-3 font-medium whitespace-nowrap data-[state=open]:bg-surface-subtle sm:min-w-[184px]')}
+            className={cn(BOTON, 'min-w-0 gap-2 border-l px-3 font-medium whitespace-nowrap data-[state=open]:bg-surface-subtle sm:min-w-[184px]', enHoy ? 'border-dash-blue/30 data-[state=open]:bg-dash-blue/10' : 'border-line')}
           >
             <Calendar aria-hidden className="text-dash-blue size-4 shrink-0" />
             <span className="truncate">{etiquetaPeriodo(value, periodo)}</span>
-            <ChevronDown aria-hidden className={cn('size-3.5 shrink-0 text-ink-muted transition-transform', abierto && 'rotate-180')} />
+            <ChevronDown aria-hidden className={cn('size-3.5 shrink-0 transition-transform', enHoy ? 'text-dash-blue' : 'text-ink-muted', abierto && 'rotate-180')} />
           </button>
         </PopoverTrigger>
         <PopoverContent align="start" collisionPadding={12} aria-label="Select date" className={POPOVER_FECHA}>

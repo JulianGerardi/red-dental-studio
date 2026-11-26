@@ -1194,7 +1194,8 @@ Pedido de Julián: *Today* se veía negro en el Dashboard y gris en Scheduling. 
 Dashboard no le pasaba su día de la demo y comparaba con la fecha real: nunca estaba "en hoy".
 
 1. El Dashboard pasa `hoy={HOY_DEMO}` (Feb 28, 2026), como Scheduling pasa `FECHA_ANCLA`. Today vuelve al día de la demo.
-2. **En hoy, Today queda activo, no apagado:** el chip azul con texto blanco de la pestaña activa de `ui/tabs`, dentro
-   del bloque. Gris se leía como deshabilitado; activo dice dónde estás. Lleva `aria-pressed`. En Scheduling
-   cuenta el período: activo si la semana o el mes que se ve incluye hoy. Fuera de hoy, texto negro con hover gris, como las flechas.
+2. **En hoy, todo el bloque queda activo** (pedido de Julián: el componente entero, no sólo Today): el estado de un
+   filtro aplicado de `ui/filter-menu` y `ui/date-filter`, borde y texto azules (`dash-blue`) sobre celeste (`info-bg`).
+   Antes Today quedaba gris apagado, que se leía como deshabilitado. Today lleva `aria-pressed`. En Scheduling cuenta el
+   período: activo si la semana o el mes que se ve incluye hoy. Fuera de hoy, el bloque blanco de siempre.
 3. Sin historia de Jira: es un ajuste visual del componente.
