@@ -1,17 +1,16 @@
 import { useId } from 'react'
-import { BadgeDollarSign, Lock, Percent, Receipt } from 'lucide-react'
+import { BadgeDollarSign, Percent, Receipt } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Alert } from '@/components/ui/alert'
-import { Checkbox } from '@/components/ui/checkbox'
 import { EmptyState } from '@/components/ui/empty-state'
 import { FieldError, FieldLabel, OptionCheckbox, control } from '@/components/patients/form'
 import { FilaDato } from './DatosHallazgo'
 import { calcularEstimado, dinero, resolverEstimado, type EstimadoProcedimiento } from '@/data/estimaciones'
 
 /* Edit Procedure › Estimate (CON-4211): el estimado del seguro de este procedimiento, como el Edit Procedure de la app
-   anterior (Outstanding Insurance Estimates + Insurance Estimate Overrides) con el vocabulario de Estimate details.
+   anterior (Outstanding Insurance Estimates) con el vocabulario de Estimate details.
    Arriba lo que no se edita (cargo, permitido, cobertura); después las partes, que se calculan solas o se cargan a
-   mano; al final el override de cada seguro, que manda sobre lo calculado. El paciente paga el resto. Ver
+   mano. El paciente paga el resto. Sin overrides por seguro (Julián, 2026-11-25). Ver
    design-reference/figma/modulos/clinical-mode.md (2026-11-25). */
 
 const CUADRADO = 'flex size-[22px] shrink-0 items-center justify-center rounded-[4px] bg-white text-ink [&_svg]:size-[13px]'
@@ -22,7 +21,7 @@ const numero = (t: string) => Math.max(0, Number(t.replace(/[^0-9.]/g, '')) || 0
 export function estimadoInicial(codigo: string, cobrado: number, e?: EstimadoProcedimiento): EstimadoProcedimiento {
   if (e) return e
   const c = calcularEstimado(codigo, cobrado)
-  return { automatico: true, primario: c.primario, secundario: c.secundario, ajuste: c.ajuste, override: {} }
+  return { automatico: true, primario: c.primario, secundario: c.secundario, ajuste: c.ajuste }
 }
 
 /** El error del estimado, si lo hay: las partes del seguro no pueden pasar el cargo. */
@@ -80,7 +79,6 @@ export function ProcedureEstimate({ codigo, cobrado, value, onChange, bloqueo }:
   const error = errorEstimado(codigo, cobrado, value)
   const fijo = !!bloqueo
   const set = (patch: Partial<EstimadoProcedimiento>) => onChange({ ...value, ...patch })
-  const setOverride = (k: 'primario' | 'secundario', v: number | undefined) => set({ override: { ...value.override, [k]: v } })
 
   return (
     <div className="flex flex-col gap-5">
@@ -105,33 +103,6 @@ export function ProcedureEstimate({ codigo, cobrado, value, onChange, bloqueo }:
           <CampoMonto label="Insurance write-off" value={value.automatico ? auto.ajuste : value.ajuste} onChange={value.automatico || fijo ? undefined : (n) => set({ ajuste: n })} />
           <CampoMonto label="Patient portion" value={Math.max(0, r.paciente)} />
         </div>
-      </section>
-
-      <section aria-labelledby="estimado-override" className="flex flex-col gap-3.5">
-        <div className="flex items-center gap-1.5">
-          <p id="estimado-override" className="text-sm font-bold text-ink">Insurance estimate overrides</p>
-          {fijo && <Lock className="size-3.5 text-ink-muted" aria-label="Locked" />}
-        </div>
-        <p className="-mt-2 text-[11px] leading-relaxed text-ink-faint">An override replaces the estimated amount for that insurance. The patient portion updates with it.</p>
-        {(['primario', 'secundario'] as const).map((k) => {
-          const nombre = k === 'primario' ? 'Primary' : 'Secondary'
-          const on = value.override[k] !== undefined
-          return (
-            <div key={k} className="grid grid-cols-2 items-center gap-4">
-              <span className="flex items-center gap-2.5">
-                <Checkbox
-                  label={`Override ${nombre.toLowerCase()} insurance estimate`} on={on} disabled={fijo}
-                  onChange={(v) => setOverride(k, v ? r[k] : undefined)}
-                />
-                <span className="text-xs text-ink">{nombre}</span>
-              </span>
-              <CampoMonto
-                hideLabel label={`${nombre} insurance override`} value={on ? value.override[k]! : r[k]}
-                onChange={on && !fijo ? (n) => setOverride(k, n) : undefined}
-              />
-            </div>
-          )
-        })}
         {error && <FieldError>{error}</FieldError>}
       </section>
     </div>
