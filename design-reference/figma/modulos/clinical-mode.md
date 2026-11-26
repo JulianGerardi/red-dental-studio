@@ -3618,3 +3618,11 @@ override por seguro alcanza o piden override del Patient portion.
 Código: `clinical/dental/{ProcedureEstimate,registroComoFinding,EditFindingDrawer,EditConditionDrawer,EditProcedureDrawer,
 data,DatosHallazgo}.tsx`, `clinical/{ProblemList,TreatmentPlanSection,TreatmentPlanList,RecordDetail}.tsx`,
 `data/{estimaciones,treatment-plan}.ts`, `tests/clinical-mode.e2e.ts`. Storybook sin tocar.
+
+### Edit procedure: sin overrides y con un finding y un diagnóstico cargados (2026-11-26)
+
+**CON-4211.** Julián: "el estimate overrides no va"; "el mensaje debajo de Link findings y Link diagnosis sacalo, y debería tener por default un finding cargado y un diagnostic cargado".
+
+- **Estimate sin *Insurance estimate overrides***: queda *Outstanding insurance estimates* (automático o a mano) y el Patient portion como resto. Se saca del modelo (`EstimadoProcedimiento.override`) y de `resolverEstimado`. Revierte lo de 2026-11-25.
+- **Link findings / Link diagnosis sin la bajada** de abajo del título.
+- **Vinculados por defecto**: si el procedimiento no trae nada vinculado, arranca con un finding (el del mismo diente o, si no hay, el primero no descartado) y su diagnóstico. Lo ya vinculado manda y no se pisa. **A validar**: que preseleccionar no lleve a guardar un vínculo que nadie revisó; se puede sacar con la ✕.

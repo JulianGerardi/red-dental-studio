@@ -47,7 +47,12 @@ export function EditProcedureDrawer({
   useEffect(() => {
     if (!finding) return
     setPestana('General information')
-    setProvider(finding.provider); setNotes(finding.notes); setLinked(finding.linked); setDiagnoses(finding.diagnoses)
+    /* Por defecto, uno de cada: el finding del mismo diente (o el primero) y su diagnóstico; lo ya vinculado manda. */
+    const candidatos = findings.filter((x) => x.id !== finding.id && x.status !== 'Discarded')
+    const sugerido = candidatos.find((x) => finding.tooth !== null && x.tooth === finding.tooth) ?? candidatos[0]
+    setProvider(finding.provider); setNotes(finding.notes)
+    setLinked(finding.linked.length || !sugerido ? finding.linked : [sugerido.id])
+    setDiagnoses(finding.diagnoses.length || !sugerido ? finding.diagnoses : candidatosDiagnostico([sugerido]).map((d) => d.valor))
     setEstimado(estimadoInicial(codigoDe(finding), finding.fee ?? 0, finding.estimado))
   }, [finding])
 
@@ -61,7 +66,7 @@ export function EditProcedureDrawer({
     /* Con el estimado mal cargado no se guarda: se vuelve a su pestaña, donde está el error. */
     if (finding.fee && estimado && errorEstimado(codigoDe(finding), finding.fee, estimado)) return setPestana('Estimate')
     /* Sin tocar nada, el estimado sigue siendo el automático: no se guarda una copia. */
-    const tocado = estimado && (finding.estimado || !estimado.automatico || Object.values(estimado.override).some((v) => v !== undefined))
+    const tocado = estimado && (finding.estimado || !estimado.automatico)
     onSave({ provider, notes, linked, diagnoses, ...(tocado ? { estimado: estimado! } : {}) })
     onClose()
   }
@@ -95,9 +100,6 @@ export function EditProcedureDrawer({
         <div className="flex flex-col gap-4">
           <div className="flex flex-col gap-1">
             <p className="text-sm font-bold text-ink">Link findings</p>
-            <p className="text-[11px] leading-relaxed text-ink-faint">
-              You can link clinical findings that may be resolved by this procedure. The system will suggest relevant findings based on the anatomical location and active conditions.
-            </p>
           </div>
           <SearchPicker
             multiple items={vinculables} getId={(x) => x.id} getText={(x) => `${x.condition} ${x.area} ${x.surfaces.join(' ')}`}
@@ -114,9 +116,6 @@ export function EditProcedureDrawer({
         <div className="flex flex-col gap-4">
           <div className="flex flex-col gap-1">
             <p className="text-sm font-bold text-ink">Link diagnosis</p>
-            <p className="text-[11px] leading-relaxed text-ink-faint">
-              You can link diagnoses that may be resolved by this procedure. The system will suggest relevant diagnoses based on the anatomical location and active conditions.
-            </p>
           </div>
           <SearchPicker
             multiple items={diagnosticos} getId={(x) => x.valor} getText={(x) => `${x.valor} ${x.descripcion}`}
