@@ -10,7 +10,7 @@ import { NavegacionClinica } from '@/components/clinical/RecordDetail'
 /* El botón de View Problem List y su tabla flotando sobre la pantalla, sin cambiar de vista: el mismo en los exámenes
    (ExamLayout) y en el Overview, así ninguna pantalla scrollea para llegar a la tabla (clinical-mode.md, 2026-10-29). */
 
-const BOTON_ACCION = cn(BOTON_EXPANDIBLE, 'border-line bg-white shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] hover:bg-surface-subtle')
+const BOTON_ACCION = cn(BOTON_EXPANDIBLE, 'border-line bg-surface shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] hover:bg-surface-subtle')
 
 export function ProblemListFlotante({ procedimientoInicial }: {
   /** Abre ya la tabla en Procedures, con esa fila (el link desde el Ledger: ?procedure=). */
@@ -34,7 +34,7 @@ export function ProblemListFlotante({ procedimientoInicial }: {
               </button>
             </PopoverTrigger>
           </TooltipTrigger>
-          <TooltipContent side="bottom" sideOffset={6} className="bg-ink text-white">Open the patient&apos;s problem list</TooltipContent>
+          <TooltipContent side="bottom" sideOffset={6} className="bg-tooltip text-white">Open the patient&apos;s problem list</TooltipContent>
         </Tooltip>
         {/* Ancho para que la tabla entre entera, y alto hasta el borde de la pantalla con scroll adentro: con una fila
             abierta se salía por abajo. Ver clinical-mode.md (2026-10-09). */}

@@ -58,7 +58,7 @@ export function Adjuntos({ value, onChange, disabled, error = 'Invalid file form
           <span className="text-[13px] font-semibold text-ink">Drag and drop your files</span>
           <span className="text-[11px] text-ink-muted">PDF, JPG, PNG, up to 10MB</span>
         </span>
-        <label className={cn('h-8 shrink-0 rounded-md border border-line bg-white px-3 text-[13px] leading-8 font-medium focus-within:outline-2 focus-within:outline-dash-blue', disabled ? 'cursor-not-allowed' : 'cursor-pointer hover:bg-surface-subtle')}>
+        <label className={cn('h-8 shrink-0 rounded-md border border-line bg-surface px-3 text-[13px] leading-8 font-medium focus-within:outline-2 focus-within:outline-dash-blue', disabled ? 'cursor-not-allowed' : 'cursor-pointer hover:bg-surface-subtle')}>
           Select file
           <input type="file" multiple accept=".pdf,.jpg,.jpeg,.png" className="sr-only" disabled={disabled} onChange={(e) => { sumar(e.target.files); e.target.value = '' }} />
         </label>

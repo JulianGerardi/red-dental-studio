@@ -13,7 +13,7 @@ import { calcularEstimado, dinero, resolverEstimado, type EstimadoProcedimiento 
    mano. El paciente paga el resto. Sin overrides por seguro (Julián, 2026-11-25). Ver
    design-reference/figma/modulos/clinical-mode.md (2026-11-25). */
 
-const CUADRADO = 'flex size-[22px] shrink-0 items-center justify-center rounded-[4px] bg-white text-ink [&_svg]:size-[13px]'
+const CUADRADO = 'flex size-[22px] shrink-0 items-center justify-center rounded-[4px] bg-surface text-ink [&_svg]:size-[13px]'
 const a2 = (n: number) => n.toFixed(2)
 const numero = (t: string) => Math.max(0, Number(t.replace(/[^0-9.]/g, '')) || 0)
 

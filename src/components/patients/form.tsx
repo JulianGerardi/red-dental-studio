@@ -40,7 +40,7 @@ export function FieldHint({ children }: { children?: React.ReactNode }) {
    deshabilitado gris. Lo usan todos los campos de este archivo. */
 export const control = (error?: string) =>
   cn(
-    'w-full rounded-md border bg-white text-[13px] shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] placeholder:text-ink-faint focus:outline-none',
+    'w-full rounded-md border bg-surface text-[13px] shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] placeholder:text-ink-faint focus:outline-none',
     'disabled:cursor-not-allowed disabled:bg-surface-muted disabled:text-ink-faint disabled:shadow-none',
     error ? 'border-field-error focus:border-field-error' : 'focus:border-dash-blue border-line',
   )
@@ -210,7 +210,7 @@ export function SelectField({
           <ChevronDown className={cn('size-4 shrink-0 text-ink transition-transform', open && 'rotate-180')} />
         </button>
         {open && (
-          <div className={cn('motion-safe:animate-[loc-in_120ms_ease-out] absolute left-0 z-30 flex w-full flex-col overflow-hidden rounded-md border border-line bg-white shadow-lg', arriba ? MENU_ARRIBA : MENU_ABAJO)}>
+          <div className={cn('motion-safe:animate-[loc-in_120ms_ease-out] absolute left-0 z-30 flex w-full flex-col overflow-hidden rounded-md border border-line bg-surface shadow-lg', arriba ? MENU_ARRIBA : MENU_ABAJO)}>
             {buscable && (
               <div className="border-b border-line p-1.5">
                 <div className="relative">
@@ -222,7 +222,7 @@ export function SelectField({
                     value={busqueda}
                     onChange={(e) => setBusqueda(e.target.value)}
                     onKeyDown={(e) => { if (e.key === 'Enter' && items[0]) { e.preventDefault(); setValue(items[0]); setOpen(false) } }}
-                    className="h-8 w-full rounded-md border border-line bg-white pr-2 pl-8 text-[13px] placeholder:text-ink-faint focus:border-dash-blue focus:outline-none"
+                    className="h-8 w-full rounded-md border border-line bg-surface pr-2 pl-8 text-[13px] placeholder:text-ink-faint focus:border-dash-blue focus:outline-none"
                   />
                 </div>
               </div>
@@ -300,7 +300,7 @@ export function DateField({
             onClick={() => setValue(new Date(1990, 0, 1))}
             aria-invalid={!!error || undefined}
             className={cn(
-              'flex h-9 w-full items-center gap-2 rounded-md border bg-white px-3 text-[13px] text-ink-faint',
+              'flex h-9 w-full items-center gap-2 rounded-md border bg-surface px-3 text-[13px] text-ink-faint',
               'shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] focus:outline-none',
               error ? 'border-field-error' : 'focus:border-dash-blue border-line',
             )}
@@ -352,7 +352,7 @@ export function OptionCheckbox({
         onChange?.(!on)
       }}
       className={cn(
-        'flex w-full items-start gap-2.5 rounded-lg border bg-white p-3 text-left transition-colors',
+        'flex w-full items-start gap-2.5 rounded-lg border bg-surface p-3 text-left transition-colors',
         'focus-visible:border-dash-blue focus:outline-none disabled:cursor-not-allowed disabled:opacity-50',
         on ? 'border-dash-blue' : 'border-line hover:bg-surface-subtle',
         className,
@@ -361,7 +361,7 @@ export function OptionCheckbox({
       <span
         className={cn(
           'mt-px flex size-4 shrink-0 items-center justify-center rounded-[3px] border transition-colors',
-          on ? 'bg-dash-blue border-dash-blue' : 'border-ink-faint bg-white',
+          on ? 'bg-dash-blue border-dash-blue' : 'border-ink-faint bg-surface',
         )}
       >
         {on && <Check className="size-3 text-white" strokeWidth={3} />}
@@ -407,7 +407,7 @@ export function CollapsibleFields({
   }
   const id = useId()
   return (
-    <div className={cn('rounded-lg border bg-white', error ? 'border-field-error' : 'border-line')}>
+    <div className={cn('rounded-lg border bg-surface', error ? 'border-field-error' : 'border-line')}>
       <button
         type="button"
         aria-expanded={abierto}
@@ -493,12 +493,12 @@ export function SearchField({
           </button>
         )}
         {abierto && emptyText && value.trim() && sugerencias.length === 0 && !options.includes(value) && (
-          <div role="status" className="absolute top-[calc(100%+4px)] left-0 z-30 w-full rounded-md border border-line bg-white px-3 py-8 text-center text-[13px] text-ink shadow-lg">
+          <div role="status" className="absolute top-[calc(100%+4px)] left-0 z-30 w-full rounded-md border border-line bg-surface px-3 py-8 text-center text-[13px] text-ink shadow-lg">
             {emptyText}
           </div>
         )}
         {abierto && sugerencias.length > 0 && (
-          <div className="motion-safe:animate-[loc-in_120ms_ease-out] absolute top-[calc(100%+4px)] left-0 z-30 max-h-60 w-full overflow-y-auto rounded-md border border-line bg-white py-1 shadow-lg">
+          <div className="motion-safe:animate-[loc-in_120ms_ease-out] absolute top-[calc(100%+4px)] left-0 z-30 max-h-60 w-full overflow-y-auto rounded-md border border-line bg-surface py-1 shadow-lg">
             {sugerencias.map((o) => {
               const sub = subtext?.(o)
               return (
@@ -631,7 +631,7 @@ export function PersonSearchField({
       <FieldLabel required={required}>{label}</FieldLabel>
       {elegida ? (
         <div className="relative">
-          <div className={cn('flex items-center gap-3 rounded-lg border bg-white p-3 pr-11', error ? 'border-field-error' : 'border-dash-blue', disabled && 'opacity-60')}>
+          <div className={cn('flex items-center gap-3 rounded-lg border bg-surface p-3 pr-11', error ? 'border-field-error' : 'border-dash-blue', disabled && 'opacity-60')}>
             <PersonaFila nombre={nombreDe(value)} subtitulo={subtitulo?.(value)} chips={chips?.(value)} />
           </div>
           {!disabled && (
@@ -678,7 +678,7 @@ export function PersonSearchField({
             </button>
           )}
           {visible && (
-            <div id={listaId} role="listbox" aria-label={label} className={cn('motion-safe:animate-[loc-in_120ms_ease-out] absolute left-0 z-30 flex max-h-72 w-full flex-col gap-1 overflow-y-auto rounded-md border border-line bg-white p-1 shadow-lg', arriba ? MENU_ARRIBA : MENU_ABAJO)}>
+            <div id={listaId} role="listbox" aria-label={label} className={cn('motion-safe:animate-[loc-in_120ms_ease-out] absolute left-0 z-30 flex max-h-72 w-full flex-col gap-1 overflow-y-auto rounded-md border border-line bg-surface p-1 shadow-lg', arriba ? MENU_ARRIBA : MENU_ABAJO)}>
               {sugerencias.map((v, i) => (
                 <button
                   key={v}
@@ -698,7 +698,7 @@ export function PersonSearchField({
             </div>
           )}
           {abierto && emptyText && q && !sugerencias.length && (
-            <p role="status" className="absolute top-[calc(100%+4px)] left-0 z-30 w-full rounded-md border border-line bg-white px-3 py-6 text-center text-xs text-ink-muted shadow-lg">
+            <p role="status" className="absolute top-[calc(100%+4px)] left-0 z-30 w-full rounded-md border border-line bg-surface px-3 py-6 text-center text-xs text-ink-muted shadow-lg">
               {emptyText}
             </p>
           )}
@@ -782,7 +782,7 @@ export function SectionCard({
   /* Dentro de un drawer va sin caja, con el título suelto, como en Confidentally 2.0. */
   if (useEnDrawer()) return <DrawerSection title={title} className={className}>{children}</DrawerSection>
   return (
-    <section className={cn('rounded-lg bg-white p-4 shadow-panel sm:p-5', className)}>
+    <section className={cn('rounded-lg bg-surface p-4 shadow-panel sm:p-5', className)}>
       <h2 className="text-sm font-bold text-ink">{title}</h2>
       <div className="mt-4 flex flex-col gap-4">{children}</div>
     </section>

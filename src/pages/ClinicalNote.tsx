@@ -154,7 +154,7 @@ export default function ClinicalNote() {
       >
         {doc
           ? <VistaDocumento doc={doc} />
-          : <EmptyState icon={FileText} title="Clinical note not found" detail="It may have been signed or removed. Go back to the history to find it." className="rounded-lg bg-white" />}
+          : <EmptyState icon={FileText} title="Clinical note not found" detail="It may have been signed or removed. Go back to the history to find it." className="rounded-lg bg-surface" />}
       </DocumentViewer>
 
       {firmando && tarea && (

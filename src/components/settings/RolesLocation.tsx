@@ -40,7 +40,7 @@ export function Switch({ on, onChange, label }: { on: boolean; onChange: (v: boo
         on ? 'bg-dash-blue' : 'bg-line-strong',
       )}
     >
-      <span className={cn('size-4 rounded-full bg-white transition-transform', on && 'translate-x-4')} />
+      <span className={cn('size-4 rounded-full bg-surface transition-transform', on && 'translate-x-4')} />
     </button>
   )
 }
@@ -63,7 +63,7 @@ export function FilaRol({
         abierto ? 'border-dash-blue' : 'border-line',
       )}
     >
-      <div className={cn('flex items-center gap-3 px-4 py-3.5', abierto ? 'bg-dash-count-bg' : 'bg-white')}>
+      <div className={cn('flex items-center gap-3 px-4 py-3.5', abierto ? 'bg-dash-count-bg' : 'bg-surface')}>
         <span className="min-w-0 flex-1">
           <span className="text-[15px] font-bold text-ink">{rol.nombre}</span>
           <span className="ml-2 text-[13px] text-ink-muted">
@@ -103,7 +103,7 @@ export function FilaRol({
       </div>
 
       {abierto && (
-        <div className="grid gap-3 border-t border-line bg-white p-4 sm:grid-cols-2 xl:grid-cols-4">
+        <div className="grid gap-3 border-t border-line bg-surface p-4 sm:grid-cols-2 xl:grid-cols-4">
           {SEDES.map((s) => {
             const on = rol.sedes.includes(s)
             return (

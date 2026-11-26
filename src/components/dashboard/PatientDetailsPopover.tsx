@@ -52,7 +52,7 @@ export function FilaDato({
   icon: Icon, label, value, className, wrap,
 }: Fila & { className?: string; wrap?: boolean }) {
   return (
-    <div className={cn('flex items-center gap-2 bg-white px-3 py-3', className)}>
+    <div className={cn('flex items-center gap-2 bg-surface px-3 py-3', className)}>
       <Icon className={cn('size-4 shrink-0 text-ink', wrap && 'mt-0.5')} strokeWidth={1.8} />
       <span className="shrink-0 text-[13px] font-semibold text-ink">{label}</span>
       <span
@@ -135,7 +135,7 @@ export function PatientDetailsPopover({
         {iniciar && (
           <button
             type="button"
-            className="flex h-9 shrink-0 items-center justify-center gap-1.5 rounded-lg bg-green px-4 text-[13px] font-semibold text-white transition-colors hover:bg-green-deep"
+            className="flex h-9 shrink-0 items-center justify-center gap-1.5 rounded-lg bg-green px-4 text-[13px] font-semibold text-white transition-colors hover:bg-green-deep dark:hover:bg-green dark:hover:brightness-110"
           >
             <Play className="size-3.5 shrink-0" /> Start encounter
             <ChevronDown className="size-3.5 shrink-0" />
@@ -159,7 +159,7 @@ export function PatientDetailsPopover({
           onClick={onClose}
           title="Open patient file"
           aria-label={`Open ${name}'s file`}
-          className={`${ICONO_SUELTO} size-9 bg-white`}
+          className={`${ICONO_SUELTO} size-9 bg-surface`}
         >
           <IdCard className="size-4" />
         </Link>
@@ -168,7 +168,7 @@ export function PatientDetailsPopover({
           onClick={onClose}
           title="Open Clinical Mode"
           aria-label={`Open Clinical Mode for ${name}`}
-          className={`${ICONO_SUELTO} size-9 bg-white`}
+          className={`${ICONO_SUELTO} size-9 bg-surface`}
         >
           <Stethoscope className="size-4" />
         </Link>
@@ -184,7 +184,7 @@ export function PatientDetailsPopover({
           Se mantiene "Reason for visit" escrito completo y el icono de
           historia clínica, que Julián pidió al mejorar este bloque; el frame
           sigue diciendo "Rsn for Visit" con el icono de tamaño de texto. */}
-      <div className="border-l-dash-blue mt-3 overflow-hidden rounded-lg border border-line border-l-[3px] bg-white">
+      <div className="border-l-dash-blue mt-3 overflow-hidden rounded-lg border border-line border-l-[3px] bg-surface">
         {/* El motivo envuelve en vez de cortarse: con "Reason" escrito completo
             no entra en una línea, y truncarlo era justo lo que había que
             arreglar acá. */}

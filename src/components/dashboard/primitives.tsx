@@ -76,7 +76,7 @@ function CuerpoConScroll({ className, children }: { className?: string; children
       <div ref={ref} onScroll={medir} className={cn('flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto overscroll-contain p-4 [scrollbar-width:thin]', className)}>
         <div className="flex flex-col gap-3">{children}</div>
       </div>
-      <div aria-hidden className={cn('pointer-events-none absolute inset-x-0 bottom-0 h-8 bg-gradient-to-t from-white to-transparent transition-opacity', alFinal && 'opacity-0')} />
+      <div aria-hidden className={cn('pointer-events-none absolute inset-x-0 bottom-0 h-8 bg-gradient-to-t from-surface to-transparent transition-opacity', alFinal && 'opacity-0')} />
     </div>
   )
 }
@@ -100,7 +100,7 @@ const PILL = {
   ok: 'bg-dash-ok-bg border-dash-ok-fg text-dash-ok-fg',
   busy: 'bg-dash-busy-bg border-dash-busy-fg text-dash-busy-fg',
   bad: 'bg-dash-bad-bg border-dash-bad-fg text-dash-bad-fg',
-  neutral: 'bg-white border-ink-muted text-ink-medium',
+  neutral: 'bg-surface border-ink-muted text-ink-medium',
 } as const
 
 export function StatusPill({

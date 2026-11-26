@@ -272,7 +272,7 @@ export function PatientInSessionPopup({ onRect }: {
         <button
           type="button" onClick={() => setAbierto((v) => !v)} aria-expanded={abierto}
           aria-label={abierto ? 'Hide currently being seen list' : 'Open currently being seen'}
-          className="pointer-events-auto group flex h-8 shrink-0 items-center gap-1.5 rounded-l-xl border border-r-0 border-line bg-white py-0 pr-3 pl-2.5 text-ink-muted shadow-sm hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-dash-ring"
+          className="pointer-events-auto group flex h-8 shrink-0 items-center gap-1.5 rounded-l-xl border border-r-0 border-line bg-surface py-0 pr-3 pl-2.5 text-ink-muted shadow-sm hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-dash-ring"
         >
           <ChevronLeft className={cn('size-4 shrink-0 transition-transform duration-200', abierto && 'rotate-180')} />
           <UserRound className="size-3.5 shrink-0" />
@@ -286,7 +286,7 @@ export function PatientInSessionPopup({ onRect }: {
         <PanelDock abierto={abierto}>
           <div
             style={{ maxHeight: maxAlto }}
-            className="flex w-[336px] max-w-full flex-col gap-2 overflow-hidden rounded-l-xl border border-r-0 border-line bg-white p-3 shadow-floating"
+            className="flex w-[336px] max-w-full flex-col gap-2 overflow-hidden rounded-l-xl border border-r-0 border-line bg-surface p-3 shadow-floating"
           >
             {detalle}
           </div>
@@ -315,12 +315,12 @@ export function PatientInSessionPopup({ onRect }: {
           <TooltipTrigger asChild>
             <button
               type="button" onClick={() => setRecogido(true)} aria-label="Hide currently being seen"
-              className="relative flex size-6 items-center justify-center rounded-full border border-line bg-white text-ink-muted shadow-sm before:absolute before:-inset-2 before:content-[''] hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-dash-ring"
+              className="relative flex size-6 items-center justify-center rounded-full border border-line bg-surface text-ink-muted shadow-sm before:absolute before:-inset-2 before:content-[''] hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-dash-ring"
             >
               <PanelRightClose className="size-3.5" />
             </button>
           </TooltipTrigger>
-          <TooltipContent side="left" className="bg-ink text-white">Hide</TooltipContent>
+          <TooltipContent side="left" className="bg-tooltip text-white">Hide</TooltipContent>
         </Tooltip>
       </TooltipProvider>
       {/* El ancho (y, si hace falta, el alto) son lo único que anima: crece desde la pestaña (46px) hasta la card
@@ -338,7 +338,7 @@ export function PatientInSessionPopup({ onRect }: {
           queda en 0 la caja se queda quieta, sin apagarse del todo. */}
       <div
         className={cn(
-          'flex items-start overflow-hidden border border-line bg-white shadow-floating transition-[width,border-radius] duration-300 ease-out',
+          'flex items-start overflow-hidden border border-line bg-surface shadow-floating transition-[width,border-radius] duration-300 ease-out',
           abierto ? 'w-[336px] rounded-xl' : 'w-[46px] rounded-full',
           hayEnCurso && 'motion-safe:animate-[session-live_2.6s_ease-in-out_infinite]',
         )}

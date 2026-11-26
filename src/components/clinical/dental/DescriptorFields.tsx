@@ -27,7 +27,7 @@ export function DescriptorFields({
                   onClick={() => onChange({ ...value, [row.id]: on ? '' : opt })}
                   className={cn(
                     'min-w-[52px] flex-1 rounded-[4px] px-2 py-[3px] text-center text-[10px] leading-[14px] font-medium transition-colors focus-visible:outline-2 focus-visible:outline-dash-blue',
-                    on ? 'bg-dash-blue text-white' : 'text-ink-muted hover:bg-white',
+                    on ? 'bg-dash-blue text-white' : 'text-ink-muted hover:bg-surface',
                   )}
                 >
                   {opt}

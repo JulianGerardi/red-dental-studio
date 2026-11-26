@@ -110,45 +110,6 @@
   --sidebar: 0 0% 100%;
 }
 
-.dark {
-  --background: 0 0% 3.9%;
-  --foreground: 0 0% 98%;
-  --card: 0 0% 3.9%;
-  --card-foreground: 0 0% 98%;
-  --popover: 0 0% 3.9%;
-  --popover-foreground: 0 0% 98%;
-  --primary: 0 0% 98%;
-  --primary-foreground: 0 0% 9%;
-  --secondary: 0 0% 14.9%;
-  --secondary-foreground: 0 0% 98%;
-  --muted: 0 0% 14.9%;
-  --muted-foreground: 0 0% 63.9%;
-  --accent: 0 0% 14.9%;
-  --accent-foreground: 0 0% 98%;
-  --destructive: 0 62.8% 30.6%;
-  --destructive-foreground: 0 0% 98%;
-  --success: 142 76% 36%;
-  --success-foreground: 0 0% 98%;
-  --warning: 36 100% 50%;
-  --warning-foreground: 0 0% 98%;
-  --border: 0 0% 14.9%;
-  --input: 0 0% 14.9%;
-  --ring: 0 0% 83.1%;
-  --sidebar-background: 240 5.9% 10%;
-  --sidebar-foreground: 240 4.8% 95.9%;
-  --sidebar-primary: 224.3 76.3% 48%;
-  --sidebar-primary-foreground: 0 0% 100%;
-  --sidebar-accent: 240 3.7% 15.9%;
-  --sidebar-accent-foreground: 240 4.8% 95.9%;
-  --sidebar-border: 240 3.7% 15.9%;
-  --chart-1: 220 70% 50%;
-  --chart-2: 160 60% 45%;
-  --chart-3: 30 80% 55%;
-  --chart-4: 280 65% 60%;
-  --chart-5: 340 75% 55%;
-  --sidebar: 240 5.9% 10%;
-  --sidebar-ring: 217.2 91.2% 59.8%;
-}
 
 @theme inline {
   --color-background: hsl(var(--background));
@@ -346,7 +307,11 @@
   --color-line-soft: #f1f1f4;
   --color-line-hair: #ededed;
 
-  /* Fondos neutros. */
+  /* Fondos neutros. surface es el fondo de cards, campos y menús: blanco en claro, gris oscuro en el tema oscuro
+     (preferences.md, 2026-11-26). Usar bg-surface, no bg-white, para lo que tiene que cambiar con el tema. */
+  --color-surface: #ffffff;
+  /* Fondo de los tooltips: casi negro en claro; en oscuro, un gris que se despega del fondo negro. */
+  --color-tooltip: #09090b;
   --color-surface-subtle: #fafafa;
   --color-surface-muted: #f4f4f5;
   --color-surface-alt: #f9f9f9;
@@ -434,6 +399,8 @@
      shadow-hairline es sólo la línea. */
   --shadow-inner-card: inset 0 0 0 0.5px rgb(0 0 0 / 0.12), 0 1px 2px 0 rgb(0 0 0 / 0.04);
   --shadow-hairline: inset 0 0 0 0.5px rgb(0 0 0 / 0.12);
+  /* Sólo en oscuro (dark:shadow-glow en el botón principal): el brillo suave del 30% que sugiere la guía de dark mode. */
+  --shadow-glow: inset 0 1px 0 0 rgb(255 255 255 / 0.12), 0 0 10px 0 rgb(53 122 189 / 0.3);
 }
 
 body { font-family: var(--font-sans); }
@@ -444,6 +411,164 @@ body { font-family: var(--font-sans); }
 :root {
   --page-background: 225 67% 98.8%;
 }
+
+/* ── Tema oscuro (Settings › Preferences › Appearance, 2026-11-26) ──────────
+   La clase `dark` en <html> la pone lib/tema.ts. Mismos nombres de token con otro valor: las pantallas no cambian.
+   `:root.dark` para ganarle al override de --page-background de arriba. Ver design-reference/figma/modulos/preferences.md. */
+:root.dark,
+.tema-oscuro {
+  color-scheme: dark;
+
+  /* Según la guía de UX Design Institute que pasó Julián (preferences.md, 2026-11-26): fondo gris muy oscuro #121212 y no
+     negro puro, texto #E0E0E0 y no blanco, marca desaturada (#357ABD), profundidad con superficies más claras y bordes,
+     no con sombras. Grises neutros, sin tinte. */
+  --background: 0 0% 7%;
+  --foreground: 0 0% 88%;
+  --card: 0 0% 12%;
+  --card-foreground: 0 0% 88%;
+  --popover: 0 0% 15%;
+  --popover-foreground: 0 0% 88%;
+  --primary: 210 56% 47%;
+  --primary-foreground: 0 0% 100%;
+  --primary-hover: 210 52% 42%;
+  --primary-active: 210 52% 38%;
+  --primary-disabled: 0 0% 17%;
+  --primary-disabled-foreground: 0 0% 42%;
+  --primary-light: 214 30% 20%;
+  --primary-light-foreground: 214 52% 69%;
+  --secondary: 0 0% 12%;
+  --secondary-foreground: 0 0% 82%;
+  --secondary-hover: 0 0% 18%;
+  --secondary-hover-foreground: 0 0% 88%;
+  --secondary-active: 0 0% 15%;
+  --secondary-active-foreground: 0 0% 88%;
+  --secondary-disabled: 0 0% 13%;
+  --secondary-disabled-foreground: 0 0% 40%;
+  --secondary-border: 0 0% 21%;
+  --destructive: 1 47% 51%;
+  --destructive-disabled: 0 20% 17%;
+  --destructive-disabled-foreground: 0 25% 45%;
+  --muted: 0 0% 16%;
+  --muted-foreground: 0 0% 58%;
+  --accent: 214 25% 19%;
+  --accent-foreground: 0 0% 88%;
+  --border: 0 0% 19%;
+  --input: 0 0% 22%;
+  --ring: 214 52% 69%;
+  --page-background: 0 0% 7%;
+  --page-background-foreground: 0 0% 88%;
+  --gray-first: 0 0% 16%;
+  --gray-first-foreground: 0 0% 80%;
+  --gray-second-foreground: 0 0% 80%;
+  --surface-primary-lighter: 214 30% 22%;
+  --surface-primary-subtle: 214 25% 16%;
+  --clinical-mode-base-fg: 0 0% 88%;
+  --calendar: 0 0% 12%;
+  --calendar-border: 0 0% 19%;
+  --calendar-disabled: 0 0% 9%;
+  --sidebar-background: 0 0% 12%;
+  --sidebar-foreground: 0 0% 80%;
+  --sidebar-primary: 0 0% 88%;
+  --sidebar-primary-foreground: 0 0% 7%;
+  --sidebar-accent: 0 0% 16%;
+  --sidebar-accent-foreground: 0 0% 88%;
+  --sidebar-border: 0 0% 19%;
+  --sidebar: 0 0% 12%;
+
+  /* El azul de la guía para rellenos (blanco encima a 4,5:1); el texto azul, un tono más claro (text-dash-blue, abajo). */
+  --color-dash-blue: #357abd;
+  --color-dash-blue-hover: #2f6ca8;
+  --color-dash-blue-active: #2a6096;
+  --color-dash-ring: #86a9d9;
+  --color-dash-blue-glow: #4a86c8;
+  --color-dash-name: #ededed;
+  --color-dash-muted: #a3a3a3;
+  --color-dash-delta: #5c5c5c;
+  --color-dash-field: #181818;
+  --color-dash-ok-fg: #74c69d;
+  --color-dash-ok-bg: #1b2b22;
+  --color-dash-busy-fg: #90b4e8;
+  --color-dash-busy-bg: #1c2433;
+  --color-dash-bad-fg: #e57373;
+  --color-dash-bad-bg: #2e1d1e;
+  --color-dash-bad-hover: #b94a48;
+  --color-dash-bad-chip: #3a2223;
+  --color-dash-count-bg: #1f2a3d;
+
+  /* Texto: #E0E0E0 de la guía; los nombres y títulos un punto más claros, para la jerarquía. */
+  --color-ink: #e0e0e0;
+  --color-ink-soft: #c8c8c8;
+  --color-ink-medium: #b0b0b0;
+  --color-ink-muted: #8f8f8f;
+  --color-ink-slate: #9aa3ad;
+  --color-ink-faint: #6b6b6b;
+
+  /* Bordes más claros que el fondo: separan donde la sombra ya no se ve. */
+  --color-line: #303030;
+  --color-line-strong: #3d3d3d;
+  --color-line-row: #2a2a2a;
+  --color-line-soft: #252525;
+  --color-line-hair: #282828;
+
+  --color-surface: #1e1e1e;
+  --color-surface-subtle: #232323;
+  --color-surface-muted: #282828;
+  --color-surface-alt: #212121;
+  --color-surface-slate: #252729;
+  --color-tooltip: #2c2c2c;
+
+  --color-field-error: #e57373;
+  --color-input-inactive: #707070;
+  --color-input-inactive-bg: #282828;
+  --color-status-ok: #2e7d4f;
+  --color-status-ok-hover: #2a7048;
+  --color-status-ok-muted: #1b2b22;
+  --color-status-ok-strong: #74c69d;
+  --color-status-bad-muted: #2e1d1e;
+  --color-status-bad-strong: #e57373;
+  --color-warn-fg: #e6b85c;
+  --color-warn-bg: #2d2616;
+  --color-attn-fg: #e6a54a;
+  --color-amber: #d9a441;
+  --color-amber-hover: #c8943a;
+  --color-amber-fg: #e8c27a;
+  --color-info-bg: #1a2232;
+  --color-info-subtle: #181d26;
+  --color-info-strong-bg: #1f2a3d;
+  --color-info-line: #2c3b55;
+  --color-info-line-strong: #415a82;
+  --color-purple-fg: #b39ddb;
+  --color-purple-bg: #251f30;
+  --color-indigo: #9a94dc;
+  --color-brand-tint: #1c2535;
+  --color-green: #2e7d4f;
+  --color-green-deep: #74c69d;
+  --color-green-tint: #1b2b22;
+  --color-green-soft: #1f3327;
+}
+
+/* Las miniaturas de Appearance se pintan cada una con su tema, sea cual sea el de la app. */
+:root.dark .tema-claro {
+  color-scheme: light;
+  --page-background: 225 67% 98.8%;
+  --color-surface: #ffffff;
+  --color-line-strong: #d4d4d8;
+  --color-dash-blue: #1d56bc;
+}
+
+/* El texto azul en oscuro: un tono más claro que el relleno. Con :where() pesa como una clase, así un hover:text-white
+   o un data-[state=active]:text-white le siguen ganando. */
+@layer utilities {
+  :where(:root.dark) .text-dash-blue,
+  :where(:root.dark) .hover\:text-dash-blue:hover { color: #86a9d9; }
+}
+
+/* Tailwind compila las sombras con el valor adentro: en oscuro se pisan por clase. Sobre fondo oscuro la sombra no se
+   ve: la card se separa por el tono (más arriba = más clara) y un borde blanco tenue, como pide la guía. */
+:root.dark .shadow-panel { --tw-shadow: 0 0 0 1px rgb(255 255 255 / 0.06); }
+:root.dark .shadow-floating { --tw-shadow: 0 0 0 1px rgb(255 255 255 / 0.09), 0 8px 24px -4px rgb(0 0 0 / 0.5); }
+:root.dark .shadow-inner-card { --tw-shadow: inset 0 0 0 0.5px rgb(255 255 255 / 0.14); }
+:root.dark .shadow-hairline { --tw-shadow: inset 0 0 0 0.5px rgb(255 255 255 / 0.14); }
 
 /* Add Range: el rango nuevo arranca resaltado y se apaga (settings-billing.md). */
 @keyframes rango-nuevo {

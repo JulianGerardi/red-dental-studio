@@ -36,7 +36,7 @@ export function LinkExistingPerson({
                 value={busqueda}
                 onChange={(e) => { setBusqueda(e.target.value); onSeleccionar(null) }}
                 placeholder="Search providers..."
-                className="focus:border-dash-blue h-9 w-full rounded-md border border-line bg-white pr-9 pl-9 text-[13px] placeholder:text-ink-faint focus:outline-none"
+                className="focus:border-dash-blue h-9 w-full rounded-md border border-line bg-surface pr-9 pl-9 text-[13px] placeholder:text-ink-faint focus:outline-none"
               />
               {busqueda && (
                 <button
@@ -58,7 +58,7 @@ export function LinkExistingPerson({
           {resultados.map((p) => (
             <button
               key={p.id} type="button" onClick={() => { onSeleccionar(p); setBusqueda(p.nombre) }}
-              className="flex items-center gap-3 rounded-lg border border-line bg-white p-3 text-left hover:bg-surface-subtle"
+              className="flex items-center gap-3 rounded-lg border border-line bg-surface p-3 text-left hover:bg-surface-subtle"
             >
               <Avatar initials={p.iniciales} size={36} />
               <span className="min-w-0 leading-tight">

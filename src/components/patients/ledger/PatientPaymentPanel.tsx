@@ -84,7 +84,7 @@ export function PatientPaymentPanel({
     onGuardar(m, soloAplicado(ap.aplicado))
   }
 
-  const botonMetodo = 'mt-7 flex size-9 shrink-0 items-center justify-center rounded-md border border-line bg-white text-ink-muted shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] hover:bg-surface-muted focus-visible:outline-2 focus-visible:outline-dash-blue'
+  const botonMetodo = 'mt-7 flex size-9 shrink-0 items-center justify-center rounded-md border border-line bg-surface text-ink-muted shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] hover:bg-surface-muted focus-visible:outline-2 focus-visible:outline-dash-blue'
   const primero = (
     <SeccionLedger titulo="Payment information">
       {/* Fecha y Apply to en las dos primeras columnas de cuatro, como red.dev (ledger.md, 2026-11-20). */}

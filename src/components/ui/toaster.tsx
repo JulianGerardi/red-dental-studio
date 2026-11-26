@@ -45,7 +45,7 @@ function mostrar(tipo: keyof typeof ICONO, mensaje: MensajeToast, accion?: Accio
         </button>
       )
       return (
-        <div className={cn('flex w-[360px] gap-3 rounded-xl border border-line bg-white px-4 py-3 shadow-[0_8px_24px_rgb(0_0_0/0.12)]', conTitulo ? 'items-start' : 'items-center')}>
+        <div className={cn('flex w-[360px] gap-3 rounded-xl border border-line bg-surface px-4 py-3 shadow-[0_8px_24px_rgb(0_0_0/0.12)]', conTitulo ? 'items-start' : 'items-center')}>
           {ICONO[tipo]}
           {conTitulo ? (
             <span className="flex min-w-0 flex-1 flex-col">

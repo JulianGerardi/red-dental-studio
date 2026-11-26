@@ -60,7 +60,7 @@ export function QuestionBlock({
             rows={2}
             placeholder="Enter text here..."
             aria-label={pregunta.texto}
-            className="focus:border-dash-blue w-full max-w-[460px] resize-y rounded-md border border-line bg-white px-2.5 py-1.5 text-[12px] placeholder:text-ink-faint focus:outline-none"
+            className="focus:border-dash-blue w-full max-w-[460px] resize-y rounded-md border border-line bg-surface px-2.5 py-1.5 text-[12px] placeholder:text-ink-faint focus:outline-none"
           />
         ) : (
           <div role="group" aria-label={pregunta.texto} className="flex flex-wrap gap-1.5">
@@ -69,7 +69,7 @@ export function QuestionBlock({
               return (
                 <button
                   key={o} type="button" aria-pressed={on} onClick={() => elegir(o)}
-                  className={cn(CHIP, on ? 'border-dash-blue bg-dash-blue text-white' : 'hover:border-dash-blue border-line bg-white text-ink')}
+                  className={cn(CHIP, on ? 'border-dash-blue bg-dash-blue text-white' : 'hover:border-dash-blue border-line bg-surface text-ink')}
                 >
                   {o}
                 </button>
@@ -102,7 +102,7 @@ export function WorkflowCard({
     <div
       className={cn(
         'flex items-center gap-2 rounded-md border px-3 py-2 transition-colors',
-        seleccionado ? 'border-dash-blue bg-dash-blue text-white' : 'hover:border-dash-blue border-line border-l-4 border-l-line-strong bg-white text-ink',
+        seleccionado ? 'border-dash-blue bg-dash-blue text-white' : 'hover:border-dash-blue border-line border-l-4 border-l-line-strong bg-surface text-ink',
       )}
     >
       <button type="button" onClick={onElegir} aria-pressed={seleccionado} className="min-w-0 flex-1 text-left">
@@ -120,7 +120,7 @@ export function WorkflowCard({
       <DropdownMenu>
         <DropdownMenuTrigger
           aria-label={`Actions for ${wf.nombre}`}
-          className={seleccionado ? 'text-dash-blue flex size-6 shrink-0 items-center justify-center rounded bg-white' : ICONO_SUELTO}
+          className={seleccionado ? 'text-dash-blue flex size-6 shrink-0 items-center justify-center rounded bg-surface' : ICONO_SUELTO}
         >
           <MoreVertical className="size-4" />
         </DropdownMenuTrigger>
@@ -144,7 +144,7 @@ export function WorkflowProgress({
   const hechos = wf.pasos.filter((p) => guardados.includes(p.id)).length
   const listo = hechos === wf.pasos.length
   return (
-    <div className="rounded-lg bg-white shadow-panel p-4">
+    <div className="rounded-lg bg-surface shadow-panel p-4">
       <div className="flex items-center gap-3">
         <span className={cn('flex size-9 shrink-0 items-center justify-center rounded-full text-white', listo ? 'bg-status-ok' : 'bg-dash-blue')}>
           {listo ? <Check className="size-4" strokeWidth={3} aria-hidden /> : <Play className="size-4" aria-hidden />}
@@ -200,7 +200,7 @@ export function NarrativeSummary({ narrativa, onAbrir }: { narrativa: Narrativa;
   const plano = narrativa.html.replace(/<h2>.*?<\/h2>/, '').replace(/<\/h3>/g, ': ').replace(/<\/(li|p)>/g, '; ').replace(/<br\s*\/?>/g, ' ')
   const texto = (new DOMParser().parseFromString(plano, 'text/html').body.textContent ?? '').replace(/;\s*$/, '').replace(/;\s*(?=[A-Z][^:;]*:)/g, '. ')
   return (
-    <div className="flex items-start gap-3 rounded-lg border border-line bg-white px-3 py-2.5">
+    <div className="flex items-start gap-3 rounded-lg border border-line bg-surface px-3 py-2.5">
       <span className="bg-purple-bg text-purple-fg flex size-8 shrink-0 items-center justify-center rounded-lg"><Bot className="size-4" aria-hidden /></span>
       <div className="min-w-0 flex-1">
         <p className="text-[12px] font-semibold text-ink">
@@ -229,7 +229,7 @@ export function TreatmentPlansCard({ onTreatmentPlan }: { onTreatmentPlan?: () =
   const casos = CASOS.filter((c) => c.estado !== 'Discarded').slice(0, 3)
   const [abiertos, setAbiertos] = useState<string[]>(casos.slice(0, 1).map((c) => c.id))
   return (
-    <div className="rounded-lg bg-white p-4 shadow-panel">
+    <div className="rounded-lg bg-surface p-4 shadow-panel">
       <p className="text-[15px] font-bold text-ink">Treatment plans</p>
       <div className="mt-2 flex flex-col">
         {casos.map((c) => {
@@ -303,7 +303,7 @@ export function TreatmentPanel({ onTreatmentPlan }: { onTreatmentPlan?: () => vo
   return (
     <TooltipProvider delayDuration={200}>
       <div className="flex flex-col gap-4 lg:flex-row lg:items-start">
-        <section aria-label={`${wf.nombre} workflow`} className="flex min-w-0 flex-1 flex-col rounded-lg bg-white shadow-panel">
+        <section aria-label={`${wf.nombre} workflow`} className="flex min-w-0 flex-1 flex-col rounded-lg bg-surface shadow-panel">
           <header className="flex flex-wrap items-center gap-2 border-b border-line-soft px-4 py-3">
             <p className="text-dash-blue text-[12px] font-bold tracking-wide uppercase">{wf.nombre}</p>
             <span className="text-[11px] text-ink-muted">· Published v{wf.version}</span>
@@ -315,7 +315,7 @@ export function TreatmentPanel({ onTreatmentPlan }: { onTreatmentPlan?: () => vo
               <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-ink-faint" />
               <input
                 value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search a section by name" aria-label="Search a section by name"
-                className="focus:border-dash-blue h-9 w-full rounded-md border border-line bg-white pr-3 pl-9 text-[13px] shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] placeholder:text-ink-faint focus:outline-none"
+                className="focus:border-dash-blue h-9 w-full rounded-md border border-line bg-surface pr-3 pl-9 text-[13px] shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] placeholder:text-ink-faint focus:outline-none"
               />
             </div>
 
@@ -377,7 +377,7 @@ export function TreatmentPanel({ onTreatmentPlan }: { onTreatmentPlan?: () => vo
         </section>
 
         <aside className="flex w-full shrink-0 flex-col gap-4 lg:w-[311px]">
-          <div className="rounded-lg bg-white shadow-panel p-3">
+          <div className="rounded-lg bg-surface shadow-panel p-3">
             <div className="flex items-center justify-between gap-2 px-1">
               <p className="text-[15px] font-bold text-ink">Workflows</p>
               <FilterMenu

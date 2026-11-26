@@ -148,7 +148,7 @@ export function CruzSuperficies({ celdas, onCambio, bloqueo }: { celdas: Celda[]
               LUGAR[c.pos] ?? '',
               c.activo
                 ? 'border-dash-blue bg-dash-blue text-white'
-                : 'border-line bg-white text-ink-muted hover:border-dash-blue hover:text-dash-blue',
+                : 'border-line bg-surface text-ink-muted hover:border-dash-blue hover:text-dash-blue',
             )}
           >
             {c.letra}
@@ -236,7 +236,7 @@ export function OdontogramPanel({ card, vacio, onTocar }: {
                 className={cn(
                   'h-9 w-full min-w-0 appearance-none rounded-md border pr-8 pl-2.5 text-[13px] shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] transition-colors',
                   'focus:border-dash-blue focus:ring-2 focus:ring-dash-blue/20 focus:outline-none',
-                  c.off ? 'border-line bg-surface-subtle text-ink-faint' : 'border-line bg-white text-ink hover:border-line-strong',
+                  c.off ? 'border-line bg-surface-subtle text-ink-faint' : 'border-line bg-surface text-ink hover:border-line-strong',
                 )}
               >
                 {c.opciones.map((o) => <option key={o.v} value={o.v}>{o.t}</option>)}
@@ -273,7 +273,7 @@ export function OdontogramPanel({ card, vacio, onTocar }: {
               onClick={() => { tocarCheckbox(c.el); releer(); onTocar?.() }}
               className={cn(
                 'flex h-8 items-center gap-2 rounded-md border px-2.5 text-[12px] transition-colors disabled:opacity-50',
-                c.activo ? 'border-dash-blue bg-dash-count-bg text-dash-blue font-medium' : 'border-line bg-white text-ink-soft hover:bg-surface-subtle',
+                c.activo ? 'border-dash-blue bg-dash-count-bg text-dash-blue font-medium' : 'border-line bg-surface text-ink-soft hover:bg-surface-subtle',
               )}
             >
               <span className={cn('flex size-3.5 shrink-0 items-center justify-center rounded-[3px] border', c.activo ? 'bg-dash-blue border-dash-blue' : 'border-ink-faint')}>
@@ -322,7 +322,7 @@ export function OdontogramPanel({ card, vacio, onTocar }: {
                 'h-8 rounded-md border px-3 text-[12px] font-medium transition-colors disabled:opacity-50',
                 accionActiva === c.clave
                   ? 'border-dash-blue bg-dash-blue text-white'
-                  : 'border-line bg-white text-ink-soft hover:bg-surface-subtle',
+                  : 'border-line bg-surface text-ink-soft hover:bg-surface-subtle',
               )}
             >
               {c.label}

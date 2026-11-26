@@ -94,11 +94,11 @@ export function Drawer({
         <DialogPrimitive.Overlay className="fixed inset-0 z-50 bg-black/20 data-open:animate-in data-open:fade-in-0 data-closed:animate-out data-closed:fade-out-0" />
         <DialogPrimitive.Content className="fixed inset-y-0 right-0 z-50 flex max-w-full items-stretch outline-none motion-safe:animate-[panel-in_180ms_ease-out]">
           {aside && (
-            <div className="motion-safe:animate-[loc-in_200ms_ease-out] hidden w-[300px] shrink-0 flex-col overflow-y-auto border-r border-line bg-white shadow-[-12px_0_32px_rgb(0_0_0/0.10)] lg:flex">
+            <div className="motion-safe:animate-[loc-in_200ms_ease-out] hidden w-[300px] shrink-0 flex-col overflow-y-auto border-r border-line bg-surface shadow-[-12px_0_32px_rgb(0_0_0/0.10)] lg:flex">
               {aside}
             </div>
           )}
-          <div className={cn('flex h-full w-screen flex-col bg-white shadow-[-12px_0_32px_rgb(0_0_0/0.14)]', ANCHO[size], className)}>
+          <div className={cn('flex h-full w-screen flex-col bg-surface shadow-[-12px_0_32px_rgb(0_0_0/0.14)]', ANCHO[size], className)}>
             <div className="flex items-start justify-between gap-3 px-6 pt-6">
               <div className="min-w-0">
                 <DialogPrimitive.Title className="text-[18px] leading-tight font-bold text-ink">{title}</DialogPrimitive.Title>

@@ -9,7 +9,7 @@ export function TopicCard({ topic, onOpen }: { topic: Topic; onOpen: () => void 
   return (
     <button
       type="button" onClick={onOpen}
-      className="group flex w-full items-center gap-2 rounded-lg border border-line bg-white px-3 py-2.5 text-left hover:border-dash-blue"
+      className="group flex w-full items-center gap-2 rounded-lg border border-line bg-surface px-3 py-2.5 text-left hover:border-dash-blue"
     >
       <span className="min-w-0 flex-1 truncate text-[13px] font-semibold text-ink">{topic.title}</span>
       <ChevronRight className="group-hover:text-dash-blue size-3.5 shrink-0 text-ink-faint" />
@@ -33,7 +33,7 @@ export default function Help() {
           const Icon = m.icon
           const abierto = abiertos.includes(m.id)
           return (
-            <div key={m.id} className="overflow-hidden rounded-lg bg-white shadow-panel">
+            <div key={m.id} className="overflow-hidden rounded-lg bg-surface shadow-panel">
               <button
                 type="button" onClick={() => alternar(m.id)} aria-expanded={abierto}
                 className="flex w-full items-center gap-2 px-4 py-3 text-left hover:bg-surface-subtle"

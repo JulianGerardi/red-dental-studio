@@ -83,7 +83,7 @@ export function EditProcedureDrawer({
             <FilaDato icono={<IconoFecha />} rotulo="Creation date">{fechaCorta(finding.date)}</FilaDato>
             {finding.fee !== undefined && (
               <FilaDato
-                icono={<span className="flex size-[22px] shrink-0 items-center justify-center rounded-[4px] bg-white text-ink"><BadgeDollarSign className="size-[14px]" /></span>}
+                icono={<span className="flex size-[22px] shrink-0 items-center justify-center rounded-[4px] bg-surface text-ink"><BadgeDollarSign className="size-[14px]" /></span>}
                 rotulo="Fee"
               >
                 $ {finding.fee.toFixed(2)}

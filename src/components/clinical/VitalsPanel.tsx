@@ -189,7 +189,7 @@ export function TarjetaVital({ v, aviso: conAviso }: { v: Vital; aviso?: boolean
   const texto = v.campos.length > 1 ? `${valores[0]}/${valores[1]}` : String(valores[0])
 
   return (
-    <div className="flex flex-col rounded-lg bg-white shadow-panel p-4">
+    <div className="flex flex-col rounded-lg bg-surface shadow-panel p-4">
       <div className="flex items-start justify-between gap-2">
         <span className="min-w-0">
           <span className="block text-[17px] font-bold text-ink">{v.titulo}</span>
@@ -214,7 +214,7 @@ export function TarjetaVital({ v, aviso: conAviso }: { v: Vital; aviso?: boolean
               onClick={() => setGrupo(g)}
               className={cn(
                 'rounded-md px-3 py-1 text-[12px] font-medium transition-colors',
-                grupo === g ? 'bg-dash-blue text-white' : 'text-ink-medium hover:bg-white',
+                grupo === g ? 'bg-dash-blue text-white' : 'text-ink-medium hover:bg-surface',
               )}
             >
               {g}
@@ -251,7 +251,7 @@ export function TarjetaVital({ v, aviso: conAviso }: { v: Vital; aviso?: boolean
               onClick={() => setUnidad(u)}
               className={cn(
                 'rounded-md px-3 py-1 text-[12px] font-medium transition-colors',
-                unidad === u ? 'bg-dash-blue text-white' : 'text-ink-medium hover:bg-white',
+                unidad === u ? 'bg-dash-blue text-white' : 'text-ink-medium hover:bg-surface',
               )}
             >
               {u}
@@ -292,7 +292,7 @@ export function VitalsPanel() {
 
       {/* Composer de notas: el frame lo pone abajo, ocupando la columna izquierda. */}
       <div className="mt-4 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-        <div className="rounded-lg bg-white shadow-panel p-3">
+        <div className="rounded-lg bg-surface shadow-panel p-3">
           <textarea
             value={nota}
             onChange={(e) => setNota(e.target.value)}

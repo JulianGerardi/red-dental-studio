@@ -228,7 +228,7 @@ export function ProblemList({ procedimientoInicial }: {
 
   return (
     <TooltipProvider delayDuration={200}>
-      <div className="flex flex-col gap-3 rounded-lg bg-white shadow-panel p-4">
+      <div className="flex flex-col gap-3 rounded-lg bg-surface shadow-panel p-4">
         <div className="flex flex-wrap items-center gap-2">
           <Tabs tabs={['Problem list', 'Procedures'] as const} value={pestana} onChange={(v) => { setEnfoque(undefined); setPestana(v) }} aria-label="Clinical records" />
           <div className="ml-auto flex flex-wrap items-center gap-2">
@@ -237,7 +237,7 @@ export function ProblemList({ procedimientoInicial }: {
               <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-ink-faint" />
               <input
                 value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search problem list" aria-label="Search problem list"
-                className="focus:border-dash-blue h-9 w-full rounded-md border border-line bg-white pr-3 pl-9 text-[13px] shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] placeholder:text-ink-faint focus:outline-none"
+                className="focus:border-dash-blue h-9 w-full rounded-md border border-line bg-surface pr-3 pl-9 text-[13px] shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] placeholder:text-ink-faint focus:outline-none"
               />
             </div>
             {pestana === 'Problem list' ? (

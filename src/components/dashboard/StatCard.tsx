@@ -15,7 +15,7 @@ export function StatCard({
   icon: LucideIcon
 }) {
   return (
-    <div className="shadow-panel flex flex-col gap-2 overflow-hidden rounded-lg bg-white p-6">
+    <div className="shadow-panel flex flex-col gap-2 overflow-hidden rounded-lg bg-surface p-6">
       <div className="flex items-center gap-4">
         <p className="min-w-px flex-1 text-[15px] leading-[1.4] font-medium text-ink">
           {title}

@@ -112,7 +112,7 @@ export function MoneyInput({
         onChange(limpio === '' ? null : Number(limpio))
       }}
       onBlur={() => setEditando(null)}
-      className={cn(control(invalid ? 'error' : undefined), 'h-8 px-2.5 text-right tabular-nums', comoTexto && !invalid && '-mr-2.5 h-7 w-[calc(100%+10px)] border-transparent bg-transparent shadow-none hover:border-line focus:border-dash-blue focus:bg-white', className)}
+      className={cn(control(invalid ? 'error' : undefined), 'h-8 px-2.5 text-right tabular-nums', comoTexto && !invalid && '-mr-2.5 h-7 w-[calc(100%+10px)] border-transparent bg-transparent shadow-none hover:border-line focus:border-dash-blue focus:bg-surface', className)}
     />
   )
 }

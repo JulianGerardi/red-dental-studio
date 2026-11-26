@@ -62,7 +62,7 @@ export function OdontogramaOverview({ ampliado = false, onAmpliar, onDetalle, ul
   const pestana = ultima.examen ? pestanaDeExamen(ultima.examen) : undefined
 
   return (
-    <div className="relative overflow-hidden rounded-lg bg-white shadow-panel">
+    <div className="relative overflow-hidden rounded-lg bg-surface shadow-panel">
       {/* Fondo punteado: es el del frame y da la sensación de mesa de trabajo. */}
       <div
         className="overflow-x-auto p-4 pb-16"
@@ -78,13 +78,13 @@ export function OdontogramaOverview({ ampliado = false, onAmpliar, onDetalle, ul
         onClick={onAmpliar}
         aria-label={ampliado ? 'Collapse chart' : 'Expand chart'}
         aria-pressed={ampliado}
-        className="absolute top-3 right-3 flex size-8 items-center justify-center rounded-lg border border-line bg-white shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] hover:bg-surface-subtle"
+        className="absolute top-3 right-3 flex size-8 items-center justify-center rounded-lg border border-line bg-surface shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] hover:bg-surface-subtle"
       >
         {ampliado ? <Minimize2 className="size-4" /> : <Maximize2 className="size-4" />}
       </button>
 
       {/* Desde sm, una sola línea: con una condición larga el aviso subía y tapaba los números de abajo. El nombre se corta. */}
-      <div className="absolute right-3 bottom-3 left-3 flex flex-wrap items-center gap-x-3 gap-y-1 rounded-lg border border-line bg-white/95 px-3 py-2 shadow-[0_4px_14px_rgb(0_0_0/0.1)] backdrop-blur-sm sm:left-auto sm:max-w-[min(600px,calc(100%-24px))] sm:flex-nowrap">
+      <div className="absolute right-3 bottom-3 left-3 flex flex-wrap items-center gap-x-3 gap-y-1 rounded-lg border border-line bg-surface/95 px-3 py-2 shadow-[0_4px_14px_rgb(0_0_0/0.1)] backdrop-blur-sm sm:left-auto sm:max-w-[min(600px,calc(100%-24px))] sm:flex-nowrap">
         <span className="flex min-w-0 items-center gap-2">
           <TriangleAlert className="size-4 shrink-0 text-warn-fg" />
           <span className="truncate text-[13px] font-semibold text-ink" title={ultima.condicion}>

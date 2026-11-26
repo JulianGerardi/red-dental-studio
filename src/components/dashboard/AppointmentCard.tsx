@@ -238,7 +238,7 @@ export function MenuCard({ nombre, onEdit, acciones }: { nombre: string; onEdit?
       <DropdownMenu>
         <DropdownMenuTrigger
           aria-label={`Actions for ${nombre}`}
-          className="flex size-8 shrink-0 items-center justify-center rounded-lg border border-line bg-white text-ink shadow-sm hover:bg-surface-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-dash-blue data-[state=open]:bg-surface-muted"
+          className="flex size-8 shrink-0 items-center justify-center rounded-lg border border-line bg-surface text-ink shadow-sm hover:bg-surface-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-dash-blue data-[state=open]:bg-surface-muted"
         >
           <EllipsisVertical className="size-4" />
         </DropdownMenuTrigger>
