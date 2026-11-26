@@ -5,6 +5,12 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-11-26
 
+### Mails: descargar el mail en PDF ([#207](https://github.com/JulianGerardi/red-dental-studio/pull/207))
+- **Vista previa** (`/emails/`): botón *Download PDF* al lado de *Download HTML*. Baja `<id>.pdf`, una página del tamaño
+  del mail, tal como se ve (ancho, datos o variables y logo). Se arma en el navegador con `html-to-image` y `jspdf`
+  (dependencia nueva, carga diferida).
+- El PDF es imagen: el texto no se selecciona y los links no funcionan. No cambia nada de lo que se le entrega al backend.
+
 ### Settings: Overview, Roles en cards con una página por rol y atajos de Billing en un ⋮ (CON-3130, CON-3131, CON-4065) ([#206](https://github.com/JulianGerardi/red-dental-studio/pull/206))
 - **Overview:** la portada de Settings se titula *Overview* y así se llama en el menú (`settings-nav.ts`; antes *General*).
   La ruta sigue siendo `/settings/general`.
