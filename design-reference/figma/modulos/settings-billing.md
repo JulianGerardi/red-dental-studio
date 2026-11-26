@@ -22,6 +22,18 @@ Fee Schedule deja la card única con `MasterList` y pasa al patrón de `componen
 5. **New fee schedule** usa la misma card del editor, sin encabezado (como *New coverage table*).
 6. `MasterList` queda sin uso en la app (sólo en su story).
 
+### Sin la tabla al entrar (Julián, 2026-11-26)
+
+*"Al inicio no va la tabla directamente, va lo creado, porque si no es redundante."* `/settings/finance/fee-schedule` ya
+no muestra la `DataTable` (Name, Type, Assignments, Effective, Last updated, Status): abre la lista y el editor vacío
+(*No fee schedule selected*), como `/settings/finance/coverage-table`. Una sola pantalla para las dos rutas.
+
+7. **El ⋮ de cada ítem** suma lo que sólo estaba en la tabla: *View assignments* y *Compare fees*, una línea y después
+   *Inactive / Active* y *Archive / Restore*. *Edit* no hace falta: tocar el ítem lo abre.
+8. **Se pierden de la vista** *Assignments* (el número con el desglose al pasar), *Effective* y *Last updated*. Effective
+   se ve en *Fee schedule version*; las asignaciones, en *View assignments*. Si recepción o administración extrañan
+   *Last updated* o el número de asignaciones de un vistazo, sumarlos como `extra` del ítem.
+
 **A validar con usuarios:** que con la lista de 340 px el editor tenga ancho suficiente en notebooks de 1024–1280 px
 (Description se parte en dos líneas antes que antes), y que la pill *Inactive* en rojo no se lea como error al lado del
 gris de Coverage.

@@ -26,7 +26,7 @@ import { SettingsEmployees, SettingsEmployeeDetail } from '@/pages/settings/Empl
 import { SettingsAccount } from '@/pages/settings/Account'
 import { SettingsConsents } from '@/pages/settings/Consents'
 import { SettingsLedgerOptions } from '@/pages/settings/LedgerOptions'
-import { SettingsFeeSchedules, SettingsFeeScheduleEdit, SettingsNewFeeSchedule } from '@/pages/settings/finance/FeeSchedules'
+import { SettingsFeeSchedules, SettingsNewFeeSchedule } from '@/pages/settings/finance/FeeSchedules'
 import { SettingsCarriers, SettingsCarrierEdit } from '@/pages/settings/finance/Carriers'
 import { SettingsInsurancePlan } from '@/pages/settings/finance/InsurancePlan'
 import { SettingsCoverageTables, SettingsNewCoverageTable } from '@/pages/settings/finance/CoverageTables'
@@ -96,7 +96,7 @@ export function AppRoutes() {
           <Route path="finance" element={<Navigate to="/settings/finance/fee-schedule" replace />} />
           <Route path="finance/fee-schedule" element={<SettingsFeeSchedules />} />
           <Route path="finance/fee-schedule/new" element={<SettingsNewFeeSchedule />} />
-          <Route path="finance/fee-schedule/:feeId/edit" element={<SettingsFeeScheduleEdit />} />
+          <Route path="finance/fee-schedule/:feeId/edit" element={<SettingsFeeSchedules />} />
           <Route path="finance/fee-schedule/:feeId" element={<RedirigirAEdit />} />
           <Route path="finance/carriers" element={<SettingsCarriers />} />
           <Route path="finance/carriers/new" element={<SettingsCarriers nuevo />} />

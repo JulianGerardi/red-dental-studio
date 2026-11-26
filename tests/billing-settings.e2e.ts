@@ -122,12 +122,12 @@ test('una excepción nueva se arma en cuatro pasos y se suma a la plantilla', as
   await expect(screen.getByRole('button', 'Manage exceptions (4)')).toBeVisible()
 })
 
-test('Assignments muestra el desglose y abre la lista de asignaciones', async ({ app, screen }) => {
+/* Sin la tabla (2026-11-26): View assignments y Compare fees salen del ⋮ de cada ítem de la lista. */
+test('al entrar se ve lo creado, y View assignments abre la lista de asignaciones', async ({ app, screen }) => {
   await app.open('/settings/finance/fee-schedule')
-  await screen.getByRole('button', '7 assignments').tap()
-  const desglose = screen.getByRole('dialog', 'Assignments')
-  await expect(desglose.getByText('Providers')).toBeVisible()
-  await desglose.getByRole('button', 'View assignments').tap()
+  await expect(screen.getByText('No fee schedule selected')).toBeVisible()
+  await screen.getByRole('button', 'Actions for PPO Premium Plan').tap()
+  await screen.getByRole('menuitem', 'View assignments').tap()
   const drawer = screen.getByRole('dialog', 'Assignments')
   await expect(drawer.getByText('Patients (3)')).toBeVisible()
   await expect(drawer.getByText('Carriers (2)')).toBeVisible()
