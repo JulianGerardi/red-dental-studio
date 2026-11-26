@@ -147,11 +147,15 @@ test('Compare fees compara por procedimiento contra el Default', async ({ app, s
 test('Add range avisa y el breadcrumb sigue la regla de Settings', async ({ app, screen }) => {
   await app.open('/settings/finance/carriers/aetna/edit/insurance-plans/acme-ppo/edit')
   const migas = screen.getByRole('navigation', 'Breadcrumb')
-  await expect(migas.getByRole('link', 'Billing')).toBeVisible()
+  /* Billing es una pantalla con pestañas (2026-11-26): el link vuelve a la pestaña de donde se vino. */
+  await expect(migas.getByRole('link', 'Billing')).toHaveAttribute('href', /carriers$/)
   await expect(migas.getByRole('link', 'Aetna Dental Plans')).toBeVisible()
   await expect(migas.getByRole('link', 'Acme Corp')).toHaveCount(0)
 
+  /* Lista y editor en una pantalla: el rastro termina en Billing, como el título, aunque haya una tabla elegida. */
   await app.open('/settings/finance/coverage-table/medicaid-adults/edit')
+  await expect(migas.getByText('Billing')).toBeVisible()
+  await expect(migas.getByText('Medicaid Adults')).toHaveCount(0)
   await screen.getByRole('button', 'Add range').tap()
   await expect(screen.getByText('A new range was added at the end. Complete it and Save.')).toBeVisible()
   await expect(screen.getByPlaceholder('R. min').last()).toBeVisible()
@@ -186,4 +190,18 @@ test('Coverage tables: pestañas por tipo y el menú desactiva y borra', async (
   await dialogo.getByRole('button', 'Delete').tap()
   await expect(screen.getByText('Standard PPO 100/80/50 was deleted.')).toBeVisible()
   await expect(screen.getByRole('link', /^Standard PPO/)).toHaveCount(0)
+})
+
+/* Acceso rápido (2026-11-26): desde Settings General se entra directo a cada sección de Billing, y en Billing se pasa de
+   una a otra con las pestañas, sin abrir el menú. */
+test('Billing: atajos desde Settings y pestañas entre secciones', async ({ app, screen }) => {
+  await app.open('/settings/general')
+  await screen.getByRole('navigation', 'Billing sections').getByRole('link', 'Carriers').tap()
+  await expect(screen.getByRole('link', 'Aetna Dental Plans')).toBeVisible()
+
+  const secciones = screen.getByRole('navigation', 'Billing sections')
+  await secciones.getByRole('link', 'Coverage tables').tap()
+  await expect(screen.getByRole('tab', 'Copayment')).toBeVisible()
+  await secciones.getByRole('link', 'Fee schedules').tap()
+  await expect(screen.getByText('No fee schedule selected')).toBeVisible()
 })

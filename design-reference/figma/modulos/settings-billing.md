@@ -1,5 +1,46 @@
 # Settings → Billing (Fee Schedules, Carriers, Coverage Table)
 
+## Billing con pestañas y atajos desde Settings (2026-11-26)
+
+Julián: *"dentro de Billing tenemos 3 opciones … para acceder debo ir siempre al menú y eso es tedioso; creemos alguna
+idea para que sea de fácil acceso, también desde Settings General"*.
+
+1. **Billing es una pantalla con tres pestañas**, como *Ledger options*: título *Billing*, la acción de la sección a la
+   derecha (*New fee schedule / New carrier / New coverage table*) y debajo **Fee schedules · Carriers · Coverage tables**
+   (`finance/BillingHeader`). Cada pestaña es su ruta de siempre. Se pasa de una a otra sin abrir el menú.
+2. **Las pestañas son links** (`ui/tabs` › `TabLinks`, mismo look que `Tabs`, con `aria-current`): cambian de pantalla,
+   no de vista, y así el aviso de cambios sin guardar del Edit Fee Schedule las frena como a cualquier link.
+3. **Settings General**: la card de Billing suma tres atajos (*Fee schedules*, *Carriers*, *Coverage tables*) que van
+   directo a la sección. La card sigue llevando a Billing (título con el área estirada; los atajos van por encima, porque
+   no se puede anidar un link en otro). Sirve para cualquier sección con `children` en `settings-nav.ts`.
+4. **Breadcrumb**: corrige lo de abajo (misma fecha). Billing vuelve a ser link porque ahora tiene pantalla: las tres
+   pestañas terminan en `Settings / Billing` (coincide con el título) y lo de adentro cuelga de Billing con link a la
+   pestaña de donde viene: `Settings / Billing / New fee schedule`, `Settings / Billing / Aetna Dental Plans / Acme Corp`.
+   El tramo de la sección se va: llevaba a la misma pestaña que Billing.
+
+**A validar con usuarios:** si se descubren los atajos de la card (o se sigue entrando por el menú), y que *Billing* de
+Settings no se confunda con el módulo Billing del menú lateral, que tiene el mismo nombre.
+
+## Breadcrumb de Billing coherente (2026-11-26)
+
+Julián: *"los breadcrumbs funcionan mal, son incoherentes"*. Relevadas las 25 rutas de Settings (breadcrumb, título y
+destino de cada link). Lo que no cerraba en Billing:
+
+1. **Billing llevaba a Fee schedules.** `/settings/finance` redirige a Fee schedules, así que desde Carriers o Coverage
+   tables el tramo *Billing* abría otra sección, y en Fee schedules apuntaba a la misma pantalla. Billing no tiene pantalla
+   propia: pasa a **texto sin link** (`Settings / Billing / Carriers`). No se inventa una página de Billing.
+2. **Lista y editor en una pantalla, dos reglas.** Consents termina en la sección (`Settings / Consents`) elija lo que
+   elija; Fee schedules y Coverage tables sumaban el ítem elegido (`… / Fee schedules / Aetna 2026`) con el título
+   *Fee schedules* debajo, y el tramo *Fee schedules* volvía a la misma pantalla sin nada elegido. Ahora terminan en la
+   sección, como Consents: el último tramo coincide con el título y el ítem elegido se ve marcado en la lista.
+3. Sin cambios: Carriers sí lleva el nombre (`… / Carriers / Aetna Dental Plans / Acme Corp`), porque el carrier y el plan
+   son pantallas aparte; *Aetna Dental Plans* vuelve a la pestaña de planes. *New fee schedule* y *New coverage table*
+   cuelgan de su lista.
+
+**Queda para decidir (no se tocó, es texto de la pantalla):** el título no dice lo mismo que el último tramo en Consents
+(*Consent templates*), Ledger (*Ledger options*), Preferences (*Account preferences*), Account (*Edit account*) y el carrier
+(*Edit carrier* bajo *Aetna Dental Plans*) y el plan (*Edit insurance plan* bajo *Acme Corp*).
+
 ## Edit Fee Schedule con el diseño de Coverage tables (2026-11-26)
 
 Sin historia de abril (epic CON-57). Pedido de Julián: *"que fee scheduling tenga el mismo diseño que coverage table"*. Edit

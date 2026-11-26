@@ -5,6 +5,18 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-11-26
 
+### Settings › Billing: pestañas entre secciones, atajos desde Settings y breadcrumb coherente (CON-57) ([#205](https://github.com/JulianGerardi/red-dental-studio/pull/205))
+- **Billing es una pantalla con pestañas**, como Ledger options: `finance/BillingHeader` (título *Billing*, la acción de la
+  sección y *Fee schedules · Carriers · Coverage tables*) reemplaza al `SettingsPageHeader` de las tres listas. Las rutas no
+  cambian: cada pestaña es la suya.
+- **`ui/tabs` › `TabLinks`**: el look de `Tabs` con links y `aria-current`, para pestañas que cambian de pantalla (así las
+  frena `useAvisoSalida`). Usá `Tabs` para vistas de un mismo bloque y `TabLinks` para pantallas hermanas.
+- **`SettingsSectionCard`** suma `atajos`: links directos a las pantallas de la sección (Settings General los saca de los
+  `children` de `settings-nav.ts`; hoy, Billing). Con atajos, la card deja de ser un `<a>` entero: el título estira su área.
+- **Breadcrumb** (`pages/Settings.tsx`): las tres pestañas terminan en `Settings / Billing`, también con un ítem elegido;
+  lo de adentro cuelga de *Billing* con link a la pestaña de origen (`Settings / Billing / Aetna Dental Plans / Acme Corp`).
+  Se va el tramo de la sección.
+- Pendiente del design system: `BillingHeader` y `TabLinks` están en `exentos.json` hasta documentarlos en Storybook.
 ### My account: switch de Dark mode ([#204](https://github.com/JulianGerardi/red-dental-studio/pull/204))
 - El menú de la cuenta (`MenuCuenta`, Topbar) suma la fila **Dark mode**: sol o luna y el `ui/switch`. Atajo al tema de
   Preferences, sincronizado con `useTema` (`lib/tema.ts`).

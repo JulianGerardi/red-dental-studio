@@ -29,25 +29,24 @@ export const SETTINGS_ICONS: Record<string, LucideIcon> = {
    de otro modo obliga a abrir el menú flotante del rail. */
 /* Settings → Billing lleva el breadcrumb de red.dev: Settings › Finance › Carriers › Aetna Dental Plans › Edit ›
    Insurance plans › Acme Corp › Edit. Un /new que abre un drawer sobre la lista termina en la lista. */
-const TITULOS_FINANZAS: Record<string, string> = { 'fee-schedule': 'Fee schedules', carriers: 'Carriers', 'coverage-table': 'Coverage tables' }
 const NUEVO_FINANZAS: Record<string, string> = { 'fee-schedule': 'New fee schedule', 'coverage-table': 'New coverage table' }
 
 /* Billing sigue la regla del resto de Settings (Julián, 2026-10-09): Settings › Billing › sección › ítem, con el nombre del
-   menú y sin un tramo "Edit"; el último no es link. El plan cuelga de su carrier. Ver settings-billing.md. */
+   menú y sin un tramo "Edit"; el último no es link. El plan cuelga de su carrier. Desde el 2026-11-26 las tres secciones
+   son pestañas de una pantalla, Billing (como Ledger options): sus listas terminan en Billing y lo de adentro cuelga de
+   Billing, con link a la pestaña de donde viene. Fee schedules y Coverage tables (lista y editor en una pantalla, como
+   Consents) terminan en Billing aunque haya uno elegido. Ver settings-billing.md (2026-11-26). */
+const LISTA_Y_EDITOR = new Set(['fee-schedule', 'coverage-table'])
 function migasFinanzas(pathname: string, nombre: (seccion: string, id: string) => string | undefined): Miga[] | null {
   const m = pathname.match(/^\/settings\/finance\/(fee-schedule|carriers|coverage-table)(?:\/(.*))?$/)
   if (!m) return null
   const [, seccion, resto = ''] = m
   const partes = resto.split('/').filter(Boolean)
   const lista = `/settings/finance/${seccion}`
-  const migas: Miga[] = [
-    { label: 'Settings', to: '/settings/general' },
-    { label: 'Billing', to: '/settings/finance' },
-    { label: TITULOS_FINANZAS[seccion], to: lista },
-  ]
+  const migas: Miga[] = [{ label: 'Settings', to: '/settings/general' }, { label: 'Billing', to: lista }]
   if (partes[0] === 'new') {
     if (NUEVO_FINANZAS[seccion]) migas.push({ label: NUEVO_FINANZAS[seccion] })
-  } else if (partes[0]) {
+  } else if (partes[0] && !LISTA_Y_EDITOR.has(seccion)) {
     migas.push({ label: nombre(seccion, partes[0]) ?? partes[0], to: `${lista}/${partes[0]}/edit/insurance-plans` })
     if (partes[2] === 'insurance-plans' && partes[3] && partes[3] !== 'new') migas.push({ label: nombre('planes', partes[3]) ?? partes[3] })
   }
@@ -127,7 +126,10 @@ export function SettingsGeneral() {
         {SETTINGS_SECTIONS.map((s) => {
           const Icon = SETTINGS_ICONS[s.icon] ?? SlidersHorizontal
           return (
-            <SettingsSectionCard key={s.to} to={s.to} icon={Icon} title={s.title} description={s.desc} />
+            <SettingsSectionCard
+              key={s.to} to={s.to} icon={Icon} title={s.title} description={s.desc}
+              atajos={SETTINGS_NAV.find((n) => n.to === s.to)?.children}
+            />
           )
         })}
       </div>
