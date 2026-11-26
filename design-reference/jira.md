@@ -208,6 +208,29 @@ de su módulo.
 - [CON-3501](https://confidetally.atlassian.net/browse/CON-3501) [Post demo] Email para cancel suscription · epic CON-3259 (sin texto)
 - [CON-478](https://confidetally.atlassian.net/browse/CON-478) Appointment Reschedule
 
+## pdfs
+
+Documento: [figma/modulos/pdfs.md](figma/modulos/pdfs.md). No hay un epic de PDFs: la lista de documentos sale de
+CON-4115 y cada historia vive en el epic de su módulo.
+
+**Historias**
+
+- [CON-4115](https://confidetally.atlassian.net/browse/CON-4115) [Documents] View
+- [CON-2641](https://confidetally.atlassian.net/browse/CON-2641) Dashboard: Pending Tasks de la Secretaria
+- [CON-2643](https://confidetally.atlassian.net/browse/CON-2643) Dashboard del Paciente: Pending Tasks
+- [CON-2220](https://confidetally.atlassian.net/browse/CON-2220) Generar Documento (Lab Order)
+- [CON-2287](https://confidetally.atlassian.net/browse/CON-2287) Generar Documento (Prescription)
+- [CON-2230](https://confidetally.atlassian.net/browse/CON-2230) New Prescription
+- [CON-3034](https://confidetally.atlassian.net/browse/CON-3034) Mejorar document design para Prescriptions (sin texto)
+- [CON-2322](https://confidetally.atlassian.net/browse/CON-2322) New Referral
+- [CON-3033](https://confidetally.atlassian.net/browse/CON-3033) Mejorar document design para Referral (sin texto)
+- [CON-3128](https://confidetally.atlassian.net/browse/CON-3128) Referral Provider: Provider Type y Specialty
+- [CON-195](https://confidetally.atlassian.net/browse/CON-195) Gestionar Consentimiento de Procedure
+- [CON-2923](https://confidetally.atlassian.net/browse/CON-2923) Generar y enviar automáticamente los consentimientos al completar la decisión de todos los Treatment Cases
+- [CON-1634](https://confidetally.atlassian.net/browse/CON-1634) Treatment Plan Overview & Consultar Case
+- [CON-1122](https://confidetally.atlassian.net/browse/CON-1122) Exam "Periodontal"
+- [CON-1649](https://confidetally.atlassian.net/browse/CON-1649) Radiographic
+
 ## employees
 
 Documento: [figma/modulos/employees.md](figma/modulos/employees.md)

@@ -22,7 +22,8 @@
     "test:e2e": "e2e run",
     "figma:capturar": "node scripts/figma/capturar.mjs",
     "figma:portada": "node scripts/figma/portada.mjs",
-    "emails:exportar": "node scripts/emails-exportar.mjs"
+    "emails:exportar": "node scripts/emails-exportar.mjs",
+    "pdfs:exportar": "node scripts/pdfs-exportar.mjs"
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.3.3",

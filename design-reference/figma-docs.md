@@ -68,6 +68,7 @@ una al lado de la otra.
 | 🔔 Notifications | `7:20` | `notifications.mjs` | `notifications.md` |
 | ❓ Help | `7:21` | `help.mjs` | `help.md` |
 | 📧 Email | `138:4` | `emails.mjs` | `emails.md` |
+| 📄 PDFs | `597:4` | `pdfs.mjs` | `pdfs.md` |
 
 Al 2026-11-15: 19 páginas de módulo, 63 flujos y 281 pantallas. Relationships & Billing se completó ese día: Add
 Relationship con sus tres pasos (con y sin Contact, persona nueva), Edit, Delete y el garante en Ledger y Billing.
@@ -113,6 +114,15 @@ de la página aparte `/emails/`, no de la app. Tres cosas del proceso:
 - **Los diseños originales** (*Welcome email* y *Email onboarding*, con textos en Arial) quedan al pie de la página sin
   tocar: el orden se corrió salteando esas dos secciones. Motores de la library corridos: 152 Pill y 19 Button, 0 instancias
   locales; otros 19 botones (fuera de la escala 28/32/36) quedaron como capas.
+
+2026-11-26 (PDFs de la plataforma, CON-4115): la página **📄 PDFs** (`597:4`, entre 📧 Email y Scheduling) suma 4 flujos y 13
+pantallas: *Template & preview* (con datos de ejemplo, sin firmar y con variables) y los 10 documentos por categoría. Se
+capturan de la página aparte `/pdfs/`. Como en los mails, la hoja va en un iframe y `sinIframe` (`flujos/pdfs.mjs`) la
+reemplaza por su contenido con las reglas pasadas a cada elemento, **de la última a la primera** (el `<style>` que pinta los
+dientes de la Lab order llega después y tiene que ganar). Dos cosas del proceso: las chips salen en Liberation Mono y se
+cambiaron a Roboto Mono antes de importar, y la firma escrita sale en Times New Roman Italic, que Figma no tiene: después de
+`arreglar` pasó a Playfair Display Italic (13 textos). La pestaña PDF no se captura (el navegador no dibuja PDF). `html_to_figma`
+respondió 504 y terminó igual; no se reintentó. Los motores de la library no se corrieron en esta página.
 
 **Recapturar una página ya conectada a la library** (Locations, 2026-11-16): después de ordenar y arreglar, correr los
 motores guardados en el archivo, en este orden y con `PAGES` = el nombre de la página: `motorLib`, `chipcountLib`, `binder`,
