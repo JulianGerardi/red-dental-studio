@@ -20,3 +20,19 @@ test('Dark se aplica al elegirlo, queda al volver y Light lo deshace', async ({ 
   await screen.getByRole('radio', /^Light/).tap()
   await expect(screen.getByRole('radio', /^Light/)).toHaveAttribute('aria-checked', 'true')
 })
+
+test('El switch de My account cambia el tema sin cerrar el menú y Preferences lo refleja', async ({ app, screen }) => {
+  await app.open('/settings/preferences')
+  await screen.getByRole('button', /Sarah Stone/).tap()
+  const atajo = screen.getByRole('menuitemcheckbox', /Dark mode/)
+  await expect(atajo).toHaveAttribute('aria-checked', 'false')
+
+  await atajo.tap()
+  await expect(atajo).toHaveAttribute('aria-checked', 'true')
+
+  /* Con el menú abierto la página queda oculta a la accesibilidad: se mira Preferences al volver a entrar. */
+  await app.open('/settings/preferences')
+  await expect(screen.getByRole('radio', /^Dark/)).toHaveAttribute('aria-checked', 'true')
+  await screen.getByRole('radio', /^Light/).tap()
+  await expect(screen.getByRole('radio', /^Light/)).toHaveAttribute('aria-checked', 'true')
+})

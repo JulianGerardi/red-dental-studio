@@ -5,6 +5,12 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-11-26
 
+### My account: switch de Dark mode ([#204](https://github.com/JulianGerardi/red-dental-studio/pull/204))
+- El menú de la cuenta (`MenuCuenta`, Topbar) suma la fila **Dark mode**: sol o luna y el `ui/switch`. Atajo al tema de
+  Preferences, sincronizado con `useTema` (`lib/tema.ts`).
+- Toda la fila es el control (`role="menuitemcheckbox"`, `aria-checked`); el `Switch` es sólo el dibujo. No cierra el
+  menú al tocarlo (`preventDefault` en `onSelect`).
+
 ### Preferences: modo oscuro y sin formato de fecha ([#203](https://github.com/JulianGerardi/red-dental-studio/pull/203))
 - **Dark funciona** (Settings › Preferences): se aplica al elegir, con un fundido corto. `lib/tema.ts` guarda el tema en
   `localStorage` (`preferences:theme`) y pone la clase `dark` en `<html>`; con backend, guardarlo por usuario.
