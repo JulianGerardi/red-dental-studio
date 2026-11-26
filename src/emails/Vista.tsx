@@ -1,9 +1,10 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { Download, Monitor, Smartphone, Braces, Eye } from 'lucide-react'
+import { Download, FileDown, Monitor, Smartphone, Braces, Eye } from 'lucide-react'
 import { PageTitle } from '@/components/ui/page-title'
 import { Button } from '@/components/ui/button'
 import { Pill } from '@/components/ui/pill'
 import { Tabs } from '@/components/ui/tabs'
+import { Toaster, aviso } from '@/components/ui/toaster'
 import { cn } from '@/lib/utils'
 import { TARJETA_PANEL } from '@/lib/estilos'
 import { COLOR, completar } from '@/emails/marco'
@@ -39,6 +40,8 @@ export default function Emails() {
   const [ancho, setAncho] = useState<Ancho>('desktop')
   const [modo, setModo] = useState<Modo>('sample')
   const [logo, setLogo] = useState<Logo>('red')
+  const [armandoPdf, setArmandoPdf] = useState(false)
+  const marco = useRef<HTMLIFrameElement>(null)
   useEffect(() => {
     const alCambiar = () => setMail(mailDelHash())
     window.addEventListener('hashchange', alCambiar)
@@ -49,6 +52,7 @@ export default function Emails() {
   return (
     <div className="mx-auto w-full max-w-[1400px] px-4 py-6 sm:px-8">
       <img src={`${ASSETS}/confidentally-logo.png`} alt="Confidentally" className="mb-5 h-11 w-auto" />
+      <Toaster />
       <PageTitle>Emails</PageTitle>
       <p className="mt-[9px] max-w-[720px] text-xs leading-[17px] text-ink-faint">
         The emails the platform sends. They all share one layout; only the text and the {'{{variables}}'} change.
@@ -110,11 +114,25 @@ export default function Emails() {
                 tabs={[{ value: 'sample', label: 'Sample data', icon: Eye }, { value: 'variables', label: 'Variables', icon: Braces }]}
               />
               {mail.remitente === 'clinica' && <ElegirLogo valor={logo} onChange={setLogo} />}
-              <Button variant="secondary" size="md" className="ml-auto" onClick={() => bajar(mail)}>
-                <Download /> Download HTML
-              </Button>
+              <div className="ml-auto flex flex-wrap gap-2">
+                <Button
+                  variant="secondary"
+                  size="md"
+                  disabled={armandoPdf}
+                  onClick={async () => {
+                    setArmandoPdf(true)
+                    try { await bajarPdf(marco.current, mail) } catch { aviso.error('Couldn’t create the PDF. Try again.') }
+                    setArmandoPdf(false)
+                  }}
+                >
+                  <FileDown /> {armandoPdf ? 'Creating PDF…' : 'Download PDF'}
+                </Button>
+                <Button variant="secondary" size="md" onClick={() => bajar(mail)}>
+                  <Download /> Download HTML
+                </Button>
+              </div>
             </div>
-            <VistaMail key={`${mail.id}-${modo}-${ancho}-${logo}`} mail={mail} ancho={ancho} modo={modo} logo={logo} />
+            <VistaMail key={`${mail.id}-${modo}-${ancho}-${logo}`} marco={marco} mail={mail} ancho={ancho} modo={modo} logo={logo} />
           </div>
         </div>
       </div>
@@ -192,8 +210,13 @@ function ElegirLogo({ valor, onChange }: { valor: Logo; onChange: (l: Logo) => v
   )
 }
 
-function VistaMail({ mail, ancho, modo, logo }: { mail: Mail; ancho: Ancho; modo: Modo; logo: Logo }) {
-  const ref = useRef<HTMLIFrameElement>(null)
+function VistaMail({ marco: ref, mail, ancho, modo, logo }: {
+  marco: React.RefObject<HTMLIFrameElement | null>
+  mail: Mail
+  ancho: Ancho
+  modo: Modo
+  logo: Logo
+}) {
   const [alto, setAlto] = useState(900)
   const html = useMemo(() => {
     const crudo = htmlDe(mail)
@@ -246,4 +269,18 @@ function bajar(mail: Mail) {
   const a = Object.assign(document.createElement('a'), { href: url, download: `${mail.id}.html` })
   a.click()
   URL.revokeObjectURL(url)
+}
+
+/* El PDF es sólo el mail, tal como se ve en la vista previa (ancho, datos o variables y logo): una página del tamaño
+   del mail, con la imagen al doble de resolución. jsPDF se carga recién al pedirlo. Ver emails.md (2026-11-26). */
+async function bajarPdf(marco: HTMLIFrameElement | null, mail: Mail) {
+  const raiz = marco?.contentDocument?.documentElement
+  if (!raiz) throw new Error('Sin vista previa')
+  const [{ toJpeg }, { jsPDF }] = await Promise.all([import('html-to-image'), import('jspdf')])
+  const ancho = raiz.scrollWidth, alto = raiz.scrollHeight
+  const imagen = await toJpeg(raiz, { width: ancho, height: alto, pixelRatio: 2, quality: 0.92, backgroundColor: COLOR.fondo })
+  const pdf = new jsPDF({ unit: 'px', format: [ancho, alto], orientation: ancho > alto ? 'landscape' : 'portrait', hotfixes: ['px_scaling'] })
+  pdf.setProperties({ title: mail.asunto })
+  pdf.addImage(imagen, 'JPEG', 0, 0, ancho, alto)
+  pdf.save(`${mail.id}.pdf`)
 }

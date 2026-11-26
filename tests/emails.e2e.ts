@@ -36,3 +36,11 @@ test('En los mails de la clínica se prueba el logo de ejemplo en otros colores'
   await screen.getByRole('link', 'Clinic account ready').tap()
   await expect(screen.getByRole('button', 'Blue logo')).not.toBeVisible()
 })
+
+test('Download PDF arma el PDF del mail sin errores', async ({ app, screen }) => {
+  await app.open('/emails/#appointment-request')
+  const pdf = screen.getByRole('button', 'Download PDF')
+  await pdf.tap()
+  await expect(screen.getByRole('button', 'Download PDF')).toBeEnabled()
+  await expect(screen.getByText(/Couldn’t create the PDF/)).not.toBeVisible()
+})
