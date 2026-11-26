@@ -5,7 +5,7 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-11-26
 
-### Settings › Fee schedules con el diseño de Coverage tables (CON-57) ([#PR](https://github.com/JulianGerardi/red-dental-studio/pull/PR))
+### Settings › Fee schedules con el diseño de Coverage tables (CON-57) ([#202](https://github.com/JulianGerardi/red-dental-studio/pull/202))
 - **Una sola pantalla** para `/settings/finance/fee-schedule` y `…/:feeId/edit`: `SettingsFeeSchedules` arma lista y editor
   con `components/settings/ListaEditor` (dos cards, como Coverage tables). Se van la `DataTable` de la entrada y
   `SettingsFeeScheduleEdit`; sin elegido, el editor muestra *No fee schedule selected*.
