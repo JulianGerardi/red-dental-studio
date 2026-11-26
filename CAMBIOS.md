@@ -5,6 +5,17 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-11-26
 
+### Settings › Fee schedules con el diseño de Coverage tables (CON-57) ([#202](https://github.com/JulianGerardi/red-dental-studio/pull/202))
+- **Una sola pantalla** para `/settings/finance/fee-schedule` y `…/:feeId/edit`: `SettingsFeeSchedules` arma lista y editor
+  con `components/settings/ListaEditor` (dos cards, como Coverage tables). Se van la `DataTable` de la entrada y
+  `SettingsFeeScheduleEdit`; sin elegido, el editor muestra *No fee schedule selected*.
+- **Lista:** `ItemLista` con la pill del estado (`TONO_ARANCEL`) y *Default*. El ⋮: *View assignments*, *Compare fees*,
+  *Inactive / Active*, *Archive / Restore*. `ItemLista` suma `estado` (pill que no sea Active / Inactive) y `acciones`
+  (reemplaza Deactivate / Delete); `EncabezadoEditor` suma `estado` y `extra`.
+- **Editor (`FeeScheduleEditor`):** es su propia card (`TARJETA_EDITOR`) con *Edit fee schedule* + estado; *Copy form* y
+  *Bulk edit* encima de la tabla, a la derecha; pie `PieEditor` con *Cancel · Save* a la derecha. `MasterList` queda sin
+  uso (sólo su story).
+
 ### Dashboard y Scheduling: la navegación de fecha se marca en azul en hoy ([#201](https://github.com/JulianGerardi/red-dental-studio/pull/201))
 - **`ui/date-nav` (`DateNav`):** cuando se está viendo hoy, todo el bloque queda activo con el estado de un filtro
   aplicado (`ui/filter-menu`): borde y texto `dash-blue` sobre `info-bg`. Fuera de hoy, el bloque blanco de siempre.

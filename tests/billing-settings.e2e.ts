@@ -91,12 +91,12 @@ test('Bulk edit sube los New fee y Save crea una versión nueva', async ({ app, 
 test('irse de un fee schedule con cambios sin guardar pregunta antes, y buscar sin resultados lo dice', async ({ app, screen }) => {
   await app.open('/settings/finance/fee-schedule/ucr-red/edit')
   await screen.getByLabel('D0120 new fee').fill('70')
-  await screen.getByRole('link', 'Aetna 2026').tap()
+  await screen.getByRole('link', /^Aetna 2026/).tap()
   const aviso = screen.getByRole('dialog', 'Are you sure you want to leave?')
   await aviso.getByRole('button', 'Cancel').tap()
   await expect(screen.getByText('UCR - Red').first()).toBeVisible()
 
-  await screen.getByRole('link', 'Aetna 2026').tap()
+  await screen.getByRole('link', /^Aetna 2026/).tap()
   await screen.getByRole('button', 'Leave without saving').tap()
   await screen.getByLabel('Search procedure').fill('zzzz')
   await expect(screen.getByText('No procedures available')).toBeVisible()
@@ -122,12 +122,12 @@ test('una excepción nueva se arma en cuatro pasos y se suma a la plantilla', as
   await expect(screen.getByRole('button', 'Manage exceptions (4)')).toBeVisible()
 })
 
-test('Assignments muestra el desglose y abre la lista de asignaciones', async ({ app, screen }) => {
+/* Sin la tabla (2026-11-26): View assignments y Compare fees salen del ⋮ de cada ítem de la lista. */
+test('al entrar se ve lo creado, y View assignments abre la lista de asignaciones', async ({ app, screen }) => {
   await app.open('/settings/finance/fee-schedule')
-  await screen.getByRole('button', '7 assignments').tap()
-  const desglose = screen.getByRole('dialog', 'Assignments')
-  await expect(desglose.getByText('Providers')).toBeVisible()
-  await desglose.getByRole('button', 'View assignments').tap()
+  await expect(screen.getByText('No fee schedule selected')).toBeVisible()
+  await screen.getByRole('button', 'Actions for PPO Premium Plan').tap()
+  await screen.getByRole('menuitem', 'View assignments').tap()
   const drawer = screen.getByRole('dialog', 'Assignments')
   await expect(drawer.getByText('Patients (3)')).toBeVisible()
   await expect(drawer.getByText('Carriers (2)')).toBeVisible()
