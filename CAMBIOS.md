@@ -5,6 +5,17 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-11-26
 
+### Settings: Overview, Roles en cards con una página por rol y atajos de Billing en un ⋮ (CON-3130, CON-3131, CON-4065) ([#PR](https://github.com/JulianGerardi/red-dental-studio/pull/PR))
+- **Overview:** la portada de Settings se titula *Overview* y así se llama en el menú (`settings-nav.ts`; antes *General*).
+  La ruta sigue siendo `/settings/general`.
+- **Roles en cards:** `settings/RoleCard` (la card de la portada con pills, *n permissions · Updated* y ⋮) reemplaza a la
+  `DataTable`. Los roles viven en `data/rolesStore` (`RolesProvider` en la ruta de Settings, `useRoles`).
+- **Página de cada rol** (`SettingsRole`): `/settings/roles/:id`, `/settings/roles/new` y `/settings/roles/new?from=<id>`
+  (Duplicate). Como la ficha de una Location: pestañas *General* / *Permissions*, cards y `FormFooter`; sin pasos. Los del
+  sistema, en sólo lectura. Dejá de usar `RoleDrawer` (sin uso; se saca al documentar).
+- **Billing en Overview:** los atajos pasan al ⋮ de la card (`SettingsSectionCard` › `atajos`), que queda igual a las demás.
+- `RoleCard` queda en `exentos.json` hasta documentarla en Storybook.
+
 ### Settings › Billing: pestañas entre secciones, atajos desde Settings y breadcrumb coherente (CON-57) ([#205](https://github.com/JulianGerardi/red-dental-studio/pull/205))
 - **Billing es una pantalla con pestañas**, como Ledger options: `finance/BillingHeader` (título *Billing*, la acción de la
   sección y *Fee schedules · Carriers · Coverage tables*) reemplaza al `SettingsPageHeader` de las tres listas. Las rutas no
