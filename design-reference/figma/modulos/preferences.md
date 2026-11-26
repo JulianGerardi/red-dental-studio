@@ -77,9 +77,7 @@ opción; la parte de la fecha sacala"*.
    fondo de cards, campos, menús y drawers. Se reemplazó `bg-white` / `from-white` / `border-white` en 101 archivos de la
    app; en claro no cambia nada. `bg-white` y `text-white` quedan para lo que va **sobre azul** (texto de botones, los
    puntos del panel del Login), que es blanco en los dos temas.
-4. **Azul de la marca un poco más claro en oscuro** (`#3b78e7`): el `#1d56bc` sobre gris casi negro no llega a 3:1. Con
-   `#3b78e7` el texto azul sobre la card y el blanco sobre el botón quedan los dos en ~4,2:1; no hay un azul que pase
-   4,5 en los dos (anotado para validar).
+4. ~~Azul de la marca un poco más claro en oscuro (`#3b78e7`)~~: reemplazado en la segunda vuelta (abajo).
 5. **Sombras**: Tailwind compila `shadow-panel` & co. con el valor adentro, así que en oscuro se pisan por clase. Sobre
    negro la sombra no se ve: la card se separa por el tono y una línea blanca tenue.
 6. **Miniaturas fieles**: cada una se pinta con su tema aunque la app esté en el otro (`tema-claro` / `tema-oscuro` en
@@ -94,3 +92,37 @@ opción; la parte de la fecha sacala"*.
 - El Storybook sigue sólo en claro (se documenta cuando Julián lo pida).
 - Validar con usuarios: contraste del azul en oscuro (punto 4) y si el tema es de la persona o del equipo.
 - Para el dev: el tema va guardado por usuario en el backend; leerlo al iniciar sesión.
+
+### Segunda vuelta: research y paleta "dimmed" (2026-11-26)
+
+Julián: *"no me convence mucho, el color contrasta mucho con el negro"*; pidió mirar cómo lo resuelven las marcas top
+antes de aplicar.
+
+**Qué hacen** (fuentes: Material 2 *Dark theme*, Apple HIG *Dark Mode*, GitHub Primer y su *Dark Dimmed*, tokens de
+Atlassian, la paleta de Google en Gerrit/Android, el rediseño de Linear):
+
+- **Nada de negro**: gris oscuro, a veces azulado. Google `#202124`, GitHub Dimmed `#22272e`, Atlassian `#1D2125`.
+  Material pide superficies "lo bastante oscuras para texto blanco", no negras.
+- **Texto que no es blanco puro**: Google `#e8eaed`, Atlassian gris azulado. El blanco puro sobre casi negro es lo que
+  "vibra".
+- **Más arriba = más claro**: Material (overlay blanco según la elevación) y Apple (*base* y *elevated*). La sombra casi
+  no se ve en oscuro.
+- **Colores desaturados**: Material usa el tono 200 del primario; Google, `blue-300 #8ab4f8` para texto y links.
+- **El contraste bajo es una opción buscada**: GitHub creó *Dark Dimmed* para quien pide menos contraste, sin bajar de
+  4,5:1 en el texto.
+
+**Qué se aplicó** (sólo cambian valores de `:root.dark`; el claro no se toca):
+
+1. **Fondo `#1b1e23` y cards `#23272d`** (antes `#0f1115` / `#17191e`), en la línea de GitHub Dimmed y Google. Drawers,
+   menús y campos siguen la misma escala; el campo queda un poco más hundido (`#1e2227`).
+2. **Texto `#e3e6ea`** (antes `#f4f4f5`); secundarios en grises azulados (`#a9afb8`, `#949aa4`), todos ≥ 5:1 sobre la
+   card.
+3. **Dos azules**: el relleno (botones, chips) `#3b6fcc`, cerca de la marca y con blanco encima a 4,8:1; el texto azul,
+   un tono más claro `#86acec` (6,5:1), como el 200 de Material. Es una regla en `index.css` sobre `text-dash-blue`
+   con `:where()`, para que un `hover:text-white` le siga ganando.
+4. **Estados desaturados**: verdes, rojos, ámbar y violetas en tonos claros para texto y fondos tenues para chips. Los
+   botones *success* / *destructive* (y los verdes de la ficha del paciente y de la sala) usan en oscuro su tono medio
+   con `dark:`, para que el blanco se lea.
+
+**A validar con usuarios**: si recepción, que pasa el día con la pantalla, lo prefiere así o más oscuro. Si aparecen
+las dos preferencias, se puede sumar un tercer tema, como GitHub (Dark / Dark dimmed).

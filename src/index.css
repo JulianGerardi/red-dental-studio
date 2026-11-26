@@ -415,118 +415,129 @@ body { font-family: var(--font-sans); }
 .tema-oscuro {
   color-scheme: dark;
 
-  --background: 222 14% 7%;
-  --foreground: 240 5% 96%;
-  --card: 225 13% 10%;
-  --card-foreground: 240 5% 96%;
-  --popover: 225 13% 10%;
-  --popover-foreground: 240 5% 96%;
-  --primary: 219 78% 57%;
+  /* "Dimmed": gris azulado y no negro, texto gris claro y no blanco puro, colores desaturados (research en
+     preferences.md, 2026-11-26: Google, GitHub Dark Dimmed, Atlassian, Apple, Material). Más arriba = más claro. */
+  --background: 216 13% 12%;
+  --foreground: 216 12% 90%;
+  --card: 216 12% 16%;
+  --card-foreground: 216 12% 90%;
+  --popover: 216 11% 18%;
+  --popover-foreground: 216 12% 90%;
+  --primary: 218 57% 52%;
   --primary-foreground: 0 0% 100%;
-  --primary-hover: 219 66% 51%;
-  --primary-active: 219 64% 46%;
-  --primary-disabled: 222 12% 18%;
-  --primary-disabled-foreground: 222 10% 42%;
-  --primary-light: 220 40% 18%;
-  --primary-light-foreground: 219 85% 72%;
-  --secondary: 225 13% 10%;
-  --secondary-foreground: 222 20% 82%;
-  --secondary-hover: 222 12% 20%;
-  --secondary-hover-foreground: 222 20% 88%;
-  --secondary-active: 222 12% 16%;
-  --secondary-active-foreground: 222 20% 88%;
-  --secondary-disabled: 222 12% 14%;
-  --secondary-disabled-foreground: 222 10% 40%;
-  --secondary-border: 222 10% 22%;
-  --destructive-disabled: 354 40% 18%;
-  --destructive-disabled-foreground: 354 50% 45%;
-  --muted: 222 11% 15%;
-  --muted-foreground: 240 4% 57%;
-  --accent: 220 30% 17%;
-  --accent-foreground: 240 5% 96%;
-  --border: 222 10% 19%;
-  --input: 222 10% 22%;
-  --ring: 219 85% 65%;
-  --page-background: 222 14% 7%;
-  --page-background-foreground: 240 5% 96%;
-  --gray-first: 222 11% 15%;
-  --gray-first-foreground: 222 15% 80%;
-  --gray-second-foreground: 222 15% 80%;
-  --surface-primary-lighter: 220 45% 20%;
-  --surface-primary-subtle: 220 35% 15%;
-  --clinical-mode-base-fg: 240 5% 96%;
-  --calendar: 225 13% 10%;
-  --calendar-border: 222 10% 19%;
-  --calendar-disabled: 222 12% 12%;
-  --sidebar-background: 225 13% 10%;
-  --sidebar-foreground: 222 15% 80%;
-  --sidebar-primary: 240 5% 96%;
-  --sidebar-primary-foreground: 222 14% 7%;
-  --sidebar-accent: 222 11% 15%;
-  --sidebar-accent-foreground: 240 5% 96%;
-  --sidebar-border: 222 10% 19%;
-  --sidebar: 225 13% 10%;
+  --primary-hover: 218 52% 47%;
+  --primary-active: 218 52% 43%;
+  --primary-disabled: 216 10% 22%;
+  --primary-disabled-foreground: 216 8% 46%;
+  --primary-light: 220 30% 24%;
+  --primary-light-foreground: 218 75% 74%;
+  --secondary: 216 12% 16%;
+  --secondary-foreground: 216 15% 82%;
+  --secondary-hover: 216 10% 23%;
+  --secondary-hover-foreground: 216 15% 88%;
+  --secondary-active: 216 10% 20%;
+  --secondary-active-foreground: 216 15% 88%;
+  --secondary-disabled: 216 10% 18%;
+  --secondary-disabled-foreground: 216 8% 44%;
+  --secondary-border: 216 9% 26%;
+  --destructive: 0 50% 53%;
+  --destructive-disabled: 0 20% 22%;
+  --destructive-disabled-foreground: 0 30% 50%;
+  --muted: 216 10% 20%;
+  --muted-foreground: 216 7% 61%;
+  --accent: 220 25% 24%;
+  --accent-foreground: 216 12% 90%;
+  --border: 216 9% 24%;
+  --input: 216 9% 27%;
+  --ring: 218 75% 70%;
+  --page-background: 216 13% 12%;
+  --page-background-foreground: 216 12% 90%;
+  --gray-first: 216 10% 20%;
+  --gray-first-foreground: 216 12% 80%;
+  --gray-second-foreground: 216 12% 80%;
+  --surface-primary-lighter: 220 30% 26%;
+  --surface-primary-subtle: 220 25% 21%;
+  --clinical-mode-base-fg: 216 12% 90%;
+  --calendar: 216 12% 16%;
+  --calendar-border: 216 9% 24%;
+  --calendar-disabled: 216 11% 14%;
+  --sidebar-background: 216 12% 16%;
+  --sidebar-foreground: 216 12% 80%;
+  --sidebar-primary: 216 12% 90%;
+  --sidebar-primary-foreground: 216 13% 12%;
+  --sidebar-accent: 216 10% 20%;
+  --sidebar-accent-foreground: 216 12% 90%;
+  --sidebar-border: 216 9% 24%;
+  --sidebar: 216 12% 16%;
 
-  --color-dash-blue: #3b78e7;
-  --color-dash-blue-hover: #2f6ad6;
-  --color-dash-blue-active: #2a5fc2;
-  --color-dash-ring: #5b8ff0;
-  --color-dash-name: #f4f4f5;
-  --color-dash-muted: #a3acb9;
-  --color-dash-delta: #5c5f66;
-  --color-dash-field: #1f2228;
-  --color-dash-ok-fg: #4cc283;
-  --color-dash-ok-bg: #12251b;
-  --color-dash-busy-fg: #8fb0f5;
-  --color-dash-busy-bg: #1b2140;
-  --color-dash-bad-fg: #f07070;
-  --color-dash-bad-bg: #2b1617;
-  --color-dash-bad-hover: #c53030;
-  --color-dash-bad-chip: #3a1c1d;
-  --color-dash-count-bg: #1e2a44;
+  /* El azul de relleno (botones, chips) queda cerca de la marca y con blanco encima a 4,8:1; el texto azul va en un tono
+     más claro (text-dash-blue, abajo), como el "200" de Material o el blue-300 de Google. */
+  --color-dash-blue: #3b6fcc;
+  --color-dash-blue-hover: #3563b8;
+  --color-dash-blue-active: #2f58a3;
+  --color-dash-ring: #7aa5ee;
+  --color-dash-blue-glow: #4a7fd9;
+  --color-dash-name: #e3e6ea;
+  --color-dash-muted: #a2a9b4;
+  --color-dash-delta: #6a717b;
+  --color-dash-field: #1e2227;
+  --color-dash-ok-fg: #6cc895;
+  --color-dash-ok-bg: #1f3329;
+  --color-dash-busy-fg: #9ab8f2;
+  --color-dash-busy-bg: #26304d;
+  --color-dash-bad-fg: #ec8a8a;
+  --color-dash-bad-bg: #3a2628;
+  --color-dash-bad-hover: #c24a4a;
+  --color-dash-bad-chip: #472b2d;
+  --color-dash-count-bg: #2a3550;
 
-  --color-ink: #f4f4f5;
-  --color-ink-soft: #d0d0d6;
-  --color-ink-medium: #a8a8b0;
-  --color-ink-muted: #8b8b94;
-  --color-ink-slate: #94a3b8;
-  --color-ink-faint: #6b6b74;
+  --color-ink: #e3e6ea;
+  --color-ink-soft: #c5cad1;
+  --color-ink-medium: #a9afb8;
+  --color-ink-muted: #949aa4;
+  --color-ink-slate: #9aa5b5;
+  --color-ink-faint: #6f7680;
 
-  --color-line: #2c2f36;
-  --color-line-strong: #3a3e46;
-  --color-line-row: #272a31;
-  --color-line-soft: #222529;
-  --color-line-hair: #25282e;
+  --color-line: #363b43;
+  --color-line-strong: #434952;
+  --color-line-row: #31353c;
+  --color-line-soft: #2c3036;
+  --color-line-hair: #2f333a;
 
-  --color-surface: #17191e;
-  --color-surface-subtle: #1c1f25;
-  --color-surface-muted: #22252b;
-  --color-surface-alt: #1a1d22;
-  --color-surface-slate: #1e232b;
+  --color-surface: #23272d;
+  --color-surface-subtle: #282c33;
+  --color-surface-muted: #2c3138;
+  --color-surface-alt: #262a30;
+  --color-surface-slate: #2a3039;
 
-  --color-field-error: #f05252;
-  --color-input-inactive: #6b7584;
-  --color-input-inactive-bg: #24282e;
-  --color-status-ok-muted: #143222;
-  --color-status-ok-strong: #4ade80;
-  --color-status-bad-muted: #3a1a1e;
-  --color-status-bad-strong: #f87171;
-  --color-warn-fg: #e0b04a;
-  --color-warn-bg: #2a2111;
-  --color-attn-fg: #f59e0b;
-  --color-info-bg: #18233a;
-  --color-info-subtle: #161d2b;
-  --color-info-strong-bg: #1e2d4d;
-  --color-info-line: #2a3d63;
-  --color-info-line-strong: #3d5687;
-  --color-amber-fg: #f0b85a;
-  --color-purple-fg: #b18cf0;
-  --color-brand-tint: #1b2640;
-  --color-purple-bg: #241c36;
-  --color-green-deep: #5cc98a;
-  --color-green-tint: #13261b;
-  --color-green-soft: #173322;
-
+  --color-field-error: #e5605f;
+  --color-input-inactive: #7a828d;
+  --color-input-inactive-bg: #2c3138;
+  --color-status-ok: #2b8a52;
+  --color-status-ok-hover: #26794a;
+  --color-status-ok-muted: #213a2c;
+  --color-status-ok-strong: #6cd396;
+  --color-status-bad-muted: #432a2d;
+  --color-status-bad-strong: #f08c8c;
+  --color-warn-fg: #dcb565;
+  --color-warn-bg: #3a3122;
+  --color-attn-fg: #e8a64a;
+  --color-amber: #d9a23c;
+  --color-amber-hover: #c8922f;
+  --color-amber-fg: #e8c07a;
+  --color-info-bg: #26304a;
+  --color-info-subtle: #232a37;
+  --color-info-strong-bg: #2c3a56;
+  --color-info-line: #3a4b6b;
+  --color-info-line-strong: #4d6290;
+  --color-purple-fg: #bba0ea;
+  --color-purple-bg: #312a45;
+  --color-indigo: #8b84e8;
+  --color-brand-tint: #283349;
+  --color-green: #2b8a52;
+  --color-green-deep: #6cc895;
+  --color-green-tint: #20332a;
+  --color-green-soft: #24392d;
 }
 
 /* Las miniaturas de Appearance se pintan cada una con su tema, sea cual sea el de la app. */
@@ -536,6 +547,13 @@ body { font-family: var(--font-sans); }
   --color-surface: #ffffff;
   --color-line-strong: #d4d4d8;
   --color-dash-blue: #1d56bc;
+}
+
+/* El texto azul en oscuro: un tono más claro que el relleno. Con :where() pesa como una clase, así un hover:text-white
+   o un data-[state=active]:text-white le siguen ganando. */
+@layer utilities {
+  :where(:root.dark) .text-dash-blue,
+  :where(:root.dark) .hover\:text-dash-blue:hover { color: #86acec; }
 }
 
 /* Tailwind compila las sombras con el valor adentro: en oscuro se pisan por clase. La sombra casi no se ve sobre negro,

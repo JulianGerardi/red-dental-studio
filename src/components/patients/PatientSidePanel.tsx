@@ -378,7 +378,7 @@ export function PendingSignatureButton({ soloIcono, className, ...props }: React
    design system: es el mismo botón que el popup del paciente, que Julián pidió
    alinear. El ámbar sí es el #ffb82c del sistema, pero con texto oscuro: el
    frame lo pone en blanco y sobre ese fondo no se lee. */
-const VERDE = 'bg-green text-white hover:bg-green-deep'
+const VERDE = 'bg-green text-white hover:bg-green-deep dark:hover:bg-green dark:hover:brightness-110'
 const ENCUENTRO: Record<EstadoEncuentro, { label: string; clase: string; icono: React.ReactNode }> = {
   sinEmpezar: { label: 'Start encounter', clase: VERDE, icono: <Play className="size-3.5 shrink-0" /> },
   enCurso: { label: 'Complete encounter', clase: VERDE, icono: <CircleCheck className="size-3.5 shrink-0" /> },

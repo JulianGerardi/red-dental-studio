@@ -145,7 +145,7 @@ export function LineaDelDia({ room, turnos, onSelect }: {
               <span className="text-dash-name text-[11px] leading-none font-semibold tabular-nums">{t.time}</span>
               <span
                 aria-hidden
-                className={cn('z-10 mt-1.5 flex size-4 shrink-0 items-center justify-center rounded-full bg-surface', hecho ? 'bg-dash-ok-fg text-white' : 'border-dash-blue border-[3px]')}
+                className={cn('z-10 mt-1.5 flex size-4 shrink-0 items-center justify-center rounded-full bg-surface', hecho ? 'bg-dash-ok-fg text-white dark:bg-green' : 'border-dash-blue border-[3px]')}
               >
                 {hecho && <Check className="size-2.5" strokeWidth={3} />}
               </span>

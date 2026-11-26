@@ -135,7 +135,7 @@ export function PatientDetailsPopover({
         {iniciar && (
           <button
             type="button"
-            className="flex h-9 shrink-0 items-center justify-center gap-1.5 rounded-lg bg-green px-4 text-[13px] font-semibold text-white transition-colors hover:bg-green-deep"
+            className="flex h-9 shrink-0 items-center justify-center gap-1.5 rounded-lg bg-green px-4 text-[13px] font-semibold text-white transition-colors hover:bg-green-deep dark:hover:bg-green dark:hover:brightness-110"
           >
             <Play className="size-3.5 shrink-0" /> Start encounter
             <ChevronDown className="size-3.5 shrink-0" />
