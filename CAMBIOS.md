@@ -5,7 +5,7 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-11-26
 
-### Settings › Billing: pestañas entre secciones, atajos desde Settings y breadcrumb coherente (CON-57) ([#PR](https://github.com/JulianGerardi/red-dental-studio/pull/PR))
+### Settings › Billing: pestañas entre secciones, atajos desde Settings y breadcrumb coherente (CON-57) ([#205](https://github.com/JulianGerardi/red-dental-studio/pull/205))
 - **Billing es una pantalla con pestañas**, como Ledger options: `finance/BillingHeader` (título *Billing*, la acción de la
   sección y *Fee schedules · Carriers · Coverage tables*) reemplaza al `SettingsPageHeader` de las tres listas. Las rutas no
   cambian: cada pestaña es la suya.
