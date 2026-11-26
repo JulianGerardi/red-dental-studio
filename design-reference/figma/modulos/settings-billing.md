@@ -1,5 +1,43 @@
 # Settings → Billing (Fee Schedules, Carriers, Coverage Table)
 
+## Edit Fee Schedule con el diseño de Coverage tables (2026-11-26)
+
+Sin historia de abril (epic CON-57). Pedido de Julián: *"que fee scheduling tenga el mismo diseño que coverage table"*. Edit
+Fee Schedule deja la card única con `MasterList` y pasa al patrón de `components/settings/ListaEditor.tsx` (ver
+2026-11-24, Coverage tables y Consents). El contenido es el mismo: campos, versiones, tabla, Copy form, Bulk edit,
+*Non-zero fees* y el aviso al salir.
+
+1. **Dos cards**: lista de 340 px (*Fee schedules*, buscador `sm` y *Filter* `sm` al lado) y editor con el resto. Bajan una
+   debajo de la otra por debajo de 768 px de contenedor. El título de la página pasa a *Fee schedules*, como *Coverage
+   tables*; el editor dice *Edit fee schedule* con la pill del estado guardado (y *Default* si lo es).
+2. **Ítem**: la card de `ItemLista` con la pill del estado (*Active / Inactive / Archived*, con los tonos de la tabla:
+   `TONO_ARANCEL`) en lugar del punto de color, y *Default* al lado. El ⋮ sigue siendo el de fee schedules (*Inactive /
+   Active*, *Archive / Restore*, con Undo): `ItemLista` suma `estado` y `acciones` para no forzar Deactivate / Delete.
+   No hay Delete: los fee schedules se archivan.
+3. **Editor**: se va el título *General information* (el encabezado del editor ocupa su lugar). *Copy form* y *Bulk edit*
+   bajan justo encima de la tabla, a la derecha, como *Manage exceptions* y *Add range*; el buscador de procedimientos y
+   *Non-zero fees* quedan a la izquierda en la misma fila.
+4. **Pie** de `PieEditor`: línea, fijo abajo, *Cancel · Save* a la derecha (antes Cancel a la izquierda). *Cancel* sigue
+   pasando por el aviso de cambios sin guardar.
+5. **New fee schedule** usa la misma card del editor, sin encabezado (como *New coverage table*).
+6. `MasterList` queda sin uso en la app (sólo en su story).
+
+### Sin la tabla al entrar (Julián, 2026-11-26)
+
+*"Al inicio no va la tabla directamente, va lo creado, porque si no es redundante."* `/settings/finance/fee-schedule` ya
+no muestra la `DataTable` (Name, Type, Assignments, Effective, Last updated, Status): abre la lista y el editor vacío
+(*No fee schedule selected*), como `/settings/finance/coverage-table`. Una sola pantalla para las dos rutas.
+
+7. **El ⋮ de cada ítem** suma lo que sólo estaba en la tabla: *View assignments* y *Compare fees*, una línea y después
+   *Inactive / Active* y *Archive / Restore*. *Edit* no hace falta: tocar el ítem lo abre.
+8. **Se pierden de la vista** *Assignments* (el número con el desglose al pasar), *Effective* y *Last updated*. Effective
+   se ve en *Fee schedule version*; las asignaciones, en *View assignments*. Si recepción o administración extrañan
+   *Last updated* o el número de asignaciones de un vistazo, sumarlos como `extra` del ítem.
+
+**A validar con usuarios:** que con la lista de 340 px el editor tenga ancho suficiente en notebooks de 1024–1280 px
+(Description se parte en dos líneas antes que antes), y que la pill *Inactive* en rojo no se lea como error al lado del
+gris de Coverage.
+
 ## Coverage tables y Consents con el mismo patrón (2026-11-24)
 
 **CON-1488** (Delete Coverage Table Template, sin descripción en Jira). Pedido de Julián con un HTML de referencia y un
