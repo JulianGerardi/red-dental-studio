@@ -1,6 +1,7 @@
-import { useState, type ReactNode } from 'react'
-import { Paperclip, Trash2, X } from 'lucide-react'
+import { useEffect, useRef, useState, type ReactNode } from 'react'
+import { ArrowLeft, Paperclip, Trash2, X } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { Alert } from '@/components/ui/alert'
 import { Chip } from '@/components/ui/chip'
 import { Pill, type PillTone } from '@/components/ui/pill'
 import { TONO_PROCEDIMIENTO } from './accionesProcedimiento'
@@ -13,17 +14,62 @@ import { ICONO_SUELTO, TARJETA_INTERNA } from '@/lib/estilos'
    texto libre ocupando todo el alto- y Cancel / Save abajo a la derecha (`FormFooter`). Ver
    design-reference/figma/modulos/clinical-mode.md (2026-11-27). */
 
+const SIN_ENCUENTRO_FICHA = 'You do not have permission to perform this action because there is no open encounter for the selected patient.'
+
 /** Las dos columnas de la ficha: lo que define el pedido a la izquierda y lo que se escribe a la derecha; en celular y tablet, una debajo de la otra. */
 export const COLUMNAS_FICHA = 'grid items-stretch gap-4 lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)]'
 
-/** El título de la ficha, del tamaño de un título de pantalla, con su estado y sus acciones a la derecha. */
-export function EncabezadoFicha({ titulo, estado, tono, acciones }: { titulo: string; estado: string; tono: PillTone; acciones?: ReactNode }) {
+/** El título de la ficha, del tamaño de un título de pantalla, con la vuelta a la lista, su estado y sus acciones a la derecha. */
+export function EncabezadoFicha({ titulo, estado, tono, acciones, onVolver, volverA }: {
+  titulo: string
+  estado?: string
+  tono?: PillTone
+  acciones?: ReactNode
+  onVolver?: () => void
+  /** A dónde vuelve la flecha: "lab orders". */
+  volverA?: string
+}) {
   return (
     <div className="flex min-h-8 flex-wrap items-center gap-3">
+      {onVolver && (
+        <button type="button" onClick={onVolver} aria-label={`Back to ${volverA ?? 'the list'}`} title={`Back to ${volverA ?? 'the list'}`} className={cn(ICONO_SUELTO, '-ml-1')}>
+          <ArrowLeft className="size-4" />
+        </button>
+      )}
       <h2 className="text-xl leading-[1.3] font-semibold text-ink">{titulo}</h2>
-      <Pill tone={tono}>{estado}</Pill>
+      {estado && <Pill tone={tono ?? 'info'}>{estado}</Pill>}
       {acciones && <span className="ml-auto flex items-center gap-2">{acciones}</span>}
     </div>
+  )
+}
+
+/** Los avisos de arriba de la ficha, iguales en Lab order, Prescription y Referral: por qué no se puede editar (sin
+ *  encuentro, o fuera de Pending: CON-2218, CON-2354, CON-2323) y, al guardar con faltantes, el de Jira. */
+export function AvisosFicha({ abierto, editable, nombre, incompleto, error }: {
+  abierto: boolean
+  editable: boolean
+  /** "lab order", "prescription", "referral". */
+  nombre: string
+  /** Se intentó guardar con campos obligatorios vacíos. */
+  incompleto?: boolean
+  /** Otro motivo por el que no se guardó ("A prescription must contain at least one medication."). */
+  error?: string
+}) {
+  const ref = useRef<HTMLDivElement>(null)
+  useEffect(() => { if (incompleto || error) ref.current?.scrollIntoView({ block: 'nearest', behavior: 'smooth' }) }, [incompleto, error])
+  return (
+    <>
+      {!abierto
+        ? <Alert tone="warning" title="Read-only mode">{SIN_ENCUENTRO_FICHA}</Alert>
+        : !editable && <Alert tone="warning" title="Read-only mode">{`This ${nombre} cannot be edited because it is not in an editable state.`}</Alert>}
+      {(incompleto || error) && (
+        <div ref={ref} className="scroll-mt-4">
+          <Alert tone="danger" title={incompleto ? 'Uncompleted fields' : 'Check the form'}>
+            {incompleto ? 'All required fields marked with (*) must be completed before proceeding.' : error}
+          </Alert>
+        </div>
+      )}
+    </>
   )
 }
 

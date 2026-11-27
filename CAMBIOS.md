@@ -17,6 +17,26 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
   (`focus:**:not-data-[slot=pill]:…`), en los cuatro tipos de ítem. Se veía en el selector *Version* de Fee schedules.
 - **Fee schedules › Available from:** lo que pasa al publicar se muestra con `ui/alert` (*Starts today* en `success`,
   *Starts on …* en `info`) en vez de una caja propia con una pill; la ayuda y el error usan `FieldHint` / `FieldError`.
+### Prescription, Lab order y Referral: el flujo completo con las mismas piezas (CON-2212, CON-2214, CON-2321) ([#216](https://github.com/JulianGerardi/red-dental-studio/pull/216))
+- **Un panel para las tres pestañas** (`clinical/RegistrosPanel`): tabla estándar con buscador, *Filter* (Status y Provider;
+  Laboratory en Lab order) y rango de fechas como red.dev, y *New …*. La fila abre la ficha; el ⋮ trae *View*, *View PDF* y
+  las acciones del estado.
+- **Una ficha para New, Edit y sólo lectura** en cada una (`LabOrderDetail`, `PrescriptionDetail`, `ReferralDetail`, sobre
+  `FichaClinica`): mismos avisos (`AvisosFicha`: *Read-only mode*, *Uncompleted fields*) y flecha de vuelta a la lista.
+- **Máquina de estados única** (`MAQUINA` en `dashboard/tareas`), igual en Pending Task, tabla y ficha: Lab order Pending →
+  Requested → Delivered / Delayed / Rejected; Prescription Pending → Active → Expired; Referral Pending → Requested →
+  Completed / Rejected; Cancel mientras esté abierta, Edit y Delete sólo en Pending. Toda acción pregunta antes
+  (`PREGUNTAS`, textos de red.dev). Acciones nuevas: `Deliver`, `Delay`, `Expire`. Sale el *Undo* de Request / Activate.
+- **Reemplaza la Prescription de #214:** se borran `clinical/PrescriptionPanel`, `clinical/PrescriptionForm` y
+  `data/prescripciones.ts`; no usarlos. Queda `PrescriptionDetail` + `data/recetas.ts`, con lo de #214: *Reuse existing
+  medication* (CON-2846), *Expire*, validaciones y filtros. `aplicarAccion` ya no acepta `{ sinAviso }`.
+- **Datos:** `clinical/registros.ts` guarda los tres tipos (la tarea + su contenido); lo creado o editado se ve en la tabla,
+  la ficha, Pending Task y el PDF (`documentoRegistro`). Hay un import circular a propósito con `dashboard/tareas` (sólo
+  se llaman dentro de funciones).
+- **Lab order:** *New lab order*, Deliver / Delay / Reject, contador de 500, y vincular un procedimiento con diente lo marca
+  en *Teeth & surface* (CON-2215). **Referral:** la lista y *New referral* (CON-2609, CON-2322).
+- Pendientes (CON-2337 al activar, findings de CON-2398, firma de CON-2221) y anomalías en `modulos/clinical-mode.md`
+  (2026-11-27, 2ª y 3ª vuelta). Piezas nuevas en `exentos.json`; la story de `LabOrderPanel` se rehace al documentar.
 
 ### Fee schedules: tachos de fila y métricas de Compare fees como el resto de la app ([#215](https://github.com/JulianGerardi/red-dental-studio/pull/215))
 - **Tacho de una fila:** sólo ícono, en rojo (`ICONO_SUELTO` + `text-dash-bad-fg`, `Trash2` de 16 px), con el nombre en el

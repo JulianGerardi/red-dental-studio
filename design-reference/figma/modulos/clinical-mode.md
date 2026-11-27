@@ -3841,3 +3841,131 @@ Al traer `main` (#209 a #211), Lab order y Referral ya no eran cards apiladas: p
 
 **A confirmar con Julián:** Lab order y Referral muestran arriba *Ordering provider* y *Order date* de sólo lectura
 (CON-2215). Prescription no los lleva: red.dev no los muestra en el formulario y ninguna historia los pide ahí.
+
+## CON-2212 · CON-2214 · CON-2321 · Prescription, Lab order y Referral: el flujo completo con las mismas piezas (2026-11-27, 2ª tanda)
+
+**Jira:** Prescription — CON-2212 (epic), CON-2230 (New), CON-2354 (Edit), CON-2355 (Cancel), CON-2356 (Delete), CON-2357
+(máquina de estados), CON-2358 (Expired), CON-2286 (lista), CON-2287 (PDF), CON-2337 (Update Patient Medications). Lab
+order — CON-2215 (New), CON-2218 (Edit), CON-2219 (lista), CON-2221 (Requested), CON-2222 (máquina), CON-2224 a CON-2228
+(Rejected, Delivered, Delayed, Delete, Canceled), CON-2584. Referral — CON-2322 (New), CON-2323 (Edit), CON-2324
+(máquina), CON-2391, CON-2392, CON-2394, CON-2398, CON-2609 (lista), CON-3436. Pedido de Julián: "armá el flujo completo
+de Prescription, Lab order y Referrals, identificá los componentes que venimos usando y usá lo mismo para todo (tablas,
+editar, new); adecuá el diseño al de la app, red.dev sirve de guía para el flujo real". Se recorrió red.dev con su
+usuario (sólo lectura: listas, ⋮ por estado, Filters, formularios, validaciones y diálogos; no se guardó ni cambió nada).
+
+**Una sola estructura para los tres** (`clinical/RegistrosPanel`, `clinical/registros`, `dashboard/tareas`):
+
+1. **Lista = tabla estándar** (`DataTable`): buscador con *Search* (`SettingsSearch`), *Filter* por estado y *New …* a la
+   derecha; columnas Provider, lo propio de cada uno (Laboratory / Medication en chip con *+N* / Referred provider con
+   su especialidad), Status, Last update, Created date y Expiration date (en rojo si vence en una semana y sigue
+   abierto). red.dev lista Prescription y Referral en cards y Lab order en tabla: acá las tres en tabla. Referral no
+   lleva Expiration date (CON-2609 no la lista y la ficha no tiene ese campo).
+2. **La fila abre la ficha**; el ⋮ trae *View* (si ya no se edita), *View PDF* (si hay documento) y las acciones del
+   estado. En red.dev una orden que ya no se edita sólo se puede ver por el PDF (Edit apagado): acá se abre en sólo
+   lectura, con su contenido.
+3. **Una ficha para New, Edit y sólo lectura** (`LabOrderDetail`, `PrescriptionDetail`, `ReferralDetail`, sobre
+   `FichaClinica`): flecha de vuelta a la lista, título (*New prescription* / *Prescription*), estado, PDF y ⋮; *General
+   information* a la izquierda, que abre con quién lo hizo y cuándo (de sólo lectura), y *Details* a la derecha; *Cancel*
+   / *Save* abajo a la derecha (*Back* si no se edita). Los avisos son los mismos (`AvisosFicha`): *Read-only mode* sin
+   encuentro o fuera de Pending (*This … cannot be edited because it is not in an editable state.*, CON-2218) y, al
+   guardar con faltantes, *Uncompleted fields* (el texto de Jira) arriba más *This field is required.* en cada campo.
+   Antes Lab order tenía mensajes propios por campo y Referral un toast.
+4. **Máquina de estados única** (`MAQUINA` en `dashboard/tareas`): Lab order Pending → Edit, Request, Cancel, Delete ·
+   Requested → Deliver, Delay, Reject, Cancel · Delayed → Deliver, Reject, Cancel. Prescription Pending → Edit, Activate,
+   Cancel, Delete · Active → Cancel. Referral Pending → Edit, Request, Cancel, Delete · Requested → Complete, Reject,
+   Cancel. Un estado final no tiene ⋮. Vale igual en Pending Task (Dashboard y Patient Dashboard), en la tabla y en la
+   ficha (la ficha no repite Edit).
+5. **Toda acción pregunta antes** (`ConfirmDialog`, `PREGUNTAS`), con el título y el texto de red.dev (*Activate
+   prescription*, *Deliver lab order*, *Cancel Referral*…); el botón dice lo que hace (*Mark as delivered*) y no
+   *Confirm*. Los avisos siguen a Jira: *The lab order has been successfully marked as Requested.*, *The prescription has
+   been successfully created / updated / canceled / deleted.* Sale el *Undo* de Request / Activate / Cancel order: ahora
+   se confirma antes.
+6. **Un solo almacén** (`clinical/registros`): cada registro es la tarea (estado, provider, fechas, documento) más su
+   contenido. Lo que se crea o edita se ve en la tabla, al reabrir la ficha, en Pending Task y en el PDF
+   (`documentoRegistro`). La tarea que abre *Complete this task* entra a su tabla con el mismo contenido que su PDF.
+   New laboratory / New provider quedan para los registros siguientes.
+7. **Sin encuentro abierto**: *New …* y las acciones se ven apagadas con el tooltip de siempre; la ficha abre en sólo
+   lectura. En sólo lectura se siguen recorriendo las medicaciones y los dientes (quedan fuera del `fieldset`).
+8. **PDF** cuando el documento existe, como red.dev: Lab order desde Requested (cancelada desde Pending no tiene,
+   CON-2584), Prescription sólo Active (CON-2287), Referral sólo Requested.
+
+**Prescription (nueva)**
+
+- Campos y listas de red.dev: Expiration date\*; por medicación *Medication\** (buscador), *Strength\** + unidad,
+  *Dosage form\**, *Quantity to dispense\**, *Refills*, *Update patient medications*, *Allow generic substitution* (sí por
+  defecto), *Controlled substance*; *Directions for use*: *Dose\** + unidad, *Route\**, *Frequency\**, *Duration\** +
+  unidad; *Additional instructions* (500). Debajo de Directions, la indicación en una frase (*Take 1 tablet orally three
+  times daily for 5 days*), como red.dev.
+- **Varias medicaciones en pestañas** (`ui/tabs`, aparecen desde la segunda) con el nombre de cada una (*Ibuprofen 400
+  mg*; red.dev dice *Medication 1*) y el punto rojo en la que tiene faltantes; *Add medication* y *Remove medication*
+  (queda al menos una).
+- **Details = Summary + Additional instructions**: todas las medicaciones a la vista con su frase, cantidad y refills, y
+  las marcas (controlled, sin genérico, actualiza las medicaciones del paciente); tocar una lleva a su pestaña. Es
+  contenido derivado de los mismos campos: red.dev muestra la frase sólo de la medicación abierta. La columna queda fija
+  arriba mientras se recorre el formulario.
+- Campos cortos de a tres en desktop ancho, de a dos y de a uno en tablet y celular.
+- Vencimiento: no se eligen días pasados ni más allá de 6 meses (CON-2230; `DatePicker` suma `min` / `max`). Números sin
+  negativos ni letras.
+- Los tres interruptores de red.dev son **casillas**: se guardan con Save (regla de `ui/switch`).
+
+**Lab order (lo que se sumó)**: *New lab order*; Deliver, Delay y Reject; contador 500 en los dos textos (CON-2215);
+vencimiento sin días pasados; vincular un procedimiento con diente lo trae marcado en *Teeth & surface* (CON-2215); la
+tabla cambia *Patient* por *Laboratory* (estaba dentro de un paciente) y pierde *View history* y el *New prescription*
+que venía del Figma (anomalía 85).
+
+**Referral (lo que se sumó)**: la lista (no existía: la pestaña decía *Planned*), *New referral*, *Referring provider* y
+*Referral date* arriba, Delete en la ficha como las otras dos.
+
+**Anomalías de red.dev / decisiones a validar con Julián**
+
+1. Unidades como enum crudo (*MG*, *APPLICATIONS*, *PERCENT*) y dos campos llamados *Unit*: acá *mg*, *Applications*, *%*
+   y *Strength unit* / *Dose unit* / *Duration unit*. La frase de red.dev dice *applicationss*.
+2. red.dev usa *Cancelled*; la app y Jira, *Canceled*.
+3. Delayed → Deliver / Reject / Cancel es un supuesto (CON-2222 es una imagen y red.dev no tenía una orden Delayed).
+4. Una Referral Completed o Rejected no tiene PDF en red.dev (el ícono queda apagado): se respetó, pero el documento
+   existió. A confirmar.
+5. **CON-2337**: la casilla *Update patient medications* se guarda, pero activar la receta todavía no escribe en las
+   Medications del paciente (los estados de ese mock son los del Figma de Medical History, sin *Active* / *Prescribed*).
+6. **CON-2398 / CON-2392**: Complete y Reject de una Referral con findings vinculados piden revisar esos findings en el
+   mismo modal; hoy sólo preguntan.
+7. **CON-2358**: Expired es automático por fecha; acá es un estado de los datos de ejemplo.
+8. CON-2221 (firma del dentista para Requested) sigue sin implementarse: su historia (CON-2338) está cancelada.
+9. Los filtros de red.dev también filtran por laboratorio, provider y rango de fechas; acá Filter es por estado y el
+   buscador cubre provider, laboratorio, medicación y derivado. Si hace falta el rango, va con `DateFilter`.
+10. El `SelectField` compartido no asocia su rótulo al botón (se nombra por el placeholder): en Prescription cada lista
+    lleva un placeholder propio. Arreglarlo en el componente cambia el nombre accesible de todos los selects de la app.
+
+**A validar con usuarios:** si el odontólogo prefiere pestañas o las medicaciones apiladas cuando son dos o tres; si el
+resumen de la derecha alcanza para revisar antes de activar; si recepción distingue *View* de *Edit* en el ⋮; y si
+*Deliver* / *Delay* se entienden como "el laboratorio entregó / avisó demora".
+
+Código: `clinical/{RegistrosPanel,registros,PrescriptionDetail,LabOrderDetail,ReferralDetail,FichaClinica,LabOrderPanel}`,
+`data/recetas.ts`, `dashboard/{tareas,documentoTarea}`, `ui/date-picker` (`min`, `max`, `ariaLabel`), `pages/ClinicalMode`.
+e2e: `tests/registros-clinicos.e2e.ts` (nuevo), `tests/pending-tasks.e2e.ts`, `tests/clinical-mode.e2e.ts`. Storybook sin
+tocar (la story de `LabOrderPanel` describe la tabla anterior; se rehace al documentar).
+
+### Una sola Prescription: se une con la de #214 según red.dev (2026-11-27, 3ª vuelta)
+
+Mientras se armaba la tanda de arriba, otra sesión publicó una Prescription propia (#214: `PrescriptionPanel`,
+`PrescriptionForm`, `data/prescripciones.ts`, la sección *Prescription: la lista y New / Edit prescription*). Julián: "fijate
+cómo está en red". Queda **una sola**, la del panel compartido (`RegistrosPanel` + `PrescriptionDetail` + `data/recetas`),
+con lo que #214 había relevado de red.dev y esta no tenía; los tres archivos de #214 se borran.
+
+- **Filtros como red.dev en las tres tablas** (`FilterMenu` con grupos + `DateFilter`): Prescription → Status, Provider y
+  vencimiento; Lab order → Status, Laboratory, Provider y vencimiento; Referral → Status y fecha de la derivación
+  (confirmado en red.dev). Reemplaza el punto 9 de la lista de arriba.
+- **Expire** en una Prescription Active (*Expire prescription* → *…successfully marked as Expired.*), además de Cancel.
+- **Reuse existing medication** (CON-2846, reemplaza el error de CON-2337): al guardar una receta con una medicación en
+  *Update patient medications* que el paciente ya tiene activa (Ibuprofen en el mock) pregunta *Medication already
+  active*. Activar sigue sin escribir en las Medications del paciente.
+- **Validaciones de #214:** la medicación sale de la lista (*Select a medication from the list.*), números mayores a 0
+  (*Enter a number greater than 0.*), vencimiento de mañana a seis meses (*Date cannot be in the past* en una Pending
+  vieja) y placeholders *e.g. 500*.
+- **Avisos como red.dev** en Lab order y Prescription: *…successfully marked as Canceled / Rejected.*; Referral conserva
+  *…successfully canceled / completed / rejected.*
+- **Lo que queda de esta tanda y no de #214:** Activate, Cancel, Expire y Delete piden encuentro abierto (como Lab order
+  y Referral; #214 no lo pedía y lo dejó "a confirmar"); la ficha es *General information* (con las medicaciones) |
+  *Details* (resumen e indicaciones), no *Medications* | *Details*; número y unidad son dos campos con su rótulo; el ⋮
+  dice *Edit / View / View PDF* (no *Edit prescription / Download PDF*); el vencimiento va en rojo si vence en una
+  semana y sigue abierta (no sólo las Expired); los datos de ejemplo son los 7 de `registros` (no los 14 de #214).
+- `ui/date-picker` queda con la firma de #214 (`min`, `max`, `disabled`, `label`); `aplicarAccion` pierde `sinAviso`.
