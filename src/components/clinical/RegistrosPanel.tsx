@@ -59,6 +59,8 @@ function MedicacionesCelda({ r }: { r: Registro }) {
 const CONFIG: Record<TipoRegistro, {
   /** El filtro de fecha de red.dev: el vencimiento (Lab order, Prescription) o la fecha de la derivación (CON-2609). */
   fecha: (r: Registro) => string
+  /** Cómo se llama esa fecha, para el lector de pantalla. */
+  nombreFecha: string
   /** Además de Status y Provider, Lab order filtra por laboratorio (CON-2219). */
   grupoExtra?: { titulo: string; de: (r: Registro) => string }
   nombre: string
@@ -74,7 +76,7 @@ const CONFIG: Record<TipoRegistro, {
 }> = {
   'Lab orders': {
     nombre: 'lab order', plural: 'lab orders', icono: FlaskConical, Ficha: LabOrderDetail,
-    fecha: (r) => r.expiration,
+    fecha: (r) => r.expiration, nombreFecha: 'expiration date',
     grupoExtra: { titulo: 'Laboratory', de: (r) => r.lab?.laboratorio ?? '' },
     estados: ['Pending', 'Requested', 'Delayed', 'Delivered', 'Rejected', 'Canceled'],
     columnas: [proveedor('Provider'), { key: 'laboratorio', header: 'Laboratory', cell: (r) => <TextCell>{r.lab?.laboratorio || '—'}</TextCell> }, columnaEstado, ...columnasFecha()],
@@ -83,7 +85,7 @@ const CONFIG: Record<TipoRegistro, {
   },
   Prescriptions: {
     nombre: 'prescription', plural: 'prescriptions', icono: IconoPastilla, Ficha: PrescriptionDetail,
-    fecha: (r) => r.expiration,
+    fecha: (r) => r.expiration, nombreFecha: 'expiration date',
     estados: ['Pending', 'Active', 'Expired', 'Canceled'],
     columnas: [
       proveedor('Provider'),
@@ -95,7 +97,7 @@ const CONFIG: Record<TipoRegistro, {
   },
   Referrals: {
     nombre: 'referral', plural: 'referrals', icono: ArrowRightLeft, Ficha: ReferralDetail,
-    fecha: (r) => r.register,
+    fecha: (r) => r.register, nombreFecha: 'referral date',
     estados: ['Pending', 'Requested', 'Completed', 'Rejected', 'Canceled'],
     columnas: [
       proveedor('Referring provider'),
@@ -201,7 +203,7 @@ export function RegistrosPanel({ kind, paciente, tarea, maximo }: {
             <FilterMenu label={`Filter ${c.plural}`} groups={grupos} />
             {/* La fecha, con el bloque del Dashboard (‹ Today › + calendario, ui/date-nav), por mes: el del vencimiento o
                 el de la derivación. Sin mes elegido, All dates. */}
-            <DateNav value={mesFiltro} onChange={setMesFiltro} onClear={() => setMesFiltro(null)} periodo="month" vacio="All dates" />
+            <DateNav value={mesFiltro} onChange={setMesFiltro} onClear={() => setMesFiltro(null)} periodo="month" vacio="All dates" label={`Filter ${c.plural} by ${c.nombreFecha}`} />
           </>
         )}
         actions={nuevo}

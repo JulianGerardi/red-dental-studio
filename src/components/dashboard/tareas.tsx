@@ -204,8 +204,9 @@ export function useAccionesTarea({ paciente, alAbrir }: { paciente?: string; alA
 }
 
 /* Las acciones de un registro según su estado, como ítems de menú: las usan el ⋮ de Pending Task, el de la ficha y el
-   de las tablas de Clinical Mode. Sin un encuentro abierto con el paciente se ven apagadas y cada una explica por qué en
-   un tooltip, que también abre con el foco del teclado (por eso no van `disabled`: Radix les quita el puntero y el foco). */
+   de las tablas de Clinical Mode. En Pending Task, sin un encuentro abierto con el paciente se ven apagadas y cada una
+   explica por qué en un tooltip, que también abre con el foco del teclado (por eso no van `disabled`: Radix les quita el
+   puntero y el foco); la ficha y las tablas de Clinical Mode las pasan siempre activas (clinical-mode.md, 2026-11-27). */
 export function ItemsTarea({ task, abierto, onAccion, sin = [] }: { task: PendingTask; abierto: boolean; onAccion: (t: PendingTask, a: AccionUI) => void; sin?: AccionTarea[] }) {
   const item = (a: AccionTarea) => {
     const Icono = ICONO[a]

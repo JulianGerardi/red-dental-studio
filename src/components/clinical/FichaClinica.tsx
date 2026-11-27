@@ -40,21 +40,27 @@ export function EncabezadoFicha({ titulo, estado, tono, acciones, onVolver, volv
         {estado && <Pill tone={tono ?? 'info'}>{estado}</Pill>}
       </div>
       {(datos?.length || campo || acciones) && (
-        <div className="ml-auto flex flex-wrap items-end justify-end gap-x-5 gap-y-3">
+        <div className={cn('ml-auto flex flex-wrap justify-end gap-x-5 gap-y-3', campo ? 'items-start' : 'items-center')}>
           {/* Con un campo al lado, los datos toman su misma grilla: el rótulo arriba, a 8 px, y el valor a la altura del
-              campo; así los tres se leen como una fila de formulario y no como texto pegado a un input. */}
+              campo; así los tres se leen como una fila de formulario y no como texto pegado a un input. El campo va
+              fuera del <dl> (no es un dato): su línea divisoria aparece desde 640 px, donde entran en una fila. */}
           {(!!datos?.length || campo) && (
-            <dl className="flex flex-wrap items-stretch gap-y-3 divide-x divide-line">
-              {datos?.map(([rotulo, valor]) => (
-                <div key={rotulo} className={cn('flex flex-col px-4 first:pl-0 last:pr-0', campo ? 'gap-2' : 'gap-0.5')}>
-                  <dt className={campo ? 'text-xs leading-4 font-medium text-ink' : 'text-[11px] leading-4 text-ink-muted'}>{rotulo}</dt>
-                  <dd className={cn('text-[13px] font-medium text-ink', campo ? 'flex h-9 items-center' : 'leading-5')}>{valor}</dd>
-                </div>
-              ))}
-              {campo && <div className="px-4 first:pl-0 last:pr-0">{campo}</div>}
-            </dl>
+            <div className="flex flex-wrap items-stretch gap-x-4 gap-y-3">
+              {!!datos?.length && (
+                <dl className="flex flex-wrap items-stretch gap-y-3 divide-x divide-line">
+                  {datos.map(([rotulo, valor]) => (
+                    <div key={rotulo} className={cn('flex flex-col px-4 first:pl-0 last:pr-0', campo ? 'gap-2' : 'gap-0.5')}>
+                      <dt className={campo ? 'text-xs leading-4 font-medium text-ink' : 'text-[11px] leading-4 text-ink-muted'}>{rotulo}</dt>
+                      <dd className={cn('text-[13px] font-medium text-ink', campo ? 'flex h-9 items-center' : 'leading-5')}>{valor}</dd>
+                    </div>
+                  ))}
+                </dl>
+              )}
+              {campo && <div className={cn(!!datos?.length && 'sm:border-l sm:border-line sm:pl-4')}>{campo}</div>}
+            </div>
           )}
-          {acciones && <span className={cn('flex items-center gap-2', campo && 'h-9')}>{acciones}</span>}
+          {/* Las acciones, a la altura del campo (24 px = rótulo + separación) aunque debajo aparezca su error. */}
+          {acciones && <span className={cn('flex items-center gap-2', campo && 'h-9 sm:mt-6')}>{acciones}</span>}
         </div>
       )}
     </div>

@@ -23,8 +23,8 @@ import { formatMDY } from '@/lib/fecha'
 
 /* La ficha de una Lab order: la misma para New lab order, Edit y la vista de una orden que ya no se edita. Mismos datos
    y acciones que red.dev (videos de Julián del 2026-11-20 al 27) con el armado de FichaClinica: quién la pide y cuándo
-   en el título y dos cards, una debajo de la otra: General information (con Teeth & surface adentro) y Details. Sólo se edita con un encuentro abierto y la orden en
-   Pending (CON-2218); se crea en Pending (CON-2215). Ver design-reference/figma/modulos/clinical-mode.md (2026-11-27). */
+   en el título y dos cards, una debajo de la otra: General information (con Teeth & surface adentro) y Details. Sólo se
+   edita con la orden en Pending (CON-2218); se crea en Pending (CON-2215). Ver design-reference/figma/modulos/clinical-mode.md (2026-11-27). */
 
 const MAX_TEXTO = 500
 const casoDe = (p: ProcedimientoFicha) => p.caso ?? 'Independent'

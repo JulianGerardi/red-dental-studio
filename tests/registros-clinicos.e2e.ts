@@ -38,6 +38,10 @@ test('La fecha de la tabla filtra por mes y Clear date vuelve a todas', async ({
   await app.open('/patients/john-smith/clinical-mode?tab=Referral')
   await expect(screen.getByText(/Showing 1 to 7 of 7 results/)).toBeVisible()
   await screen.getByRole('button', 'Today').tap()
+  /* Los datos de ejemplo son de 2026: se llega a noviembre de 2026 desde el mes real, sea cual sea. */
+  const hoy = new Date()
+  const pasos = (2026 - hoy.getFullYear()) * 12 + (10 - hoy.getMonth())
+  for (let i = 0; i < Math.abs(pasos); i++) await screen.getByRole('button', pasos > 0 ? 'Next month' : 'Previous month').tap()
   await expect(screen.getByText(/Showing 1 to 2 of 2 results/)).toBeVisible()
   await screen.getByRole('button', 'Previous month').tap()
   await expect(screen.getByText(/Showing 1 to 2 of 2 results/)).toBeVisible()
@@ -54,7 +58,7 @@ test('Prescription: New valida, crea en Pending, se edita, se activa y se cancel
 
   await screen.getByRole('button', /^Expiration date/).tap()
   await screen.getByRole('button', 'Next month').tap()
-  await screen.getByRole('button', /^Tuesday, December 15, 2026$/).tap()
+  await screen.getByRole('button', / 15, \d{4}$/).tap()
   await screen.getByPlaceholder('Search by drug name or brand name').fill('ibu')
   await screen.getByRole('button', 'Ibuprofen').tap()
   await screen.getByRole('textbox', /^Strength/).fill('400')
@@ -144,7 +148,7 @@ test('Lab order: New crea en Pending; Request, Delay y Deliver siguen la máquin
   await screen.getByRole('button', 'Smile Lab Studio').tap()
   await screen.getByRole('button', /^Delivery expiration date/).tap()
   await screen.getByRole('button', 'Next month').tap()
-  await screen.getByRole('button', /^Tuesday, December 15, 2026$/).tap()
+  await screen.getByRole('button', / 15, \d{4}$/).tap()
   /* CON-2215: vincular un procedimiento con diente lo trae marcado en Teeth & surface. */
   await screen.getByLabel('Search procedures').fill('D2750')
   await screen.getByRole('button', /D2750/).tap()

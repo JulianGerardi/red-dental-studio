@@ -37,7 +37,9 @@ export function moverPeriodo(d: Date, periodo: PeriodoFecha, paso: 1 | -1) {
 
 const BOTON = 'flex items-center justify-center text-ink transition-colors hover:bg-surface-subtle focus-visible:z-10 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-dash-blue disabled:pointer-events-none disabled:text-ink-faint'
 
-export function DateNav({ value, onChange, periodo = 'day', hoy = new Date(), marked, tour, className, vacio, onClear }: {
+export function DateNav({ value, onChange, periodo = 'day', hoy = new Date(), marked, tour, className, vacio, onClear, label = 'Date navigation' }: {
+  /** Nombre del bloque para el lector de pantalla; como filtro, dice qué fecha filtra ("Filter lab orders by expiration date"). */
+  label?: string
   /** `null`: sin fecha elegida (sólo con `vacio`): la pantalla no filtra por fecha. */
   value: Date | null
   onChange: (d: Date) => void
@@ -74,7 +76,7 @@ export function DateNav({ value, onChange, periodo = 'day', hoy = new Date(), ma
   return (
     <div
       role="group"
-      aria-label="Date navigation"
+      aria-label={label}
       data-tour={tour}
       className={cn(
         'inline-flex h-8 shrink-0 items-stretch overflow-hidden rounded-md border text-[13px] shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] transition-colors',
