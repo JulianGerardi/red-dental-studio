@@ -3626,3 +3626,85 @@ data,DatosHallazgo}.tsx`, `clinical/{ProblemList,TreatmentPlanSection,TreatmentP
 - **Estimate sin *Insurance estimate overrides***: queda *Outstanding insurance estimates* (automático o a mano) y el Patient portion como resto. Se saca del modelo (`EstimadoProcedimiento.override`) y de `resolverEstimado`. Revierte lo de 2026-11-25.
 - **Link findings / Link diagnosis sin la bajada** de abajo del título.
 - **Vinculados por defecto**: si el procedimiento no trae nada vinculado, arranca con un finding (el del mismo diente o, si no hay, el primero no descartado) y su diagnóstico. Lo ya vinculado manda y no se pisa. **A validar**: que preseleccionar no lleve a guardar un vínculo que nadie revisó; se puede sacar con la ✕.
+
+## CON-2214 · CON-2321 · CON-2584 · Lab order y Referral: layout para escribir, mismo procedimiento y lo que muestran los videos de red.dev (2026-11-27)
+
+**Jira:** CON-2214 (Lab Order), CON-2215 y CON-2221 (comentarios de Abril: Patient, Ordering Provider y Order Date;
+firma del dentista para Requested), CON-2584 (comentario de Abril: el procedimiento tiene que mostrar fecha y diente,
+superficie o zona, también una vez elegido; en sólo lectura New Laboratory y adjuntos apagados), CON-2321, CON-2322,
+CON-2394, CON-2398, CON-2392, CON-3436. Pedido de Julián sobre la versión "como Edit account" del 2026-11-25 y cuatro
+videos de red.dev (dos de Lab Order, dos de Referral).
+
+**Problemas que marcó Julián** (y eran ciertos):
+
+1. Los procedimientos tenían dos formatos: en Lab order el caso y el estado pero no el diente; en Referral el diente pero
+   no el caso. No se comparó antes de mandar.
+2. Las cards apiladas a todo el ancho le daban casi toda la pantalla a General information y dejaban el texto libre (lo
+   único donde se escribe mucho y lo que lee el laboratorio o el especialista) en una caja de 4 filas, abajo y con scroll.
+3. Espacio vacío: la fecha sola en media fila, el procedimiento en media fila, el recuadro punteado alto de *Initialize…*.
+4. Teeth & surface iba en su propia card; tiene que estar dentro de General information.
+
+**Decisiones**
+
+1. **Dos columnas en desktop (≥1024 px), 7:5** (`COLUMNAS_FICHA`): a la izquierda *General information* (lo que define
+   el pedido), a la derecha *Details*, que se estira al alto de la izquierda y le da ese alto al texto libre (`TextArea`
+   suma `crecer`; `settings/Card` suma `bodyClassName`). En Lab order, *Dental work requested* se lleva 2/3 y *Special
+   instructions* 1/3; en Referral, la nota todo. En celular y tablet, una columna con textos de 7 filas. Es lo que hace
+   red.dev (dos columnas), con la estética de la app. Cancel / Save siguen abajo a la derecha (`FormFooter`).
+2. **Teeth & surface dentro de General information**, como subsección con su rótulo y Permanent / Primary a la derecha.
+   Sin el recuadro punteado: los dos *Initialize…* en una fila.
+3. **Un solo formato de procedimiento** (`ProcedimientoResumen` y `ProcedimientosVinculados` en `FichaClinica`), en el
+   buscador y en la lista, en las dos fichas: chip del caso (o *Independent*, el término de red.dev en los dos módulos;
+   el Treatment plan los llama *Unassigned*), pill del estado, código - nombre y "Tooth 19 · O, D" o la zona ("Full
+   mouth") con *Created date*. Vinculados uno debajo del otro, con el tacho. La Referral de ejemplo arranca con D2740 para
+   que se vea igual que la Lab order.
+4. **Ordering provider y Order date** (CON-2215, Abril) arriba de General information, de sólo lectura. *Patient* no se
+   repite: está en la barra del paciente.
+5. Sólo lectura (CON-2584): también los *Initialize…*, la dentición y los dientes.
+
+**Lab order: lo que muestran los videos y se corrigió**
+
+- **Dentición mixta:** Permanent / Primary sólo cambia la arcada que se ve; lo marcado en una queda al pasar a la otra
+  (antes se borraba). Al lado de la arcada, las listas *Permanent* y *Primary* con los dientes marcados (red.dev dice
+  *Pediatric*; acá *Primary*, como el botón): tocar uno lo elige para la rueda.
+- **Rueda de cinco superficies** (`dental/RuedaSuperficies`, nueva): M a la izquierda, D a la derecha, O al centro y
+  arriba / abajo según la arcada (maxilar: B / P; mandíbula: L / B), como red.dev. La `SurfaceWheel` de siete zonas sigue
+  en los findings. Supuesto: en los anteriores el centro es I (incisal); el video sólo muestra molares.
+- **Toggle all** marca o saca las cinco superficies del diente elegido (antes marcaba todos los dientes). *Apply to unset*
+  copia las del diente elegido a los marcados sin superficies.
+- **Request pregunta antes** (`PREGUNTA_LAB`): *Request lab order* con el texto de red.dev. Delete también, con su texto
+  (*Delete lab order*). Antes Request se hacía al toque.
+- **Edit desde la tabla** de la pestaña Lab order abre la ficha (antes: "Editing is not available"); *View order* también.
+  Edit sólo en Pending. Lo hecho desde el ⋮ de la ficha se ve en la fila.
+
+**Referral: lo que muestran los videos y se corrigió**
+
+- *Request referral* con el texto de red.dev.
+- **Requested: Complete y Reject** en el ⋮ (CON-2398, CON-2392), cada uno con su pregunta (*Complete referral* / *Reject
+  referral*) y su aviso (*The referral has been successfully completed / rejected.*); la tarea sale de Pending Task. En el
+  código la acción se llama `Finish` para no chocar con *Complete this task*.
+- El ⋮ de la ficha no tiene Delete (red.dev lo tiene en el tacho de la lista, no en la ficha).
+- **New provider con Credentials** (cuarto paso): tipo, número y vencimiento, de a varias, como New laboratory
+  (`clinical/Credenciales`, compartido).
+
+**Anomalías de red.dev / pendientes**
+
+1. El buscador de procedimientos de Referral en red.dev muestra procedimientos *Referred*; CON-2322 dice sólo Planned. Se
+   sigue Jira.
+2. El PDF de Lab order de red.dev sale con una segunda hoja en blanco y no lleva dientes, procedimientos ni ASAP.
+3. El ⋮ de Lab order en Pending Task sigue con Edit / Request para órdenes Requested o Delayed (red.dev sólo mostró
+   Pending): falta la máquina de estados (CON-2222).
+4. Firma del dentista para pasar a Requested (CON-2221, *Dentist signature required to mark as Requested*): no está; la
+   historia de firmar la Lab Order (CON-2338) está cancelada. Validar con Julián.
+5. Los tipos de credencial siguen siendo los de Employees (License, DEA, NPI); red.dev muestra *DEA #*.
+6. La lista de Referral de red.dev (cards con referring / referred provider, Created, Last updated, Expiration date, PDF,
+   tacho y ⋮) no está construida (CON-3870).
+
+**A validar con usuarios:** si la columna de Details a la derecha se lee como "lo que va al laboratorio"; si 2/3 – 1/3
+entre trabajo e indicaciones alcanza; si recepción entiende *Independent*; y si la lista de dientes elegidos se usa para
+cambiar de diente o se toca siempre la arcada.
+
+Código: `clinical/{FichaClinica,LabOrderDetail,ReferralDetail,LabOrderPanel,Credenciales,NewProviderDrawer,
+NewLaboratoryDrawer}.tsx`, `clinical/dental/RuedaSuperficies.tsx`, `dashboard/tareas.tsx`, `patients/form.tsx`
+(`TextArea.crecer`), `settings/primitives.tsx` (`Card.bodyClassName`); e2e en `tests/pending-tasks.e2e.ts`. Storybook sin
+tocar.
