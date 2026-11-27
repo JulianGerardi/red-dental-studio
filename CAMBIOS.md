@@ -5,7 +5,7 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-11-27
 
-### Fee schedules: el aviso de la fecha va al lado del campo ([#PR](https://github.com/JulianGerardi/red-dental-studio/pull/PR))
+### Fee schedules: el aviso de la fecha va al lado del campo ([#222](https://github.com/JulianGerardi/red-dental-studio/pull/222))
 - **Available from:** el aviso de qué pasa con la fecha (*Starts today* / *Starts on …*, `ui/alert`) va en la columna de al
   lado, a la altura del campo; en celular, debajo. El error de fecha pasada queda debajo del campo.
 - **Versión Scheduled:** ese aviso sólo aparece si se cambia la fecha (sin cambios repetía el de arriba), y dice *as soon as
