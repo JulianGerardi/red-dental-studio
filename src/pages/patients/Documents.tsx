@@ -78,7 +78,7 @@ export default function Documents() {
           {/* El encabezado de las tablas por defecto (Locations, Employees): título con la acción alineada y el buscador de
               36px con Search en su fila (documents en treatments.md, 2026-10-12). */}
           <SettingsPageHeader
-            titulo="Documents manager"
+            titulo="Documents"
             accion={(
               <Button
                 variant="secondary"

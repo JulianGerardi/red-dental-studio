@@ -8,6 +8,10 @@
 Figma 4293:57917. Dos pantallas que comparten encabezado y se alternan con un
 par de tabs arriba a la derecha: **Adjustments Types** y **Payment Method**.
 
+## Breadcrumb y título iguales (2026-11-27)
+
+Sin historia de Jira. Regla transversal en `../README.md` (*Regla: breadcrumb y título van de la mano*). El título pasa de *Ledger options* a **Ledger**, como el menú y el rastro. A validar: si se confunde con el Ledger del paciente.
+
 ## Adjustments Types
 
 Buscador, tira de filtros -All · Charge · Credit · Production · Collections- y

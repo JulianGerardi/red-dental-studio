@@ -656,7 +656,8 @@ export function SettingsLocationDetail() {
 
   return (
     <div className={PADDING_PAGINA}>
-      <PageTitle>{tab === 'Information' ? loc.nombre : tab}</PageTitle>
+      {/* Siempre el nombre: la pestaña ya dice la sección y el breadcrumb termina en la locación (README, 2026-11-27). */}
+      <PageTitle>{loc.nombre}</PageTitle>
 
       <Tabs size="sm" className="mt-4" aria-label="Location sections" tabs={TABS} value={tab} onChange={cambiarTab} />
 

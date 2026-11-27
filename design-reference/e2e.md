@@ -33,6 +33,9 @@ reporte queda en `.e2e/report.json` (ignorado en git, como el resto de `.e2e/`).
   Cancel lo deja Closed; Save pide horas, avisa Start ≥ End y guarda las franjas en todos los días elegidos.
   Desde 2026-11-16: el día de origen no se saca; pisar días abiertos con otro horario pregunta *Replace working hours?*
   (Cancel no guarda; un día Closed no entra) y los turnos afectados se resuelven antes (No Show + Waiting List).
+- `tests/breadcrumb-titulo.e2e.ts` (2026-11-27): en cada pantalla con rastro el H1 es el último tramo; en la ficha de
+  una locación y de un empleado el título no cambia con la pestaña; el editor de Consents y de Fee schedules se titula con
+  el ítem elegido. Ver README.md, *Regla: breadcrumb y título van de la mano*.
 - `tests/roles.e2e.ts` (2026-11-25, CON-3130 / CON-3131 / CON-3181 / CON-4065): New role pide Name, Description y un
   permiso y no acepta un nombre repetido; un rol del sistema se abre en sólo lectura; uno con empleados no se desactiva.
 - `tests/billing-settings.e2e.ts` suma (2026-11-25): irse de un fee schedule con cambios pregunta *Are you sure you want

@@ -132,7 +132,7 @@ export function FeeScheduleEditor({ arancel, onGuardado }: { arancel?: Arancel; 
     <section aria-label={arancel ? 'Edit fee schedule' : 'New fee schedule'} className={TARJETA_EDITOR}>
       {arancel && (
         <EncabezadoEditor
-          titulo="Edit fee schedule" estado={{ nombre: arancel.estado, tono: TONO_ARANCEL[arancel.estado] }}
+          titulo={arancel.nombre} estado={{ nombre: arancel.estado, tono: TONO_ARANCEL[arancel.estado] }}
           extra={arancel.porDefecto && <Pill tone="info" size="sm">Default</Pill>}
         />
       )}

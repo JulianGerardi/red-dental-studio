@@ -8,6 +8,10 @@
 Pantalla nueva (2026-09-09), armada desde una captura que pasó Julián de la
 plataforma real. No hay frame de Figma para esta.
 
+## Breadcrumb y título iguales (2026-11-27)
+
+Sin historia de Jira. Regla transversal en `../README.md` (*Regla: breadcrumb y título van de la mano*). El título pasa de *Edit account* (el del sitio real) a **Account**, como el menú y el rastro.
+
 ## Header normalizado
 
 Pedido explícito: *"normalicemos el header de arriba que contiene el título,

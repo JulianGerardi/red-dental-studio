@@ -240,7 +240,7 @@ export function SettingsCarrierEdit({ tab, nuevoPlan = false }: { tab: 'carrier'
   return (
     <div className={PADDING_PAGINA}>
       <SettingsPageHeader
-        titulo="Edit carrier"
+        titulo={c.nombre}
         accion={<Button size="md" onClick={() => setPlan(true)}><Plus /> New insurance plan</Button>}
       />
       <Tabs size="sm"

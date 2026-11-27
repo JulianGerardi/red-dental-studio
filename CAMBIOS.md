@@ -5,6 +5,18 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-11-27
 
+### Breadcrumb y título van de la mano ([#211](https://github.com/JulianGerardi/red-dental-studio/pull/211))
+- **Regla:** en toda pantalla con breadcrumb, el H1 dice lo mismo que el último tramo. Sección = nombre del menú; ítem =
+  su nombre, sin verbo (*Edit …* sólo en Edit patient); lo que no existe todavía, *New …*. Las pestañas no cambian el
+  título. Detalle en `design-reference/figma/README.md` (*Regla: breadcrumb y título van de la mano*).
+- **Títulos que cambian:** Consents, Ledger, Preferences, Account; en la ficha, el nombre de la locación, del empleado
+  (con su pill de estado al lado; la card ya no repite nombre y estado), del carrier y del plan; en el paciente,
+  Treatments, Documents, Insurance.
+- **Lista y editor** (Consents, Fee schedules, Coverage tables): `EncabezadoEditor` recibe el nombre del ítem elegido en
+  vez de *Edit template / Edit fee schedule / Edit coverage table*.
+- **Para el dev:** `tests/breadcrumb-titulo.e2e.ts` falla si una pantalla con rastro no tiene el último tramo como H1. Al
+  sumar una pantalla, sumala ahí. Sin historia de Jira.
+
 ### PDFs: nota clínica como red.dev, findings y diagnósticos, importes iguales y anexos (CON-2975, CON-3081, CON-2204, CON-2730) ([#210](https://github.com/JulianGerardi/red-dental-studio/pull/210))
 - **Clinical note completa** (especificación de reconstrucción + las notas de red.dev): Vital Signs, Medical History,
   Exams, Treatment Plan con el Consent Summary, Operative Report, Workflows, órdenes, firma del provider con hash y

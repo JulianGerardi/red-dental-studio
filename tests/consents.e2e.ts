@@ -47,5 +47,5 @@ test('el ⋮ de un template lo desactiva y Delete pide confirmación', async ({ 
   await screen.getByRole('menuitem', 'Delete').tap()
   await screen.getByRole('dialog', 'Delete template?').getByRole('button', 'Delete').tap()
   await expect(screen.getByText('Extraction Informed Consent was deleted.')).toBeVisible()
-  await expect(screen.getByRole('heading', 'Edit template')).toBeVisible()
+  await expect(screen.getByRole('heading', 'Root Canal Consent', { level: 2 })).toBeVisible()
 })
