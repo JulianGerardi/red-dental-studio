@@ -807,6 +807,12 @@ La regla (NN/g, Carbon, Atlassian: el último tramo es la página actual, sin li
 
 `tests/breadcrumb-titulo.e2e.ts` recorre las pantallas con rastro y falla si el H1 no es el último tramo.
 
+Auditoría de la app entera antes de publicar (58 pantallas, recorridas siguiendo los links y probando cada pestaña): todas
+cumplen. Quedan fuera de la regla, a propósito y sin rastro: **Help** (el H1 es la pregunta del buscador, *What can we
+help you with?*, patrón de centro de ayuda) y el placeholder compartido de Message, Contacts, Documents y Reports (*Page
+under construction*, como el original). Si se quiere, el placeholder puede titularse con la sección; espera ok. Los datos
+mock muestran a John Smith en cualquier paciente (`/patients/abril-viola`): rastro y título coinciden igual.
+
 Se revierten textos copiados de red.dev o del Figma: *Treatment plan* (treatments.md, 2026-11-12), *Documents manager*,
 *Insurance plans*, *Edit account*, *Edit carrier*, *Edit insurance plan*, *Account preferences*, *Ledger options*,
 *Consent templates*; el *Queda para decidir* de settings-billing.md (2026-11-26) queda resuelto.
