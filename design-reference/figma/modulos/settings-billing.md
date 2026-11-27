@@ -1,6 +1,49 @@
 # Settings → Billing (Fee Schedules, Carriers, Coverage Table)
 
 
+
+## Versiones de un Fee Schedule como la guía funcional (2026-11-27) · CON-1151, CON-1369, CON-1375, CON-495, CON-496, CON-497, CON-1276, CON-1108
+
+Julián pasó la *Guía funcional: ¿Cómo funciona un Fee Schedule?* (texto y video). Dos capas: el **fee schedule** (nombre,
+tipo y si está disponible) y sus **versiones** (las hojas de precios en el tiempo). Lo que no cerraba antes: el switch
+*Save in draft state* ponía inactivo todo el fee schedule, la versión activa y las expiradas se editaban, guardar una futura
+creaba otra versión y Archive / Inactive no miraban las asociaciones.
+
+1. **Estados de una versión** (`estadoVersion`): *Active* (la que rige hoy), *Scheduled* (publicada con fecha futura) y
+   *Expired* (reemplazada). El selector *Fee schedule version* las muestra de la más nueva a la más vieja y suma *Draft*
+   arriba si hay uno. Debajo de los campos, un aviso dice qué es la versión que se ve y qué se puede hacer (la tabla de
+   estados de la guía, en una línea).
+2. **Active no se edita** (CON-495, CON-1369): la tabla queda en texto (*Fee*) y *Available from* deshabilitado. **Update
+   fees** abre el Draft con sus precios (*Open draft* si ya había uno).
+3. **Draft** (`Arancel.borrador`, uno por fee schedule): *Current fee* (lo que rige hoy) y *New fee*, Copy form y Bulk
+   edit. Pie: *Discard draft* a la izquierda, *Cancel · Save draft · Publish*. **Publish** confirma con el texto de
+   CON-1151 y crea la versión desde *Available from* (hoy o después: *The available date must be today or a future date.*);
+   si ya hay una versión ese día, la reemplaza. Toast de CON-1151.
+4. **Scheduled se edita en el lugar** (CON-1375): precios y fecha, *Save changes*, sin versión nueva. Con asociaciones
+   confirma con el texto de CON-495. *Current fee* es lo que la versión ya tiene guardado.
+5. **Expired**: sólo lectura, con el día en que la reemplazaron (CON-1369).
+6. **⋮ de la lista** (`useAccionesArancel`): con asociaciones (patients, providers, locations o carriers por sus planes),
+   *Inactive* y *Archive* muestran el error de CON-496 / CON-1276 y sólo dejan *Close*. Archive confirma (*Are you sure you
+   want to archive this fee schedule? This action cannot be undone.*) y no deja Undo. **Restore** confirma (CON-1108) y lo
+   deja **Active** (antes quedaba Inactive). Un fee schedule archivado se ve en sólo lectura (CON-1276).
+7. **New fee schedule**: Name, Type, Available from y los fees; *Publish* crea la versión 1. El nombre repetido usa el texto
+   de Jira (*There is already a fee schedule with this name. Please choose a different name.*).
+8. Se va el switch *Save in draft state*: el borrador es de la versión, no del fee schedule. Inactivar sigue en el ⋮.
+9. Datos de ejemplo: *Delta Dental PPO 2026* suma el aumento ya publicado para el 01/01/2027, así se ven las tres etapas
+   (expirada, activa y programada) como en el ejemplo de la guía.
+
+### Anomalías y pendientes
+
+- **Draft y Publish no tienen historia en Jira**: salen de la guía. Las historias (Done) hablan de *Save* que crea la
+  versión directo. Conviene que exista la historia del Draft.
+- La guía junta *Archived / Inactive*; Jira los separa (CON-496 Deactivate, CON-1276 Archive). Se mantienen los dos.
+- New fee schedule publica directo (la guía arranca en Draft): un fee schedule sin ninguna versión rompe Compare fees y
+  las asignaciones. Queda para cuando exista la historia.
+- El paso de Scheduled a Active es por fecha (se calcula con el día de hoy): no hay un job que lo haga.
+
+**A validar con usuarios:** si *Update fees* se encuentra (la tabla de la activa ya no se edita) y si el aviso de cada
+versión alcanza para entender por qué una se edita y otra no.
+
 ## Atajos de Billing en un ⋮ y Settings › Overview (2026-11-26)
 
 Julián: *"los accesos rápidos de Billing ponelo en un elipsis, así quedan las cards iguales"*. Los tres atajos de la card

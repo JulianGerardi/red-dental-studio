@@ -73,23 +73,30 @@ test('cambiar de pestaña con cambios sin guardar pide confirmación', async ({ 
   await expect(screen.getByText('Add a new procedure to the payment table')).toBeVisible()
 })
 
-test('Bulk edit sube los New fee y Save crea una versión nueva', async ({ app, screen }) => {
+/* Versiones como la guía de Fee Schedules (2026-11-27): la activa no se edita; Update fees abre un Draft, y Publish lo
+   convierte en versión con la confirmación de CON-1151. */
+test('Update fees abre un Draft, Bulk edit sube los fees y Publish crea una versión nueva', async ({ app, screen }) => {
   await app.open('/settings/finance/fee-schedule/aetna-2026/edit')
+  await expect(screen.getByLabel('D0120 new fee')).toHaveCount(0)
+  await screen.getByRole('button', 'Update fees').tap()
+  await expect(screen.getByText(/Only you see these fees/)).toBeVisible()
   await screen.getByRole('button', 'Bulk edit').tap()
   const drawer = screen.getByRole('dialog', 'Increase all')
   await drawer.getByLabel(/^Increase all fees by/).fill('10')
   await drawer.getByRole('button', '$').tap()
   await drawer.getByRole('button', '%').tap()
   await drawer.getByRole('button', 'Confirm').tap()
-  await screen.getByRole('button', 'Save').tap()
+  await screen.getByRole('button', 'Publish').tap()
+  await screen.getByRole('dialog', 'Create a new version?').getByRole('button', 'Confirm').tap()
 
-  await expect(screen.getByText(/Aetna 2026 was saved\. The new fees apply from/)).toBeVisible()
-  /* D1110 en Aetna 2026 es $92 (el 80% de $115): con +10%, $101.20 pasa a ser el Current fee de la versión nueva. */
+  await expect(screen.getByText(/A new version has been created, effective from/)).toBeVisible()
+  /* D1110 en Aetna 2026 es $92 (el 80% de $115): con +10%, la versión nueva lo tiene en $101.20. */
   await expect(screen.getByText('$101.20')).toBeVisible()
 })
 
-test('irse de un fee schedule con cambios sin guardar pregunta antes, y buscar sin resultados lo dice', async ({ app, screen }) => {
+test('irse de un Draft con cambios sin guardar pregunta antes, y buscar sin resultados lo dice', async ({ app, screen }) => {
   await app.open('/settings/finance/fee-schedule/ucr-red/edit')
+  await screen.getByRole('button', 'Update fees').tap()
   await screen.getByLabel('D0120 new fee').fill('70')
   await screen.getByRole('link', /^Aetna 2026/).tap()
   const aviso = screen.getByRole('dialog', 'Are you sure you want to leave?')
@@ -100,6 +107,38 @@ test('irse de un fee schedule con cambios sin guardar pregunta antes, y buscar s
   await screen.getByRole('button', 'Leave without saving').tap()
   await screen.getByLabel('Search procedure').fill('zzzz')
   await expect(screen.getByText('No procedures available')).toBeVisible()
+})
+
+/* Una versión futura se cambia en el lugar, sin versión nueva (CON-1375); una expirada es sólo lectura (CON-1369). */
+test('la versión Scheduled se edita en el lugar y la Expired es sólo lectura', async ({ app, screen }) => {
+  await app.open('/settings/finance/fee-schedule/delta-ppo/edit')
+  await screen.getByRole('button', '01/01/2026 - Active').tap()
+  await screen.getByRole('button', '01/01/2027 - Scheduled').tap()
+  await screen.getByLabel('D0120 new fee').fill('60')
+  await screen.getByRole('button', 'Save changes').tap()
+  await screen.getByRole('dialog', 'Save changes?').getByRole('button', 'Save changes').tap()
+  await expect(screen.getByText(/These fees apply from 01\/01\/2027/)).toBeVisible()
+  await expect(screen.getByRole('button', '01/01/2027 - Scheduled')).toBeVisible()
+
+  await screen.getByRole('button', '01/01/2027 - Scheduled').tap()
+  await screen.getByRole('button', '07/01/2025 - Expired').tap()
+  await expect(screen.getByText('Expired version')).toBeVisible()
+  await expect(screen.getByLabel('D0120 new fee')).toHaveCount(0)
+})
+
+/* CON-496 / CON-1276: con asociaciones no se desactiva ni se archiva; CON-1108: Restore pide confirmación y la deja Active. */
+test('no se archiva un fee schedule con asociaciones, y Restore lo deja Active', async ({ app, screen }) => {
+  await app.open('/settings/finance/fee-schedule')
+  await screen.getByRole('button', 'Actions for UCR - Red').tap()
+  await screen.getByRole('menuitem', 'Archive').tap()
+  await expect(screen.getByText(/cannot be deactivated when there are active associations/)).toBeVisible()
+  await screen.getByRole('button', 'Close').tap()
+
+  await screen.getByRole('button', 'Actions for Standard 2025').tap()
+  await screen.getByRole('menuitem', 'Restore').tap()
+  await screen.getByRole('dialog', 'Restore fee schedule?').getByRole('button', 'Restore').tap()
+  await expect(screen.getByText('Standard 2025 was restored.')).toBeVisible()
+  await expect(screen.getByRole('link', /^Standard 2025 Active/)).toBeVisible()
 })
 
 test('una excepción nueva se arma en cuatro pasos y se suma a la plantilla', async ({ app, screen }) => {

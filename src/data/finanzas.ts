@@ -46,8 +46,13 @@ export const ESTADOS_ARANCEL = ['Active', 'Inactive', 'Archived'] as const
 export type EstadoArancel = (typeof ESTADOS_ARANCEL)[number]
 export const TONO_ARANCEL: Record<EstadoArancel, PillTone> = { Active: 'success', Inactive: 'danger', Archived: 'neutral' }
 
-/* Cada guardado con Available From crea una versión; la vigente es la última que ya empezó. */
+/* Las versiones son las hojas de precios en el tiempo (CON-1151, CON-1369): la vigente es la última que ya empezó
+   (Active), las de antes quedan Expired y las que todavía no empezaron, Scheduled. Los cambios se arman en un Draft (uno
+   por fee schedule) y se publican como versión nueva. Ver settings-billing.md, 2026-11-27. */
 export type VersionArancel = { id: string; desde: string; precios: Record<string, number> }
+export type EstadoVersion = 'Active' | 'Scheduled' | 'Expired'
+/** El Draft: no afecta a la clínica hasta que se publica. */
+export type BorradorArancel = { precios: Record<string, number>; desde: string }
 
 /* Type y Assignments no están en red.dev: los pidió Julián para la tabla de Fee Schedules (settings-billing.md). */
 export const TIPOS_ARANCEL = ['UCR', 'PPO', 'Medicaid', 'Discount plan'] as const
@@ -63,6 +68,8 @@ export type Arancel = {
   porDefecto: boolean
   estado: EstadoArancel
   versiones: VersionArancel[]
+  /** El único Draft del fee schedule, si hay uno abierto. */
+  borrador?: BorradorArancel
   /** Last updated, ISO. */
   actualizado: string
   asignados: Asignados
@@ -89,7 +96,8 @@ const SIN_MEDICAID = ['D2740', 'D2720', 'D6010', 'D6750', 'D9972', 'D5986', 'D80
 export const ARANCELES: Arancel[] = [
   arancel('ucr-red', 'UCR - Red', 'UCR', 'Active', '2026-09-28', [version('ucr-red-1', '2025-01-01', derivado(0.95)), version('ucr-red-2', '2026-01-01', { ...UCR })], { pacientes: ['patient-0002', 'patient-0005'], locaciones: ['abril', 'alaska', 'northgate'] }, true),
   arancel('aetna-2026', 'Aetna 2026', 'PPO', 'Active', '2026-10-05', [version('aetna-2026-1', '2026-03-01', derivado(0.8))]),
-  arancel('delta-ppo', 'Delta Dental PPO 2026', 'PPO', 'Active', '2026-08-14', [version('delta-ppo-1', '2025-07-01', derivado(0.74, ['D9972'])), version('delta-ppo-2', '2026-01-01', derivado(0.78, ['D9972', 'D5986']))], { locaciones: ['riverside'] }),
+  /* Las tres etapas de la guía: una expirada, la activa y el aumento ya publicado para el 01/01/2027. */
+  arancel('delta-ppo', 'Delta Dental PPO 2026', 'PPO', 'Active', '2026-08-14', [version('delta-ppo-1', '2025-07-01', derivado(0.74, ['D9972'])), version('delta-ppo-2', '2026-01-01', derivado(0.78, ['D9972', 'D5986'])), version('delta-ppo-3', '2027-01-01', derivado(0.81, ['D9972', 'D5986']))], { locaciones: ['riverside'] }),
   arancel('ppo-premium', 'PPO Premium Plan', 'PPO', 'Active', '2026-07-02', [version('ppo-premium-1', '2026-03-01', derivado(0.82))], { pacientes: ['patient-0001', 'patient-0004', 'patient-0007'], proveedores: ['emily-chen'], locaciones: ['bayside'] }),
   arancel('medicaid', 'Medicaid', 'Medicaid', 'Active', '2026-06-19', [version('medicaid-1', '2025-07-01', derivado(0.55, SIN_MEDICAID))], { pacientes: ['patient-0010', 'patient-0013'], proveedores: ['julio-perez'] }),
   arancel('membership', 'In-house Membership', 'Discount plan', 'Inactive', '2026-02-01', [version('membership-1', '2026-02-01', derivado(0.85))], { pacientes: ['patient-0003', 'patient-0006', 'patient-0009', 'patient-0012'] }),
@@ -109,12 +117,19 @@ export function versionVigente(a: Arancel, hoy = hoyIso()): VersionArancel {
 /* Non-zero fees: cuántos códigos del catálogo tienen un importe mayor que cero. */
 export const conImporte = (precios: Record<string, number | null>) => PROCEDIMIENTOS.filter((p) => (precios[p.code] ?? 0) > 0).length
 
+/* Una versión que todavía no empezó es Scheduled aunque sea la única (Cigna DPPO 2027 decía Active). */
+export function estadoVersion(a: Arancel, v: VersionArancel, hoy = hoyIso()): EstadoVersion {
+  return v.desde > hoy ? 'Scheduled' : v.id === versionVigente(a, hoy).id ? 'Active' : 'Expired'
+}
+
 /* "03/06/2026 - Active", como el select de red.dev (que además muestra una hora). */
 export function etiquetaVersion(a: Arancel, v: VersionArancel, hoy = hoyIso()) {
-  const vigente = versionVigente(a, hoy)
-  /* Una versión que todavía no empezó es Scheduled aunque sea la única (Cigna DPPO 2027 decía Active). */
-  const estado = v.desde > hoy ? 'Scheduled' : v.id === vigente.id ? 'Active' : 'Expired'
-  return `${fechaMDA(v.desde)} - ${estado}`
+  return `${fechaMDA(v.desde)} - ${estadoVersion(a, v, hoy)}`
+}
+
+/* La versión que reemplazó a una expirada: su Available From es el día en que la otra dejó de regir. */
+export function siguienteVersion(a: Arancel, v: VersionArancel) {
+  return [...a.versiones].sort((x, y) => x.desde.localeCompare(y.desde)).find((x) => x.desde > v.desde)
 }
 
 /* ── Coverage tables (plantillas) ──────────────────────────────────── */
