@@ -5,13 +5,18 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-11-27
 
-### El tacho va en rojo en toda la app ([#PR](https://github.com/JulianGerardi/red-dental-studio/pull/PR))
+### Tachos en rojo en toda la app, aviso de fecha de Fee schedules y pill en los menús ([#PR](https://github.com/JulianGerardi/red-dental-studio/pull/PR))
 - **Regla** (`design-reference/figma/README.md`): todo `Trash2` que borra o quita algo va en `text-dash-bad-fg`, también en
   reposo. En una fila, sólo ícono con `cn(ICONO_SUELTO, 'text-dash-bad-fg')`; en un ⋮, `variant="destructive"`; un botón
   con texto, `text-dash-bad-fg hover:text-dash-bad-fg`.
 - **Pasaron de gris a rojo:** Location (Rooms, Exceptions, Working hours, New exception), Employees (credenciales y Roles &
   location), Clinical Mode (procedimientos de la ficha, radiografías, credenciales) y el popover clínico del paciente. Sólo
   cambia el color: mismos botones y acciones.
+- **Bug: una pill adentro de un ítem de menú se ponía gris al pasarle el mouse** (el ítem con foco le pone su color de
+  texto a todo lo que tiene adentro). `ui/pill` lleva `data-slot="pill"` y `ui/dropdown-menu` la deja afuera de esa regla
+  (`focus:**:not-data-[slot=pill]:…`), en los cuatro tipos de ítem. Se veía en el selector *Version* de Fee schedules.
+- **Fee schedules › Available from:** lo que pasa al publicar se muestra con `ui/alert` (*Starts today* en `success`,
+  *Starts on …* en `info`) en vez de una caja propia con una pill; la ayuda y el error usan `FieldHint` / `FieldError`.
 
 ### Fee schedules: tachos de fila y métricas de Compare fees como el resto de la app ([#215](https://github.com/JulianGerardi/red-dental-studio/pull/215))
 - **Tacho de una fila:** sólo ícono, en rojo (`ICONO_SUELTO` + `text-dash-bad-fg`, `Trash2` de 16 px), con el nombre en el

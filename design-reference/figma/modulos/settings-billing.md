@@ -6,6 +6,18 @@
 Sin historia de Jira. Regla transversal en `../README.md` (*Regla: breadcrumb y título van de la mano*). Edit carrier pasa a **el nombre del carrier** (*Aetna Dental Plans*) y Edit insurance plan a **el del plan** (*Acme Corp*), como el último tramo. El encabezado del editor de Fee schedules y Coverage tables es el ítem elegido (*UCR - Red* · Active · Default) en vez de *Edit fee schedule* / *Edit coverage table*. Resuelve el *Queda para decidir* de abajo.
 
 
+## Aviso de la fecha con `ui/alert` y pill gris en el menú Version (2026-11-27)
+
+Sin historia de Jira. Devolución de Julián sobre el editor de Fee schedules, con captura y video.
+
+1. **Lo que pasa con *Available from*** era una caja propia (fondo de color, pill y texto de 12 px) que no existía en el
+   design system. Pasa a `ui/alert`, el mismo aviso de arriba del editor: *Starts today* (`success`) o *Starts on
+   MM/DD/YYYY* (`info`) de título y el resto del texto debajo. Mismas palabras del prototipo, partidas en título y cuerpo.
+   La ayuda (*Used when you publish…*) es un `FieldHint` y los errores, `FieldError`, como en cualquier campo.
+2. **Bug: la pill del menú *Version* se ponía gris al pasarle el mouse.** `DropdownMenuItem` con foco le aplica su color
+   de texto a todos sus descendientes y pisaba el verde de *Active* (y el azul de *Scheduled*). Se arregla en la raíz:
+   `ui/pill` lleva `data-slot="pill"` y `ui/dropdown-menu` la excluye de esa regla. Vale para cualquier pill en un menú.
+
 ## Tachos y métricas de Compare fees como el resto de la app (2026-11-27)
 
 Sin historia de Jira. Julián: *"fijate que los trash estén alineados al design system"* y *"que las métricas de Compare
