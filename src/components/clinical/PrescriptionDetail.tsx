@@ -39,18 +39,15 @@ const DOS = 'grid gap-4 sm:grid-cols-2'
 
 const SubTitulo = ({ children }: { children: string }) => <h3 className="text-[13px] font-semibold text-ink">{children}</h3>
 
-export function PrescriptionDetail({ registro, nuevo, abierto, onVolver, onAccion }: {
+export function PrescriptionDetail({ registro, nuevo, onVolver, onAccion }: {
   registro: Registro
   /** Todavía no existe: Save la crea en Pending. */
   nuevo?: boolean
-  /** Hay un encuentro abierto con el paciente. */
-  abierto: boolean
   onVolver: () => void
   onAccion: (t: PendingTask, a: AccionUI) => void
 }) {
-  /* Una receta nueva se carga siempre (New no pide encuentro, como red.dev). Una existente: en Pending (CON-2354) y con
-     un encuentro abierto. */
-  const editable = nuevo || (abierto && esEditable(registro))
+  /* Sólo se edita en Pending (CON-2354); no pide un encuentro abierto (Julián, 2026-11-27). */
+  const editable = nuevo || esEditable(registro)
   const [vence, setVence] = useState<Date | null>(() => aFecha(registro.expiration))
   const [medicaciones, setMedicaciones] = useState<Medicacion[]>(() => registro.receta?.medicaciones.length ? registro.receta.medicaciones : [medicacionVacia()])
   const [actual, setActual] = useState(() => String(medicaciones[0]!.id))
@@ -107,8 +104,8 @@ export function PrescriptionDetail({ registro, nuevo, abierto, onVolver, onAccio
         /* El vencimiento también va en el título, como red.dev. El calendario es el de toda la app, sin días apagados:
            que no quede en el pasado ni más allá del límite (CON-2230) se revisa al guardar. */
         campo={(
-          <div className="flex w-[180px] flex-col gap-2">
-            {/* El rótulo arriba y el campo de fecha de los formularios de la app (h-9, ancho completo). */}
+          <div className="flex w-[190px] flex-col gap-2">
+            {/* El rótulo arriba, a 8 px como en los formularios, y el campo de fecha de la app (h-9, ancho completo). */}
             <FieldLabel required>Expiration date</FieldLabel>
             <DatePicker value={vence} onChange={setVence} error={!!errorVence} label="Expiration date" disabled={!editable} className="h-9 w-full" />
             {errorVence && <FieldError>{errorVence}</FieldError>}
@@ -116,11 +113,11 @@ export function PrescriptionDetail({ registro, nuevo, abierto, onVolver, onAccio
         )}
         acciones={!nuevo && (registro.pdf || accionesDe(registro).some((x) => x !== 'Edit')) && <>
           {registro.pdf && <Button variant="secondary" onClick={() => onAccion(registro, 'PDF')}><FileText /> PDF</Button>}
-          <MenuTarea task={registro} abierto={abierto} onAccion={onAccion} sin={['Edit']} />
+          <MenuTarea task={registro} abierto onAccion={onAccion} sin={['Edit']} />
         </>}
       />
 
-      <AvisosFicha abierto={abierto || !!nuevo} editable={editable} nombre="prescription" incompleto={incompleto} error={errorVence && errorVence !== OBLIGATORIO ? errorVence : undefined} />
+      <AvisosFicha editable={editable} nombre="prescription" incompleto={incompleto} error={errorVence && errorVence !== OBLIGATORIO ? errorVence : undefined} />
 
       {/* Una card debajo de la otra, como los formularios de la app: las medicaciones y, al final, las indicaciones. */}
       <Card title="Medications" action={editable && <Button size="sm" variant="secondary" onClick={agregar}><Plus /> Add medication</Button>}>

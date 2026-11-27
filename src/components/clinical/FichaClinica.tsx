@@ -13,8 +13,6 @@ import { ICONO_SUELTO, TARJETA_INTERNA } from '@/lib/estilos'
    las acciones; las cards (settings `Card`) una debajo de la otra, como los formularios de la app; y Cancel / Save abajo
    a la derecha (`FormFooter`). Ver design-reference/figma/modulos/clinical-mode.md (2026-11-27). */
 
-const SIN_ENCUENTRO_FICHA = 'You do not have permission to perform this action because there is no open encounter for the selected patient.'
-
 /** El título de la ficha, del tamaño de un título de pantalla: la vuelta a la lista, el nombre y el estado a la izquierda;
  *  a la derecha, quién lo hizo y cuándo (`datos`, de sólo lectura), un campo propio del encabezado (`campo`: el vencimiento
  *  de una Prescription, como red.dev) y las acciones (PDF, ⋮). En pantallas angostas la derecha baja a su propia fila. */
@@ -42,44 +40,43 @@ export function EncabezadoFicha({ titulo, estado, tono, acciones, onVolver, volv
         {estado && <Pill tone={tono ?? 'info'}>{estado}</Pill>}
       </div>
       {(datos?.length || campo || acciones) && (
-        <div className="ml-auto flex flex-wrap items-center justify-end gap-x-5 gap-y-3">
-          {!!datos?.length && (
-            <dl className="flex flex-wrap items-stretch gap-y-2 divide-x divide-line">
-              {datos.map(([rotulo, valor]) => (
-                <div key={rotulo} className="flex flex-col gap-0.5 px-4 first:pl-0 last:pr-0">
-                  <dt className="text-[11px] leading-4 text-ink-muted">{rotulo}</dt>
-                  <dd className="text-[13px] leading-5 font-medium text-ink">{valor}</dd>
+        <div className="ml-auto flex flex-wrap items-end justify-end gap-x-5 gap-y-3">
+          {/* Con un campo al lado, los datos toman su misma grilla: el rótulo arriba, a 8 px, y el valor a la altura del
+              campo; así los tres se leen como una fila de formulario y no como texto pegado a un input. */}
+          {(!!datos?.length || campo) && (
+            <dl className="flex flex-wrap items-stretch gap-y-3 divide-x divide-line">
+              {datos?.map(([rotulo, valor]) => (
+                <div key={rotulo} className={cn('flex flex-col px-4 first:pl-0 last:pr-0', campo ? 'gap-2' : 'gap-0.5')}>
+                  <dt className={campo ? 'text-xs leading-4 font-medium text-ink' : 'text-[11px] leading-4 text-ink-muted'}>{rotulo}</dt>
+                  <dd className={cn('text-[13px] font-medium text-ink', campo ? 'flex h-9 items-center' : 'leading-5')}>{valor}</dd>
                 </div>
               ))}
+              {campo && <div className="px-4 first:pl-0 last:pr-0">{campo}</div>}
             </dl>
           )}
-          {campo}
-          {acciones && <span className="flex items-center gap-2">{acciones}</span>}
+          {acciones && <span className={cn('flex items-center gap-2', campo && 'h-9')}>{acciones}</span>}
         </div>
       )}
     </div>
   )
 }
 
-/** Los avisos de arriba de la ficha, iguales en Lab order, Prescription y Referral: por qué no se puede editar (sin
- *  encuentro, o fuera de Pending: CON-2218, CON-2354, CON-2323) y, al guardar con faltantes, el de Jira. */
-export function AvisosFicha({ abierto, editable, nombre, incompleto, error }: {
-  abierto: boolean
+/** Los avisos de arriba de la ficha, iguales en Lab order, Prescription y Referral: por qué no se puede editar (fuera de
+ *  Pending: CON-2218, CON-2354, CON-2323) y, al guardar con faltantes, el de Jira. */
+export function AvisosFicha({ editable, nombre, incompleto, error }: {
   editable: boolean
   /** "lab order", "prescription", "referral". */
   nombre: string
   /** Se intentó guardar con campos obligatorios vacíos. */
   incompleto?: boolean
-  /** Otro motivo por el que no se guardó ("A prescription must contain at least one medication."). */
+  /** Otro motivo por el que no se guardó ("Date cannot be in the past"). */
   error?: string
 }) {
   const ref = useRef<HTMLDivElement>(null)
   useEffect(() => { if (incompleto || error) ref.current?.scrollIntoView({ block: 'nearest', behavior: 'smooth' }) }, [incompleto, error])
   return (
     <>
-      {!abierto
-        ? <Alert tone="warning" title="Read-only mode">{SIN_ENCUENTRO_FICHA}</Alert>
-        : !editable && <Alert tone="warning" title="Read-only mode">{`This ${nombre} cannot be edited because it is not in an editable state.`}</Alert>}
+      {!editable && <Alert tone="warning" title="Read-only mode">{`This ${nombre} cannot be edited because it is not in an editable state.`}</Alert>}
       {(incompleto || error) && (
         <div ref={ref} className="scroll-mt-4">
           <Alert tone="danger" title={incompleto ? 'Uncompleted fields' : 'Check the form'}>

@@ -32,19 +32,16 @@ const aFecha = (s: string) => { const f = new Date(s); return s && !Number.isNaN
 const esPermanente = (d: string) => /^\d+$/.test(d)
 const hoyDia = () => { const d = new Date(); return new Date(d.getFullYear(), d.getMonth(), d.getDate()) }
 
-export function LabOrderDetail({ registro, nuevo, abierto, onVolver, onAccion }: {
+export function LabOrderDetail({ registro, nuevo, onVolver, onAccion }: {
   registro: Registro
   /** Todavía no existe: Save la crea en Pending. */
   nuevo?: boolean
-  /** Hay un encuentro abierto con el paciente. */
-  abierto: boolean
   onVolver: () => void
   onAccion: (t: PendingTask, a: AccionUI) => void
 }) {
   const inicio = registro.lab ?? LAB_VACIO
-  /* Una orden nueva se carga siempre (New no pide encuentro, como red.dev). Una existente: con encuentro abierto y en
-     Pending (CON-2218, CON-3904). */
-  const editable = nuevo || (abierto && esEditable(registro))
+  /* Sólo se edita en Pending (CON-2218, CON-3904); no pide un encuentro abierto (Julián, 2026-11-27). */
+  const editable = nuevo || esEditable(registro)
   const [vence, setVence] = useState<Date | null>(() => aFecha(registro.expiration))
   const [laboratorios, setLaboratorios] = useState<Laboratorio[]>(listaLaboratorios)
   const [lab, setLab] = useState(inicio.laboratorio)
@@ -121,15 +118,17 @@ export function LabOrderDetail({ registro, nuevo, abierto, onVolver, onAccion }:
         datos={[['Ordering provider', registro.provider ?? '—'], ['Order date', registro.register]]}
         acciones={!nuevo && <>
           {registro.pdf && <Button variant="secondary" onClick={() => onAccion(registro, 'PDF')}><FileText /> PDF</Button>}
-          <MenuTarea task={registro} abierto={abierto} onAccion={onAccion} sin={['Edit']} />
+          <MenuTarea task={registro} abierto onAccion={onAccion} sin={['Edit']} />
         </>}
       />
 
-      <AvisosFicha abierto={abierto || !!nuevo} editable={editable} nombre="lab order" incompleto={Object.values(errores).includes(OBLIGATORIO)} error={errores.vence && errores.vence !== OBLIGATORIO ? errores.vence : undefined} />
+      <AvisosFicha editable={editable} nombre="lab order" incompleto={Object.values(errores).includes(OBLIGATORIO)} error={errores.vence && errores.vence !== OBLIGATORIO ? errores.vence : undefined} />
 
       {/* Una card debajo de la otra, con la misma diagramación que Prescription y Referral (Julián, 2026-11-27). */}
       <Card title="General information">
-          <div className="flex min-w-0 flex-col gap-6">
+          {/* En pantallas anchas, lo que define la orden a la izquierda y Teeth & surface a la derecha: el dibujo y la
+              rueda ocupan media card en vez de quedar sueltos en el medio. Más angosto, uno debajo del otro. */}
+          <div className="grid min-w-0 gap-x-8 gap-y-6 xl:grid-cols-2 xl:items-start">
            <fieldset disabled={!editable} className="flex min-w-0 flex-col gap-6">
             <legend className="sr-only">General information</legend>
             <div className="grid gap-4 sm:grid-cols-2">
@@ -188,7 +187,7 @@ export function LabOrderDetail({ registro, nuevo, abierto, onVolver, onAccion }:
               ) : (
                 <>
                   <Tabs size="sm" aria-label="Dentition" value={denticion} onChange={setDenticion} tabs={['Permanent', 'Primary']} />
-                  <div className="flex flex-col items-center gap-6 sm:flex-row sm:items-start sm:justify-center sm:gap-10">
+                  <div className="flex flex-col items-center gap-6 sm:flex-row sm:items-start sm:justify-center sm:gap-8">
                     <ArcadaAnatomica denticion={denticion} marcados={dientes} actual={actual} disabled={!editable} onToggle={tocarDiente} />
                     <div className="flex w-full shrink-0 flex-col gap-5 sm:w-[220px]">
                       {/* Los dientes marcados de las dos denticiones: tocar uno lo elige para marcarle (o ver) sus superficies. */}
@@ -235,13 +234,14 @@ export function LabOrderDetail({ registro, nuevo, abierto, onVolver, onAccion }:
       <Card title="Details">
         <fieldset disabled={!editable} className="flex min-w-0 flex-col gap-4">
           <legend className="sr-only">Details</legend>
-          <div className="grid gap-4 sm:grid-cols-2">
+          {/* Uno debajo del otro, a todo el ancho: primero lo que se pide y después las indicaciones. */}
+          <div className="flex flex-col gap-4">
             <TextArea
-              label="Dental work requested" required rows={6} placeholder="Describe the work the laboratory has to do"
+              label="Dental work requested" required rows={5} placeholder="Describe the work the laboratory has to do"
               value={trabajo} onChange={(v) => setTrabajo(v.slice(0, MAX_TEXTO))} error={errores.trabajo} disabled={!editable} hint={`${trabajo.length}/${MAX_TEXTO}`}
             />
             <TextArea
-              label="Special instructions" rows={6} placeholder="Enter special instructions"
+              label="Special instructions" rows={4} placeholder="Enter special instructions"
               value={indicaciones} onChange={(v) => setIndicaciones(v.slice(0, MAX_TEXTO))} disabled={!editable} hint={`${indicaciones.length}/${MAX_TEXTO}`}
             />
           </div>

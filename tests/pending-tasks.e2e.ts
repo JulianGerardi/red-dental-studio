@@ -32,7 +32,7 @@ test('Request pasa la orden a Requested y Cancel la saca de la lista', async ({ 
   await expect(screen.getByRole('tab', 'Lab orders (1)')).toBeVisible()
 })
 
-test('Complete this Task abre el detalle de la orden, en sólo lectura sin encuentro', async ({ app, screen }) => {
+test('Complete this Task abre el detalle de la orden; una ya pedida, en sólo lectura', async ({ app, screen }) => {
   await app.open('/')
   await screen.getByRole('tab', /^Lab orders/).tap()
   /* Por vencimiento, la de James Foster (todavía no llegó) va primero. */
@@ -108,7 +108,7 @@ test('Complete this Task abre la Clinical Note; se firma con el login y Back to 
 })
 
 /* Referral (video de red.dev de Julián, 2026-11-25; CON-2322, CON-2323, CON-2394). Ver clinical-mode.md. */
-test('Complete this task abre el detalle de la Referral, en sólo lectura sin encuentro', async ({ app, screen }) => {
+test('Complete this task abre el detalle de la Referral; una ya pedida, en sólo lectura', async ({ app, screen }) => {
   await app.open('/')
   await screen.getByRole('tab', /^Referrals/).tap()
   /* Sophia Collins todavía no llegó: su derivación (Requested) se ve en sólo lectura. */

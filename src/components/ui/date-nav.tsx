@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Calendar, ChevronDown, ChevronLeft, ChevronRight } from 'lucide-react'
+import { Calendar, ChevronDown, ChevronLeft, ChevronRight, X } from 'lucide-react'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { MonthCalendar, POPOVER_FECHA, formatLargo, primeroDelMes, sameDay } from '@/components/ui/date-picker'
 import { cn } from '@/lib/utils'
@@ -37,8 +37,9 @@ export function moverPeriodo(d: Date, periodo: PeriodoFecha, paso: 1 | -1) {
 
 const BOTON = 'flex items-center justify-center text-ink transition-colors hover:bg-surface-subtle focus-visible:z-10 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-dash-blue disabled:pointer-events-none disabled:text-ink-faint'
 
-export function DateNav({ value, onChange, periodo = 'day', hoy = new Date(), marked, tour, className }: {
-  value: Date
+export function DateNav({ value, onChange, periodo = 'day', hoy = new Date(), marked, tour, className, vacio, onClear }: {
+  /** `null`: sin fecha elegida (sólo con `vacio`): la pantalla no filtra por fecha. */
+  value: Date | null
   onChange: (d: Date) => void
   /** Cuánto se mueve con las flechas y qué dice el campo. */
   periodo?: PeriodoFecha
@@ -49,20 +50,26 @@ export function DateNav({ value, onChange, periodo = 'day', hoy = new Date(), ma
   /** Paso del recorrido guiado (Help). */
   tour?: string
   className?: string
+  /** Lo que dice sin fecha elegida ("All dates"): el filtro de una tabla, que también muestra todo. */
+  vacio?: string
+  /** Saca la fecha: con una elegida aparece la ✕ al final del bloque. */
+  onClear?: () => void
 }) {
   const [abierto, setAbierto] = useState(false)
-  const [mes, setMes] = useState(() => primeroDelMes(value))
+  /* Sin fecha, las flechas y el calendario parten de hoy. */
+  const base = value ?? hoy
+  const [mes, setMes] = useState(() => primeroDelMes(base))
   const abrir = (v: boolean) => {
-    if (v) setMes(primeroDelMes(value))
+    if (v) setMes(primeroDelMes(base))
     setAbierto(v)
   }
   /* En la semana, el calendario marca los siete días que se ven. */
-  const desde = periodo === 'week' ? inicioSemana(value) : value
-  const hasta = periodo === 'week' ? sumar(desde, 6) : value
+  const desde = !value ? null : periodo === 'week' ? inicioSemana(value) : value
+  const hasta = !desde ? null : periodo === 'week' ? sumar(desde, 6) : desde
   /* Hoy está en lo que se ve: el mismo día, la misma semana o el mismo mes. */
-  const enHoy = periodo === 'day' ? sameDay(value, hoy)
+  const enHoy = !!value && (periodo === 'day' ? sameDay(value, hoy)
     : periodo === 'week' ? sameDay(inicioSemana(value), inicioSemana(hoy))
-    : value.getFullYear() === hoy.getFullYear() && value.getMonth() === hoy.getMonth()
+    : value.getFullYear() === hoy.getFullYear() && value.getMonth() === hoy.getMonth())
 
   return (
     <div
@@ -76,14 +83,14 @@ export function DateNav({ value, onChange, periodo = 'day', hoy = new Date(), ma
         className,
       )}
     >
-      <button type="button" aria-label={`Previous ${NOMBRE[periodo]}`} onClick={() => onChange(moverPeriodo(value, periodo, -1))} className={cn(BOTON, 'w-8')}>
+      <button type="button" aria-label={`Previous ${NOMBRE[periodo]}`} onClick={() => onChange(moverPeriodo(base, periodo, -1))} className={cn(BOTON, 'w-8')}>
         <ChevronLeft className="size-4" />
       </button>
       {/* Today dice si se está viendo hoy (dashboard.md, 2026-11-26). */}
       <button type="button" aria-pressed={enHoy} onClick={() => onChange(hoy)} className={cn(BOTON, 'px-2 font-medium')}>
         Today
       </button>
-      <button type="button" aria-label={`Next ${NOMBRE[periodo]}`} onClick={() => onChange(moverPeriodo(value, periodo, 1))} className={cn(BOTON, 'w-8')}>
+      <button type="button" aria-label={`Next ${NOMBRE[periodo]}`} onClick={() => onChange(moverPeriodo(base, periodo, 1))} className={cn(BOTON, 'w-8')}>
         <ChevronRight className="size-4" />
       </button>
       <Popover open={abierto} onOpenChange={abrir}>
@@ -94,7 +101,7 @@ export function DateNav({ value, onChange, periodo = 'day', hoy = new Date(), ma
             className={cn(BOTON, 'min-w-0 gap-2 border-l px-3 font-medium whitespace-nowrap data-[state=open]:bg-surface-subtle sm:min-w-[184px]', enHoy ? 'border-dash-blue/30 data-[state=open]:bg-dash-blue/10' : 'border-line')}
           >
             <Calendar aria-hidden className="text-dash-blue size-4 shrink-0" />
-            <span className="truncate">{etiquetaPeriodo(value, periodo)}</span>
+            <span className="truncate">{value ? etiquetaPeriodo(value, periodo) : vacio ?? 'All dates'}</span>
             <ChevronDown aria-hidden className={cn('size-3.5 shrink-0 transition-transform', enHoy ? 'text-dash-blue' : 'text-ink-muted', abierto && 'rotate-180')} />
           </button>
         </PopoverTrigger>
@@ -110,6 +117,11 @@ export function DateNav({ value, onChange, periodo = 'day', hoy = new Date(), ma
           />
         </PopoverContent>
       </Popover>
+      {value && onClear && (
+        <button type="button" aria-label="Clear date" title="Clear date" onClick={onClear} className={cn(BOTON, 'w-8 border-l', enHoy ? 'border-dash-blue/30' : 'border-line')}>
+          <X className="size-3.5" />
+        </button>
+      )}
     </div>
   )
 }

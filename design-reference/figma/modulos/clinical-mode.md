@@ -4043,3 +4043,29 @@ PrescriptionDetail,ReferralDetail,RegistrosPanel,registros}`, `dashboard/{tareas
 - **Corregido en la revisión:** *New* después de entrar por una tarea de Pending Task tomaba el id y el estado de esa
   tarea y la pisaba al guardar; ahora crea un registro nuevo en Pending. El documento de una tarea pedida desde el
   Dashboard firmaba con la fecha de creación. El foco de un diente se distingue del diente elegido (trazo negro).
+
+### Sin encuentro, la fecha del Dashboard y Lab order a lo ancho (2026-11-27, 6ª vuelta)
+
+**CON-2214 · CON-2212 · CON-2321.** Pedido de Julián sobre el link de prueba; reemplaza lo que la 4ª y la 5ª vuelta dicen
+del encuentro y del filtro de fecha.
+
+- **Nada pide un encuentro abierto en estas tres pestañas**: ni *New*, ni editar una Pending, ni las acciones del ⋮
+  ("no tengo que poner siempre Start encounter para iniciar algo"). La ficha sólo queda en *Read-only mode* cuando el
+  registro ya no está en Pending. `RegistrosPanel` y las fichas pierden `encuentroAbierto` / `abierto`; `AvisosFicha`,
+  el aviso de *no open encounter*. **Pending Task del Dashboard y del Patient Dashboard no cambia**: su ⋮ sigue apagado
+  sin encuentro (CON-2643), pero *Complete this task* abre la ficha y desde ahí sí se edita. A unificar si Julián lo
+  pide.
+- **El filtro de fecha de las tablas es el bloque del Dashboard** (`ui/date-nav`: ‹ Today › + calendario), por mes:
+  filtra por el mes del vencimiento (Lab order, Prescription) o de la derivación (Referral). Para servir de filtro,
+  `DateNav` admite `value: null` con `vacio` (*All dates*) y `onClear` (la ✕ al final del bloque). Sale `DateFilter` de
+  estas tablas.
+- **Lab order sin aire a los costados**: dentro de *General information*, desde 1280 px, los campos (laboratorio, fecha,
+  ASAP, procedimientos) van a la izquierda y *Teeth & surface* (dentición, arcadas, dientes marcados, rueda y sus botones)
+  a la derecha. Más angosto, uno debajo del otro. La lógica no cambia.
+- **Details de Lab order**: *Dental work requested* y, debajo, *Special instructions*, los dos a todo el ancho.
+- **Expiration date de Prescription en el título**: los tres datos comparten grilla (rótulo arriba a 8 px y el valor a la
+  altura del campo, 36 px), separados por una línea; antes el rótulo quedaba pegado al campo porque los otros dos eran
+  texto chico (`EncabezadoFicha`: con `campo`, `datos` toma la grilla de formulario).
+
+**A validar con usuarios:** si filtrar por mes alcanza o piden un rango libre; y si *Today* se entiende como "este mes"
+en una tabla.

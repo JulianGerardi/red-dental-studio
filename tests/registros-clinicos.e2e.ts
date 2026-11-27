@@ -5,14 +5,14 @@ import { expect } from 'e2e'
    sólo lectura) y la máquina de estados de cada uno, con las preguntas de red.dev y los avisos de Jira (CON-2214,
    CON-2212, CON-2321). Ver design-reference/figma/modulos/clinical-mode.md (2026-11-27). */
 
-const abrir = async (app: { open: (u: string) => Promise<unknown> }, screen: any, tab: string) => {
+/* Sin Start encounter: en Clinical Mode estos registros no piden un encuentro abierto. */
+const abrir = async (app: { open: (u: string) => Promise<unknown> }, _screen: unknown, tab: string) => {
   await app.open(`/patients/john-smith/clinical-mode?tab=${encodeURIComponent(tab)}`)
-  await screen.getByRole('button', /Start encounter/).tap()
 }
 
-test('New está siempre activo: sin encuentro abierto se puede crear; lo ya cargado se abre en sólo lectura', async ({ app, screen }) => {
+test('Sin encuentro abierto se crea y se edita; lo que ya no está en Pending se abre en sólo lectura', async ({ app, screen }) => {
   await app.open('/patients/john-smith/clinical-mode?tab=Prescription')
-  /* Como red.dev: New no pide encuentro y la ficha nueva se carga. */
+  /* En Clinical Mode nada pide un encuentro abierto: New y la ficha de una Pending se cargan igual. */
   await screen.getByRole('button', /New prescription/).tap()
   await expect(screen.getByText('Read-only mode')).toHaveCount(0)
   await expect(screen.getByRole('button', 'Save')).toBeEnabled()
@@ -23,8 +23,26 @@ test('New está siempre activo: sin encuentro abierto se puede crear; lo ya carg
   await expect(screen.getByText('Ibuprofen 400 mg').first()).toBeVisible()
   await expect(screen.getByRole('button', /New prescription/)).toBeVisible()
   await screen.getByText('Chlorhexidine gluconate 0.12%').first().tap()
-  await expect(screen.getByText('Read-only mode')).toBeVisible()
+  await expect(screen.getByText('Read-only mode')).toHaveCount(0)
+  await expect(screen.getByRole('button', 'Save')).toBeEnabled()
+  await screen.getByRole('button', 'Back to prescriptions').tap()
+  /* Una receta Active no se edita, con o sin encuentro. */
+  await screen.getByRole('button', /^Actions for prescription of Ibuprofen 600 mg, Active/).tap()
+  await screen.getByRole('menuitem', 'View').tap()
+  await expect(screen.getByText('This prescription cannot be edited because it is not in an editable state.')).toBeVisible()
   await expect(screen.getByRole('button', 'Save')).toBeDisabled()
+})
+
+/* El filtro de fecha es el bloque del Dashboard (‹ Today › + calendario), por mes; la ✕ vuelve a All dates. */
+test('La fecha de la tabla filtra por mes y Clear date vuelve a todas', async ({ app, screen }) => {
+  await app.open('/patients/john-smith/clinical-mode?tab=Referral')
+  await expect(screen.getByText(/Showing 1 to 7 of 7 results/)).toBeVisible()
+  await screen.getByRole('button', 'Today').tap()
+  await expect(screen.getByText(/Showing 1 to 2 of 2 results/)).toBeVisible()
+  await screen.getByRole('button', 'Previous month').tap()
+  await expect(screen.getByText(/Showing 1 to 2 of 2 results/)).toBeVisible()
+  await screen.getByRole('button', 'Clear date').tap()
+  await expect(screen.getByText(/Showing 1 to 7 of 7 results/)).toBeVisible()
 })
 
 test('Prescription: New valida, crea en Pending, se edita, se activa y se cancela (CON-2230, CON-2354, CON-2355)', async ({ app, screen }) => {

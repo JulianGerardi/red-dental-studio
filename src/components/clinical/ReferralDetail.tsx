@@ -22,12 +22,10 @@ import { PROCEDIMIENTOS_REFERRAL, agregarProveedor, guardarRegistro, hoy, provee
 const MAX_NOTA = 500
 const VACIA: DatosDerivacion = { proveedor: '', nota: '', procedimientos: [], asap: false, obligatoria: false, adjuntos: [] }
 
-export function ReferralDetail({ registro, nuevo, abierto, onVolver, onAccion }: {
+export function ReferralDetail({ registro, nuevo, onVolver, onAccion }: {
   registro: Registro
   /** Todavía no existe: Save la crea en Pending. */
   nuevo?: boolean
-  /** Hay un encuentro abierto con el paciente. */
-  abierto: boolean
   onVolver: () => void
   onAccion: (t: PendingTask, a: AccionUI) => void
 }) {
@@ -42,9 +40,8 @@ export function ReferralDetail({ registro, nuevo, abierto, onVolver, onAccion }:
   const [errores, setErrores] = useState<{ proveedor?: string; nota?: string }>({})
   const [nuevoProveedor, setNuevoProveedor] = useState(false)
 
-  /* Una derivación nueva se carga siempre (New no pide encuentro, como red.dev). Una existente: en Pending (CON-2323) y
-     con un encuentro abierto. */
-  const editable = nuevo || (abierto && esEditable(registro))
+  /* Sólo se edita en Pending (CON-2323); no pide un encuentro abierto (Julián, 2026-11-27). */
+  const editable = nuevo || esEditable(registro)
   const elegidos = PROCEDIMIENTOS_REFERRAL.filter((p) => procedimientos.includes(p.id))
 
   const guardar = () => {
@@ -69,11 +66,11 @@ export function ReferralDetail({ registro, nuevo, abierto, onVolver, onAccion }:
         datos={[['Referring provider', registro.provider ?? '—'], ['Referral date', registro.register], ...(registro.expiration ? [['Expiration date', <span key="vence" className={cn(urge(registro) && 'text-dash-bad-fg')}>{registro.expiration}</span>] as [string, ReactNode]] : [])]}
         acciones={!nuevo && <>
           {registro.pdf && <Button variant="secondary" onClick={() => onAccion(registro, 'PDF')}><FileText /> PDF</Button>}
-          <MenuTarea task={registro} abierto={abierto} onAccion={onAccion} sin={['Edit']} />
+          <MenuTarea task={registro} abierto onAccion={onAccion} sin={['Edit']} />
         </>}
       />
 
-      <AvisosFicha abierto={abierto || !!nuevo} editable={editable} nombre="referral" incompleto={Object.values(errores).some(Boolean)} />
+      <AvisosFicha editable={editable} nombre="referral" incompleto={Object.values(errores).some(Boolean)} />
 
       {/* Una card debajo de la otra, como los formularios de la app. */}
       <Card title="General information">
