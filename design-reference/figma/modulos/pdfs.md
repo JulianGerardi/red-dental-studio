@@ -154,6 +154,10 @@ siguen saliendo de la especificación.
   las **adendas** después de la firma (CON-2730). El aviso de nota generada sola (CON-2937) también.
 - **Títulos sin número, en azul** (pedido de Julián), en todos los PDF. Los números no aportaban en documentos cortos y
   cambiaban con cada sección que se omite. La hoja de la app (`ui/document-sheet`) sigue numerada: queda distinta.
+- **Sin cajas** (pedido de Julián: "deben estar todos iguales"): los medicamentos de la receta y las órdenes de la nota
+  dejan la caja con borde y quedan como el resto (título en negrita y sus datos). Lo mismo el aviso de nota generada
+  sola y la portada del anexo PDF. Con borde quedan sólo el resumen (igual en todos) y el diagrama de la boca de la Lab
+  order (como la app).
 
 ### 2. Treatment plan y consentimientos
 

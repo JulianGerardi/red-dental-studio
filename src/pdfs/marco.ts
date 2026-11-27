@@ -48,7 +48,7 @@ export type Bloque =
   | { tipo: 'narrativas'; lista: string; titulo: string; detalle?: string; texto: string; vacio?: string }
   /** Un subtítulo adentro de una sección. */
   | { tipo: 'subtitulo'; texto: string }
-  /** Una caja por ítem (cada medicamento de la receta). */
+  /** Un bloque por ítem (cada medicamento de la receta), sin caja: todos los PDF iguales (Julián, 2026-11-27). */
   | { tipo: 'tarjetas'; lista: string; titulo: string; campos: Campo[]; pie?: string }
   | { tipo: 'imagenes'; lista: string; imagen: string; titulo: string; detalle: string; vacio: string }
   /** Casillas que marca el paciente al firmar: marcadas si `marcada` tiene valor. */
@@ -162,13 +162,13 @@ h1 { margin: 0; font-size: 15pt; line-height: 1.25; font-weight: 700; color: ${C
 .resumen dd { margin: 1pt 0 0; font-weight: 500; color: ${COLOR.tinta}; overflow-wrap: anywhere; }
 section { margin-top: 18pt; }
 h2 { margin: 0 0 5pt; font-size: 10.5pt; font-weight: 700; color: ${COLOR.marca}; break-after: avoid; }
-.aviso { margin: 10pt 0 0; padding: 6pt 9pt; border-radius: 4pt; background: ${COLOR.franja}; font-size: 8pt; color: ${COLOR.texto}; }
+.aviso { margin: 8pt 0 0; font-size: 8pt; color: ${COLOR.apagado}; }
 .anexo-cabeza { padding-bottom: 9pt; margin-bottom: 14pt; border-bottom: 1.5pt solid ${COLOR.tinta}; }
 .anexo-cabeza .tipo { margin-top: 0; }
 .anexo-cabeza span { display: block; margin-top: 2pt; font-size: 8pt; color: ${COLOR.apagado}; }
 .anexo-imagen { margin: 0; }
 .anexo-imagen img { display: block; width: 100%; max-height: 215mm; object-fit: contain; border-radius: 4pt; }
-.anexo-pdf { padding: 14pt; border: .75pt dashed ${COLOR.tenue}; border-radius: 4pt; text-align: center; color: ${COLOR.apagado}; }
+.anexo-pdf { color: ${COLOR.apagado}; }
 .anexos-pie { margin-top: 6pt; }
 .campos { margin: 0; }
 .campos div { margin-bottom: 2pt; }
@@ -210,7 +210,7 @@ h2 { margin: 0 0 5pt; font-size: 10.5pt; font-weight: 700; color: ${COLOR.marca}
 .narrativa-titulo span { font-weight: 400; font-size: 8pt; color: ${COLOR.apagado}; }
 h3 { margin: 10pt 0 4pt; font-size: 9pt; font-weight: 700; color: ${COLOR.tinta}; break-after: avoid; }
 h2 + h3 { margin-top: 2pt; }
-.tarjeta { padding: 8pt 10pt; margin-bottom: 7pt; border: .75pt solid ${COLOR.linea}; border-radius: 4pt; break-inside: avoid; }
+.tarjeta { margin-bottom: 9pt; break-inside: avoid; }
 .tarjeta-titulo { font-weight: 600; font-size: 9.5pt; color: ${COLOR.tinta}; }
 .imagenes { display: grid; grid-template-columns: 1fr 1fr; gap: 10pt; }
 .imagenes figure { margin: 0; break-inside: avoid; }
