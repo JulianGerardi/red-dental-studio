@@ -43,6 +43,6 @@ test('Billing profile elegido en Insurance defaults no se deshabilita y lleva a 
   await screen.getByRole('switch', 'Use this location as a billing provider').tap()
   await expect(screen.getByRole('dialog', 'Unable to disable billing profile')).toBeVisible()
   await screen.getByText('Bayside Dental — Specific billing profile').tap()
-  await expect(screen.getByRole('heading', 'Insurance defaults')).toBeVisible()
+  await expect(screen.getByRole('tab', 'Insurance defaults', { selected: true })).toBeVisible()
   await expect(screen.getByText('Bayside Dental Group')).toBeVisible()
 })

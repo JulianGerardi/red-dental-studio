@@ -779,3 +779,44 @@ mismo diseño. Se va `settings/HojaConsentimientoPdf` (el formato de cards de re
 **Para backend:** el PDF real lo genera el servidor; el formato de referencia es este (`pdfDeDocumento` lo muestra en
 una página A4 con Helvetica).
 
+
+## Regla: breadcrumb y título van de la mano (2026-11-27)
+
+Sin historia de Jira (no hay reglas de negocio sobre el rastro; las que lo nombran son de diseño o están canceladas).
+Julián: *"siento que el título y el breadcrumb no van de la mano … apliquemos las mejores prácticas"*. Relevadas las 40
+rutas (rastro, H1 y pestañas). En 13 pantallas el H1 decía otra cosa que el último tramo (*Consents* / *Consent
+templates*, *Elena Martinez* / *Employee information*, *Aetna Dental Plans* / *Edit carrier*…), y en Location y Employee el
+H1 cambiaba con la pestaña.
+
+La regla (NN/g, Carbon, Atlassian: el último tramo es la página actual, sin link, y el encabezado lo repite):
+
+1. **El H1 dice lo mismo que el último tramo**, palabra por palabra. Las pantallas de primer nivel no llevan rastro y su
+   H1 es el nombre del menú.
+2. **Una sección se llama como en el menú** (menú de Settings, menú del paciente): el menú, el rastro y el título usan
+   la misma palabra. *Consents*, *Ledger*, *Preferences*, *Account*; en el paciente, *Treatments*, *Documents*,
+   *Insurance*.
+3. **Un ítem se llama por su nombre**, no por la acción: *Abril*, *Elena Martinez*, *Aetna Dental Plans*, *Acme Corp*. La
+   pantalla ya se edita; el verbo va en el botón (*Save changes*). Lo que todavía no existe sí lleva la acción: *New
+   role*, *New fee schedule* (rastro y título iguales). *Edit patient* queda: es una pantalla aparte del Overview.
+4. **Las pestañas no cambian el título**: el H1 de la ficha sigue siendo el ítem y la pestaña dice la sección.
+5. **Lista y editor en una pantalla** (Consents, Fee schedules, Coverage tables): el rastro y el H1 terminan en la
+   sección, y el encabezado del editor es **el nombre del ítem elegido** con su estado (*UCR - Red* · Active · Default),
+   no *Edit template* / *Edit fee schedule*. Así se lee la jerarquía de corrido: sección → ítem.
+6. El estado de un ítem va al lado de su título (`SettingsPageHeader` › `etiquetas`), no repetido más abajo: en la ficha
+   del empleado el nombre y el pill salen de la card (queda la foto y *Is clinical practitioner*).
+
+`tests/breadcrumb-titulo.e2e.ts` recorre las pantallas con rastro y falla si el H1 no es el último tramo.
+
+Auditoría de la app entera antes de publicar (58 pantallas, recorridas siguiendo los links y probando cada pestaña): todas
+cumplen. Quedan fuera de la regla, a propósito y sin rastro: **Help** (el H1 es la pregunta del buscador, *What can we
+help you with?*, patrón de centro de ayuda) y el placeholder compartido de Message, Contacts, Documents y Reports (*Page
+under construction*, como el original). Si se quiere, el placeholder puede titularse con la sección; espera ok. Los datos
+mock muestran a John Smith en cualquier paciente (`/patients/abril-viola`): rastro y título coinciden igual.
+
+Se revierten textos copiados de red.dev o del Figma: *Treatment plan* (treatments.md, 2026-11-12), *Documents manager*,
+*Insurance plans*, *Edit account*, *Edit carrier*, *Edit insurance plan*, *Account preferences*, *Ledger options*,
+*Consent templates*; el *Queda para decidir* de settings-billing.md (2026-11-26) queda resuelto.
+
+**A validar con usuarios:** si *Ledger* en Settings se confunde con el Ledger del paciente (si pasa, se renombra en el
+menú, el rastro y el título a la vez, p. ej. *Ledger options*), y si en Edit patient falta el nombre del paciente en el
+rastro (hoy `Patients / Edit patient`, decisión de patients.md).

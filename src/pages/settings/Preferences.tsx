@@ -72,7 +72,7 @@ export function SettingsPreferences() {
 
   return (
     <div className={PADDING_PAGINA}>
-      <SettingsPageHeader titulo="Account preferences" />
+      <SettingsPageHeader titulo="Preferences" />
 
       <div className={cn(TARJETA_PANEL, 'mt-4')}>
         <Seccion titulo="Appearance" detalle="Choose the theme for your portal.">

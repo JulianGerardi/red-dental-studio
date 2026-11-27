@@ -3,6 +3,10 @@
 **Jira**: sin historia. Se buscó *preference*, *theme* y *date format* en `CON`: no hay historia de la pantalla (avisarle
 a Julián). Se armó desde el video de red.dev.
 
+## Breadcrumb y título iguales (2026-11-27)
+
+Sin historia de Jira. Regla transversal en `../README.md` (*Regla: breadcrumb y título van de la mano*). El título pasa de *Account preferences* a **Preferences**, como el menú y el rastro.
+
 ## Pantalla nueva desde red.dev (2026-11-25)
 
 Julián: *"diseñar en base a nuestro design system, componentes, textos y tamaños la parte de Preferences"*, con un video

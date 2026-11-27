@@ -1,6 +1,10 @@
 # Settings → Billing (Fee Schedules, Carriers, Coverage Table)
 
 
+## Breadcrumb y título iguales (2026-11-27)
+
+Sin historia de Jira. Regla transversal en `../README.md` (*Regla: breadcrumb y título van de la mano*). Edit carrier pasa a **el nombre del carrier** (*Aetna Dental Plans*) y Edit insurance plan a **el del plan** (*Acme Corp*), como el último tramo. El encabezado del editor de Fee schedules y Coverage tables es el ítem elegido (*UCR - Red* · Active · Default) en vez de *Edit fee schedule* / *Edit coverage table*. Resuelve el *Queda para decidir* de abajo.
+
 
 ## Versiones de un Fee Schedule: guía funcional y prototipo (2026-11-27) · CON-1151, CON-1369, CON-1375, CON-495, CON-496, CON-497, CON-1276, CON-1108
 

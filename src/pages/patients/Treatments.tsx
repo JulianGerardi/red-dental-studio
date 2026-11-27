@@ -110,8 +110,8 @@ export default function Treatments() {
         />
 
         <div className="flex min-w-0 flex-1 flex-col">
-          {/* "Treatment plan", como red.dev; el Figma decía "Treatments plan" (treatments.md, 2026-11-12). */}
-          <PageTitle>Treatment plan</PageTitle>
+          {/* Treatments, como el menú del paciente y el breadcrumb (README, "Breadcrumb y título", 2026-11-27). */}
+          <PageTitle>Treatments</PageTitle>
 
           {vacio ? (
             <div className={cn(TARJETA_PANEL, 'mt-4 flex min-h-[560px] flex-col items-center justify-center lg:flex-1')}>
