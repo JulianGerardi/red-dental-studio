@@ -780,18 +780,21 @@ mismo diseño. Se va `settings/HojaConsentimientoPdf` (el formato de cards de re
 una página A4 con Helvetica).
 
 
-## Regla: el tacho va en rojo (2026-11-27)
+## Regla: el tacho va en rojo, con un solo formato (2026-11-27)
 
-Sin historia de Jira. Julián: *"pasalos a rojo en toda la app"*. Todo tacho (`Trash2`) que borra o quita algo va en
-`text-dash-bad-fg`, también en reposo: antes varios estaban en gris y sólo se ponían rojos al pasar el mouse.
+Sin historia de Jira. Julián: *"pasalos a rojo en toda la app"* y, después, *"algunos quedaron con el fondo rojo y otros
+con el fondo gris: deberíamos igualar para todo con un solo formato"*. Todo tacho (`Trash2`) que borra o quita algo usa una
+de estas dos constantes de `lib/estilos.ts`; nadie arma el suyo:
 
-- **Fila o ítem** (rangos, excepciones, salas, credenciales, asignaciones): sólo ícono, `cn(ICONO_SUELTO, 'text-dash-bad-fg')`,
-  16 px, con el nombre en el `aria-label` (*Remove …* / *Delete …*). Sin botón con texto.
-- **Menú ⋮**: `DropdownMenuItem variant="destructive"`.
-- **Botón con texto** (acción de un bloque o del pie: *Remove* de una credencial, *Discard draft*, *Delete* del turno):
-  `text-dash-bad-fg hover:text-dash-bad-fg` sobre `secondary` o `ghost`.
-- Pasaron a rojo: Location (Rooms, Exceptions, Working hours, New exception), Employees (credenciales, Roles & location),
-  Clinical Mode (procedimientos de la ficha, radiografías, credenciales) y el popover clínico del paciente.
+- **`ICONO_TACHO`** — sólo ícono, para una fila o un ítem (rangos, excepciones, salas, credenciales, asignaciones): botón
+  de 28 px, `Trash2` de 16, `text-dash-bad-fg` en reposo y fondo `dash-bad-bg` al pasar el mouse, con el nombre en el
+  `aria-label` (*Remove …* / *Delete …*). Lo que pide el lugar (un margen para alinear con un campo) se suma con `cn`.
+- **`BOTON_BORRAR`** — sobre un `ui/button` `secondary` o `ghost` con texto (*Remove* de una credencial, *Remove
+  medication*, *Discard draft*, *Delete* del turno, borrar una suscripción): mismo rojo y mismo fondo al pasar.
+- En un **menú ⋮**, `DropdownMenuItem variant="destructive"`, como siempre.
+
+Antes convivían tres formatos: `ICONO_SUELTO` en rojo (fondo gris al pasar), botones a mano con fondo rojo y otros que sólo
+cambiaban el tono del ícono, en 14 o 16 px y con cajas de 24 a 36 px. El *Delete* deshabilitado del turno sigue apagado.
 
 ## Regla: breadcrumb y título van de la mano (2026-11-27)
 

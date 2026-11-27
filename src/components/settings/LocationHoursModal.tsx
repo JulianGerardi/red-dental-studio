@@ -1,4 +1,5 @@
 import { DrawerActions } from '@/components/ui/drawer'
+import { ICONO_TACHO } from '@/lib/estilos'
 import { Button } from '@/components/ui/button'
 import { useState } from 'react'
 import { Trash2, Plus } from 'lucide-react'
@@ -146,7 +147,7 @@ export function LocationHoursModal({
                   type="button"
                   aria-label="Delete time range"
                   onClick={() => setRangos((p) => p.filter((_, j) => j !== i))}
-                  className="mt-7 shrink-0 rounded p-1 text-dash-bad-fg hover:bg-dash-bad-bg"
+                  className={cn(ICONO_TACHO, 'mt-7')}
                 >
                   <Trash2 className="size-4" />
                 </button>

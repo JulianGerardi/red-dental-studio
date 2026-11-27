@@ -7,7 +7,7 @@ import { Pill, type PillTone } from '@/components/ui/pill'
 import { TONO_PROCEDIMIENTO } from './accionesProcedimiento'
 import type { EstadoProcedimiento } from '@/data/clinical-mode'
 import { FieldError, FieldLabel } from '@/components/patients/form'
-import { ICONO_SUELTO, TARJETA_INTERNA } from '@/lib/estilos'
+import { ICONO_SUELTO, TARJETA_INTERNA, ICONO_TACHO } from '@/lib/estilos'
 
 /* Las fichas de Clinical Mode que se completan desde Pending Task (Lab order, Referral): título con estado y acciones,
    dos cards (settings `Card`) lado a lado en desktop -General information a la izquierda, Details a la derecha con el
@@ -192,7 +192,7 @@ export function ProcedimientosVinculados({ items, onRemove, disabled }: { items:
           {!disabled && (
             <button
               type="button" aria-label={`Remove ${p.codigo}`} title="Remove" onClick={() => onRemove(p)}
-              className="flex size-8 shrink-0 items-center justify-center rounded-md text-dash-bad-fg hover:bg-dash-bad-bg focus-visible:outline-2 focus-visible:outline-dash-blue"
+              className={ICONO_TACHO}
             >
               <Trash2 className="size-4" />
             </button>

@@ -18,7 +18,7 @@ import {
   type PlanPaciente, type RelacionPlan, type Suscripcion,
 } from '@/data/insurance'
 import { aviso } from '@/components/ui/toaster'
-import { CONTENEDOR_PAGINA, TARJETA_PANEL, TABLA_LINK } from '@/lib/estilos'
+import { CONTENEDOR_PAGINA, TARJETA_PANEL, TABLA_LINK, BOTON_BORRAR } from '@/lib/estilos'
 import { OBLIGATORIO } from '@/lib/validacion'
 
 /* Figma 3817:865128 "Insurance", frames 3817:865704 y 3831:897436.
@@ -251,7 +251,7 @@ export default function Insurance() {
                       2026-10-30). Sin suscripción elegida, Manage queda deshabilitado y no hay qué borrar. */}
                   <div className="mt-auto flex justify-end gap-2 pt-5">
                     {elegida && (
-                      <Button variant="secondary" iconOnly aria-label="Delete subscription" onClick={pedirBorrar} className="text-dash-bad-fg hover:text-dash-bad-fg">
+                      <Button variant="secondary" iconOnly aria-label="Delete subscription" onClick={pedirBorrar} className={BOTON_BORRAR}>
                         <Trash2 />
                       </Button>
                     )}

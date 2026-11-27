@@ -1,4 +1,5 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
+import { ICONO_TACHO } from '@/lib/estilos'
 import { createPortal } from 'react-dom'
 import { Pencil, Plus, Trash2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
@@ -116,9 +117,9 @@ export function ClinicalPopover({
                 type="button"
                 aria-label={`Delete ${it.name}`}
                 onClick={() => onDelete(it)}
-                className="shrink-0 text-dash-bad-fg hover:text-dash-bad-hover"
+                className={cn(ICONO_TACHO, '-my-1.5')}
               >
-                <Trash2 className="size-3.5" />
+                <Trash2 className="size-4" />
               </button>
             </div>
           </div>

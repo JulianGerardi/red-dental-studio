@@ -2,7 +2,7 @@ import { useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Building2, MapPin, Stethoscope, Trash2, UserRound, type LucideIcon } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import { ICONO_SUELTO } from '@/lib/estilos'
+import { ICONO_TACHO } from '@/lib/estilos'
 import { ModalShell } from '@/components/patients/form'
 import { Button } from '@/components/ui/button'
 import { DrawerSection } from '@/components/ui/drawer'
@@ -218,7 +218,7 @@ export function AssignmentsTab({ arancel }: { arancel: Arancel }) {
                   {x.detalle && <span className="block text-[11px] text-ink-muted">{x.detalle}</span>}
                 </span>
                 {/* El tacho de una fila, como en los rangos y las excepciones: sólo ícono, en rojo (settings-billing.md, 2026-11-27). */}
-                <button type="button" aria-label={`Remove ${x.nombre}${x.detalle ? ` (${x.detalle})` : ''}`} onClick={() => setAQuitar(x)} className={cn(ICONO_SUELTO, 'text-dash-bad-fg')}>
+                <button type="button" aria-label={`Remove ${x.nombre}${x.detalle ? ` (${x.detalle})` : ''}`} onClick={() => setAQuitar(x)} className={ICONO_TACHO}>
                   <Trash2 className="size-4" />
                 </button>
               </li>
