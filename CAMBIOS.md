@@ -5,7 +5,7 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-11-27
 
-### Fee schedules: versiones Draft, Scheduled, Active y Expired, y pestaña Assignments (CON-1151, CON-1369, CON-1375, CON-495, CON-496, CON-497, CON-1276, CON-1108) ([#PR](https://github.com/JulianGerardi/red-dental-studio/pull/PR))
+### Fee schedules: versiones Draft, Scheduled, Active y Expired, y pestaña Assignments (CON-1151, CON-1369, CON-1375, CON-495, CON-496, CON-497, CON-1276, CON-1108) ([#213](https://github.com/JulianGerardi/red-dental-studio/pull/213))
 - **Flujo de versiones** (guía funcional y prototipo de Julián): la versión Active, las Expired y un fee schedule archivado
   son de sólo lectura. *Create new version* pasa a editar; *Save draft* guarda el borrador sin fecha (`Arancel.borrador`,
   uno por fee schedule); *Publish…* pide *Available from* (hoy o después), muestra el resumen y crea la versión: Active si
