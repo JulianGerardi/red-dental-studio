@@ -451,3 +451,48 @@ test('End Encounter registra fases en orden, completa antes de tiempo y cierra e
   await expect(screen.getByText('Encounter completed.')).toBeVisible()
   await expect(screen.getByRole('dialog', 'Clinical note')).toBeVisible()
 })
+
+/* Prescription (CON-2230, CON-2354, CON-2356): la tabla estándar, New prescription valida cada medicación y Delete pregunta. */
+test('Prescription crea una receta, valida los campos y borra una Pending', async ({ app, screen }) => {
+  await app.open('/patients/patient-0001/clinical-mode?tab=Prescription')
+  await expect(screen.getByText(/Showing 1 to 10 of 14 results/)).toBeVisible()
+
+  await screen.getByRole('button', 'Filter prescriptions').tap()
+  await screen.getByRole('menuitemcheckbox', /Pending/).tap()
+  await screen.getByRole('menuitemcheckbox', /Pending/).press('Escape')
+  await expect(screen.getByText(/Showing 1 to 2 of 2 results/)).toBeVisible()
+
+  await screen.getByRole('button', 'Actions for Chlorhexidine 0.12% rinse 15 ml').tap()
+  await screen.getByRole('menuitem', /Delete prescription/).tap()
+  await screen.getByRole('button', 'Delete').tap()
+  await expect(screen.getByText('The prescription has been successfully deleted.')).toBeVisible()
+  await expect(screen.getByText(/Showing 1 to 1 of 1 results/)).toBeVisible()
+
+  await screen.getByRole('button', 'New prescription').tap()
+  await screen.getByRole('button', 'Save').tap()
+  await expect(screen.getByText(/Uncompleted fields/)).toBeVisible()
+
+  await screen.getByRole('button', /Expiration date/).tap()
+  await screen.getByRole('button', 'Next month').tap()
+  await screen.getByRole('button', /15, 20/).first().tap()
+  await screen.getByPlaceholder('Search by drug name or brand name').fill('Amoxi')
+  await screen.getByRole('button', /^Amoxicillin$/).tap()
+  await screen.getByPlaceholder('e.g. 500').fill('500')
+  await screen.getByRole('button', 'Strength unit').tap()
+  await screen.getByRole('button', 'mg').tap()
+  // Los SelectField sin elegir dicen "Select": Dosage form, Route y Frequency, en ese orden.
+  await screen.getByRole('button', 'Select').first().tap()
+  await screen.getByRole('button', 'Capsule').tap()
+  await screen.getByPlaceholder('e.g. 30').fill('21')
+  await screen.getByPlaceholder('e.g. 1').fill('1')
+  await screen.getByRole('button', 'Dose unit').tap()
+  await screen.getByRole('button', 'Capsule').last().tap()
+  await screen.getByRole('button', 'Select').first().tap()
+  await screen.getByRole('button', 'Oral').tap()
+  await screen.getByRole('button', 'Select').first().tap()
+  await screen.getByRole('button', 'Every 8 hours').tap()
+  await screen.getByPlaceholder('e.g. 7').fill('7')
+  await screen.getByRole('button', 'Save').tap()
+  await expect(screen.getByText('The prescription has been successfully created.')).toBeVisible()
+  await expect(screen.getByText(/Showing 1 to 2 of 2 results/)).toBeVisible()
+})

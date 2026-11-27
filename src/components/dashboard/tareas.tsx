@@ -71,8 +71,10 @@ export function useTareasVivas(base: PendingTask[]) {
 export const reiniciarTareas = () => { cambios = {}; oyentes.forEach((f) => f()) }
 
 /* Request y Activate se hacen al toque y se deshacen desde el aviso; Cancel y Delete ya pasaron por la pregunta. */
-export function aplicarAccion(t: PendingTask, accion: AccionTarea | 'Sign') {
+/* `sinAviso`: el que llama ya avisó (Prescription en Clinical Mode, que tiene sus propios textos de Jira). */
+export function aplicarAccion(t: PendingTask, accion: AccionTarea | 'Sign', { sinAviso = false } = {}) {
   if (!t.id) return
+  if (sinAviso) { guardar(t.id, { ...cambios[t.id], ...(accion === 'Cancel' ? { state: 'Canceled' } : {}), fuera: true }); return }
   const id = t.id
   const antes = cambios[id]
   const nombre = nombreTarea(t)

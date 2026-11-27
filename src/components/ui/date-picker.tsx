@@ -49,7 +49,7 @@ export const POPOVER_FECHA = 'w-auto max-w-[calc(100vw-24px)] p-3'
 
 /* Un mes, con su navegación: lo usan DatePicker (un día) y DateFilter (un día o un rango). */
 export function MonthCalendar({
-  month, onMonthChange, from, to, onPick, onHover, marked = [], max, yearNav,
+  month, onMonthChange, from, to, onPick, onHover, marked = [], min, max, yearNav,
 }: {
   month: Date
   onMonthChange: (m: Date) => void
@@ -61,6 +61,8 @@ export function MonthCalendar({
   onHover?: (d: Date | null) => void
   /** Días con contenido: se marcan con un punto. */
   marked?: Date[]
+  /** Primer día que se puede elegir: los de antes, deshabilitados, y sin flecha a los meses que pasaron. */
+  min?: Date
   /** Último día que se puede elegir: los de después, deshabilitados, y sin flecha a los meses que vienen. */
   max?: Date
   /** Saltos de año (‹‹ ››): sin ellos una fecha de nacimiento queda a cientos de clics. */
@@ -70,13 +72,15 @@ export function MonthCalendar({
   const mover = (n: number) => onMonthChange(new Date(month.getFullYear(), month.getMonth() + n, 1))
   const celdas = Array.from({ length: 42 }, (_, i) => new Date(month.getFullYear(), month.getMonth(), 1 + i - month.getDay()))
   const hayDespues = (n: number) => !tope || new Date(month.getFullYear(), month.getMonth() + n, 1) <= tope
+  const piso = min && dia(min)
+  const hayAntes = (n: number) => !piso || new Date(month.getFullYear(), month.getMonth() - n + 1, 0) >= piso
 
   return (
     <div className="flex flex-col">
       <div className="relative flex h-7 items-center justify-center">
         <div className="absolute left-0 flex gap-1">
-          {yearNav && <NavBtn onClick={() => mover(-12)} label="Previous year"><ChevronsLeft className="size-4" /></NavBtn>}
-          <NavBtn onClick={() => mover(-1)} label="Previous month"><ChevronLeft className="size-4" /></NavBtn>
+          {yearNav && <NavBtn onClick={() => mover(-12)} label="Previous year" hidden={!hayAntes(12)}><ChevronsLeft className="size-4" /></NavBtn>}
+          <NavBtn onClick={() => mover(-1)} label="Previous month" hidden={!hayAntes(1)}><ChevronLeft className="size-4" /></NavBtn>
         </div>
         <span className="flex items-center gap-1 text-sm font-medium">
           <span aria-live="polite">{MONTHS[month.getMonth()]}</span>
@@ -93,7 +97,7 @@ export function MonthCalendar({
           <span key={d} className="flex size-9 items-center justify-center text-[0.8rem] text-muted-foreground">{d}</span>
         ))}
         {celdas.map((d) => {
-          const despues = !!tope && d > tope
+          const despues = (!!tope && d > tope) || (!!piso && d < piso)
           const extremo = !!from && !!to && (sameDay(d, from) || sameDay(d, to))
           const medio = !!from && !!to && !extremo && d > dia(from) && d < dia(to)
           const fuera = d.getMonth() !== month.getMonth()
@@ -170,10 +174,20 @@ export function DatePicker({
   className,
   error,
   variant = 'field',
+  min,
+  max,
+  disabled,
+  label,
 }: {
   value: Date | null
   onChange: (d: Date) => void
   marked?: Date[]
+  /** Días fuera de [min, max] deshabilitados: Expiration date de una prescripción, de mañana a seis meses (CON-2230). */
+  min?: Date
+  max?: Date
+  disabled?: boolean
+  /** Nombre para lectores de pantalla cuando el rótulo no es un <label> del campo. */
+  label?: string
   placeholder?: string
   /** Para usarlo como campo de formulario: h-9, ancho completo. */
   className?: string
@@ -195,6 +209,8 @@ export function DatePicker({
         <button
           type="button"
           aria-invalid={error || undefined}
+          aria-label={label ? `${label}: ${value ? formatMDY(value) : placeholder}` : undefined}
+          disabled={disabled}
           className={cn(
             fechaTriggerClasses(variant),
             !value && 'text-ink-faint',
@@ -213,6 +229,8 @@ export function DatePicker({
           from={value}
           to={value}
           marked={marked}
+          min={min}
+          max={max}
           yearNav
           onPick={(d) => {
             onChange(d)

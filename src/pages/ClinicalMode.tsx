@@ -16,6 +16,7 @@ import { NavegacionClinica, examenDePestana, type DestinoClinico } from '@/compo
 import { VitalsPanel } from '@/components/clinical/VitalsPanel'
 import { LabOrderPanel } from '@/components/clinical/LabOrderPanel'
 import { ReferralPanel } from '@/components/clinical/ReferralDetail'
+import { PrescriptionPanel } from '@/components/clinical/PrescriptionPanel'
 import { RadiographyPanel } from '@/components/clinical/RadiographyPanel'
 import { TreatmentPlanSection } from '@/components/clinical/TreatmentPlanSection'
 import { TreatmentPanel } from '@/components/clinical/TreatmentPanel'
@@ -115,6 +116,8 @@ export default function ClinicalMode() {
       ? <ExamLayout findings={false}><VitalsPanel /></ExamLayout>
       : pestana === 'Lab order'
         ? <LabOrderPanel tarea={tareaPedida?.kind === 'Lab orders' ? tareaPedida : undefined} encuentroAbierto={encuentro !== 'sinEmpezar'} />
+        : pestana === 'Prescription'
+          ? <PrescriptionPanel key={tareaPedida?.id} paciente={`${patient.first} ${patient.last}`} tarea={tareaPedida?.kind === 'Prescriptions' ? tareaPedida : undefined} />
         : pestana === 'Referral'
           ? <ReferralPanel tarea={tareaPedida?.kind === 'Referrals' ? tareaPedida : undefined} encuentroAbierto={encuentro !== 'sinEmpezar'}>{enConstruccion}</ReferralPanel>
         : pestana === 'Radiographic'
