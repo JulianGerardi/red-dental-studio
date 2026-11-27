@@ -54,7 +54,7 @@ test('un plan nuevo se arma en cuatro pasos y sigue en su Coverage table', async
   await drawer.getByRole('button', 'No').tap()
   await drawer.getByRole('button', /^Save/).tap()
 
-  await expect(screen.getByRole('heading', 'Edit insurance plan')).toBeVisible()
+  await expect(screen.getByRole('heading', 'Globex Corp', { level: 1 })).toBeVisible()
   await expect(screen.getByText('No procedure ranges found')).toBeVisible()
   await screen.getByRole('button', 'Copy from').tap()
   const copiar = screen.getByRole('dialog', 'Copy from')

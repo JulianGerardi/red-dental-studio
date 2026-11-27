@@ -1,7 +1,6 @@
 import { SettingsSearch } from '@/components/settings/SettingsSearch'
 import { PADDING_PAGINA } from '@/lib/estilos'
 import { useCallback, useMemo, useState } from 'react'
-import { PageTitle } from '@/components/ui/page-title'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { Trash2, FileText, Pencil, Ban, UserMinus, Plus, TriangleAlert } from 'lucide-react'
 import { EmptyState } from '@/components/ui/empty-state'
@@ -240,7 +239,8 @@ export function SettingsEmployeeDetail() {
 
   return (
     <div className={PADDING_PAGINA}>
-      <PageTitle>{tab === 'Employee' ? 'Employee information' : tab}</PageTitle>
+      {/* El nombre, como el último tramo del breadcrumb, con su estado al lado; la card ya no lo repite (README, 2026-11-27). */}
+      <SettingsPageHeader titulo={empleado.nombre} etiquetas={<EstadoPill estado={empleado.estado} />} />
 
       <Tabs size="sm"
         className="mt-4"
@@ -267,12 +267,6 @@ export function SettingsEmployeeDetail() {
                     label={empleado.nombre}
                     size={56}
                   />
-                  <span>
-                    <span className="block text-xl font-bold text-ink">{empleado.nombre}</span>
-                    <span className="mt-1 inline-block rounded-full border border-dash-ok-fg bg-dash-ok-bg px-2 py-[2px] text-[11px] font-semibold text-dash-ok-fg">
-                      {empleado.estado}
-                    </span>
-                  </span>
                 </div>
                 <span className="flex items-center gap-2">
                   <Toggle on={esProvider} onChange={alternarProvider} />

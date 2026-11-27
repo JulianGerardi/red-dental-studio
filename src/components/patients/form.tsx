@@ -745,9 +745,11 @@ export function DateTextField({
 }
 
 export function TextArea({
-  label, required, className, placeholder, value = '', onChange, error, hint, disabled, rows = 4,
+  label, required, className, placeholder, value = '', onChange, error, hint, disabled, rows = 4, crecer,
 }: {
   label: string
+  /** Ocupa el alto que le deja su contenedor (flex), con `rows` como mínimo: el texto libre de Lab order y Referral. */
+  crecer?: boolean
   required?: boolean
   className?: string
   placeholder?: string
@@ -769,7 +771,7 @@ export function TextArea({
         aria-invalid={!!error || undefined}
         disabled={disabled}
         onChange={(e) => onChange?.(e.target.value)}
-        className={cn(control(error), 'resize-none px-3 py-2')}
+        className={cn(control(error), 'resize-none px-3 py-2', crecer && 'flex-1')}
       />
       {pie(error, hint)}
     </label>

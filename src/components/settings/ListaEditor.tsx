@@ -111,7 +111,7 @@ export function ItemLista({ nombre, activo, estado, elegido, to, onElegir, extra
   )
 }
 
-/* El título del editor con el estado al lado: Edit coverage table / Edit template + Active o Inactive (o `estado`). */
+/* El título del editor: el nombre del ítem elegido (o "New …") con su estado al lado (README, "Breadcrumb y título"). */
 export function EncabezadoEditor({ titulo, activo, estado, extra }: { titulo: string; activo?: boolean; estado?: EstadoLista; extra?: ReactNode }) {
   const pill = activo !== undefined || estado ? pillEstado(activo ?? false, estado) : undefined
   return (

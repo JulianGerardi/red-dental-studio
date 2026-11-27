@@ -1,6 +1,10 @@
 # Settings → Billing (Fee Schedules, Carriers, Coverage Table)
 
 
+## Breadcrumb y título iguales (2026-11-27)
+
+Sin historia de Jira. Regla transversal en `../README.md` (*Regla: breadcrumb y título van de la mano*). Edit carrier pasa a **el nombre del carrier** (*Aetna Dental Plans*) y Edit insurance plan a **el del plan** (*Acme Corp*), como el último tramo. El encabezado del editor de Fee schedules y Coverage tables es el ítem elegido (*UCR - Red* · Active · Default) en vez de *Edit fee schedule* / *Edit coverage table*. Resuelve el *Queda para decidir* de abajo.
+
 ## Atajos de Billing en un ⋮ y Settings › Overview (2026-11-26)
 
 Julián: *"los accesos rápidos de Billing ponelo en un elipsis, así quedan las cards iguales"*. Los tres atajos de la card

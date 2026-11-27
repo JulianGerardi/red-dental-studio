@@ -35,11 +35,21 @@ export type Bloque =
   | { tipo: 'html'; variable: string }
   | { tipo: 'nota'; texto: string }
   | { tipo: 'lista'; lista: string; valor: string; vacio: string; rotulo?: string }
-  | { tipo: 'tabla'; lista: string; columnas: Columna[]; vacio: string; totales?: Campo[] }
-  /** Una tabla por grupo (las visitas del treatment plan), con su subtotal. */
-  | { tipo: 'grupos'; lista: string; titulo: string; total: string; tabla: Omit<Extract<Bloque, { tipo: 'tabla' }>, 'tipo'> }
-  /** Una caja por ítem (cada medicamento de la receta). */
-  | { tipo: 'tarjetas'; lista: string; titulo: string; campos: Campo[] }
+  /** `subtotal`: una fila al pie con un rótulo y un importe por cada una de las últimas columnas. */
+  | { tipo: 'tabla'; lista: string; columnas: Columna[]; vacio: string; subtotal?: { rotulo: string; valores: string[] } }
+  /** Una tabla por grupo (las visitas del treatment plan). */
+  | { tipo: 'grupos'; lista: string; titulo: string; tabla: Omit<Extract<Bloque, { tipo: 'tabla' }>, 'tipo'> }
+  /** Los importes de un documento, alineados a la derecha; la última fila es lo que paga el paciente. El mismo bloque en
+      el treatment plan y en el consentimiento de aceptación. */
+  | { tipo: 'importes'; filas: Campo[]; nota?: string }
+  /** Texto armado a mano con {{variables}} y las clases de la hoja: la nota clínica, que es narrativa (CON-2975). */
+  | { tipo: 'libre'; html: string }
+  /** Textos con título y fecha (las narrativas de los cuestionarios y de los workflows). */
+  | { tipo: 'narrativas'; lista: string; titulo: string; detalle?: string; texto: string; vacio?: string }
+  /** Un subtítulo adentro de una sección. */
+  | { tipo: 'subtitulo'; texto: string }
+  /** Un bloque por ítem (cada medicamento de la receta), sin caja: todos los PDF iguales (Julián, 2026-11-27). */
+  | { tipo: 'tarjetas'; lista: string; titulo: string; campos: Campo[]; pie?: string }
   | { tipo: 'imagenes'; lista: string; imagen: string; titulo: string; detalle: string; vacio: string }
   /** Casillas que marca el paciente al firmar: marcadas si `marcada` tiene valor. */
   | { tipo: 'casillas'; items: string[]; marcada: string; aviso?: string }
@@ -47,9 +57,11 @@ export type Bloque =
       cada ítem se llaman `tooth` y `surfaces`; la dentición (Permanent o Primary) va en `denticion`. */
   | { tipo: 'boca'; lista: string; denticion: string }
 
-export type Seccion = { titulo: string; bloques: Bloque[] }
+/** `si`: la sección sólo sale si esa variable tiene valor (la nota clínica no muestra lo que no pasó en la visita). Los
+    títulos van sin número, en azul (pedido de Julián, 2026-11-27). */
+export type Seccion = { titulo: string; bloques: Bloque[]; si?: string }
 /** Quién firma: `prefijo` arma las variables {{<prefijo>_name}}, {{<prefijo>_signed_date}} y {{<prefijo>_signature_image}}. */
-export type Firma = { rol: string; prefijo: string }
+export type Firma = { rol: string; prefijo: string; hash?: boolean }
 
 export type Hoja = {
   /** El tipo, chico y en azul: "Dental clinical note". */
@@ -60,6 +72,13 @@ export type Hoja = {
   resumen: Campo[]
   secciones: Seccion[]
   firmas?: Firma[]
+  /** Un aviso debajo del título (la nota generada sola al cerrarse el encounter). */
+  aviso?: string
+  /** Secciones que van después de las firmas (las adendas de la nota: se suman una vez firmada). */
+  posdata?: Seccion[]
+  /** Lista de adjuntos que van como anexo, cada uno en su hoja: `annex_label`, `name`, `file_type`, `is_image`,
+      `file_url`. Las imágenes se ven en la hoja; un PDF adjunto lo agrega el backend después de su hoja. */
+  anexos?: string
   /** Lo que dice el pie de cada página después del nombre de la clínica. */
   pie: string
 }
@@ -67,13 +86,13 @@ export type Hoja = {
 const esc = (s: string) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
 const campos = (cs: Campo[]) => `<dl class="campos">${cs.map(([r, v]) => `<div><dt>${esc(r)}:</dt> <dd>${v}</dd></div>`).join('')}</dl>`
 
-function tabla({ lista, columnas, vacio, totales }: Omit<Extract<Bloque, { tipo: 'tabla' }>, 'tipo'>) {
+function tabla({ lista, columnas, vacio, subtotal }: Omit<Extract<Bloque, { tipo: 'tabla' }>, 'tipo'>) {
   const clase = (c: Columna) => (c.derecha ? ' class="der"' : '')
   return `<table class="tabla">
 <thead><tr>${columnas.map((c) => `<th${clase(c)}${c.ancho ? ` style="width:${c.ancho}"` : ''}>${esc(c.titulo)}</th>`).join('')}</tr></thead>
 <tbody>{{#${lista}}}<tr>${columnas.map((c) => `<td${clase(c)}>${c.valor}</td>`).join('')}</tr>{{/${lista}}}
-{{^${lista}}}<tr><td class="vacio" colspan="${columnas.length}">${esc(vacio)}</td></tr>{{/${lista}}}</tbody>${totales ? `
-<tfoot>${totales.map(([r, v]) => `<tr><td colspan="${columnas.length - 1}" class="der">${esc(r)}</td><td class="der">${v}</td></tr>`).join('')}</tfoot>` : ''}
+{{^${lista}}}<tr><td class="vacio" colspan="${columnas.length}">${esc(vacio)}</td></tr>{{/${lista}}}</tbody>${subtotal ? `
+<tfoot><tr><td colspan="${columnas.length - subtotal.valores.length}">${subtotal.rotulo}</td>${subtotal.valores.map((v) => `<td class="der">${v}</td>`).join('')}</tr></tfoot>` : ''}
 </table>`
 }
 
@@ -96,8 +115,12 @@ function bloque(b: Bloque): string {
     case 'nota': return `<p class="nota">${b.texto}</p>`
     case 'lista': return `${b.rotulo ? `<p class="rotulo">${esc(b.rotulo)}</p>` : ''}<ul class="lista">{{#${b.lista}}}<li>${b.valor}</li>{{/${b.lista}}}{{^${b.lista}}}<li>${esc(b.vacio)}</li>{{/${b.lista}}}</ul>`
     case 'tabla': return tabla(b)
-    case 'grupos': return `{{#${b.lista}}}<div class="grupo"><p class="grupo-titulo"><span>${b.titulo}</span><span>${b.total}</span></p>${tabla(b.tabla)}</div>{{/${b.lista}}}`
-    case 'tarjetas': return `{{#${b.lista}}}<div class="tarjeta"><p class="tarjeta-titulo">${b.titulo}</p>${campos(b.campos)}</div>{{/${b.lista}}}`
+    case 'grupos': return `{{#${b.lista}}}<div class="grupo"><p class="grupo-titulo"><span>${b.titulo}</span></p>${tabla(b.tabla)}</div>{{/${b.lista}}}`
+    case 'importes': return `<div class="importes"><dl>${b.filas.map(([r, v]) => `<div><dt>${esc(r)}</dt><dd>${v}</dd></div>`).join('')}</dl>${b.nota ? `<p class="nota">${esc(b.nota)}</p>` : ''}</div>`
+    case 'libre': return b.html
+    case 'narrativas': return `{{#${b.lista}}}<div class="narrativa"><p class="narrativa-titulo">${b.titulo}${b.detalle ? `<span>${b.detalle}</span>` : ''}</p><p>${b.texto}</p></div>{{/${b.lista}}}${b.vacio ? `{{^${b.lista}}}<p class="nota">${esc(b.vacio)}</p>{{/${b.lista}}}` : ''}`
+    case 'subtitulo': return `<h3>${esc(b.texto)}</h3>`
+    case 'tarjetas': return `{{#${b.lista}}}<div class="tarjeta"><p class="tarjeta-titulo">${b.titulo}</p>${campos(b.campos)}${b.pie ?? ''}</div>{{/${b.lista}}}`
     case 'imagenes': return `<div class="imagenes">{{#${b.lista}}}<figure><img src="${b.imagen}" alt="${b.titulo}"><figcaption><b>${b.titulo}</b><span>${b.detalle}</span></figcaption></figure>{{/${b.lista}}}</div>{{^${b.lista}}}<p class="nota">${esc(b.vacio)}</p>{{/${b.lista}}}`
     case 'casillas': return `<ul class="casillas">${b.items.map((i) => `<li><span class="casilla{{#${b.marcada}}} marcada{{/${b.marcada}}}">{{#${b.marcada}}}<svg viewBox="0 0 10 10" width="8" height="8"><path d="M2 5.2 4.2 7.4 8 2.8" fill="none" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>{{/${b.marcada}}}</span>${esc(i)}</li>`).join('')}</ul>${b.aviso ? `<p class="nota">${esc(b.aviso)}</p>` : ''}`
     case 'boca': return `<style>{{#${b.lista}}}.boca [data-tooth="{{tooth}}"] .pieza{fill:${COLOR.diente};stroke:${COLOR.marca}}{{/${b.lista}}}</style>
@@ -106,11 +129,12 @@ function bloque(b: Bloque): string {
   }
 }
 
-function firma({ rol, prefijo: p }: Firma) {
+function firma({ rol, prefijo: p, hash }: Firma) {
   return `<div class="firma">
 <div class="trazo">{{#${p}_signed_date}}{{#${p}_signature_image}}<img src="{{${p}_signature_image}}" alt="Signature of {{${p}_name}}">{{/${p}_signature_image}}{{^${p}_signature_image}}<span class="escrita">{{${p}_name}}</span>{{/${p}_signature_image}}{{/${p}_signed_date}}{{^${p}_signed_date}}<span class="pendiente">Pending signature</span>{{/${p}_signed_date}}</div>
 <b>{{${p}_name}} · ${esc(rol)}</b>
-<span>{{#${p}_signed_date}}Signed electronically · {{${p}_signed_date}}{{/${p}_signed_date}}{{^${p}_signed_date}}Not signed yet{{/${p}_signed_date}}</span>
+<span>{{#${p}_signed_date}}Signed electronically · {{${p}_signed_date}}{{/${p}_signed_date}}{{^${p}_signed_date}}Not signed yet{{/${p}_signed_date}}</span>${hash ? `
+{{#${p}_signature_hash}}<span class="hash">Content hash: {{${p}_signature_hash}}</span>{{/${p}_signature_hash}}` : ''}
 </div>`
 }
 
@@ -137,8 +161,15 @@ h1 { margin: 0; font-size: 15pt; line-height: 1.25; font-weight: 700; color: ${C
 .resumen dt { font-size: 6.5pt; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: ${COLOR.apagado}; }
 .resumen dd { margin: 1pt 0 0; font-weight: 500; color: ${COLOR.tinta}; overflow-wrap: anywhere; }
 section { margin-top: 18pt; }
-h2 { display: flex; gap: 7pt; margin: 0 0 5pt; font-size: 10.5pt; font-weight: 700; color: ${COLOR.tinta}; break-after: avoid; }
-h2 span { color: ${COLOR.marca}; font-weight: 600; }
+h2 { margin: 0 0 5pt; font-size: 10.5pt; font-weight: 700; color: ${COLOR.marca}; break-after: avoid; }
+.aviso { margin: 8pt 0 0; font-size: 8pt; color: ${COLOR.apagado}; }
+.anexo-cabeza { padding-bottom: 9pt; margin-bottom: 14pt; border-bottom: 1.5pt solid ${COLOR.tinta}; }
+.anexo-cabeza .tipo { margin-top: 0; }
+.anexo-cabeza span { display: block; margin-top: 2pt; font-size: 8pt; color: ${COLOR.apagado}; }
+.anexo-imagen { margin: 0; }
+.anexo-imagen img { display: block; width: 100%; max-height: 215mm; object-fit: contain; border-radius: 4pt; }
+.anexo-pdf { color: ${COLOR.apagado}; }
+.anexos-pie { margin-top: 6pt; }
 .campos { margin: 0; }
 .campos div { margin-bottom: 2pt; }
 .campos dt { display: inline; font-weight: 600; color: ${COLOR.tinta}; }
@@ -155,11 +186,31 @@ h2 span { color: ${COLOR.marca}; font-weight: 600; }
 .tabla tr { break-inside: avoid; }
 .tabla .der { text-align: right; font-variant-numeric: tabular-nums; }
 .tabla .vacio { color: ${COLOR.apagado}; }
-.tabla tfoot td { border-bottom: 0; padding-top: 3pt; padding-bottom: 0; font-weight: 600; }
-.tabla tfoot tr:last-child td { font-size: 9.5pt; padding-top: 5pt; }
+.tabla tfoot td { border-bottom: 0; padding-top: 4.5pt; font-weight: 600; background: ${COLOR.caja}; }
+.tabla .sub { display: block; font-size: 7.5pt; line-height: 1.45; color: ${COLOR.apagado}; }
+.tabla .sub b { font-weight: 600; color: ${COLOR.texto}; }
 .grupo { margin-bottom: 12pt; break-inside: avoid; }
-.grupo-titulo { display: flex; justify-content: space-between; margin: 0 0 2pt; font-weight: 600; color: ${COLOR.tinta}; }
-.tarjeta { padding: 8pt 10pt; margin-bottom: 7pt; border: .75pt solid ${COLOR.linea}; border-radius: 4pt; break-inside: avoid; }
+.grupo-titulo { display: flex; justify-content: space-between; gap: 12pt; margin: 0 0 2pt; font-weight: 600; color: ${COLOR.tinta}; }
+.importes { display: flex; flex-direction: column; align-items: flex-end; break-inside: avoid; }
+.importes dl { width: 62mm; margin: 0 0 6pt; }
+.importes dl div { display: flex; justify-content: space-between; gap: 12pt; padding: 2.5pt 0; }
+.importes dt { color: ${COLOR.texto}; }
+.importes dd { margin: 0; font-variant-numeric: tabular-nums; color: ${COLOR.tinta}; }
+.importes dl div:last-child { margin-top: 3pt; padding-top: 5pt; border-top: .75pt solid ${COLOR.tinta}; font-size: 10pt; font-weight: 700; }
+.importes dl div:last-child dt { color: ${COLOR.tinta}; }
+.importes .nota { max-width: 62mm; text-align: right; }
+.bloque { margin-bottom: 8pt; break-inside: avoid; }
+.bloque-titulo { margin: 0 0 1pt; font-weight: 600; color: ${COLOR.tinta}; }
+.lista b, .bloque b { font-weight: 600; color: ${COLOR.tinta}; }
+.hash { font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 6.5pt; overflow-wrap: anywhere; }
+.narrativa { margin-bottom: 7pt; break-inside: avoid; }
+.narrativa .firmado { display: block; margin-top: 2pt; font-size: 7.5pt; color: ${COLOR.apagado}; }
+.campos .linea { display: block; }
+.narrativa-titulo { display: flex; justify-content: space-between; gap: 12pt; margin: 0 0 1pt; font-weight: 600; color: ${COLOR.tinta}; }
+.narrativa-titulo span { font-weight: 400; font-size: 8pt; color: ${COLOR.apagado}; }
+h3 { margin: 10pt 0 4pt; font-size: 9pt; font-weight: 700; color: ${COLOR.tinta}; break-after: avoid; }
+h2 + h3 { margin-top: 2pt; }
+.tarjeta { margin-bottom: 9pt; break-inside: avoid; }
 .tarjeta-titulo { font-weight: 600; font-size: 9.5pt; color: ${COLOR.tinta}; }
 .imagenes { display: grid; grid-template-columns: 1fr 1fr; gap: 10pt; }
 .imagenes figure { margin: 0; break-inside: avoid; }
@@ -188,13 +239,21 @@ h2 span { color: ${COLOR.marca}; font-weight: 600; }
 .firma b { color: ${COLOR.tinta}; font-weight: 600; }
 .firma span { color: ${COLOR.apagado}; }
 .pie-pantalla { display: none; }
+@media print { .anexo { break-before: page; } }
 /* En pantalla (vista previa y navegador) se ve como una hoja; el PDF usa @page. */
 @media screen {
   body { background: ${COLOR.caja}; padding: 24px; }
+  .hoja + .hoja { margin-top: 24px; }
   .hoja { width: 210mm; min-height: 297mm; margin: 0 auto; padding: 18mm 18mm 12mm; display: flex; flex-direction: column; background: #fff; box-shadow: 0 0 0 1px rgb(0 0 0/.06), 0 2px 4px rgb(0 0 0/.05), 0 16px 32px -12px rgb(0 0 0/.22); }
   .pie-pantalla { display: flex; justify-content: space-between; margin-top: auto; padding-top: 24pt; font-size: 7pt; color: ${COLOR.tenue}; }
 }
 `
+
+const seccion = (s: Seccion) => {
+  const html = `<section>\n<h2>${esc(s.titulo)}</h2>\n${s.bloques.map(bloque).join('\n')}\n</section>`
+  return s.si ? `{{#${s.si}}}${html}{{/${s.si}}}` : html
+}
+const pie = (h: Hoja) => `<footer class="pie-pantalla"><span>{{practice_name}} · ${esc(h.pie)} · {{patient_name}}</span></footer>`
 
 export function armarHoja(h: Hoja): string {
   const estilos = ESTILOS.replace('PIE', h.pie.replace(/"/g, ''))
@@ -214,14 +273,18 @@ export function armarHoja(h: Hoja): string {
 </header>
 <p class="tipo">${esc(h.tipo)}</p>
 <h1>${h.titulo}</h1>
-<dl class="resumen">${h.resumen.map(([r, v]) => `<div><dt>${esc(r)}</dt><dd>${v}</dd></div>`).join('')}</dl>
-${h.secciones.map((s, i) => `<section>
-<h2><span>${i + 1}</span>${esc(s.titulo)}</h2>
-${s.bloques.map(bloque).join('\n')}
-</section>`).join('\n')}
+${h.aviso ? `${h.aviso}\n` : ''}<dl class="resumen">${h.resumen.map(([r, v]) => `<div><dt>${esc(r)}</dt><dd>${v}</dd></div>`).join('')}</dl>
+${h.secciones.map(seccion).join('\n')}
 ${h.firmas?.length ? `<div class="firmas">${h.firmas.map(firma).join('')}</div>` : ''}
-<footer class="pie-pantalla"><span>{{practice_name}} · ${esc(h.pie)} · {{patient_name}}</span></footer>
-</main>
+${(h.posdata ?? []).map(seccion).join('\n')}
+${pie(h)}
+</main>${h.anexos ? `
+{{#${h.anexos}}}<main class="hoja anexo">
+<header class="anexo-cabeza"><p class="tipo">Annex {{annex_label}} · ${esc(h.pie)}</p><h1>{{name}}</h1><span>{{file_type}} · {{patient_name}}</span></header>
+{{#is_image}}<figure class="anexo-imagen"><img src="{{file_url}}" alt="{{name}}"></figure>{{/is_image}}
+{{^is_image}}<p class="anexo-pdf">The attached document starts on the next page.</p>{{/is_image}}
+${pie(h)}
+</main>{{/${h.anexos}}}` : ''}
 </body>
 </html>
 `
@@ -299,7 +362,9 @@ export function variablesDe(plantilla: string, ejemplo: Datos): { variables: str
           continue
         }
       }
-      ;(lista ? listas[lista]! : variables).add(n.nombre)
+      /* Una variable general usada adentro de una lista (el paciente en la hoja de un anexo) sigue siendo general. */
+      const general = !lista || (item && !(n.nombre in item) && n.nombre in ejemplo)
+      ;(general ? variables : listas[lista]!).add(n.nombre)
       recorrer(n.hijos ?? [], lista, item)
     }
   }

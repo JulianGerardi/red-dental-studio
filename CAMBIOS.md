@@ -3,6 +3,46 @@
 Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber el dev. El porqué de cada decisión está en
 `design-reference/figma/modulos/<módulo>.md`; lo anterior al 2026-10-06, en `git log` y en esos mismos archivos.
 
+## 2026-11-27
+
+### Breadcrumb y título van de la mano ([#211](https://github.com/JulianGerardi/red-dental-studio/pull/211))
+- **Regla:** en toda pantalla con breadcrumb, el H1 dice lo mismo que el último tramo. Sección = nombre del menú; ítem =
+  su nombre, sin verbo (*Edit …* sólo en Edit patient); lo que no existe todavía, *New …*. Las pestañas no cambian el
+  título. Detalle en `design-reference/figma/README.md` (*Regla: breadcrumb y título van de la mano*).
+- **Títulos que cambian:** Consents, Ledger, Preferences, Account; en la ficha, el nombre de la locación, del empleado
+  (con su pill de estado al lado; la card ya no repite nombre y estado), del carrier y del plan; en el paciente,
+  Treatments, Documents, Insurance.
+- **Lista y editor** (Consents, Fee schedules, Coverage tables): `EncabezadoEditor` recibe el nombre del ítem elegido en
+  vez de *Edit template / Edit fee schedule / Edit coverage table*.
+- **Para el dev:** `tests/breadcrumb-titulo.e2e.ts` falla si una pantalla con rastro no tiene el último tramo como H1. Al
+  sumar una pantalla, sumala ahí. Sin historia de Jira.
+
+### PDFs: nota clínica como red.dev, findings y diagnósticos, importes iguales y anexos (CON-2975, CON-3081, CON-2204, CON-2730) ([#210](https://github.com/JulianGerardi/red-dental-studio/pull/210))
+- **Clinical note completa** (especificación de reconstrucción + las notas de red.dev): Vital Signs, Medical History,
+  Exams, Treatment Plan con el Consent Summary, Operative Report, Workflows, órdenes, firma del provider con hash y
+  adendas después de la firma. Lo que no pasó en la visita no sale.
+- **Treatment plan, aceptación, rechazo y Referral:** findings y diagnósticos debajo de cada procedimiento. Importes
+  iguales en treatment plan y aceptación (Fee / Insurance / Adjustment / Patient y el bloque Estimate).
+- **Lab order** sin el UUID interno; **Prescription** sin ID. **Adjuntos del Referral** como anexos, uno por hoja.
+- **Todos los PDF:** títulos en azul sin número y sin cajas.
+- **Para el dev/backend:** en `src/pdfs/marco.ts`, bloques `importes`, `narrativas`, `subtitulo` y `libre`;
+  `tabla.subtotal` reemplaza a `totales`; `Seccion.si`, `Hoja.aviso`, `Hoja.posdata`, `Hoja.anexos` y `Firma.hash`. Las
+  secciones condicionales usan booleanos (`has_vitals`…); un PDF adjunto se agrega detrás de su hoja y *Page N of M* se
+  cuenta después de unir. Detalle en `modulos/pdfs.md` (2026-11-27).
+
+### Lab order y Referral: dos columnas, mismo procedimiento y lo de los videos de red.dev (CON-2214, CON-2321, CON-2584) ([#209](https://github.com/JulianGerardi/red-dental-studio/pull/209))
+- **Layout:** *General information* a la izquierda (Lab order con *Teeth & surface* adentro) y *Details* a la derecha, con
+  el texto libre a todo el alto (`COLUMNAS_FICHA`, `TextArea.crecer`, `Card.bodyClassName`). En celular, una columna.
+- **Procedimiento único** en las dos fichas (`ProcedimientoResumen`, `ProcedimientosVinculados`): caso o *Independent*,
+  estado, código, diente / zona y fecha (CON-2584).
+- **Lab order:** *Ordering provider* y *Order date* (CON-2215); dentición mixta con la lista de dientes elegidos; rueda de
+  5 superficies (`dental/RuedaSuperficies`); *Toggle all* por diente; Request y Delete preguntan; Edit desde la tabla abre
+  la ficha.
+- **Referral:** *Request referral* con texto de red.dev; Requested suma *Complete* y *Reject* (`AccionTarea` `Finish` y
+  `Reject`); sin Delete en la ficha; New provider con *Credentials* (`clinical/Credenciales`, compartido con New
+  laboratory).
+- Piezas nuevas en `exentos.json` hasta documentarlas. Detalle y anomalías en `modulos/clinical-mode.md`.
+
 ## 2026-11-26
 
 ### PDFs para el backend: plantillas de los 10 documentos y página aparte ([#208](https://github.com/JulianGerardi/red-dental-studio/pull/208))

@@ -22,6 +22,7 @@ test('Request pasa la orden a Requested y Cancel la saca de la lista', async ({ 
   /* Olivia Brooks está en el sillón: su encuentro está abierto. */
   await screen.getByRole('button', 'Actions for Lab order for Olivia Brooks').tap()
   await screen.getByRole('menuitem', 'Request').tap()
+  await screen.getByRole('dialog', 'Request lab order').getByRole('button', 'Mark as requested').tap()
   await expect(screen.getByText('Lab order for Olivia Brooks requested.')).toBeVisible()
   await expect(screen.getByRole('button', 'Open PDF of the lab order for Olivia Brooks')).toBeVisible()
 
@@ -123,7 +124,35 @@ test('Una Referral Pending con encuentro abierto se edita, valida y se pide desd
 
   await screen.getByRole('button', 'Actions for Referral for Olivia Brooks').tap()
   await screen.getByRole('menuitem', 'Request').tap()
-  await screen.getByRole('dialog', 'Mark this referral as requested?').getByRole('button', 'Mark as requested').tap()
+  await screen.getByRole('dialog', 'Request referral').getByRole('button', 'Mark as requested').tap()
   await expect(screen.getByText('Referral for Olivia Brooks requested.')).toBeVisible()
   await expect(screen.getByText("This referral can't be edited")).toBeVisible()
+})
+
+/* Teeth & surface como red.dev: lo marcado en Permanent queda al pasar a Primary, y Toggle all marca las cinco
+   superficies del diente elegido (Lingual arriba en la mandíbula). */
+test('Lab order: dentición mixta y Toggle all por diente', async ({ app, screen }) => {
+  await app.open('/patients/john-smith/clinical-mode?tab=Lab%20order&task=paciente-lab-orders-1')
+  await screen.getByRole('button', /Start encounter/).tap()
+  await screen.getByRole('button', 'Initialize permanent dentition').tap()
+  await screen.getByRole('button', 'Tooth 17').tap()
+  await screen.getByRole('button', 'Primary').tap()
+  await screen.getByRole('button', 'Tooth I').tap()
+  await expect(screen.getByRole('button', 'Edit surfaces of tooth 17')).toBeVisible()
+  await screen.getByRole('button', 'Edit surfaces of tooth 17').tap()
+  await expect(screen.getByRole('checkbox', 'Lingual')).toBeVisible()
+  await screen.getByRole('button', 'Toggle all').tap()
+  await expect(screen.getByRole('checkbox', 'Occlusal')).toHaveAttribute('aria-checked', 'true')
+  await expect(screen.getByRole('checkbox', 'Buccal')).toHaveAttribute('aria-checked', 'true')
+})
+
+/* Una Referral Requested se completa o se rechaza desde su ⋮, con la pregunta de red.dev (video del 2026-11-27). */
+test('Referral Requested: Complete pregunta y la saca de Pending Task', async ({ app, screen }) => {
+  await app.open('/patients/john-smith/clinical-mode?tab=Referral&task=paciente-referrals-1')
+  await screen.getByRole('button', /Start encounter/).tap()
+  await screen.getByRole('button', /^Actions for Referral/).tap()
+  await expect(screen.getByRole('menuitem', 'Reject')).toBeVisible()
+  await screen.getByRole('menuitem', 'Complete').tap()
+  await screen.getByRole('dialog', 'Complete referral').getByRole('button', 'Complete').tap()
+  await expect(screen.getByText('The referral has been successfully completed.')).toBeVisible()
 })

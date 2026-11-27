@@ -378,7 +378,7 @@ export function SettingsInsurancePlan() {
   return (
     <div className={PADDING_PAGINA}>
       <SettingsPageHeader
-        titulo="Edit insurance plan"
+        titulo={p.nombre}
         etiquetas={<Pill tone={TONO_ESTADO[p.estado]}>{p.estado}</Pill>}
       />
       <Tabs size="sm"
