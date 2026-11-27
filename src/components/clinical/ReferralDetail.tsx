@@ -66,7 +66,7 @@ export function ReferralDetail({ registro, nuevo, onVolver, onAccion }: {
         datos={[['Referring provider', registro.provider ?? '—'], ['Referral date', registro.register], ...(registro.expiration ? [['Expiration date', <span key="vence" className={cn(urge(registro) && 'text-dash-bad-fg')}>{registro.expiration}</span>] as [string, ReactNode]] : [])]}
         acciones={!nuevo && <>
           {registro.pdf && <Button variant="secondary" onClick={() => onAccion(registro, 'PDF')}><FileText /> PDF</Button>}
-          <MenuTarea task={registro} abierto onAccion={onAccion} sin={['Edit']} />
+          <MenuTarea task={registro} onAccion={onAccion} sin={['Edit']} />
         </>}
       />
 

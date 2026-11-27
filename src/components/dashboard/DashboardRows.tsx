@@ -135,8 +135,6 @@ const vencida = (t: PendingTask, hoy: Date) => {
 
 type PropsTarea = {
   task: PendingTask
-  /** Hay un encuentro abierto con el paciente: el ⋮ deja hacer sus acciones. */
-  encuentroAbierto?: boolean
   /** Lo que hacen el ⋮, el PDF y Complete this Task (`useAccionesTarea`). Sin esto, el botón sólo avisa. */
   onAccion?: (t: PendingTask, a: AccionUI) => void
   /** El día contra el que se mide el vencimiento (el del Dashboard); por defecto, hoy. */
@@ -147,7 +145,7 @@ type PropsTarea = {
    estado en pills, quién y cuándo se registró abajo, el vencimiento a la derecha, el PDF, Complete this Task y el ⋮.
    El PDF sólo si ya hay documento y Expired date sólo si venció, como red.dev (dashboard.md, 2026-11-20). Va adentro de la lista
    con divisores de PendingTaskList. Ver design-reference/figma/modulos/dashboard.md. */
-export function TaskRow({ task, encuentroAbierto = false, onAccion, hoy = new Date() }: PropsTarea) {
+export function TaskRow({ task, onAccion, hoy = new Date() }: PropsTarea) {
   const Icono = ICONO_TAREA[task.kind] ?? ClipboardList
   const expirada = vencida(task, hoy)
   const fecha = task.kind === 'Clinical note' ? 'Completed' : 'Register'
@@ -182,7 +180,7 @@ export function TaskRow({ task, encuentroAbierto = false, onAccion, hoy = new Da
         )}
         <Button size="sm" className="shrink-0" onClick={() => (onAccion ? onAccion(task, 'Complete') : completarTarea(task))}>Complete this task <ArrowRight /></Button>
         {/* El hueco del ⋮ queda aunque la tarea no tenga acciones (Clinical note): las fechas no se corren (dashboard.md, 2026-11-24). */}
-        {onAccion && <span className="flex size-7 shrink-0 items-center justify-center"><MenuTarea task={task} abierto={encuentroAbierto} onAccion={onAccion} /></span>}
+        {onAccion && <span className="flex size-7 shrink-0 items-center justify-center"><MenuTarea task={task} onAccion={onAccion} /></span>}
       </span>
     </div>
   )

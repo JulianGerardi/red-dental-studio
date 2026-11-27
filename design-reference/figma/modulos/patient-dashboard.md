@@ -621,3 +621,8 @@ tarea no tenga acciones, así el vencimiento y *Complete this task* no se corren
 
 Mismo PDF que el Dashboard (ver `dashboard.md`, misma fecha): Patient Information, Receiving Laboratory, Provider
 Information, Dental Work Request y Teeth & Surface Specifications con el diagrama de la boca, sin firma.
+
+## CON-2643 · Pending task ya no pide un encuentro abierto (2026-11-27)
+
+Mismo cambio que el Dashboard (ver `dashboard.md`, misma fecha): el ⋮ de cada tarea funciona sin tocar *Start
+encounter* en la ficha. `PendingTaskList` ya no recibe `encuentroAbierto`.

@@ -1199,3 +1199,22 @@ Dashboard no le pasaba su día de la demo y comparaba con la fecha real: nunca e
    Antes Today quedaba gris apagado, que se leía como deshabilitado. Today lleva `aria-pressed`. En Scheduling cuenta el
    período: activo si la semana o el mes que se ve incluye hoy. Fuera de hoy, el bloque blanco de siempre.
 3. Sin historia de Jira: es un ajuste visual del componente.
+
+## CON-2641 · CON-2643 · Pending Task ya no pide un encuentro abierto (2026-11-27)
+
+Pedido de Julián ("unificalo, que pending task tampoco pida encuentro"), después de sacar la misma regla de Lab order,
+Prescription y Referral en Clinical Mode (clinical-mode.md, 2026-11-27). **Reemplaza** los dos primeros puntos de la
+sección del 2026-11-20.
+
+1. **El ⋮ de cada tarea funciona siempre**, en el Dashboard y en el Patient Dashboard: Edit, Request, Activate, Cancel,
+   Delete… según el estado del registro (`MAQUINA`), con sus preguntas de siempre. Se van el estado apagado, el tooltip
+   *You do not have permission to perform this action because there is no open encounter for the selected patient.* y la
+   constante `SIN_ENCUENTRO`.
+2. **Para el dev:** `ItemsTarea` y `MenuTarea` pierden `abierto`; `TaskRow` y `PendingTaskList` pierden
+   `encuentroAbierto`. El Dashboard sigue pasándole a Clinical Mode el encuentro del paciente (`alAbrir`): sólo decide
+   qué muestra el botón de encuentro de la barra, no habilita nada.
+3. **Diferencia con red.dev, a propósito:** red.dev apaga esas opciones sin encuentro (videos del 2026-11-20). Ni
+   CON-2641 ni CON-2643 piden un encuentro para las acciones; la regla salía sólo de los videos. **A confirmar con el
+   equipo** si el backend la mantiene: si la API rechaza la acción sin encuentro, la app tiene que mostrar ese error.
+4. **Sin cambios:** lo que no está en Pending sigue en sólo lectura (CON-2218, CON-2354, CON-2323), y el botón de
+   encuentro de la ficha y de Clinical Mode (Start, Complete, Pause) funciona igual que antes.

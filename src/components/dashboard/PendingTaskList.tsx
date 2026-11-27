@@ -14,10 +14,8 @@ const ORDEN = ['Clinical note', 'Lab orders', 'Prescriptions', 'Referrals']
 const fecha = (s: string) => new Date(s).getTime() || 0
 const porVencimiento = (a: PendingTask, b: PendingTask) => fecha(a.expiration) - fecha(b.expiration) || fecha(a.register) - fecha(b.register) || a.person.localeCompare(b.person)
 
-export function PendingTaskList({ tasks, limit, enCaja, llenarAlto, cargarAlScroll, encuentroAbierto, onAccion, hoy }: {
+export function PendingTaskList({ tasks, limit, enCaja, llenarAlto, cargarAlScroll, onAccion, hoy }: {
   tasks: PendingTask[]; limit?: number; enCaja?: boolean; llenarAlto?: boolean; cargarAlScroll?: boolean
-  /** Si el paciente de la tarea tiene un encuentro abierto: habilita su ⋮. */
-  encuentroAbierto?: (t: PendingTask) => boolean
   onAccion?: (t: PendingTask, a: AccionUI) => void
   hoy?: Date
 }) {
@@ -35,7 +33,7 @@ export function PendingTaskList({ tasks, limit, enCaja, llenarAlto, cargarAlScro
             <section key={k} aria-label={k} className="flex flex-col gap-1.5">
               <p className={cn('text-[11px] font-semibold tracking-wide text-ink-muted uppercase')}>{k} · {tasks.filter((t) => t.kind === k).length}</p>
               <ul className="shadow-hairline flex flex-col divide-y divide-line-soft rounded-lg">
-                {del.map((t, i) => <li key={t.id ?? i}><TaskRow task={t} encuentroAbierto={encuentroAbierto?.(t)} onAccion={onAccion} hoy={hoy} /></li>)}
+                {del.map((t, i) => <li key={t.id ?? i}><TaskRow task={t} onAccion={onAccion} hoy={hoy} /></li>)}
               </ul>
             </section>
           )

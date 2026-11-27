@@ -210,7 +210,7 @@ export function RegistrosPanel({ kind, paciente, tarea, maximo }: {
         rowActions={(r) => (
           <>
             {!esEditable(r) && item(<Eye className="size-3.5" />, 'View', () => setVista({ modo: 'ficha', id: r.id }))}
-            {accionesDe(r).length > 0 && <ItemsTarea task={r} abierto onAccion={hacer} />}
+            {accionesDe(r).length > 0 && <ItemsTarea task={r} onAccion={hacer} />}
           </>
         )}
         pageSize={10}

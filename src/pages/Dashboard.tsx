@@ -318,8 +318,9 @@ export default function Dashboard() {
     [...new Set(porLlegar.map((a) => a[campo]))].sort().map((v) => ({ value: v, count: porLlegar.filter((a) => a[campo] === v).length }))
   const turnos = porLlegar.filter((a) =>
     (providers.length === 0 || providers.includes(a.provider)) && (salas.length === 0 || salas.includes(a.operatory)))
-  /* Las tareas con sus cambios (Request, Cancel…); las que ya no están pendientes salen. Un paciente tiene el encuentro
-     abierto si está en el sillón (In progress) o en pausa (On hold) ese día (dashboard.md, 2026-11-20). */
+  /* Las tareas con sus cambios (Request, Cancel…); las que ya no están pendientes salen. El encuentro del paciente -en
+     el sillón (In progress) o en pausa (On hold)- ya no habilita nada: sólo se le pasa a Clinical Mode (dashboard.md,
+     2026-11-27). */
   const todasLasTareas = useTareasVivas(dia.tasks)
   const encuentroDe = (t: PendingTask) =>
     dia.appointments.some((a) => a.name === t.person && a.enCurso) ? 'enCurso' as const
@@ -468,7 +469,7 @@ export default function Dashboard() {
             />
           )
         ) : (
-          <PendingTaskList tasks={tareas} limit={TOPE.tareas} hoy={date} encuentroAbierto={(t) => !!encuentroDe(t)} onAccion={accionesTarea.hacer} />
+          <PendingTaskList tasks={tareas} limit={TOPE.tareas} hoy={date} onAccion={accionesTarea.hacer} />
         )}
         {accionesTarea.dialogo}
       </Panel>

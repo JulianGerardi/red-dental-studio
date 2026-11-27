@@ -5,6 +5,13 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-11-27
 
+### Pending Task ya no pide un encuentro abierto (CON-2641, CON-2643) ([#220](https://github.com/JulianGerardi/red-dental-studio/pull/220))
+- **El ⋮ de cada tarea funciona siempre**, en el Dashboard y en el Patient Dashboard, igual que en Clinical Mode desde
+  #219. Se van el estado apagado y el tooltip *…there is no open encounter for the selected patient*.
+- **Para el dev:** `ItemsTarea` y `MenuTarea` pierden `abierto`; `TaskRow` y `PendingTaskList`, `encuentroAbierto`; sale
+  `SIN_ENCUENTRO`. Es distinto de red.dev, que apaga esas opciones sin encuentro: si el backend mantiene la regla, hay
+  que mostrar su error. Detalle en `design-reference/figma/modulos/dashboard.md` (2026-11-27).
+
 ### Lab order, Prescription y Referral: Teeth & surface de red.dev, datos en el título, sin encuentro y PDF nuevo (CON-2214, CON-2212, CON-2321) ([#219](https://github.com/JulianGerardi/red-dental-studio/pull/219))
 - **Teeth & surface (Lab order):** `clinical/dental/ArcadaAnatomica` dibuja las arcadas de red.dev (`arcadasRed.ts`, SVG
   generado; cada diente es un botón) y `RuedaSuperficies` usa sus cinco formas. Reemplaza a `DentalArch`, que se borra.

@@ -219,7 +219,6 @@ test('Referral: New crea en Pending, se pide y se rechaza (CON-2322, CON-2394, C
 test('Pending Task → Prescription: Complete this task abre la receta y Activate la saca de las pendientes (CON-2643)', async ({ app, screen }) => {
   await app.open('/')
   await screen.getByRole('tab', /^Prescriptions/).tap()
-  /* Henry Richardson está en el sillón: su encuentro está abierto. */
   await screen.getByRole('button', 'Actions for Prescription for Henry Richardson').tap()
   await screen.getByRole('menuitem', 'Edit').tap()
   await expect(screen.getByRole('heading', 'Prescription')).toBeVisible()

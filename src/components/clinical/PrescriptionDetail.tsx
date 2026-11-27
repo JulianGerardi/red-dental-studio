@@ -114,7 +114,7 @@ export function PrescriptionDetail({ registro, nuevo, onVolver, onAccion }: {
         )}
         acciones={!nuevo && (registro.pdf || accionesDe(registro).some((x) => x !== 'Edit')) && <>
           {registro.pdf && <Button variant="secondary" onClick={() => onAccion(registro, 'PDF')}><FileText /> PDF</Button>}
-          <MenuTarea task={registro} abierto onAccion={onAccion} sin={['Edit']} />
+          <MenuTarea task={registro} onAccion={onAccion} sin={['Edit']} />
         </>}
       />
 

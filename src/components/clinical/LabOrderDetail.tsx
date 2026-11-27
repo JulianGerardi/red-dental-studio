@@ -118,7 +118,7 @@ export function LabOrderDetail({ registro, nuevo, onVolver, onAccion }: {
         datos={[['Ordering provider', registro.provider ?? '—'], ['Order date', registro.register]]}
         acciones={!nuevo && <>
           {registro.pdf && <Button variant="secondary" onClick={() => onAccion(registro, 'PDF')}><FileText /> PDF</Button>}
-          <MenuTarea task={registro} abierto onAccion={onAccion} sin={['Edit']} />
+          <MenuTarea task={registro} onAccion={onAccion} sin={['Edit']} />
         </>}
       />
 
