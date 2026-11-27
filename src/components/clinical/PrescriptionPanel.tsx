@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Ban, CircleCheck, Eye, FileDown, Pencil, Pill as PillIcon, Plus, Trash2 } from 'lucide-react'
+import { Ban, CalendarX, CircleCheck, Eye, FileDown, Pencil, Pill as PillIcon, Plus, Trash2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { aviso } from '@/components/ui/toaster'
 import { Button } from '@/components/ui/button'
@@ -16,7 +16,7 @@ import type { PendingTask } from '@/components/dashboard/PendingTaskCard'
 import { aplicarAccion } from '@/components/dashboard/tareas'
 import { abrirDocumento, type Documento } from '@/components/dashboard/documentoTarea'
 import {
-  MEDICACION_ACTIVA, PRESCRIPTOR, RECETAS, TONO_RECETA, nombreMedicacion, recetaDeTarea, type EstadoReceta, type Receta,
+  PRESCRIPTOR, RECETAS, TONO_RECETA, nombreMedicacion, recetaDeTarea, type EstadoReceta, type Receta,
 } from '@/data/prescripciones'
 import { PrescriptionForm } from './PrescriptionForm'
 
@@ -74,7 +74,7 @@ function documento(r: Receta, paciente: string): Documento {
   }
 }
 
-type Pregunta = { r: Receta; accion: 'Cancel' | 'Delete' | 'Activate' }
+type Pregunta = { r: Receta; accion: 'Cancel' | 'Delete' | 'Activate' | 'Expire' }
 
 export function PrescriptionPanel({ paciente, recetas: inicio = RECETAS, tarea }: {
   /** El paciente de Clinical Mode: va en el PDF. */
@@ -102,26 +102,27 @@ export function PrescriptionPanel({ paciente, recetas: inicio = RECETAS, tarea }
 
   const pdf = (r: Receta) => abrirDocumento(documento(r, paciente), () => aviso.error("We couldn't open the PDF. Allow pop-ups for this site and try again."))
 
+  /* Los textos de red.dev (relevado el 2026-11-27): cada cambio de estado pregunta antes. */
   const activar = (r: Receta) => {
     const antes = recetas
     reemplazar(r.id, { estado: 'Active', actualizado: hoy })
     const t = deTarea(r)
     if (t) aplicarAccion(t, 'Activate', { sinAviso: true })
-    aviso.ok('The prescription has been successfully activated.', t ? undefined : { label: 'Undo', onClick: () => setRecetas(antes) })
-  }
-  /* Activate pregunta antes si una medicación que entra al historial ya está activa en el paciente (CON-2846). */
-  const pedirActivar = (r: Receta) => {
-    if (r.medicaciones.some((m) => m.actualizar && MEDICACION_ACTIVA.includes(m.droga))) setPregunta({ r, accion: 'Activate' })
-    else activar(r)
+    aviso.ok('The prescription has been successfully marked as Active.', t ? undefined : { label: 'Undo', onClick: () => setRecetas(antes) })
   }
 
   const confirmar = ({ r, accion }: Pregunta) => {
     setPregunta(null)
     const t = deTarea(r)
     if (accion === 'Activate') { activar(r); return }
+    if (accion === 'Expire') {
+      reemplazar(r.id, { estado: 'Expired', actualizado: hoy })
+      aviso.ok('The prescription has been successfully marked as Expired.')
+      return
+    }
     if (accion === 'Cancel') {
       reemplazar(r.id, { estado: 'Canceled', actualizado: hoy })
-      aviso.ok('The prescription has been successfully canceled.')
+      aviso.ok('The prescription has been successfully marked as Canceled.')
     } else {
       setRecetas((xs) => xs.filter((x) => x.id !== r.id))
       aviso.ok('The prescription has been successfully deleted.')
@@ -130,15 +131,16 @@ export function PrescriptionPanel({ paciente, recetas: inicio = RECETAS, tarea }
     if (ficha === r.id) setFicha(undefined)
   }
 
-  /* Las acciones según el estado: Edit, Activate y Delete sólo en Pending (CON-2354, CON-2356); Cancel en Pending o Active
-     (CON-2355); el PDF sólo de una Active (CON-2287). Las demás se abren para consultar (CON-2286). */
+  /* Las acciones según el estado, como red.dev: Edit, Activate y Delete sólo en Pending (CON-2354, CON-2356); Cancel en
+     Pending o Active (CON-2355); Expire y el PDF sólo en una Active (CON-2287). Las demás se abren para consultar (CON-2286). */
   const items = (r: Receta, enFicha = false) => (
     <>
       {!enFicha && (r.estado === 'Pending'
         ? <DropdownMenuItem onSelect={() => setFicha(r.id)}><Pencil className="size-4 shrink-0" /> Edit prescription</DropdownMenuItem>
         : <DropdownMenuItem onSelect={() => setFicha(r.id)}><Eye className="size-4 shrink-0" /> View prescription</DropdownMenuItem>)}
       {r.estado === 'Active' && !enFicha && <DropdownMenuItem onSelect={() => pdf(r)}><FileDown className="size-4 shrink-0" /> Download PDF</DropdownMenuItem>}
-      {r.estado === 'Pending' && <DropdownMenuItem onSelect={() => pedirActivar(r)}><CircleCheck className="size-4 shrink-0" /> Activate</DropdownMenuItem>}
+      {r.estado === 'Pending' && <DropdownMenuItem onSelect={() => setPregunta({ r, accion: 'Activate' })}><CircleCheck className="size-4 shrink-0" /> Activate</DropdownMenuItem>}
+      {r.estado === 'Active' && <DropdownMenuItem onSelect={() => setPregunta({ r, accion: 'Expire' })}><CalendarX className="size-4 shrink-0" /> Expire</DropdownMenuItem>}
       {(r.estado === 'Pending' || r.estado === 'Active') && (
         <DropdownMenuItem variant="destructive" onSelect={() => setPregunta({ r, accion: 'Cancel' })}><Ban className="size-4 shrink-0" /> Cancel prescription</DropdownMenuItem>
       )}
@@ -148,33 +150,22 @@ export function PrescriptionPanel({ paciente, recetas: inicio = RECETAS, tarea }
     </>
   )
 
+  /* Título, texto y botón de cada pregunta (red.dev; Delete, CON-2356). */
+  const PREGUNTAS = {
+    Activate: { title: 'Activate prescription', confirm: 'Activate', texto: 'Are you sure you want to mark this prescription as Active? Once marked as Active, you will no longer be able to edit this prescription.' },
+    Cancel: { title: 'Cancel prescription', confirm: 'Cancel prescription', texto: 'Are you sure you want to mark this prescription as Canceled?' },
+    Expire: { title: 'Expire prescription', confirm: 'Expire', texto: 'Are you sure you want to mark this prescription as Expired?' },
+    Delete: { title: 'Delete prescription', confirm: 'Delete', texto: 'Are you sure you want to delete this prescription? This action cannot be undone.' },
+  }
   const dialogo = pregunta && (
-    pregunta.accion === 'Activate' ? (
-      /* Textos de CON-2846. */
-      <ConfirmDialog
-        title="This medication is already active for the patient." confirmLabel="Reuse existing medication" cancelLabel="Cancel" icon="warning"
-        onCancel={() => setPregunta(null)} onConfirm={() => confirmar(pregunta)}
-      >
-        <p>Do you want to reuse the existing medication?</p>
-        <p className="mt-2 font-medium text-ink">{pregunta.r.medicaciones.filter((m) => m.actualizar && MEDICACION_ACTIVA.includes(m.droga)).map((m) => m.droga).join(', ')}</p>
-      </ConfirmDialog>
-    ) : pregunta.accion === 'Cancel' ? (
-      /* CON-2355. */
-      <ConfirmDialog
-        title="Cancel prescription" confirmLabel="Cancel prescription" cancelLabel="Keep it" tone="danger"
-        onCancel={() => setPregunta(null)} onConfirm={() => confirmar(pregunta)}
-      >
-        <p>Are you sure you want to cancel this prescription?</p>
-      </ConfirmDialog>
-    ) : (
-      /* CON-2356. */
-      <ConfirmDialog
-        title="Delete prescription" confirmLabel="Delete" cancelLabel="Cancel" tone="danger" icon="delete"
-        onCancel={() => setPregunta(null)} onConfirm={() => confirmar(pregunta)}
-      >
-        <p>Are you sure you want to delete this prescription? This action cannot be undone.</p>
-      </ConfirmDialog>
-    )
+    <ConfirmDialog
+      title={PREGUNTAS[pregunta.accion].title} confirmLabel={PREGUNTAS[pregunta.accion].confirm}
+      cancelLabel={pregunta.accion === 'Cancel' ? 'Keep it' : 'Cancel'}
+      tone={pregunta.accion === 'Activate' ? undefined : 'danger'} icon={pregunta.accion === 'Delete' ? 'delete' : undefined}
+      onCancel={() => setPregunta(null)} onConfirm={() => confirmar(pregunta)}
+    >
+      <p>{PREGUNTAS[pregunta.accion].texto}</p>
+    </ConfirmDialog>
   )
 
   if (ficha) {
@@ -245,8 +236,8 @@ export function PrescriptionPanel({ paciente, recetas: inicio = RECETAS, tarea }
         rowActions={(r) => items(r)}
         pageSize={10}
         empty={!filtrando
-          ? { icon: PillIcon, title: 'No prescriptions yet', detail: 'Prescriptions created for this patient will show up here.' }
-          : { icon: PillIcon, title: 'No prescriptions found', detail: 'Try a different medication, provider, status or date.' }}
+          ? { icon: PillIcon, title: 'No prescriptions', detail: "This patient doesn't have any prescriptions yet." }
+          : { icon: PillIcon, title: 'No prescriptions match the current filters', detail: 'Try a different medication, provider, status or date.' }}
       />
       {dialogo}
     </div>

@@ -3697,3 +3697,50 @@ Anomalías y supuestos:
 **A validar con usuarios:** si el odontólogo prefiere ver todas las medicaciones a la vez (filas) en vez de pestañas cuando
 receta tres o más; si *Update patient medications* se entiende sin explicación; y si el filtro de vencimiento se usa más
 para lo que vence pronto o para lo ya vencido.
+
+### Prescription: el funcionamiento de red.dev (2026-11-27, 2ª vuelta)
+
+Julián pasó acceso a red.dev para relevar cómo funciona Prescription. Se miró sin cambiar nada (sin guardar, activar,
+cancelar ni borrar): la lista de *Aaa Test Aaa*, Edit de una Pending, New Prescription con Save vacío, el ⋮ de cada
+estado, los filtros y Pending Tasks; los textos de las preguntas salen del código publicado de la app. Lo que cambió acá
+para funcionar igual (el diseño sigue siendo el nuestro):
+
+1. **Listas de opciones de red.dev**, no las de CON-2230 (la app real las cambió por unas odontológicas): Dosage form
+   (33, de *Buccal tablet* a *Vaginal tablet*), Strength unit (g, mcg, mEq, mg, ml, mmol, %, IU, Unknown), Dose unit
+   (Applications, Capsules, Drops, Puffs, Sprays, Suppository, Tablespoons, Tablets, Teaspoons, Unknown), Route (Buccal,
+   Dental, Intramuscular, Intrathecal, Intravenous, Oral, Periodontal, Sublingual, Submucosal, Topical), Frequency (As
+   needed, At bedtime, Every 4 to 6 hours, Four times daily, Immediately, Once daily, Three times daily, Twice daily,
+   Unknown) y Duration (Days, Weeks, Months). Los códigos en mayúsculas de red.dev (MG, APPLICATIONS) se escriben como se
+   leen.
+2. **La indicación armada** debajo de Directions for use, como red.dev: *Take 1 tablet orally every 4-6 hours for 5 days*
+   (`indicacionesDeUso`), sólo con todos los datos.
+3. **La pestaña lleva el nombre de la droga** elegida (red.dev: *clonazepam*); sin droga, *Medication N*. *Remove …* usa
+   el mismo nombre.
+4. **Cada cambio de estado pregunta antes**, con los textos de red.dev:
+   - *Activate prescription* (Pending): *…Once marked as Active, you will no longer be able to edit this prescription.* →
+     *The prescription has been successfully marked as Active.*
+   - *Cancel prescription* (Pending o Active) → *…successfully marked as Canceled.*
+   - **Expire** (nuevo, sólo Active): *Expire prescription* → *…successfully marked as Expired.*
+   - *Delete prescription* (Pending, el tacho de la fila): el texto de CON-2356, igual en red.dev.
+5. **Medicación ya activa: al guardar**, no al activar. red.dev la detecta al crear o editar, cuando una medicación con
+   *Update patient medications* ya está activa en el paciente: *Medication already active* · *This medication is already
+   active for the patient. Do you want to reuse the existing medication?* → *Reuse existing medication* guarda
+   reutilizándola; *Cancel* vuelve al formulario. El campo de red.dev se llama `activated` (CON-2854 lo renombró a
+   *Update Patient Medications*).
+6. **Textos:** sólo lectura *This prescription can only be edited while Pending.*; vacío *No prescriptions* · *This
+   patient doesn't have any prescriptions yet.*; con filtros *No prescriptions match the current filters*.
+7. Se confirmó lo que ya estaba: PDF sólo en Active y tacho sólo en Pending (en red.dev, deshabilitados en el resto);
+   Expired y Cancelled sólo tienen *Edit* deshabilitado (acá, *View prescription*); New Prescription sin ⋮ ni PDF; los
+   campos numéricos vacíos con placeholder; Refills opcional; error *Uncompleted fields*.
+
+Diferencias que se dejan como están (a confirmar con Julián):
+
+1. **Expiration date:** red.dev deja elegir desde hoy y sin tope; CON-2230 pide posterior a hoy y hasta 6 meses. Se sigue
+   Jira.
+2. **Strength** en red.dev sólo acepta enteros; acá admite decimales (clonazepam 0.5 mg no se podría recetar).
+3. red.dev escribe **Cancelled** y agrega una "s" de más en la indicación (*applicationss*); acá *Canceled* y el plural
+   bien hecho. La unidad **UI** de red.dev va como *IU*.
+4. **Filters** en red.dev se aplican con *Apply Filters*; acá al tocar, como todos los filtros de la app.
+5. **Pending Tasks** de red.dev marca con *Expired date* las Pending vencidas, y su ⋮ (Edit, Activate, Cancel) aparece
+   deshabilitado sin encuentro abierto. No se sumó acá: es otra pantalla (dashboard.md).
+6. El buscador de red.dev consulta una base de drogas real (amoxapine, AMOXICILINA, Soltamox…); acá, la lista corta del mock.

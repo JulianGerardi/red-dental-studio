@@ -4,13 +4,15 @@ import { aviso } from '@/components/ui/toaster'
 import { Alert } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
+import { ConfirmDialog } from '@/components/ui/confirm-dialog'
 import { DatePicker, formatMDY } from '@/components/ui/date-picker'
 import { Tabs } from '@/components/ui/tabs'
 import { FieldError, FieldHint, FieldLabel, FormFooter, SearchField, SelectField, TextArea, TextField } from '@/components/patients/form'
 import { Card } from '@/components/settings/primitives'
 import { OBLIGATORIO } from '@/lib/validacion'
 import {
-  DOSIS_UNIDADES, DROGAS, DURACION_UNIDADES, FORMAS, FRECUENCIAS, FUERZA_UNIDADES, TONO_RECETA, VIAS, medicacionNueva,
+  DOSIS_UNIDADES, DROGAS, DURACION_UNIDADES, FORMAS, FRECUENCIAS, FUERZA_UNIDADES, MEDICACION_ACTIVA, TONO_RECETA, VIAS,
+  indicacionesDeUso, medicacionNueva,
   type Medicacion, type Receta,
 } from '@/data/prescripciones'
 import { EncabezadoFicha } from './FichaClinica'
@@ -97,6 +99,10 @@ export function PrescriptionForm({ receta, onVolver, onGuardar, acciones }: {
   const [errores, setErrores] = useState<Record<string, Errores>>({})
   const [errorVence, setErrorVence] = useState<string>()
   const [siguiente, setSiguiente] = useState(2)
+  /* Lo que se iba a guardar mientras se pregunta por la medicación ya activa. */
+  const [duplicada, setDuplicada] = useState<Pick<Receta, 'vence' | 'medicaciones' | 'indicaciones'> | null>(null)
+  /* La pestaña lleva el nombre de la droga elegida, como red.dev; sin droga, "Medication N". */
+  const nombreTab = (x: Medicacion, i: number) => (DROGAS.includes(x.droga) ? x.droga : `Medication ${i + 1}`)
 
   const m = meds.find((x) => x.id === activa) ?? meds[0]!
   const e = errores[m.id] ?? {}
@@ -122,7 +128,7 @@ export function PrescriptionForm({ receta, onVolver, onGuardar, acciones }: {
     const resto = meds.filter((x) => x.id !== m.id)
     setMeds(resto)
     setActiva(resto[Math.max(0, i - 1)]!.id)
-    aviso.ok(`Medication ${i + 1} removed.`)
+    aviso.ok(`${nombreTab(m, i)} removed.`)
   }
 
   const guardar = () => {
@@ -138,7 +144,11 @@ export function PrescriptionForm({ receta, onVolver, onGuardar, acciones }: {
       aviso.error('Uncompleted fields: All required fields marked with (*) must be completed before proceeding.')
       return
     }
-    onGuardar({ vence: formatMDY(vence!), medicaciones: meds, indicaciones: indicaciones.trim() })
+    const datos = { vence: formatMDY(vence!), medicaciones: meds, indicaciones: indicaciones.trim() }
+    /* Una medicación que entra al historial y ya está activa en el paciente: red.dev pregunta al guardar si se reutiliza
+       (CON-2846). */
+    if (meds.some((x) => x.actualizar && MEDICACION_ACTIVA.includes(x.droga))) { setDuplicada(datos); return }
+    onGuardar(datos)
   }
 
   return (
@@ -150,7 +160,7 @@ export function PrescriptionForm({ receta, onVolver, onGuardar, acciones }: {
       />
 
       {!editable && (
-        <Alert tone="info" title="This prescription can't be edited">Only pending prescriptions can be edited.</Alert>
+        <Alert tone="info" title="This prescription can't be edited">This prescription can only be edited while Pending.</Alert>
       )}
 
       <Card title="General information">
@@ -180,17 +190,17 @@ export function PrescriptionForm({ receta, onVolver, onGuardar, acciones }: {
         <div className="flex flex-wrap items-center gap-2">
           <Tabs
             aria-label="Medications" size="sm" value={m.id} onChange={setActiva}
-            tabs={meds.map((x, i) => ({ value: x.id, label: `Medication ${i + 1}`, alerta: Object.keys(errores[x.id] ?? {}).length > 0 }))}
+            tabs={meds.map((x, i) => ({ value: x.id, label: nombreTab(x, i), alerta: Object.keys(errores[x.id] ?? {}).length > 0 }))}
           />
           {editable && meds.length > 1 && (
             <Button variant="ghost" size="sm" className="ml-auto text-field-error hover:text-field-error" onClick={quitar}>
-              <Trash2 /> Remove medication {meds.findIndex((x) => x.id === m.id) + 1}
+              <Trash2 /> Remove {nombreTab(m, meds.findIndex((x) => x.id === m.id))}
             </Button>
           )}
         </div>
 
         <fieldset key={m.id} disabled={!editable} className="mt-5 grid min-w-0 gap-x-8 gap-y-6 xl:grid-cols-2">
-          <legend className="sr-only">Medication {meds.findIndex((x) => x.id === m.id) + 1}</legend>
+          <legend className="sr-only">{nombreTab(m, meds.findIndex((x) => x.id === m.id))}</legend>
           <section className="flex min-w-0 flex-col gap-4" aria-label="Medication details">
             <Subtitulo>Medication details</Subtitulo>
             <SearchField
@@ -230,6 +240,8 @@ export function PrescriptionForm({ receta, onVolver, onGuardar, acciones }: {
                 error={e.duracion} errorUnidad={e.duracionUnidad} onValor={(v) => cambiar({ duracion: v })} onUnidad={(v) => cambiar({ duracionUnidad: v })}
               />
             </div>
+            {/* La indicación armada con los datos, como red.dev: se lee igual que en la receta. */}
+            <p aria-live="polite" className="text-[12px] leading-[1.4] text-ink-muted">{indicacionesDeUso(m)}</p>
           </section>
         </fieldset>
       </Card>
@@ -239,6 +251,16 @@ export function PrescriptionForm({ receta, onVolver, onGuardar, acciones }: {
           ? <FormFooter onCancel={onVolver} onSave={guardar} />
           : <Button variant="secondary" size="md" onClick={onVolver}>Back to prescriptions</Button>}
       </div>
+
+      {duplicada && (
+        <ConfirmDialog
+          title="Medication already active" confirmLabel="Reuse existing medication" cancelLabel="Cancel" icon="warning"
+          onCancel={() => setDuplicada(null)} onConfirm={() => { const d = duplicada; setDuplicada(null); onGuardar(d) }}
+        >
+          <p>This medication is already active for the patient. Do you want to reuse the existing medication?</p>
+          <p className="mt-2 font-medium text-ink">{meds.filter((x) => x.actualizar && MEDICACION_ACTIVA.includes(x.droga)).map((x) => x.droga).join(', ')}</p>
+        </ConfirmDialog>
+      )}
     </div>
   )
 }
