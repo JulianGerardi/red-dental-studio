@@ -1,4 +1,5 @@
 import { useEffect, useId, useRef, useState } from 'react'
+import { BOTON_BORRAR } from '@/lib/estilos'
 import { createPortal } from 'react-dom'
 import { Link } from 'react-router-dom'
 import { slug } from '@/data/patientsStore'
@@ -236,7 +237,7 @@ export function AppointmentDetailsDrawer({
         <div className={onDelete ? 'grid grid-cols-2 gap-2' : 'grid'}>
           {/* Delete (CON-2990): sólo Proposed; en el resto se ve apagado y dice por qué. Los dos botones, del mismo ancho. */}
           {onDelete && (eliminable ? (
-            <Button variant="secondary" className="text-dash-bad-fg hover:bg-dash-bad-bg" onClick={() => setConfirmando(true)}>
+            <Button variant="secondary" className={BOTON_BORRAR} onClick={() => setConfirmando(true)}>
               <Trash2 /> Delete
             </Button>
           ) : (

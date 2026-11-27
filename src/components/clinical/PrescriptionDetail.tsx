@@ -11,6 +11,7 @@ import { FieldError, FieldLabel, FormFooter, SearchField, SelectField, TextArea,
 import { Card } from '@/components/settings/primitives'
 import { OBLIGATORIO } from '@/lib/validacion'
 import { formatMDY } from '@/lib/fecha'
+import { BOTON_BORRAR } from '@/lib/estilos'
 import {
   FORMAS, FRECUENCIAS, MEDICACION_ACTIVA, MEDICAMENTOS, UNIDADES_DOSIS, UNIDADES_DURACION, UNIDADES_FUERZA, VIAS, erroresDe, fraseDeUso, medicacionVacia, nombreMedicacion,
   type Medicacion,
@@ -130,7 +131,7 @@ export function PrescriptionDetail({ registro, nuevo, onVolver, onAccion }: {
                 size="sm" aria-label="Medications" value={String(m.id)} onChange={setActual}
                 tabs={medicaciones.map((x, i) => ({ value: String(x.id), label: rotulo(x, i), alerta: intento && Object.keys(erroresDe(x).errores).length > 0 }))}
               />
-              {editable && <Button size="sm" variant="ghost" className="ml-auto text-field-error hover:text-field-error" onClick={quitar}><Trash2 /> Remove medication</Button>}
+              {editable && <Button size="sm" variant="ghost" className={cn('ml-auto', BOTON_BORRAR)} onClick={quitar}><Trash2 /> Remove medication</Button>}
             </div>
           )}
           {/* Medication details | Directions for use, lado a lado en pantallas anchas como red.dev; los campos, de a dos. */}

@@ -21,6 +21,13 @@ export const AREA_TOQUE = "relative pointer-coarse:after:absolute pointer-coarse
 export const ICONO_SUELTO =
   `${AREA_TOQUE} flex size-7 shrink-0 items-center justify-center rounded-md text-ink transition-colors hover:bg-surface-muted`
 
+/* El tacho, con un solo formato en toda la app (README, "el tacho va en rojo", 2026-11-27): rojo en reposo y fondo rojo
+   claro al pasar el mouse. ICONO_TACHO es el de sólo ícono (una fila, un ítem), con Trash2 de 16 px; BOTON_BORRAR va
+   sobre un `ui/button` secondary o ghost con texto (Remove, Delete, Discard draft). */
+export const ICONO_TACHO =
+  `${AREA_TOQUE} flex size-7 shrink-0 items-center justify-center rounded-md text-dash-bad-fg transition-colors hover:bg-dash-bad-bg`
+export const BOTON_BORRAR = 'text-dash-bad-fg hover:bg-dash-bad-bg hover:text-dash-bad-fg active:bg-dash-bad-bg'
+
 /* Contenedor de página del módulo de Patients (Dashboard, Scheduling,
    Billing, Patients y todo /patients/:id/*): a 1400px fijo, una pantalla de
    1920 o más dejaba una franja vacía a la derecha sin usar. El tope no

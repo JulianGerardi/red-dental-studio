@@ -1,5 +1,6 @@
 import { SettingsSearch } from '@/components/settings/SettingsSearch'
-import { PADDING_PAGINA } from '@/lib/estilos'
+import { cn } from '@/lib/utils'
+import { PADDING_PAGINA, ICONO_TACHO } from '@/lib/estilos'
 import { useCallback, useMemo, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { Trash2, FileText, Pencil, Ban, UserMinus, Plus, TriangleAlert } from 'lucide-react'
@@ -356,7 +357,7 @@ export function SettingsEmployeeDetail() {
                         type="button"
                         aria-label="Remove credential"
                         onClick={() => setCredenciales((p) => p.filter((x) => x !== c))}
-                        className="mb-1 rounded p-2 text-dash-bad-fg hover:bg-dash-bad-bg"
+                        className={cn(ICONO_TACHO, 'mb-1')}
                       >
                         <Trash2 className="size-4" />
                       </button>

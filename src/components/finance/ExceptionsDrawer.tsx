@@ -9,7 +9,7 @@ import { EmptyState } from '@/components/ui/empty-state'
 import { SettingsSearch } from '@/components/settings/SettingsSearch'
 import { OpcionDireccion } from '@/components/patients/AddRelationshipDrawer'
 import { UnitField } from '@/components/finance/fields'
-import { ICONO_SUELTO, TABLA_ENCABEZADO, TABLA_FILA, TABLA_MARCO } from '@/lib/estilos'
+import { TABLA_ENCABEZADO, TABLA_FILA, TABLA_MARCO, ICONO_TACHO } from '@/lib/estilos'
 import { cn } from '@/lib/utils'
 import {
   OPCIONES_PROCEDIMIENTO, TIPOS_DEDUCIBLE, TIPOS_EXCEPCION, codigoDeOpcion, descripcionDe, opcionProcedimiento,
@@ -133,7 +133,7 @@ export function ExceptionsDrawer({ excepciones, onClose, onGuardar, agregando = 
                   <span role="cell" className="min-w-0">{resumenExcepcion(e)}</span>
                   <span role="cell" className="min-w-0 break-words">{e.motivo}</span>
                   <span role="cell" className="flex justify-center">
-                    <button type="button" aria-label={`Remove exception ${e.procedimientos.join(', ')}`} onClick={() => onGuardar(excepciones.filter((x) => x.id !== e.id), 'removed')} className={cn(ICONO_SUELTO, 'text-dash-bad-fg')}>
+                    <button type="button" aria-label={`Remove exception ${e.procedimientos.join(', ')}`} onClick={() => onGuardar(excepciones.filter((x) => x.id !== e.id), 'removed')} className={ICONO_TACHO}>
                       <Trash2 className="size-4" />
                     </button>
                   </span>

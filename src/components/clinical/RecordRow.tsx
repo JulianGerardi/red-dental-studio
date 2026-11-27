@@ -1,4 +1,5 @@
 import { FileText, Trash2, MoreVertical, Plus } from 'lucide-react'
+import { ICONO_TACHO } from '@/lib/estilos'
 import { FilterTrigger } from '@/components/ui/filter-menu'
 import { aviso } from '@/components/ui/toaster'
 import { cn } from '@/lib/utils'
@@ -55,7 +56,7 @@ export function RecordRow({
 
       <div className="text-muted-foreground flex shrink-0 gap-2">
         <button aria-label="Document"><FileText className="size-4" /></button>
-        <button aria-label="Delete" className="text-dash-bad-fg"><Trash2 className="size-4" /></button>
+        <button aria-label="Delete" className={ICONO_TACHO}><Trash2 className="size-4" /></button>
         <button aria-label="More"><MoreVertical className="size-4" /></button>
       </div>
     </div>

@@ -7,7 +7,7 @@ import { useParams, useSearchParams } from 'react-router-dom'
 import { Pencil, DoorOpen, Plus, Trash2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { EmptyState } from '@/components/ui/empty-state'
-import { ICONO_SUELTO, PADDING_PAGINA } from '@/lib/estilos'
+import { PADDING_PAGINA, ICONO_TACHO } from '@/lib/estilos'
 import { Button } from '@/components/ui/button'
 import { aviso } from '@/components/ui/toaster'
 import { Card } from '@/components/settings/primitives'
@@ -475,7 +475,7 @@ export function RoomsTab() {
               >
                 <Pencil className="size-3" /> <span className="max-lg:hidden">Edit room</span>
               </button>
-              <button type="button" aria-label={`Delete ${s.nombre}`} onClick={() => borrar(s)} className={cn(ICONO_SUELTO, 'text-dash-bad-fg')}>
+              <button type="button" aria-label={`Delete ${s.nombre}`} onClick={() => borrar(s)} className={ICONO_TACHO}>
                 <Trash2 className="size-4" />
               </button>
             </span>
@@ -605,7 +605,7 @@ export function ExceptionsTab() {
               >
                 <Pencil className="size-3" /> <span className="max-lg:hidden">Edit exception</span>
               </button>
-              <button type="button" aria-label={`Delete ${e.nombre}`} onClick={() => borrar(e)} className={cn(ICONO_SUELTO, 'text-dash-bad-fg')}>
+              <button type="button" aria-label={`Delete ${e.nombre}`} onClick={() => borrar(e)} className={ICONO_TACHO}>
                 <Trash2 className="size-4" />
               </button>
             </span>
