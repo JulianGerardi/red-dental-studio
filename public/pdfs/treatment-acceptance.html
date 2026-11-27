@@ -59,9 +59,6 @@ h2::before { content: counter(seccion); color: #1d56bc; font-weight: 600; }
 .tabla .sub b { font-weight: 600; color: #3f3f46; }
 .grupo { margin-bottom: 12pt; break-inside: avoid; }
 .grupo-titulo { display: flex; justify-content: space-between; gap: 12pt; margin: 0 0 2pt; font-weight: 600; color: #09090b; }
-.grupo-detalle { font-weight: 500; color: #71717a; }
-.grupo-nota { margin: 4pt 0 0; font-size: 8pt; color: #3f3f46; }
-.grupo-nota b { font-weight: 600; color: #09090b; }
 .importes { display: flex; flex-direction: column; align-items: flex-end; break-inside: avoid; }
 .importes dl { width: 62mm; margin: 0 0 6pt; }
 .importes dl div { display: flex; justify-content: space-between; gap: 12pt; padding: 2.5pt 0; }
@@ -70,10 +67,10 @@ h2::before { content: counter(seccion); color: #1d56bc; font-weight: 600; }
 .importes dl div:last-child { margin-top: 3pt; padding-top: 5pt; border-top: .75pt solid #09090b; font-size: 10pt; font-weight: 700; }
 .importes dl div:last-child dt { color: #09090b; }
 .importes .nota { max-width: 62mm; text-align: right; }
-.cuadros { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6pt; margin: 0 0 4pt; }
-.cuadros div { padding: 5pt 7pt; border: .75pt solid #e7e7e7; border-radius: 4pt; break-inside: avoid; }
-.cuadros dt { font-size: 6.5pt; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: #71717a; }
-.cuadros dd { margin: 1pt 0 0; font-weight: 600; color: #09090b; font-variant-numeric: tabular-nums; }
+.bloque { margin-bottom: 8pt; break-inside: avoid; }
+.bloque-titulo { margin: 0 0 1pt; font-weight: 600; color: #09090b; }
+.lista b, .bloque b { font-weight: 600; color: #09090b; }
+.hash { font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 6.5pt; overflow-wrap: anywhere; }
 .narrativa { margin-bottom: 7pt; break-inside: avoid; }
 .narrativa .firmado { display: block; margin-top: 2pt; font-size: 7.5pt; color: #71717a; }
 .campos .linea { display: block; }

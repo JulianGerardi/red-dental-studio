@@ -122,26 +122,30 @@ consentimiento estaban armados distinto.
 
 ### 1. Nota clínica (pasa a propuesta)
 
-No pude entrar al sistema ni hablar con Sikiu: el contenido sale de Jira. La nota se arma con los eventos del encounter
-(CON-2816, CON-2728): uno por tipo (`event_type`, CON-2617) y cada uno con el payload de su historia. Una sección por tipo:
+**Fuente: la especificación que pasó Julián** (*Especificación de Reconstrucción: Nota Clínica Completa*, CON-2816,
+CON-2975, CON-3081, CON-3605, CON-3668, CON-2727). CON-2975 y CON-3081 son las pruebas de QA con los textos exactos. No
+pude entrar a red.dev (pide login y no tengo usuario): no se comparó con una nota real.
 
-| Sección | Historia | Qué muestra |
-| --- | --- | --- |
-| Medical History | CON-3605, CON-2198, CON-2199 | Cuestionarios de la visita (Chief Complaint, Triage), los del paciente con su fecha (en orden alfabético), condiciones/alergias/cirugías (tipo, desde, estado, severidad, reacciones, nota) y medicación |
-| Vitals | CON-2191 | Un cuadro por medición y las notas |
-| Exams and findings | CON-1619, CON-2772 | Una tabla por examen: finding, área, resultado (positive/negative en ROS y Physical), descriptores, nota y la review |
-| Periodontal measures | CON-2055 | Sólo las significativas (PD ≥ 4 mm, recesión ≥ 1 mm, agrandamiento gingival) |
-| Procedures performed | CON-2620 | Los que pasaron a Completed o In progress |
-| Treatment plan | CON-2204 | Cada caso (tipo, recomendado, estado, total) con sus procedimientos por visita, findings, diagnósticos y la discusión |
-| Prescriptions, Lab orders, Referrals | CON-2615, CON-2614, CON-2616 | Una caja por orden con los campos del evento |
-| Workflows | CON-2621 | Las narrativas (no salen si la nota se generó sola, CON-2937) |
-| Additional Notes | | El texto libre del provider |
-| Addenda (después de la firma) | CON-2730 | Autor, fecha, texto y firma de cada una; no cambian la nota firmada |
-
-- **Una sección sólo sale si pasó algo en la visita**: `{{#has_vitals}}`, `{{#has_exams}}`… (Mustache necesita un booleano
-  para no repetir la sección por cada ítem). Los números de sección salen de un contador de CSS, así que no quedan huecos.
-- **Generada sola (CON-2937):** `{{#auto_generated}}` muestra un aviso debajo del título.
-- Sin firmar, la vista previa no muestra adendas (sólo existen sobre una nota firmada).
+- **La nota es texto, no tablas**, con los textos de la especificación copiados tal cual y en su orden: Vital Signs →
+  Medical History (antecedentes, Chief Complaint y Triage sin título de grupo, *Patient History* en orden alfabético) →
+  Exams → Consent Summary → Operative Report → Workflows → órdenes → firma.
+- **Omisión estricta:** lo que no tuvo actividad en la visita no sale, ni la sección ni la línea. Cada sección lleva su
+  booleano (`has_vitals`, `has_exams`, `consent_presented`, `has_procedures`…) y cada subtítulo condicional también
+  (`has_probing_depths`, `has_recession`…): Mustache no sabe si una lista está vacía sin repetir el bloque.
+- **Exams** sale sólo si hay al menos un finding o una review (CON-3668). Cada examen repetible lleva su fecha. Dental
+  Assessment y Radiographic tienen sus tres textos (sin findings —sólo si se usó *No findings*—, con findings y
+  reviewed); Periodontal, el de review o el del nuevo sondaje con PD ≥ 4 mm, recesión, agrandamiento, sangrado y
+  supuración. Las zonas van con el nombre anatómico (*Left Mandibular Gingiva*), no "Zone 14".
+- **Consent Summary** sale si hubo interacción con un consentimiento en la sesión; la lista de aceptados, sólo si el
+  paciente firmó en esa sesión.
+- **Operative Report:** "{código} — {descripción} on #{diente} [in progress / completed]", una vez por procedimiento
+  aunque tenga varias visitas.
+- **Firma:** sólo el provider (CON-2975 pide sacar la del paciente), con fecha, hora y hash del contenido (CON-2727).
+- Recetas, lab orders y referrals siguen como cajas con rótulo y valor: la especificación no da su texto. *Documents
+  sent: Yes* sólo si se adjuntó un archivo.
+- **Fuera de la especificación y se mantienen:** *Additional Notes* (el texto libre de la hoja de la app; sólo si hay) y
+  las **adendas** después de la firma (CON-2730). El aviso de nota generada sola (CON-2937) también.
+- **Sale la sección Treatment plan** de la primera vuelta: la especificación la reemplaza por el Consent Summary.
 
 ### 2. Treatment plan y consentimientos
 
@@ -171,12 +175,16 @@ No pude entrar al sistema ni hablar con Sikiu: el contenido sale de Jira. La not
 2. CON-2191 manda `measure: vm.value` (el valor dos veces); la plantilla espera la unidad en `measure`.
 3. CON-2615 dice "Para cada [lab_orders]" en la historia de recetas, y CON-2616 llama `record_prescription_event` en la de
    referrals: copias de otra historia.
-4. CON-3605 dice "Oral History"; la app lo llama *Dental and Oral Health History* (se usó el de la app).
+4. CON-3605 y la especificación dicen "Oral History"; la app lo llama *Dental and Oral Health History*. La nota usa el
+   de la especificación.
+5. La especificación dice "Finding on #{tooth}/{surface}": se tomó "Finding" como el nombre del finding
+   ("Deep caries on #19/O, D").
+6. La especificación pone el título "Consent Summary" y el texto empieza otra vez con "Consent Summary:". Se copió tal
+   cual.
 
 ### Para validar
 
-- Con Sikiu o en el sistema: generar una nota real con todos los registros de Clinical Mode y comparar sección por
-  sección (sobre todo exámenes y workflows, cuyo texto real no está en Jira).
-- Con odontólogos: si la nota se lee bien en este orden (historia → vitales → exámenes → procedimientos → plan → órdenes)
-  o si esperan el formato SOAP.
+- En red.dev: generar una nota real con todos los registros de Clinical Mode y compararla con el PDF de ejemplo,
+  sobre todo exámenes, órdenes y workflows.
+- Con odontólogos: si el BRAINS fijo del Consent Summary alcanza o esperan el detalle de cada plan.
 - Con recepción: si el paciente entiende *Adjustment* o conviene "Insurance discount".

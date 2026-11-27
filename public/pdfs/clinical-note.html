@@ -59,9 +59,6 @@ h2::before { content: counter(seccion); color: #1d56bc; font-weight: 600; }
 .tabla .sub b { font-weight: 600; color: #3f3f46; }
 .grupo { margin-bottom: 12pt; break-inside: avoid; }
 .grupo-titulo { display: flex; justify-content: space-between; gap: 12pt; margin: 0 0 2pt; font-weight: 600; color: #09090b; }
-.grupo-detalle { font-weight: 500; color: #71717a; }
-.grupo-nota { margin: 4pt 0 0; font-size: 8pt; color: #3f3f46; }
-.grupo-nota b { font-weight: 600; color: #09090b; }
 .importes { display: flex; flex-direction: column; align-items: flex-end; break-inside: avoid; }
 .importes dl { width: 62mm; margin: 0 0 6pt; }
 .importes dl div { display: flex; justify-content: space-between; gap: 12pt; padding: 2.5pt 0; }
@@ -70,10 +67,10 @@ h2::before { content: counter(seccion); color: #1d56bc; font-weight: 600; }
 .importes dl div:last-child { margin-top: 3pt; padding-top: 5pt; border-top: .75pt solid #09090b; font-size: 10pt; font-weight: 700; }
 .importes dl div:last-child dt { color: #09090b; }
 .importes .nota { max-width: 62mm; text-align: right; }
-.cuadros { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6pt; margin: 0 0 4pt; }
-.cuadros div { padding: 5pt 7pt; border: .75pt solid #e7e7e7; border-radius: 4pt; break-inside: avoid; }
-.cuadros dt { font-size: 6.5pt; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: #71717a; }
-.cuadros dd { margin: 1pt 0 0; font-weight: 600; color: #09090b; font-variant-numeric: tabular-nums; }
+.bloque { margin-bottom: 8pt; break-inside: avoid; }
+.bloque-titulo { margin: 0 0 1pt; font-weight: 600; color: #09090b; }
+.lista b, .bloque b { font-weight: 600; color: #09090b; }
+.hash { font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 6.5pt; overflow-wrap: anywhere; }
 .narrativa { margin-bottom: 7pt; break-inside: avoid; }
 .narrativa .firmado { display: block; margin-top: 2pt; font-size: 7.5pt; color: #71717a; }
 .campos .linea { display: block; }
@@ -130,88 +127,71 @@ h2 + h3 { margin-top: 2pt; }
 <h1>{{patient_name}}</h1>
 {{#auto_generated}}<p class="aviso">Generated automatically when the encounter closed after 48 hours without activity. Workflow narratives are not included.</p>{{/auto_generated}}
 <dl class="resumen"><div><dt>Patient name</dt><dd>{{patient_name}}</dd></div><div><dt>Date of birth</dt><dd>{{patient_birth_date}}</dd></div><div><dt>Date of visit</dt><dd>{{visit_date}} — {{visit_time}}</dd></div><div><dt>Attending dentist</dt><dd>{{provider_name}}</dd></div><div><dt>Location</dt><dd>{{location_name}}</dd></div><div><dt>Contact</dt><dd>{{patient_phone}}</dd></div></dl>
+{{#has_vitals}}<section>
+<h2>Vital Signs</h2>
+<p>Patient vitals were taken:</p>
+<ul class="lista">{{#height_in}}<li>Height {{height_in}} in, Weight {{weight_lb}} pounds; BMI {{bmi}}.</li>{{/height_in}}{{#blood_pressure}}<li>Blood pressure: {{blood_pressure}} mmHg.</li>{{/blood_pressure}}{{#heart_rate}}<li>Heart rate: {{heart_rate}} bpm.</li>{{/heart_rate}}{{#respiratory_rate}}<li>Respiratory rate: {{respiratory_rate}} rpm.</li>{{/respiratory_rate}}{{#temperature}}<li>Temperature: {{temperature}} °F.</li>{{/temperature}}{{#oxygen_saturation}}<li>Oxygen saturation: {{oxygen_saturation}} %.</li>{{/oxygen_saturation}}</ul>
+{{#out_of_range_values}}<p><b>Out of range values:</b> {{out_of_range_values}}.</p>{{/out_of_range_values}}{{#vitals_notes}}<p><b>Notes:</b> {{vitals_notes}}</p>{{/vitals_notes}}
+</section>{{/has_vitals}}
 <section>
 <h2>Medical History</h2>
-<h3>This visit</h3>
-{{#encounter_questionnaires}}<div class="narrativa"><p class="narrativa-titulo">{{name}}</p><p>{{narrative}}</p></div>{{/encounter_questionnaires}}{{^encounter_questionnaires}}<p class="nota">No questionnaires answered in this visit.</p>{{/encounter_questionnaires}}
-<h3>Patient history</h3>
-{{#history_questionnaires}}<div class="narrativa"><p class="narrativa-titulo">{{name}}<span>Completed on {{completed_at}}</span></p><p>{{narrative}}</p></div>{{/history_questionnaires}}{{^history_questionnaires}}<p class="nota">No history questionnaires answered.</p>{{/history_questionnaires}}
-<h3>Conditions, allergies and surgeries</h3>
-<table class="tabla">
-<thead><tr><th style="width:19%">Type</th><th>Description</th><th style="width:13%">Since</th><th style="width:11%">Status</th><th style="width:28%">Notes</th></tr></thead>
-<tbody>{{#patient_conditions}}<tr><td>{{type}}</td><td>{{description}}{{#severity}}<span class="sub"><b>Severity:</b> {{severity}}</span>{{/severity}}{{#reactions}}<span class="sub"><b>Reaction:</b> {{name}}</span>{{/reactions}}</td><td>{{start_date}}</td><td>{{status}}</td><td>{{note}}</td></tr>{{/patient_conditions}}
-{{^patient_conditions}}<tr><td class="vacio" colspan="5">Patient reports no known medical conditions, allergies or surgeries.</td></tr>{{/patient_conditions}}</tbody>
-</table>
-<h3>Medications</h3>
-<table class="tabla">
-<thead><tr><th>Medication</th><th style="width:30%">Directions</th><th style="width:13%">Since</th><th style="width:11%">Status</th></tr></thead>
-<tbody>{{#patient_medications}}<tr><td>{{drug_brand}} ({{drug}}) {{strength}} {{strength_unit}}<span class="sub">{{dosage_form}}</span></td><td>{{dose}} {{dose_unit}} {{route}}, {{frequency}}</td><td>{{start_date}}</td><td>{{status}}</td></tr>{{/patient_medications}}
-{{^patient_medications}}<tr><td class="vacio" colspan="4">Patient reports no current medications.</td></tr>{{/patient_medications}}</tbody>
-</table>
+<p class="rotulo">Past medical conditions:{{^past_medical_conditions}} <span>Patient reports no known medical conditions.</span>{{/past_medical_conditions}}</p>
+<ul class="lista">{{#past_medical_conditions}}<li><b>{{name}}</b> ({{start_date}}).{{#notes}} {{notes}}{{/notes}}</li>{{/past_medical_conditions}}</ul>
+<p class="rotulo">Current medications:</p><ul class="lista">{{#current_medications}}<li><b>{{name}}</b> {{dose}} {{unit}} · {{frequency}} · {{status}} ({{start_date}}).{{#notes}} {{notes}}{{/notes}}</li>{{/current_medications}}{{^current_medications}}<li>Patient reports no current medications.</li>{{/current_medications}}</ul>
+<p class="rotulo">Known allergies:</p><ul class="lista">{{#known_allergies}}<li><b>Allergy to {{allergen}}</b> {{reactions}} ({{start_date}}).{{#notes}} {{notes}}{{/notes}}</li>{{/known_allergies}}{{^known_allergies}}<li>No known allergies reported.</li>{{/known_allergies}}</ul>
+<p class="rotulo">Past surgeries and/or hospitalizations:</p><ul class="lista">{{#past_surgeries}}<li>{{name}} ({{date}}).</li>{{/past_surgeries}}{{^past_surgeries}}<li>No past surgeries or hospitalizations reported.</li>{{/past_surgeries}}</ul>
+{{#encounter_questionnaires}}<div class="narrativa"><p class="narrativa-titulo">{{name}}</p><p>{{narrative}}</p></div>{{/encounter_questionnaires}}
+{{#has_history_questionnaires}}<h3>Patient History</h3>{{/has_history_questionnaires}}
+{{#history_questionnaires}}<div class="narrativa"><p class="narrativa-titulo">{{name}}<span>Completed on {{completed_at}}</span></p><p>{{narrative}}</p></div>{{/history_questionnaires}}
 </section>
-{{#has_vitals}}<section>
-<h2>Vitals</h2>
-<dl class="cuadros">{{#vitals}}<div><dt>{{observation}}</dt><dd>{{value}} {{measure}}</dd></div>{{/vitals}}</dl>{{^vitals}}<p class="nota">No vitals recorded.</p>{{/vitals}}
-<p>{{#vitals_notes}}<b>Notes:</b> {{vitals_notes}}{{/vitals_notes}}</p>
-</section>{{/has_vitals}}
 {{#has_exams}}<section>
-<h2>Exams and findings</h2>
-{{#exams}}<div class="grupo"><p class="grupo-titulo"><span>{{exam_type}}</span></p><table class="tabla">
-<thead><tr><th>Finding</th><th style="width:14%">Area</th><th style="width:11%">Result</th><th style="width:34%">Notes</th></tr></thead>
-<tbody>{{#exam_findings}}<tr><td>{{description}}{{#descriptors}}<span class="sub"><b>{{name}}:</b> {{answer}}</span>{{/descriptors}}</td><td>{{anatomic_area}}</td><td>{{status}}</td><td>{{note}}</td></tr>{{/exam_findings}}
-{{^exam_findings}}<tr><td class="vacio" colspan="4">No findings recorded.</td></tr>{{/exam_findings}}</tbody>
-</table><p class="grupo-nota">{{#review}}<b>Review:</b> {{review}}{{/review}}</p></div>{{/exams}}
+<h2>Exams</h2>
+{{#exams}}<div class="bloque"><p class="bloque-titulo">{{exam_name}} ({{exam_date}}):</p><ul class="lista">{{#findings}}<li>{{finding}} on {{location}}{{#details}} [details: ({{details}})]{{/details}}.{{#note}} ({{note}}){{/note}}</li>{{/findings}}</ul></div>{{/exams}}
+{{#dental_assessment}}<div class="bloque"><p class="bloque-titulo">Dental Assessment ({{dental_assessment_date}}):</p>{{#dental_assessment_no_findings}}<p>The dental assessment showed no significant findings; dentition appears healthy.</p>{{/dental_assessment_no_findings}}<ul class="lista">{{#dental_assessment_findings}}<li>{{finding}} on {{location}}{{#details}} [details: ({{details}})]{{/details}}.{{#note}} ({{note}}){{/note}}</li>{{/dental_assessment_findings}}</ul>{{#dental_assessment_reviewed}}<p>Dental assessment reviewed: stable with no changes from last exam; prior findings unchanged.{{#dental_assessment_review_note}} Note: {{dental_assessment_review_note}}{{/dental_assessment_review_note}}</p>{{/dental_assessment_reviewed}}</div>{{/dental_assessment}}
+{{#radiographic_exams}}<div class="bloque"><p class="bloque-titulo">Radiographic Examination ({{exam_date}}):</p>{{#no_findings}}<p>The radiographic examination indicated no abnormalities; all structures are within normal limits.</p>{{/no_findings}}{{#has_findings}}<p>The radiographic examination revealed:</p><ul class="lista">{{#findings}}<li>{{finding}} on {{location}}{{#details}} [details: ({{details}})]{{/details}}.{{#note}} ({{note}}){{/note}}</li>{{/findings}}</ul>{{/has_findings}}{{#reviewed}}<p>Radiographic findings reviewed: stable and unchanged from prior radiographs; no new issues.{{#review_note}} Note: {{review_note}}{{/review_note}}</p>{{/reviewed}}</div>{{/radiographic_exams}}
+{{#periodontal_exams}}<div class="bloque"><p class="bloque-titulo">Periodontal Examination ({{exam_date}}):</p>{{#reviewed}}<p>Periodontal chart reviewed: no changes since prior charting; status stable.</p>{{/reviewed}}{{#new_charting}}<p>A new periodontal charting was performed, with the following clinically significant findings documented individually for each tooth and respective surfaces.</p>
+{{#has_probing_depths}}<p class="rotulo">Probing Depths (≥ 4 mm)</p><ul class="lista">{{#probing_depths}}<li>#{{tooth}} {{surface}}: +{{value}} mm.</li>{{/probing_depths}}</ul>{{/has_probing_depths}}
+{{#has_gingival_margin}}<p class="rotulo">Gingival Margin Levels (including +1 mm recession and overgrowth)</p>{{#has_recession}}<p>Recession (+1 mm or greater):</p><ul class="lista">{{#recession}}<li>#{{tooth}} {{surface}}: +{{value}} mm.</li>{{/recession}}</ul>{{/has_recession}}{{#has_overgrowth}}<p>Overgrowth (negative values):</p><ul class="lista">{{#overgrowth}}<li>#{{tooth}} {{surface}}: -{{value}} mm.</li>{{/overgrowth}}</ul>{{/has_overgrowth}}{{/has_gingival_margin}}
+{{#has_bleeding}}<p class="rotulo">Bleeding on probing</p><ul class="lista">{{#bleeding}}<li>#{{tooth}} {{surface}}.</li>{{/bleeding}}</ul>{{/has_bleeding}}
+{{#has_suppuration}}<p class="rotulo">Suppuration</p><ul class="lista">{{#suppuration}}<li>#{{tooth}} {{surface}}.</li>{{/suppuration}}</ul>{{/has_suppuration}}{{/new_charting}}</div>{{/periodontal_exams}}
 </section>{{/has_exams}}
-{{#has_periodontal_measures}}<section>
-<h2>Periodontal measures</h2>
-<table class="tabla">
-<thead><tr><th style="width:12%">Tooth</th><th style="width:14%">Surface</th><th>Measure</th><th class="der" style="width:14%">Value</th></tr></thead>
-<tbody>{{#periodontal_measures}}<tr><td>{{tooth}}</td><td>{{surface}}</td><td>{{measure}}</td><td class="der">{{value}}</td></tr>{{/periodontal_measures}}
-{{^periodontal_measures}}<tr><td class="vacio" colspan="4">No significant measures.</td></tr>{{/periodontal_measures}}</tbody>
-</table>
-<p class="nota">Only clinically significant measures: probing depth of 4 mm or more, gingival recession of 1 mm or more and gingival overgrowth.</p>
-</section>{{/has_periodontal_measures}}
+{{#consent_presented}}<section>
+<h2>Consent Summary</h2>
+<p><b>Consent Summary:</b> The treatment plan(s) presented, including full BRAINS discussion (Benefits, Risks, Alternatives, Including No Treatment, and Sensible Expectations) for each individual option, were thoroughly reviewed and discussed with the patient in clear, understandable language.</p>
+<p>All procedures, potential complications, prognosis, financial implications, treatment sequences, and patient decisions (accepted/declined) for every presented plan were explained in detail. The patient had ample opportunity to ask questions, which were fully answered to their satisfaction. Patient verbalized understanding of each proposed treatment option, associated risks (including but not limited to infection, pain, nerve injury, failure rates &lt;5%, tooth fracture), benefits, reasonable alternatives, and consequences of declination or no treatment.</p>
+<p>Written informed consent forms were recorded separately for each presented treatment plan (accepted and/or declined options). All patient decisions have been documented accordingly.</p>
+{{#has_accepted_consents}}<p class="rotulo">The following informed consent(s) were accepted by the patient:</p><ul class="lista">{{#accepted_consents}}<li>{{consent_name}} – {{plan_name}}</li>{{/accepted_consents}}</ul>{{/has_accepted_consents}}
+</section>{{/consent_presented}}
 {{#has_procedures}}<section>
-<h2>Procedures performed</h2>
-<table class="tabla">
-<thead><tr><th style="width:9%">Code</th><th>Description</th><th style="width:12%">Area</th><th style="width:13%">Status</th></tr></thead>
-<tbody>{{#procedures}}<tr><td>{{code}}</td><td>{{description}}{{#findings}}<span class="sub"><b>Finding:</b> {{description}}</span>{{/findings}}{{#diagnoses}}<span class="sub"><b>Diagnosis:</b> {{code}} · {{description}}</span>{{/diagnoses}}</td><td>{{anatomic_area}}</td><td>{{status}}</td></tr>{{/procedures}}
-{{^procedures}}<tr><td class="vacio" colspan="4">No procedures performed.</td></tr>{{/procedures}}</tbody>
-</table>
+<h2>Operative Report</h2>
+<h3>Procedure</h3>
+<ul class="lista">{{#procedures}}<li>{{code}} — {{description}} on {{location}} [{{status}}].</li>{{/procedures}}</ul>
 </section>{{/has_procedures}}
-{{#has_treatment_cases}}<section>
-<h2>Treatment plan</h2>
-{{#treatment_cases}}<div class="grupo"><p class="grupo-titulo"><span>{{name}} · {{case_type}}{{#recommended}} · Recommended{{/recommended}}</span><span class="grupo-detalle">{{status}} · {{total}}</span></p><table class="tabla">
-<thead><tr><th style="width:8%">Visit</th><th style="width:9%">Code</th><th>Description</th><th style="width:12%">Area</th><th style="width:12%">Status</th></tr></thead>
-<tbody>{{#case_procedures}}<tr><td>{{visit}}</td><td>{{code}}</td><td>{{description}}{{#findings}}<span class="sub"><b>Finding:</b> {{description}}</span>{{/findings}}{{#diagnoses}}<span class="sub"><b>Diagnosis:</b> {{code}} · {{description}}</span>{{/diagnoses}}</td><td>{{anatomic_area}}</td><td>{{status}}</td></tr>{{/case_procedures}}
-{{^case_procedures}}<tr><td class="vacio" colspan="5">No procedures.</td></tr>{{/case_procedures}}</tbody>
-</table></div>{{/treatment_cases}}
-<p>{{#treatment_discussion}}<b>Discussion:</b> {{treatment_discussion}}{{/treatment_discussion}}</p>
-</section>{{/has_treatment_cases}}
+{{#has_workflows}}<section>
+<h2>Workflows</h2>
+{{#workflows}}<div class="narrativa"><p class="narrativa-titulo">{{workflow_name}}</p><p>{{narrative}}</p></div>{{/workflows}}
+</section>{{/has_workflows}}
 {{#has_prescriptions}}<section>
 <h2>Prescriptions</h2>
-{{#prescriptions}}<div class="tarjeta"><p class="tarjeta-titulo">Prescription · {{status}}</p><dl class="campos"><div><dt>Medications:</dt> <dd>{{#medications}}<span class="linea">{{drug_brand}} ({{drug}}) {{strength}} {{strength_unit}} {{dosage_form}}: {{dose}} {{dose_unit}}, {{frequency}}, for {{duration_number}} {{duration_unit}}</span>{{/medications}}</dd></div><div><dt>Indications:</dt> <dd>{{indications}}</dd></div></dl></div>{{/prescriptions}}
+{{#prescriptions}}<div class="tarjeta"><p class="tarjeta-titulo">Prescription · {{status}}</p><dl class="campos"><div><dt>Medications:</dt> <dd>{{#medications}}<span class="linea">{{drug_brand}} ({{drug}}) {{strength}} {{strength_unit}} {{dosage_form}}: {{dose}} {{dose_unit}}, {{frequency}}, for {{duration_number}} {{duration_unit}}</span>{{/medications}}</dd></div><div><dt>Indications:</dt> <dd>{{indications}}</dd></div></dl>{{#document_sent}}<p><b>Documents sent:</b> Yes</p>{{/document_sent}}</div>{{/prescriptions}}
 </section>{{/has_prescriptions}}
 {{#has_lab_orders}}<section>
-<h2>Lab orders</h2>
-{{#lab_orders}}<div class="tarjeta"><p class="tarjeta-titulo">{{laboratory}} · {{status}}</p><dl class="campos"><div><dt>Work requested:</dt> <dd>{{work_requested}}</dd></div><div><dt>Procedures:</dt> <dd>{{#lab_treatments}}<span class="linea">{{cdt_code}} {{description}} · {{anatomic_area}} · {{treatment_plan}}</span>{{/lab_treatments}}</dd></div><div><dt>Special instructions:</dt> <dd>{{special_instructions}}</dd></div><div><dt>ASAP:</dt> <dd>{{asap}}</dd></div><div><dt>Mandatory to continue treatment:</dt> <dd>{{mandatory_to_continue_treatment}}</dd></div><div><dt>Expiration date:</dt> <dd>{{expiration_date}}</dd></div><div><dt>Documents sent:</dt> <dd>{{document_sent}}</dd></div></dl></div>{{/lab_orders}}
+<h2>Lab Orders</h2>
+{{#lab_orders}}<div class="tarjeta"><p class="tarjeta-titulo">{{laboratory}} · {{status}}</p><dl class="campos"><div><dt>Work requested:</dt> <dd>{{work_requested}}</dd></div><div><dt>Procedures:</dt> <dd>{{#lab_treatments}}<span class="linea">{{cdt_code}} {{description}} · {{anatomic_area}} · {{treatment_plan}}</span>{{/lab_treatments}}</dd></div><div><dt>Special instructions:</dt> <dd>{{special_instructions}}</dd></div><div><dt>ASAP:</dt> <dd>{{asap}}</dd></div><div><dt>Mandatory to continue treatment:</dt> <dd>{{mandatory_to_continue_treatment}}</dd></div><div><dt>Expiration date:</dt> <dd>{{expiration_date}}</dd></div></dl>{{#document_sent}}<p><b>Documents sent:</b> Yes</p>{{/document_sent}}</div>{{/lab_orders}}
 </section>{{/has_lab_orders}}
 {{#has_referrals}}<section>
 <h2>Referrals</h2>
-{{#referrals}}<div class="tarjeta"><p class="tarjeta-titulo">{{referral}} · {{specialties}} · {{status}}</p><dl class="campos"><div><dt>Procedures:</dt> <dd>{{#referral_procedures}}<span class="linea">{{cdt_code}} {{description}} · {{anatomic_area}}</span>{{/referral_procedures}}</dd></div><div><dt>Notes:</dt> <dd>{{notes}}</dd></div><div><dt>Documents sent:</dt> <dd>{{document_sent}}</dd></div></dl></div>{{/referrals}}
+{{#referrals}}<div class="tarjeta"><p class="tarjeta-titulo">{{referral}} · {{specialties}} · {{status}}</p><dl class="campos"><div><dt>Procedures:</dt> <dd>{{#referral_procedures}}<span class="linea">{{cdt_code}} {{description}} · {{anatomic_area}}</span>{{/referral_procedures}}</dd></div><div><dt>Notes:</dt> <dd>{{notes}}</dd></div></dl>{{#document_sent}}<p><b>Documents sent:</b> Yes</p>{{/document_sent}}</div>{{/referrals}}
 </section>{{/has_referrals}}
-{{#has_workflows}}<section>
-<h2>Workflows</h2>
-{{#workflows}}<div class="narrativa"><p class="narrativa-titulo">{{workflow_name}}<span>{{workflow_type}}</span></p><p>{{narrative}}</p></div>{{/workflows}}
-</section>{{/has_workflows}}
-<section>
+{{#clinical_notes_html}}<section>
 <h2>Additional Notes</h2>
 <div class="prosa">{{{clinical_notes_html}}}</div>
-</section>
+</section>{{/clinical_notes_html}}
 <div class="firmas"><div class="firma">
 <div class="trazo">{{#provider_signed_date}}{{#provider_signature_image}}<img src="{{provider_signature_image}}" alt="Signature of {{provider_name}}">{{/provider_signature_image}}{{^provider_signature_image}}<span class="escrita">{{provider_name}}</span>{{/provider_signature_image}}{{/provider_signed_date}}{{^provider_signed_date}}<span class="pendiente">Pending signature</span>{{/provider_signed_date}}</div>
 <b>{{provider_name}} · Provider</b>
 <span>{{#provider_signed_date}}Signed electronically · {{provider_signed_date}}{{/provider_signed_date}}{{^provider_signed_date}}Not signed yet{{/provider_signed_date}}</span>
+{{#provider_signature_hash}}<span class="hash">Content hash: {{provider_signature_hash}}</span>{{/provider_signature_hash}}
 </div></div>
 {{#has_addenda}}<section>
 <h2>Addenda</h2>

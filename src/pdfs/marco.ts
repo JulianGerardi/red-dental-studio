@@ -37,20 +37,19 @@ export type Bloque =
   | { tipo: 'lista'; lista: string; valor: string; vacio: string; rotulo?: string }
   /** `subtotal`: una fila al pie con un rótulo y un importe por cada una de las últimas columnas. */
   | { tipo: 'tabla'; lista: string; columnas: Columna[]; vacio: string; subtotal?: { rotulo: string; valores: string[] } }
-  /** Una tabla por grupo (visitas del treatment plan, exámenes y casos de la nota): título, un dato a la derecha y una
-      nota debajo de la tabla. */
-  | { tipo: 'grupos'; lista: string; titulo: string; detalle?: string; nota?: string; tabla: Omit<Extract<Bloque, { tipo: 'tabla' }>, 'tipo'> }
+  /** Una tabla por grupo (las visitas del treatment plan). */
+  | { tipo: 'grupos'; lista: string; titulo: string; tabla: Omit<Extract<Bloque, { tipo: 'tabla' }>, 'tipo'> }
   /** Los importes de un documento, alineados a la derecha; la última fila es lo que paga el paciente. El mismo bloque en
       el treatment plan y en el consentimiento de aceptación. */
   | { tipo: 'importes'; filas: Campo[]; nota?: string }
-  /** Datos sueltos en cuadros, como el resumen (los vitales de la nota). */
-  | { tipo: 'cuadros'; lista: string; rotulo: string; valor: string; vacio: string }
+  /** Texto armado a mano con {{variables}} y las clases de la hoja: la nota clínica, que es narrativa (CON-2975). */
+  | { tipo: 'libre'; html: string }
   /** Textos con título y fecha (las narrativas de los cuestionarios y de los workflows). */
   | { tipo: 'narrativas'; lista: string; titulo: string; detalle?: string; texto: string; vacio?: string }
   /** Un subtítulo adentro de una sección. */
   | { tipo: 'subtitulo'; texto: string }
   /** Una caja por ítem (cada medicamento de la receta). */
-  | { tipo: 'tarjetas'; lista: string; titulo: string; campos: Campo[] }
+  | { tipo: 'tarjetas'; lista: string; titulo: string; campos: Campo[]; pie?: string }
   | { tipo: 'imagenes'; lista: string; imagen: string; titulo: string; detalle: string; vacio: string }
   /** Casillas que marca el paciente al firmar: marcadas si `marcada` tiene valor. */
   | { tipo: 'casillas'; items: string[]; marcada: string; aviso?: string }
@@ -62,7 +61,7 @@ export type Bloque =
     visita). Los números salen con un contador de CSS, así que una sección que no sale no deja un hueco. */
 export type Seccion = { titulo: string; bloques: Bloque[]; si?: string }
 /** Quién firma: `prefijo` arma las variables {{<prefijo>_name}}, {{<prefijo>_signed_date}} y {{<prefijo>_signature_image}}. */
-export type Firma = { rol: string; prefijo: string }
+export type Firma = { rol: string; prefijo: string; hash?: boolean }
 
 export type Hoja = {
   /** El tipo, chico y en azul: "Dental clinical note". */
@@ -116,12 +115,12 @@ function bloque(b: Bloque): string {
     case 'nota': return `<p class="nota">${b.texto}</p>`
     case 'lista': return `${b.rotulo ? `<p class="rotulo">${esc(b.rotulo)}</p>` : ''}<ul class="lista">{{#${b.lista}}}<li>${b.valor}</li>{{/${b.lista}}}{{^${b.lista}}}<li>${esc(b.vacio)}</li>{{/${b.lista}}}</ul>`
     case 'tabla': return tabla(b)
-    case 'grupos': return `{{#${b.lista}}}<div class="grupo"><p class="grupo-titulo"><span>${b.titulo}</span>${b.detalle ? `<span class="grupo-detalle">${b.detalle}</span>` : ''}</p>${tabla(b.tabla)}${b.nota ? `<p class="grupo-nota">${b.nota}</p>` : ''}</div>{{/${b.lista}}}`
+    case 'grupos': return `{{#${b.lista}}}<div class="grupo"><p class="grupo-titulo"><span>${b.titulo}</span></p>${tabla(b.tabla)}</div>{{/${b.lista}}}`
     case 'importes': return `<div class="importes"><dl>${b.filas.map(([r, v]) => `<div><dt>${esc(r)}</dt><dd>${v}</dd></div>`).join('')}</dl>${b.nota ? `<p class="nota">${esc(b.nota)}</p>` : ''}</div>`
-    case 'cuadros': return `<dl class="cuadros">{{#${b.lista}}}<div><dt>${b.rotulo}</dt><dd>${b.valor}</dd></div>{{/${b.lista}}}</dl>{{^${b.lista}}}<p class="nota">${esc(b.vacio)}</p>{{/${b.lista}}}`
+    case 'libre': return b.html
     case 'narrativas': return `{{#${b.lista}}}<div class="narrativa"><p class="narrativa-titulo">${b.titulo}${b.detalle ? `<span>${b.detalle}</span>` : ''}</p><p>${b.texto}</p></div>{{/${b.lista}}}${b.vacio ? `{{^${b.lista}}}<p class="nota">${esc(b.vacio)}</p>{{/${b.lista}}}` : ''}`
     case 'subtitulo': return `<h3>${esc(b.texto)}</h3>`
-    case 'tarjetas': return `{{#${b.lista}}}<div class="tarjeta"><p class="tarjeta-titulo">${b.titulo}</p>${campos(b.campos)}</div>{{/${b.lista}}}`
+    case 'tarjetas': return `{{#${b.lista}}}<div class="tarjeta"><p class="tarjeta-titulo">${b.titulo}</p>${campos(b.campos)}${b.pie ?? ''}</div>{{/${b.lista}}}`
     case 'imagenes': return `<div class="imagenes">{{#${b.lista}}}<figure><img src="${b.imagen}" alt="${b.titulo}"><figcaption><b>${b.titulo}</b><span>${b.detalle}</span></figcaption></figure>{{/${b.lista}}}</div>{{^${b.lista}}}<p class="nota">${esc(b.vacio)}</p>{{/${b.lista}}}`
     case 'casillas': return `<ul class="casillas">${b.items.map((i) => `<li><span class="casilla{{#${b.marcada}}} marcada{{/${b.marcada}}}">{{#${b.marcada}}}<svg viewBox="0 0 10 10" width="8" height="8"><path d="M2 5.2 4.2 7.4 8 2.8" fill="none" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>{{/${b.marcada}}}</span>${esc(i)}</li>`).join('')}</ul>${b.aviso ? `<p class="nota">${esc(b.aviso)}</p>` : ''}`
     case 'boca': return `<style>{{#${b.lista}}}.boca [data-tooth="{{tooth}}"] .pieza{fill:${COLOR.diente};stroke:${COLOR.marca}}{{/${b.lista}}}</style>
@@ -130,11 +129,12 @@ function bloque(b: Bloque): string {
   }
 }
 
-function firma({ rol, prefijo: p }: Firma) {
+function firma({ rol, prefijo: p, hash }: Firma) {
   return `<div class="firma">
 <div class="trazo">{{#${p}_signed_date}}{{#${p}_signature_image}}<img src="{{${p}_signature_image}}" alt="Signature of {{${p}_name}}">{{/${p}_signature_image}}{{^${p}_signature_image}}<span class="escrita">{{${p}_name}}</span>{{/${p}_signature_image}}{{/${p}_signed_date}}{{^${p}_signed_date}}<span class="pendiente">Pending signature</span>{{/${p}_signed_date}}</div>
 <b>{{${p}_name}} · ${esc(rol)}</b>
-<span>{{#${p}_signed_date}}Signed electronically · {{${p}_signed_date}}{{/${p}_signed_date}}{{^${p}_signed_date}}Not signed yet{{/${p}_signed_date}}</span>
+<span>{{#${p}_signed_date}}Signed electronically · {{${p}_signed_date}}{{/${p}_signed_date}}{{^${p}_signed_date}}Not signed yet{{/${p}_signed_date}}</span>${hash ? `
+{{#${p}_signature_hash}}<span class="hash">Content hash: {{${p}_signature_hash}}</span>{{/${p}_signature_hash}}` : ''}
 </div>`
 }
 
@@ -193,9 +193,6 @@ h2::before { content: counter(seccion); color: ${COLOR.marca}; font-weight: 600;
 .tabla .sub b { font-weight: 600; color: ${COLOR.texto}; }
 .grupo { margin-bottom: 12pt; break-inside: avoid; }
 .grupo-titulo { display: flex; justify-content: space-between; gap: 12pt; margin: 0 0 2pt; font-weight: 600; color: ${COLOR.tinta}; }
-.grupo-detalle { font-weight: 500; color: ${COLOR.apagado}; }
-.grupo-nota { margin: 4pt 0 0; font-size: 8pt; color: ${COLOR.texto}; }
-.grupo-nota b { font-weight: 600; color: ${COLOR.tinta}; }
 .importes { display: flex; flex-direction: column; align-items: flex-end; break-inside: avoid; }
 .importes dl { width: 62mm; margin: 0 0 6pt; }
 .importes dl div { display: flex; justify-content: space-between; gap: 12pt; padding: 2.5pt 0; }
@@ -204,10 +201,10 @@ h2::before { content: counter(seccion); color: ${COLOR.marca}; font-weight: 600;
 .importes dl div:last-child { margin-top: 3pt; padding-top: 5pt; border-top: .75pt solid ${COLOR.tinta}; font-size: 10pt; font-weight: 700; }
 .importes dl div:last-child dt { color: ${COLOR.tinta}; }
 .importes .nota { max-width: 62mm; text-align: right; }
-.cuadros { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6pt; margin: 0 0 4pt; }
-.cuadros div { padding: 5pt 7pt; border: .75pt solid ${COLOR.linea}; border-radius: 4pt; break-inside: avoid; }
-.cuadros dt { font-size: 6.5pt; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: ${COLOR.apagado}; }
-.cuadros dd { margin: 1pt 0 0; font-weight: 600; color: ${COLOR.tinta}; font-variant-numeric: tabular-nums; }
+.bloque { margin-bottom: 8pt; break-inside: avoid; }
+.bloque-titulo { margin: 0 0 1pt; font-weight: 600; color: ${COLOR.tinta}; }
+.lista b, .bloque b { font-weight: 600; color: ${COLOR.tinta}; }
+.hash { font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 6.5pt; overflow-wrap: anywhere; }
 .narrativa { margin-bottom: 7pt; break-inside: avoid; }
 .narrativa .firmado { display: block; margin-top: 2pt; font-size: 7.5pt; color: ${COLOR.apagado}; }
 .campos .linea { display: block; }
