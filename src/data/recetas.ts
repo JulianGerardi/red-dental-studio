@@ -59,7 +59,8 @@ const COMO: Record<string, string> = {
   Buccal: 'buccally', Dental: 'on the teeth', Intramuscular: 'intramuscularly', Intrathecal: 'intrathecally', Intravenous: 'intravenously', Oral: 'orally',
   Periodontal: 'in the periodontal pocket', Sublingual: 'sublingually', Submucosal: 'submucosally', Topical: 'topically',
 }
-const unidad = (n: string, u: string) => {
+/** La unidad de una dosis en una frase: "tablet" si es una, "tablets" si son más. */
+export const unidadDeDosis = (n: string, u: string) => {
   if (!u || u === 'Unknown') return ''
   const una = Number(n) === 1
   if (u === 'Suppository') return una ? 'suppository' : 'suppositories'
@@ -71,7 +72,7 @@ export function fraseDeUso(m: Medicacion) {
   if (!m.dosis || !m.via || !m.frecuencia || !m.duracion) return ''
   const frecuencia = m.frecuencia === 'Unknown' ? '' : m.frecuencia.toLowerCase()
   const duracion = `for ${m.duracion} ${Number(m.duracion) === 1 ? m.unidadDuracion.replace(/s$/, '') : m.unidadDuracion}`.toLowerCase()
-  return [VERBO[m.via] ?? 'Take', m.dosis, unidad(m.dosis, m.unidadDosis), COMO[m.via], frecuencia, duracion].filter(Boolean).join(' ')
+  return [VERBO[m.via] ?? 'Take', m.dosis, unidadDeDosis(m.dosis, m.unidadDosis), COMO[m.via], frecuencia, duracion].filter(Boolean).join(' ')
 }
 
 /* Lo obligatorio de cada medicación (los asteriscos de red.dev; la unidad acompaña a su número) y sus reglas (CON-2230):

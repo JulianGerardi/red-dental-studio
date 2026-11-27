@@ -19,8 +19,10 @@ const SIN_ENCUENTRO_FICHA = 'You do not have permission to perform this action b
 /** Las dos columnas de la ficha: lo que define el pedido a la izquierda y lo que se escribe a la derecha; en celular y tablet, una debajo de la otra. */
 export const COLUMNAS_FICHA = 'grid items-stretch gap-4 lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)]'
 
-/** El título de la ficha, del tamaño de un título de pantalla, con la vuelta a la lista, su estado y sus acciones a la derecha. */
-export function EncabezadoFicha({ titulo, estado, tono, acciones, onVolver, volverA }: {
+/** El título de la ficha, del tamaño de un título de pantalla: la vuelta a la lista, el nombre y el estado a la izquierda;
+ *  a la derecha, quién lo hizo y cuándo (`datos`, de sólo lectura), un campo propio del encabezado (`campo`: el vencimiento
+ *  de una Prescription, como red.dev) y las acciones (PDF, ⋮). En pantallas angostas la derecha baja a su propia fila. */
+export function EncabezadoFicha({ titulo, estado, tono, acciones, onVolver, volverA, datos, campo }: {
   titulo: string
   estado?: string
   tono?: PillTone
@@ -28,17 +30,37 @@ export function EncabezadoFicha({ titulo, estado, tono, acciones, onVolver, volv
   onVolver?: () => void
   /** A dónde vuelve la flecha: "lab orders". */
   volverA?: string
+  /** Pares rótulo / valor: "Ordering provider" · "Dr. Elena Martinez". */
+  datos?: [rotulo: string, valor: ReactNode][]
+  campo?: ReactNode
 }) {
   return (
-    <div className="flex min-h-8 flex-wrap items-center gap-3">
-      {onVolver && (
-        <button type="button" onClick={onVolver} aria-label={`Back to ${volverA ?? 'the list'}`} title={`Back to ${volverA ?? 'the list'}`} className={cn(ICONO_SUELTO, '-ml-1')}>
-          <ArrowLeft className="size-4" />
-        </button>
+    <div className="flex flex-wrap items-center gap-x-6 gap-y-3">
+      <div className="flex min-h-8 items-center gap-3">
+        {onVolver && (
+          <button type="button" onClick={onVolver} aria-label={`Back to ${volverA ?? 'the list'}`} title={`Back to ${volverA ?? 'the list'}`} className={cn(ICONO_SUELTO, '-ml-1')}>
+            <ArrowLeft className="size-4" />
+          </button>
+        )}
+        <h2 className="text-xl leading-[1.3] font-semibold text-ink">{titulo}</h2>
+        {estado && <Pill tone={tono ?? 'info'}>{estado}</Pill>}
+      </div>
+      {(datos?.length || campo || acciones) && (
+        <div className="ml-auto flex flex-wrap items-center justify-end gap-x-5 gap-y-3">
+          {!!datos?.length && (
+            <dl className="flex flex-wrap items-stretch gap-y-2 divide-x divide-line">
+              {datos.map(([rotulo, valor]) => (
+                <div key={rotulo} className="flex flex-col gap-0.5 px-4 first:pl-0 last:pr-0">
+                  <dt className="text-[11px] leading-4 text-ink-muted">{rotulo}</dt>
+                  <dd className="text-[13px] leading-5 font-medium text-ink">{valor}</dd>
+                </div>
+              ))}
+            </dl>
+          )}
+          {campo}
+          {acciones && <span className="flex items-center gap-2">{acciones}</span>}
+        </div>
       )}
-      <h2 className="text-xl leading-[1.3] font-semibold text-ink">{titulo}</h2>
-      {estado && <Pill tone={tono ?? 'info'}>{estado}</Pill>}
-      {acciones && <span className="ml-auto flex items-center gap-2">{acciones}</span>}
     </div>
   )
 }

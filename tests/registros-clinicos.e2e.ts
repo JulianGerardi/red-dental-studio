@@ -10,9 +10,13 @@ const abrir = async (app: { open: (u: string) => Promise<unknown> }, screen: any
   await screen.getByRole('button', /Start encounter/).tap()
 }
 
-test('Sin encuentro abierto New está apagado y la ficha se abre en sólo lectura', async ({ app, screen }) => {
+test('New está siempre activo: sin encuentro abierto se puede crear; lo ya cargado se abre en sólo lectura', async ({ app, screen }) => {
   await app.open('/patients/john-smith/clinical-mode?tab=Prescription')
-  await expect(screen.getByRole('button', /New prescription/)).toHaveAttribute('aria-disabled', 'true')
+  /* Como red.dev: New no pide encuentro y la ficha nueva se carga. */
+  await screen.getByRole('button', /New prescription/).tap()
+  await expect(screen.getByText('Read-only mode')).toHaveCount(0)
+  await expect(screen.getByRole('button', 'Save')).toBeEnabled()
+  await screen.getByRole('button', 'Cancel').tap()
   await screen.getByText('Chlorhexidine gluconate 0.12%').first().tap()
   await expect(screen.getByText('Read-only mode')).toBeVisible()
   await expect(screen.getByRole('button', 'Save')).toBeDisabled()
@@ -72,9 +76,10 @@ test('Prescription: New valida, crea en Pending, se edita, se activa y se cancel
   await screen.getByRole('menuitem', 'Activate').tap()
   await screen.getByRole('dialog', 'Activate prescription').getByRole('button', 'Mark as active').tap()
   await expect(screen.getByText('The prescription has been successfully marked as Active.')).toBeVisible()
+  /* El documento existe desde que está Active: el botón de la fila se prende. */
+  await expect(screen.getByRole('button', /^View PDF of the prescription of Ibuprofen 600 mg, Active, created (?!10\/30)/)).toBeEnabled()
   await screen.getByRole('button', /^Actions for prescription of Ibuprofen 600 mg, Active, created (?!10\/30)/).tap()
   await expect(screen.getByRole('menuitem', 'Edit')).toHaveCount(0)
-  await expect(screen.getByRole('menuitem', 'View PDF')).toBeVisible()
   await expect(screen.getByRole('menuitem', 'Expire')).toBeVisible()
   await screen.getByRole('menuitem', 'Cancel').tap()
   await screen.getByRole('dialog', 'Cancel prescription').getByRole('button', 'Cancel prescription').tap()
@@ -191,7 +196,7 @@ test('Pending Task → Prescription: Complete this task abre la receta y Activat
   await screen.getByRole('button', 'Actions for Prescription for Henry Richardson').tap()
   await screen.getByRole('menuitem', 'Edit').tap()
   await expect(screen.getByRole('heading', 'Prescription')).toBeVisible()
-  await expect(screen.getByText('Summary')).toBeVisible()
+  await expect(screen.getByText('Directions for use')).toBeVisible()
   await screen.getByRole('button', /^Actions for Prescription/).tap()
   await screen.getByRole('menuitem', 'Activate').tap()
   await screen.getByRole('dialog', 'Activate prescription').getByRole('button', 'Mark as active').tap()

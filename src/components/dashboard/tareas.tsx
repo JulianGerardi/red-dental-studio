@@ -9,9 +9,9 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 import { cn } from '@/lib/utils'
 import type { PillTone } from '@/components/ui/pill'
 import type { PendingTask } from './PendingTaskCard'
-import { abrirDocumento } from './documentoTarea'
+import { abrirDocumento, abrirHoja, documentoTarea } from './documentoTarea'
 /* Ciclo a propósito (registros usa tareaViva): se llaman sólo dentro de funciones. */
-import { documentoRegistro } from '@/components/clinical/registros'
+import { hojaDeRegistro } from '@/components/clinical/registros'
 
 /* Lo que hacen los botones de una tarea de Pending Task, en el Dashboard, en el Patient Dashboard y en el detalle de la
    orden en Clinical Mode. Sale de los videos de red.dev de Julián (sólo lo que muestran); ver
@@ -129,8 +129,13 @@ export function aplicarAccion(t: PendingTask, accion: AccionTarea | 'Sign') {
 }
 
 /* El PDF de la tarea (formato de red.dev, documentoTarea.ts) en una pestaña nueva. */
-export const abrirPdf = (t: PendingTask) =>
-  abrirDocumento(documentoRegistro(tareaViva(t)), () => aviso.error("We couldn't open the PDF. Allow pop-ups for this site and try again."))
+export function abrirPdf(t: PendingTask) {
+  const alFallar = () => aviso.error("We couldn't open the PDF. Allow pop-ups for this site and try again.")
+  /* Lab order, Prescription y Referral salen de las plantillas de PDF (src/pdfs); la Clinical note, del PDF de la tarea. */
+  const hoja = hojaDeRegistro(tareaViva(t))
+  if (hoja) abrirHoja(hoja, alFallar)
+  else abrirDocumento(documentoTarea(t), alFallar)
+}
 
 type Pregunta = { t: PendingTask; accion: Exclude<AccionTarea, 'Edit'> }
 type TextoPregunta = { title: string; confirm: string; keep?: string; texto: string }

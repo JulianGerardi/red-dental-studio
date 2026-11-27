@@ -1,6 +1,7 @@
 import { useState, type ComponentType, type ReactNode } from 'react'
 import { ArrowRightLeft, Eye, FileText, FlaskConical, Pill as IconoPastilla, Plus, type LucideIcon } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { ICONO_SUELTO } from '@/lib/estilos'
 import { Button } from '@/components/ui/button'
 import { Chip } from '@/components/ui/chip'
 import { DataTable, TextCell, type DataTableColumn } from '@/components/ui/data-table'
@@ -8,15 +9,14 @@ import { DateFilter, inRange, type DatePreset, type DateRange } from '@/componen
 import { DropdownMenuItem } from '@/components/ui/dropdown-menu'
 import { FilterMenu, type FilterGroup } from '@/components/ui/filter-menu'
 import { Pill } from '@/components/ui/pill'
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 import { SettingsSearch } from '@/components/settings/SettingsSearch'
 import type { PendingTask } from '@/components/dashboard/PendingTaskCard'
-import { ItemsTarea, SIN_ENCUENTRO, TONO_ESTADO, accionesDe, esEditable, useAccionesTarea, type AccionUI } from '@/components/dashboard/tareas'
+import { ItemsTarea, TONO_ESTADO, accionesDe, esEditable, useAccionesTarea, type AccionUI } from '@/components/dashboard/tareas'
 import { nombreMedicacion } from '@/data/recetas'
 import { LabOrderDetail } from './LabOrderDetail'
 import { PrescriptionDetail } from './PrescriptionDetail'
 import { ReferralDetail } from './ReferralDetail'
-import { asegurarRegistro, nuevoRegistro, proveedoresDerivacion, useRegistros, type Registro, type TipoRegistro } from './registros'
+import { asegurarRegistro, nuevoRegistro, proveedoresDerivacion, urge, useRegistros, type Registro, type TipoRegistro } from './registros'
 
 /* Las pestañas Lab order, Prescription y Referral de Clinical Mode son el mismo panel: la tabla estándar (buscador con
    Search, Filter y el rango de fechas de red.dev, y la acción New a la derecha), la fila que abre la ficha, el ⋮ con las acciones del estado
@@ -27,17 +27,11 @@ import { asegurarRegistro, nuevoRegistro, proveedoresDerivacion, useRegistros, t
 type PropsFicha = { registro: Registro; nuevo?: boolean; abierto: boolean; onVolver: () => void; onAccion: (t: PendingTask, a: AccionUI) => void }
 
 const fecha = (s: string) => s || '—'
-const FINALES = ['Delivered', 'Rejected', 'Canceled', 'Completed', 'Expired']
-/* Vence en una semana o ya venció y sigue abierto: en rojo, como red.dev. */
-const urge = (r: Registro) => {
-  const f = new Date(r.expiration)
-  return !FINALES.includes(r.state) && !Number.isNaN(f.getTime()) && f.getTime() - Date.now() < 7 * 86400000
-}
 const columnaEstado: DataTableColumn<Registro> = { key: 'estado', header: 'Status', width: 120, cell: (r) => <Pill tone={TONO_ESTADO[r.state] ?? 'info'}>{r.state}</Pill> }
-const columnasFecha = (conVencimiento = true): DataTableColumn<Registro>[] => [
+const columnasFecha = (): DataTableColumn<Registro>[] => [
   { key: 'actualizado', header: 'Last update', width: 120, cell: (r) => fecha(r.updated) },
   { key: 'creado', header: 'Created date', width: 120, cell: (r) => fecha(r.register) },
-  ...(conVencimiento ? [{ key: 'vence', header: 'Expiration date', width: 130, cell: (r: Registro) => <span className={cn(urge(r) && 'font-semibold text-dash-bad-fg')}>{fecha(r.expiration)}</span> }] : []),
+  { key: 'vence', header: 'Expiration date', width: 130, cell: (r: Registro) => <span className={cn(urge(r) && 'font-semibold text-dash-bad-fg')}>{fecha(r.expiration)}</span> },
 ]
 const proveedor = (header: string): DataTableColumn<Registro> => ({ key: 'proveedor', header, cell: (r) => <TextCell>{r.provider ?? '—'}</TextCell> })
 const especialidadDe = (nombre?: string) => proveedoresDerivacion().find((p) => p.nombre === nombre)?.especialidad
@@ -108,8 +102,8 @@ const CONFIG: Record<TipoRegistro, {
           {especialidadDe(r.derivacion?.proveedor) && <span className="truncate text-[11px] text-ink-muted">{especialidadDe(r.derivacion?.proveedor)}</span>}
         </span>
       ) },
-      /* CON-2609: Referral date, provider referido, provider creador y Status; la derivación no tiene vencimiento propio. */
-      columnaEstado, ...columnasFecha(false),
+      /* CON-2609: Referral date, provider referido, provider creador y Status; el vencimiento, como la lista de red.dev. */
+      columnaEstado, ...columnasFecha(),
     ],
     texto: (r) => `${r.provider} ${r.derivacion?.proveedor} ${especialidadDe(r.derivacion?.proveedor) ?? ''} ${r.state}`,
     rotulo: (r) => `referral to ${r.derivacion?.proveedor || r.person}, ${r.state}, created ${r.register}`,
@@ -159,13 +153,8 @@ export function RegistrosPanel({ kind, paciente, tarea, encuentroAbierto = false
     )
   }
 
-  const nuevo = (
-    <Button size="md" aria-disabled={!encuentroAbierto || undefined} className={cn(!encuentroAbierto && 'cursor-not-allowed opacity-50')}
-      onClick={() => { if (encuentroAbierto) setVista({ modo: 'nuevo', borrador: nuevoRegistro(kind, tarea ?? (paciente ? { person: paciente, initials: paciente.split(/\s+/).map((x) => x[0]).join('').slice(0, 2).toUpperCase() } : undefined)) }) }}
-    >
-      <Plus /> New {c.nombre}
-    </Button>
-  )
+  /* New está siempre activo, con o sin encuentro, como red.dev (Julián, 2026-11-27). */
+  const nuevo = <Button size="md" onClick={() => setVista({ modo: 'nuevo', borrador: nuevoRegistro(kind, tarea ?? (paciente ? { person: paciente, initials: paciente.split(/\s+/).map((x) => x[0]).join('').slice(0, 2).toUpperCase() } : undefined)) })}><Plus /> New {c.nombre}</Button>
   const fechaDe = (r: Registro) => new Date(c.fecha.de(r))
   const visibles = registros.filter((r) =>
     c.texto(r).toLowerCase().includes(q.trim().toLowerCase())
@@ -181,12 +170,24 @@ export function RegistrosPanel({ kind, paciente, tarea, encuentroAbierto = false
     ...(c.grupoExtra ? [{ title: c.grupoExtra.titulo, options: unicos(c.grupoExtra.de).map(contar(c.grupoExtra.de)), value: extras, onChange: setExtras }] : []),
     ...(kind !== 'Referrals' ? [{ title: 'Provider', options: unicos((r) => r.provider ?? '').map(contar((r) => r.provider ?? '')), value: proveedores, onChange: setProveedores }] : []),
   ]
+  /* El documento en la fila, como el ícono de red.dev: se abre cuando existe; si todavía no, se ve apagado. */
+  const columnaPdf: DataTableColumn<Registro> = {
+    key: 'pdf', header: 'PDF', width: 64, cell: (r) => (
+      <button
+        type="button" disabled={!r.pdf} aria-label={`View PDF of the ${c.rotulo(r)}`} title={r.pdf ? 'View PDF' : 'No document yet'}
+        onClick={(e) => { e.stopPropagation(); hacer(r, 'PDF') }}
+        className={cn(ICONO_SUELTO, 'disabled:cursor-not-allowed disabled:opacity-30')}
+      >
+        <FileText className="size-4" />
+      </button>
+    ),
+  }
   const item = (icono: ReactNode, texto: string, alElegir: () => void) => <DropdownMenuItem className="text-[13px]" onSelect={alElegir}>{icono} {texto}</DropdownMenuItem>
 
   return (
     <div>
       <DataTable
-        columns={c.columnas}
+        columns={[...c.columnas, columnaPdf]}
         rows={visibles}
         rowKey={(r) => r.id}
         rowLabel={c.rotulo}
@@ -201,18 +202,10 @@ export function RegistrosPanel({ kind, paciente, tarea, encuentroAbierto = false
             />
           </>
         )}
-        actions={encuentroAbierto ? nuevo : (
-          <TooltipProvider delayDuration={100}>
-            <Tooltip>
-              <TooltipTrigger asChild>{nuevo}</TooltipTrigger>
-              <TooltipContent side="top" className="max-w-[240px] text-center">{SIN_ENCUENTRO}</TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
-        )}
+        actions={nuevo}
         rowActions={(r) => (
           <>
             {!esEditable(r) && item(<Eye className="size-3.5" />, 'View', () => setVista({ modo: 'ficha', id: r.id }))}
-            {r.pdf && item(<FileText className="size-3.5" />, 'View PDF', () => hacer(r, 'PDF'))}
             {accionesDe(r).length > 0 && <ItemsTarea task={r} abierto={encuentroAbierto} onAccion={hacer} />}
           </>
         )}

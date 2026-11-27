@@ -139,7 +139,7 @@ test('Lab order: dentición mixta y Toggle all por diente', async ({ app, screen
   await screen.getByRole('button', /New lab order/).tap()
   await screen.getByRole('button', 'Initialize permanent dentition').tap()
   await screen.getByRole('button', 'Tooth 17').tap()
-  await screen.getByRole('button', 'Primary').tap()
+  await screen.getByRole('tab', 'Primary').tap()
   await screen.getByRole('button', 'Tooth I').tap()
   await expect(screen.getByRole('button', 'Edit surfaces of tooth 17')).toBeVisible()
   await screen.getByRole('button', 'Edit surfaces of tooth 17').tap()

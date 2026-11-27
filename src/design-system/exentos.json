@@ -34,5 +34,6 @@
   "components/clinical/dental/RuedaSuperficies.tsx#RuedaSuperficies": "Lab order / Referral (2026-11-27): se ve en Pages (Clinical Mode). Story propia al documentar la tanda.",
   "components/clinical/FichaClinica.tsx#AvisosFicha": "Lab order / Prescription / Referral (2026-11-27): se ve en Pages (Clinical Mode). Story propia al documentar la tanda.",
   "components/clinical/PrescriptionDetail.tsx#PrescriptionDetail": "Lab order / Prescription / Referral (2026-11-27): se ve en Pages (Clinical Mode). Story propia al documentar la tanda.",
-  "components/clinical/RegistrosPanel.tsx#RegistrosPanel": "Lab order / Prescription / Referral (2026-11-27): se ve en Pages (Clinical Mode). Story propia al documentar la tanda."
+  "components/clinical/RegistrosPanel.tsx#RegistrosPanel": "Lab order / Prescription / Referral (2026-11-27): se ve en Pages (Clinical Mode). Story propia al documentar la tanda.",
+  "components/clinical/dental/ArcadaAnatomica.tsx#ArcadaAnatomica": "Teeth & surface de Lab order (2026-11-27): se ve en Pages (Clinical Mode). Story propia al documentar la tanda."
 }

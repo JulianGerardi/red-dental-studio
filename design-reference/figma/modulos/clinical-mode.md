@@ -3969,3 +3969,56 @@ con lo que #214 había relevado de red.dev y esta no tenía; los tres archivos d
   dice *Edit / View / View PDF* (no *Edit prescription / Download PDF*); el vencimiento va en rojo si vence en una
   semana y sigue abierta (no sólo las Expired); los datos de ejemplo son los 7 de `registros` (no los 14 de #214).
 - `ui/date-picker` queda con la firma de #214 (`min`, `max`, `disabled`, `label`); `aplicarAccion` pierde `sinAviso`.
+
+## CON-2214 · CON-2212 · CON-2321 · Teeth & surface de red.dev, datos en el título, fichas apiladas y el PDF nuevo (2026-11-27, 4ª vuelta)
+
+**Jira:** CON-2215 (Lab order), CON-2230 / CON-2287 (Prescription y su PDF), CON-2322 / CON-2609 (Referral), CON-4115
+(PDFs). Pedido de Julián sobre lo publicado en #216, con dos links de red.dev (una Prescription Active y la lista de
+Referral), que se recorrieron otra vez sin cambiar nada.
+
+1. **Teeth & surface como está armado en red.dev** (`dental/ArcadaAnatomica`, reemplaza a `DentalArch`, que se borra): el
+   dibujo de las dos arcadas con la anatomía de cada diente, su número afuera y *Maxillary* / *Mandibular* adentro, para
+   Permanent y Primary. Sale del SVG de red.dev (`dental/arcadasRed.ts`, generado: un trazo por diente; los colores son
+   los tokens de la app). Cada diente es un botón (`aria-pressed`, teclado). La dentición va debajo del rótulo
+   (`ui/tabs`), el dibujo a la izquierda y, a la derecha, *Permanent* / *Primary* con los dientes marcados, la rueda y
+   *Toggle all* / *Apply to unset*. La **rueda** usa las cinco formas de red.dev (`RuedaSuperficies`).
+2. **Quién y cuándo, en el título** (`EncabezadoFicha` suma `datos` y `campo`): pares rótulo / valor separados por una
+   línea, a la derecha del título y junto al PDF y el ⋮; en celular bajan a su fila. Lab order: *Ordering provider* y
+   *Order date*. Prescription: *Prescribing provider*, *Prescription date* y **Expiration date\*** (el `DatePicker`,
+   como red.dev, con su error debajo). Referral: *Referring provider*, *Referral date* y *Expiration date*. Salen de
+   *General information*.
+3. **New siempre activo**: *New lab order / prescription / referral* no piden encuentro abierto (en red.dev se crean con
+   el paciente en *Pending Signature*) y la ficha nueva se carga y se guarda. Lo ya cargado sigue pidiendo encuentro para
+   editar y para las acciones del ⋮ (CON-2643). **A confirmar con Julián** si eso también se saca.
+4. **Prescription y Referral, una card debajo de la otra**, como los formularios de la app (Lab order sigue en dos
+   columnas). Prescription: *Medications* (*Add medication* en el título de la card, pestañas, y *Medication details* |
+   *Directions for use* lado a lado desde 1280 px con los campos de a dos, como red.dev) y *Details* con *Additional
+   instructions*. **Sale el *Summary***. Referral: *General information* (provider + *New provider* | ASAP y Mandatory,
+   Procedures) y *Details* (Referral note | Attachments).
+5. **Prescription Active como red.dev**: campos apagados, Save apagado, PDF en el título y ⋮ con *Expire* y *Cancel*.
+6. **El documento sale de las plantillas de PDF** (`src/pdfs/plantillas`, las que recibe el backend), completadas con lo
+   cargado en la ficha (`hojaDeRegistro` + `completar`) y abiertas en una pestaña (`abrirHoja`): Lab order, Prescription
+   y Referral. La Clinical note sigue con el PDF de la tarea. Se va `documentoRegistro`.
+7. **PDF en la fila** de las tres tablas (columna *PDF*, el ícono de red.dev): se abre cuando el documento existe y se ve
+   apagado cuando todavía no. Sale *View PDF* del ⋮.
+8. **Referral con Expiration date** en la tabla (y en el título), en rojo cuando vence en una semana o ya venció y sigue
+   abierta, como Lab order y Prescription (`urge`).
+
+Anomalías y supuestos:
+
+- La ficha de Referral de red.dev no tiene campo de vencimiento y su lista muestra la misma fecha que *Created*. Acá una
+  derivación nueva vence a los 30 días (supuesto, no hay regla en Jira): **a confirmar**.
+- La plantilla de Lab order no tiene *Special instructions*, *ASAP* ni procedimientos: van dentro de *Dental Work
+  Request*. Dibuja una sola dentición; con dientes de las dos, la permanente (los temporarios quedan en la lista).
+- El PDF de red.dev de Prescription trae *Prescription ID*, *Valid From* y una tabla de medicación; el nuestro es el de
+  `pdfs.md` (sin ID, una medicación por bloque).
+- El documento se abre como hoja HTML (la plantilla), no como archivo .pdf: el PDF lo arma el backend. Desde la pestaña
+  se imprime o se guarda como PDF.
+- El dibujo de las arcadas pesa unos 85 KB en el módulo de Clinical Mode.
+
+**A validar con usuarios:** si el vencimiento en el título se ve como un campo obligatorio (queda lejos del resto); y si
+el dibujo anatómico se toca bien en celular (los dientes anteriores son chicos).
+
+Código: `clinical/dental/{ArcadaAnatomica,arcadasRed,RuedaSuperficies}`, `clinical/{FichaClinica,LabOrderDetail,
+PrescriptionDetail,ReferralDetail,RegistrosPanel,registros}`, `dashboard/{tareas,documentoTarea}`, `data/recetas`;
+`tests/{registros-clinicos,pending-tasks}.e2e.ts`.
