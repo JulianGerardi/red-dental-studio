@@ -5,6 +5,12 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-11-27
 
+### Mails: Employee, Rescheduled (booked) y Subscription canceled como en el Figma ([#212](https://github.com/JulianGerardi/red-dental-studio/pull/212))
+- **Employee account ready:** "…access {{practice_name}}’s Confidentally workspace and use the features included in your role."
+- **Rescheduled (booked):** título "Appointment scheduled" y primera línea "…has been canceled.", como el Figma.
+- **Subscription canceled:** suma el aviso de solo lectura debajo de *Subscription details*.
+- Los tres pasan de *Proposal* a *From the Figma*. Sin variables nuevas; `public/emails/` regenerado.
+
 ### Breadcrumb y título van de la mano ([#211](https://github.com/JulianGerardi/red-dental-studio/pull/211))
 - **Regla:** en toda pantalla con breadcrumb, el H1 dice lo mismo que el último tramo. Sección = nombre del menú; ítem =
   su nombre, sin verbo (*Edit …* sólo en Edit patient); lo que no existe todavía, *New …*. Las pestañas no cambian el

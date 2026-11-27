@@ -12,9 +12,9 @@ test('Elegir un mail muestra su asunto, de dónde sale el texto y sus variables'
   await expect(screen.getByText(/^From the Figma$/)).toBeVisible()
   await expect(screen.getByText(/^\{\{appointment_date\}\}$/)).toBeVisible()
 
-  await screen.getByRole('link', /^Subscription canceled/).tap()
+  await screen.getByRole('link', /^Treatment plan ready/).tap()
   await expect(screen.getByText(/^Proposal · pending approval$/)).toBeVisible()
-  await expect(screen.getByText(/^\{\{subscription_end_date\}\}$/)).toBeVisible()
+  await expect(screen.getByText(/^\{\{portal_link\}\}$/)).toBeVisible()
 })
 
 test('La vista previa cambia entre escritorio y celular, y entre datos de ejemplo y variables', async ({ app, screen }) => {
