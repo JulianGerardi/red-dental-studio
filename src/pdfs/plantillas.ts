@@ -100,7 +100,7 @@ export const PDFS: Pdf[] = [
     firma: 'Only the provider: name, date and time, and the content hash. Addenda are signed by their author.',
     origen: 'propuesta',
     completado: [
-      'Texts and order from the clinical note spec (CON-2975, CON-3081, CON-3605, CON-3668)',
+      'Texts and order from the clinical note spec (CON-2975, CON-3081, CON-3605, CON-3668) and the notes generated in red.dev',
       'Orders and workflows as label and value: the spec does not give their text',
       'Additional Notes and Addenda (CON-2730), not in the spec',
     ],
@@ -112,7 +112,7 @@ export const PDFS: Pdf[] = [
       aviso: '{{#auto_generated}}<p class="aviso">Generated automatically when the encounter closed after 48 hours without activity. Workflow narratives are not included.</p>{{/auto_generated}}',
       resumen: [
         ['Patient name', '{{patient_name}}'], ['Date of birth', '{{patient_birth_date}}'], ['Date of visit', '{{visit_date}} — {{visit_time}}'],
-        ['Attending dentist', '{{provider_name}}'], ['Location', '{{location_name}}'], ['Contact', '{{patient_phone}}'],
+        ['Attending dentist', '{{provider_name}}'], ['Contact', '{{patient_phone}}'],
       ],
       secciones: [
         { titulo: 'Vital Signs', si: 'has_vitals', bloques: [{ tipo: 'libre', html: `<p>Patient vitals were taken:</p>
@@ -120,9 +120,9 @@ export const PDFS: Pdf[] = [
 {{#out_of_range_values}}<p><b>Out of range values:</b> {{out_of_range_values}}.</p>{{/out_of_range_values}}{{#vitals_notes}}<p><b>Notes:</b> {{vitals_notes}}</p>{{/vitals_notes}}` }] },
         { titulo: 'Medical History', bloques: [
           { tipo: 'libre', html: `<p class="rotulo">Past medical conditions:{{^past_medical_conditions}} <span>Patient reports no known medical conditions.</span>{{/past_medical_conditions}}</p>
-<ul class="lista">{{#past_medical_conditions}}<li><b>{{name}}</b> ({{start_date}}).{{#notes}} {{notes}}{{/notes}}</li>{{/past_medical_conditions}}</ul>` },
+<ul class="lista">{{#past_medical_conditions}}<li>{{name}} {{status}} ({{start_date}}).{{#notes}} {{notes}}{{/notes}}</li>{{/past_medical_conditions}}</ul>` },
           { tipo: 'lista', rotulo: 'Current medications:', lista: 'current_medications', vacio: 'Patient reports no current medications.', valor: '<b>{{name}}</b> {{dose}} {{unit}} · {{frequency}} · {{status}} ({{start_date}}).{{#notes}} {{notes}}{{/notes}}' },
-          { tipo: 'lista', rotulo: 'Known allergies:', lista: 'known_allergies', vacio: 'No known allergies reported.', valor: '<b>Allergy to {{allergen}}</b> {{reactions}} ({{start_date}}).{{#notes}} {{notes}}{{/notes}}' },
+          { tipo: 'lista', rotulo: 'Known allergies:', lista: 'known_allergies', vacio: 'No known allergies reported.', valor: 'Allergy to {{allergen}} ({{start_date}}).{{#notes}} {{notes}}{{/notes}}<ul class="lista">{{#reactions}}<li>{{category}} – {{symptom}}</li>{{/reactions}}{{#severity}}<li>Severity: {{severity}}</li>{{/severity}}</ul>' },
           { tipo: 'lista', rotulo: 'Past surgeries and/or hospitalizations:', lista: 'past_surgeries', vacio: 'No past surgeries or hospitalizations reported.', valor: '{{name}} ({{date}}).' },
           { tipo: 'narrativas', lista: 'encounter_questionnaires', titulo: '{{name}}', texto: '{{narrative}}' },
           { tipo: 'libre', html: '{{#has_history_questionnaires}}<h3>Patient History</h3>{{/has_history_questionnaires}}' },
@@ -136,13 +136,15 @@ export const PDFS: Pdf[] = [
 {{#has_gingival_margin}}<p class="rotulo">Gingival Margin Levels (including +1 mm recession and overgrowth)</p>{{#has_recession}}<p>Recession (+1 mm or greater):</p><ul class="lista">{{#recession}}<li>#{{tooth}} {{surface}}: +{{value}} mm.</li>{{/recession}}</ul>{{/has_recession}}{{#has_overgrowth}}<p>Overgrowth (negative values):</p><ul class="lista">{{#overgrowth}}<li>#{{tooth}} {{surface}}: -{{value}} mm.</li>{{/overgrowth}}</ul>{{/has_overgrowth}}{{/has_gingival_margin}}
 {{#has_bleeding}}<p class="rotulo">Bleeding on probing</p><ul class="lista">{{#bleeding}}<li>#{{tooth}} {{surface}}.</li>{{/bleeding}}</ul>{{/has_bleeding}}
 {{#has_suppuration}}<p class="rotulo">Suppuration</p><ul class="lista">{{#suppuration}}<li>#{{tooth}} {{surface}}.</li>{{/suppuration}}</ul>{{/has_suppuration}}{{/new_charting}}</div>{{/periodontal_exams}}` }] },
-        { titulo: 'Consent Summary', si: 'consent_presented', bloques: [{ tipo: 'libre', html: `<p><b>Consent Summary:</b> The treatment plan(s) presented, including full BRAINS discussion (Benefits, Risks, Alternatives, Including No Treatment, and Sensible Expectations) for each individual option, were thoroughly reviewed and discussed with the patient in clear, understandable language.</p>
+        { titulo: 'Treatment Plan', si: 'has_treatment_plan', bloques: [{ tipo: 'libre', html: `{{#has_treatment_cases}}<p>Treatment plan(s) were proposed that included the following sequence(s) of events for each option presented:</p>
+{{#treatment_cases}}<div class="bloque"><p class="bloque-titulo">{{name}} – {{case_type}}{{#recommended}} (Recommended){{/recommended}} · Est. total cost: {{total}}</p>{{#visits}}<p>{{visit_name}} (Est. cost: {{visit_cost}})</p><ul class="lista">{{#procedures}}<li><b>{{code}}</b> — {{description}}{{#anatomic_area}} — {{anatomic_area}}{{/anatomic_area}}.</li>{{/procedures}}</ul>{{/visits}}<p>Patient Decision: {{decision}}</p></div>{{/treatment_cases}}{{/has_treatment_cases}}
+{{#consent_presented}}<p><b>Consent Summary:</b> The treatment plan(s) presented, including full BRAINS discussion (Benefits, Risks, Alternatives, Including No Treatment, and Sensible Expectations) for each individual option, were thoroughly reviewed and discussed with the patient in clear, understandable language.</p>
 <p>All procedures, potential complications, prognosis, financial implications, treatment sequences, and patient decisions (accepted/declined) for every presented plan were explained in detail. The patient had ample opportunity to ask questions, which were fully answered to their satisfaction. Patient verbalized understanding of each proposed treatment option, associated risks (including but not limited to infection, pain, nerve injury, failure rates &lt;5%, tooth fracture), benefits, reasonable alternatives, and consequences of declination or no treatment.</p>
-<p>Written informed consent forms were recorded separately for each presented treatment plan (accepted and/or declined options). All patient decisions have been documented accordingly.</p>
+<p>Written informed consent forms were recorded separately for each presented treatment plan (accepted and/or declined options). All patient decisions have been documented accordingly.</p>{{/consent_presented}}
 {{#has_accepted_consents}}<p class="rotulo">The following informed consent(s) were accepted by the patient:</p><ul class="lista">{{#accepted_consents}}<li>{{consent_name}} – {{plan_name}}</li>{{/accepted_consents}}</ul>{{/has_accepted_consents}}` }] },
         { titulo: 'Operative Report', si: 'has_procedures', bloques: [
           { tipo: 'subtitulo', texto: 'Procedure' },
-          { tipo: 'libre', html: '<ul class="lista">{{#procedures}}<li>{{code}} — {{description}} on {{location}} [{{status}}].</li>{{/procedures}}</ul>' },
+          { tipo: 'libre', html: '<ul class="lista">{{#procedures}}<li><b>{{code}}</b> — {{description}}{{#location}} on <b>{{location}}</b>{{/location}} <em>[{{status}}]</em>.</li>{{/procedures}}</ul>' },
         ] },
         { titulo: 'Workflows', si: 'has_workflows', bloques: [
           { tipo: 'narrativas', lista: 'workflows', titulo: '{{workflow_name}}', texto: '{{narrative}}' },
@@ -185,12 +187,12 @@ export const PDFS: Pdf[] = [
       height_in: '68', weight_lb: '187', bmi: '28.4', blood_pressure: '145/92', heart_rate: '74', respiratory_rate: '16', temperature: '98.4', oxygen_saturation: '98',
       out_of_range_values: 'Blood pressure',
       vitals_notes: 'Taken seated, before local anesthesia.',
-      past_medical_conditions: [{ name: 'Hypertension', start_date: '03/15/2019', notes: 'Controlled with medication.' }],
+      past_medical_conditions: [{ name: 'Hypertension', status: 'Active', start_date: '03/15/2019', notes: 'Controlled with medication.' }],
       current_medications: [
         { name: 'Lisinopril', dose: '10', unit: 'mg', frequency: 'once daily', status: 'Active', start_date: '03/15/2019', notes: 'The patient has to take it for life.' },
       ],
       known_allergies: [
-        { allergen: 'latex', reactions: 'Dermatological – Skin rash, mild', start_date: '01/01/2015', notes: 'Use nitrile gloves.' },
+        { allergen: 'latex', start_date: '01/01/2015', notes: 'Use nitrile gloves.', reactions: [{ category: 'Dermatological', symptom: 'Skin rash' }], severity: 'Mild' },
       ],
       past_surgeries: [{ name: 'Appendectomy', date: '06/10/2012' }],
       encounter_questionnaires: [
@@ -224,6 +226,21 @@ export const PDFS: Pdf[] = [
           has_gingival_margin: true, has_recession: true, recession: [{ tooth: '19', surface: 'L', value: '2' }], has_overgrowth: false, overgrowth: [],
           has_bleeding: true, bleeding: [{ tooth: '19', surface: 'B' }, { tooth: '19', surface: 'DB' }], has_suppuration: false, suppuration: [] },
       ],
+      has_treatment_plan: true,
+      has_treatment_cases: true,
+      treatment_cases: [
+        { name: 'Restorative plan', case_type: 'Definitive / Rehabilitation', recommended: true, total: '$2,430.00', decision: 'Accepted', visits: [
+          { visit_name: 'Visit 1', visit_cost: '$1,180.00', procedures: [
+            { code: 'D3330', description: 'Endodontic therapy, molar tooth', anatomic_area: '#19' },
+            { code: 'D1110', description: 'Prophylaxis, adult', anatomic_area: '' },
+          ] },
+          { visit_name: 'Visit 2', visit_cost: '$1,250.00', procedures: [{ code: 'D2740', description: 'Crown, porcelain/ceramic', anatomic_area: '#19' }] },
+        ] },
+        { name: 'Extraction and implant', case_type: 'Definitive / Rehabilitation', recommended: false, total: '$2,350.00', decision: 'Declined', visits: [
+          { visit_name: 'Visit 1', visit_cost: '$250.00', procedures: [{ code: 'D7140', description: 'Extraction, erupted tooth', anatomic_area: '#19' }] },
+          { visit_name: 'Visit 2', visit_cost: '$2,100.00', procedures: [{ code: 'D6010', description: 'Implant body, endosteal', anatomic_area: '#19' }] },
+        ] },
+      ],
       consent_presented: true,
       has_accepted_consents: true,
       accepted_consents: [
@@ -232,6 +249,7 @@ export const PDFS: Pdf[] = [
       ],
       has_procedures: true,
       procedures: [
+        { code: 'D0140', description: 'Limited oral evaluation – problem focused', location: '', status: 'completed' },
         { code: 'D0220', description: 'Intraoral – periapical first radiographic image', location: '#19', status: 'completed' },
         { code: 'D3221', description: 'Pulpal debridement, primary and permanent teeth', location: '#19', status: 'completed' },
       ],

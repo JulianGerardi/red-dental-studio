@@ -123,8 +123,10 @@ consentimiento estaban armados distinto.
 ### 1. Nota clínica (pasa a propuesta)
 
 **Fuente: la especificación que pasó Julián** (*Especificación de Reconstrucción: Nota Clínica Completa*, CON-2816,
-CON-2975, CON-3081, CON-3605, CON-3668, CON-2727). CON-2975 y CON-3081 son las pruebas de QA con los textos exactos. No
-pude entrar a red.dev (pide login y no tengo usuario): no se comparó con una nota real.
+CON-2975, CON-3081, CON-3605, CON-3668, CON-2727). CON-2975 y CON-3081 son las pruebas de QA con los textos exactos.
+**Se comparó con las 8 notas que genera red.dev** (Dashboard › Pending Tasks › Clinical Notes, sin firmar; sólo
+lectura, no se firmó ni se creó nada). Son todas de un paciente y no traen vitales, exámenes ni órdenes: esas partes
+siguen saliendo de la especificación.
 
 - **La nota es texto, no tablas**, con los textos de la especificación copiados tal cual y en su orden: Vital Signs →
   Medical History (antecedentes, Chief Complaint y Triage sin título de grupo, *Patient History* en orden alfabético) →
@@ -136,16 +138,22 @@ pude entrar a red.dev (pide login y no tengo usuario): no se comparó con una no
   Assessment y Radiographic tienen sus tres textos (sin findings —sólo si se usó *No findings*—, con findings y
   reviewed); Periodontal, el de review o el del nuevo sondaje con PD ≥ 4 mm, recesión, agrandamiento, sangrado y
   supuración. Las zonas van con el nombre anatómico (*Left Mandibular Gingiva*), no "Zone 14".
-- **Consent Summary** sale si hubo interacción con un consentimiento en la sesión; la lista de aceptados, sólo si el
-  paciente firmó en esa sesión.
-- **Operative Report:** "{código} — {descripción} on #{diente} [in progress / completed]", una vez por procedimiento
-  aunque tenga varias visitas.
+- **Treatment Plan, como la nota real:** "Treatment plan(s) were proposed…", cada caso con "{nombre} – {tipo}
+  (Recommended) · Est. total cost", sus visitas con el costo, los procedimientos (código en negrita, descripción y zona)
+  y "Patient Decision". El **Consent Summary** va adentro de esta sección, como en red.dev, y sale si hubo interacción
+  con un consentimiento (CON-3081); la lista de aceptados, sólo si el paciente firmó en esa sesión.
+- **Antecedentes con el formato de red.dev:** "{condición} {estado} ({fecha}). {nota}", el medicamento en negrita y cada
+  alergia con su reacción ("Gastrointestinal – Abdominal Pain") y su severidad debajo.
+- **Resumen con los 5 datos de la nota real** (sin Location).
+- **Operative Report:** "**{código}** — {descripción} on **#{diente}** *[in progress / completed]*", una vez por
+  procedimiento aunque tenga varias visitas; sin zona, sin "on".
 - **Firma:** sólo el provider (CON-2975 pide sacar la del paciente), con fecha, hora y hash del contenido (CON-2727).
 - Recetas, lab orders y referrals siguen como cajas con rótulo y valor: la especificación no da su texto. *Documents
   sent: Yes* sólo si se adjuntó un archivo.
 - **Fuera de la especificación y se mantienen:** *Additional Notes* (el texto libre de la hoja de la app; sólo si hay) y
   las **adendas** después de la firma (CON-2730). El aviso de nota generada sola (CON-2937) también.
-- **Sale la sección Treatment plan** de la primera vuelta: la especificación la reemplaza por el Consent Summary.
+- **Títulos sin número, en azul** (pedido de Julián), en todos los PDF. Los números no aportaban en documentos cortos y
+  cambiaban con cada sección que se omite. La hoja de la app (`ui/document-sheet`) sigue numerada: queda distinta.
 
 ### 2. Treatment plan y consentimientos
 
@@ -179,8 +187,12 @@ pude entrar a red.dev (pide login y no tengo usuario): no se comparó con una no
    de la especificación.
 5. La especificación dice "Finding on #{tooth}/{surface}": se tomó "Finding" como el nombre del finding
    ("Deep caries on #19/O, D").
-6. La especificación pone el título "Consent Summary" y el texto empieza otra vez con "Consent Summary:". Se copió tal
-   cual.
+6. En red.dev el Consent Summary es un párrafo de la sección Treatment Plan; la especificación lo trata como sección
+   aparte. Se siguió la nota real. Si hay consentimiento sin plan presentado, la sección igual tiene que salir
+   (`has_treatment_plan` lo decide el backend).
+7. **En red.dev:** los costos salen sin formato ("Est. total cost: 110.0", "Est. cost: 0"); la plantilla espera el
+   importe con moneda ("$110.00"). Falta el espacio después de la raya en el plan ("D0140 —Limited…"). El bloque de
+   firma sin firmar dice "Date:" vacío; la plantilla dice "Not signed yet".
 
 ### Para validar
 

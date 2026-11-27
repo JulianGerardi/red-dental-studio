@@ -40,6 +40,8 @@
       "dental_assessment_no_findings",
       "dental_assessment_reviewed",
       "dental_assessment_review_note",
+      "has_treatment_plan",
+      "has_treatment_cases",
       "consent_presented",
       "has_accepted_consents",
       "has_procedures",
@@ -56,6 +58,7 @@
     "lists": {
       "past_medical_conditions": [
         "name",
+        "status",
         "start_date",
         "notes"
       ],
@@ -70,9 +73,13 @@
       ],
       "known_allergies": [
         "allergen",
-        "reactions",
         "start_date",
-        "notes"
+        "notes",
+        "severity"
+      ],
+      "known_allergies.reactions": [
+        "category",
+        "symptom"
       ],
       "past_surgeries": [
         "name",
@@ -149,6 +156,22 @@
       "periodontal_exams.suppuration": [
         "tooth",
         "surface"
+      ],
+      "treatment_cases": [
+        "name",
+        "case_type",
+        "recommended",
+        "total",
+        "decision"
+      ],
+      "treatment_cases.visits": [
+        "visit_name",
+        "visit_cost"
+      ],
+      "treatment_cases.visits.procedures": [
+        "code",
+        "description",
+        "anatomic_area"
       ],
       "accepted_consents": [
         "consent_name",
@@ -251,6 +274,7 @@
       "past_medical_conditions": [
         {
           "name": "Hypertension",
+          "status": "Active",
           "start_date": "03/15/2019",
           "notes": "Controlled with medication."
         }
@@ -269,9 +293,15 @@
       "known_allergies": [
         {
           "allergen": "latex",
-          "reactions": "Dermatological – Skin rash, mild",
           "start_date": "01/01/2015",
-          "notes": "Use nitrile gloves."
+          "notes": "Use nitrile gloves.",
+          "reactions": [
+            {
+              "category": "Dermatological",
+              "symptom": "Skin rash"
+            }
+          ],
+          "severity": "Mild"
         }
       ],
       "past_surgeries": [
@@ -405,6 +435,77 @@
           "suppuration": []
         }
       ],
+      "has_treatment_plan": true,
+      "has_treatment_cases": true,
+      "treatment_cases": [
+        {
+          "name": "Restorative plan",
+          "case_type": "Definitive / Rehabilitation",
+          "recommended": true,
+          "total": "$2,430.00",
+          "decision": "Accepted",
+          "visits": [
+            {
+              "visit_name": "Visit 1",
+              "visit_cost": "$1,180.00",
+              "procedures": [
+                {
+                  "code": "D3330",
+                  "description": "Endodontic therapy, molar tooth",
+                  "anatomic_area": "#19"
+                },
+                {
+                  "code": "D1110",
+                  "description": "Prophylaxis, adult",
+                  "anatomic_area": ""
+                }
+              ]
+            },
+            {
+              "visit_name": "Visit 2",
+              "visit_cost": "$1,250.00",
+              "procedures": [
+                {
+                  "code": "D2740",
+                  "description": "Crown, porcelain/ceramic",
+                  "anatomic_area": "#19"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Extraction and implant",
+          "case_type": "Definitive / Rehabilitation",
+          "recommended": false,
+          "total": "$2,350.00",
+          "decision": "Declined",
+          "visits": [
+            {
+              "visit_name": "Visit 1",
+              "visit_cost": "$250.00",
+              "procedures": [
+                {
+                  "code": "D7140",
+                  "description": "Extraction, erupted tooth",
+                  "anatomic_area": "#19"
+                }
+              ]
+            },
+            {
+              "visit_name": "Visit 2",
+              "visit_cost": "$2,100.00",
+              "procedures": [
+                {
+                  "code": "D6010",
+                  "description": "Implant body, endosteal",
+                  "anatomic_area": "#19"
+                }
+              ]
+            }
+          ]
+        }
+      ],
       "consent_presented": true,
       "has_accepted_consents": true,
       "accepted_consents": [
@@ -419,6 +520,12 @@
       ],
       "has_procedures": true,
       "procedures": [
+        {
+          "code": "D0140",
+          "description": "Limited oral evaluation – problem focused",
+          "location": "",
+          "status": "completed"
+        },
         {
           "code": "D0220",
           "description": "Intraoral – periapical first radiographic image",

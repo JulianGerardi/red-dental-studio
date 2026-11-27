@@ -57,8 +57,8 @@ export type Bloque =
       cada ítem se llaman `tooth` y `surfaces`; la dentición (Permanent o Primary) va en `denticion`. */
   | { tipo: 'boca'; lista: string; denticion: string }
 
-/** `si`: la sección sólo sale si esa variable o lista tiene valor (la nota clínica no muestra lo que no pasó en la
-    visita). Los números salen con un contador de CSS, así que una sección que no sale no deja un hueco. */
+/** `si`: la sección sólo sale si esa variable tiene valor (la nota clínica no muestra lo que no pasó en la visita). Los
+    títulos van sin número, en azul (pedido de Julián, 2026-11-27). */
 export type Seccion = { titulo: string; bloques: Bloque[]; si?: string }
 /** Quién firma: `prefijo` arma las variables {{<prefijo>_name}}, {{<prefijo>_signed_date}} y {{<prefijo>_signature_image}}. */
 export type Firma = { rol: string; prefijo: string; hash?: boolean }
@@ -161,9 +161,7 @@ h1 { margin: 0; font-size: 15pt; line-height: 1.25; font-weight: 700; color: ${C
 .resumen dt { font-size: 6.5pt; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: ${COLOR.apagado}; }
 .resumen dd { margin: 1pt 0 0; font-weight: 500; color: ${COLOR.tinta}; overflow-wrap: anywhere; }
 section { margin-top: 18pt; }
-body { counter-reset: seccion; }
-h2 { display: flex; gap: 7pt; margin: 0 0 5pt; font-size: 10.5pt; font-weight: 700; color: ${COLOR.tinta}; break-after: avoid; counter-increment: seccion; }
-h2::before { content: counter(seccion); color: ${COLOR.marca}; font-weight: 600; }
+h2 { margin: 0 0 5pt; font-size: 10.5pt; font-weight: 700; color: ${COLOR.marca}; break-after: avoid; }
 .aviso { margin: 10pt 0 0; padding: 6pt 9pt; border-radius: 4pt; background: ${COLOR.franja}; font-size: 8pt; color: ${COLOR.texto}; }
 .anexo-cabeza { padding-bottom: 9pt; margin-bottom: 14pt; border-bottom: 1.5pt solid ${COLOR.tinta}; }
 .anexo-cabeza .tipo { margin-top: 0; }

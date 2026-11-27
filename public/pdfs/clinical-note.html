@@ -27,9 +27,7 @@ h1 { margin: 0; font-size: 15pt; line-height: 1.25; font-weight: 700; color: #09
 .resumen dt { font-size: 6.5pt; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: #71717a; }
 .resumen dd { margin: 1pt 0 0; font-weight: 500; color: #09090b; overflow-wrap: anywhere; }
 section { margin-top: 18pt; }
-body { counter-reset: seccion; }
-h2 { display: flex; gap: 7pt; margin: 0 0 5pt; font-size: 10.5pt; font-weight: 700; color: #09090b; break-after: avoid; counter-increment: seccion; }
-h2::before { content: counter(seccion); color: #1d56bc; font-weight: 600; }
+h2 { margin: 0 0 5pt; font-size: 10.5pt; font-weight: 700; color: #1d56bc; break-after: avoid; }
 .aviso { margin: 10pt 0 0; padding: 6pt 9pt; border-radius: 4pt; background: #e8eef8; font-size: 8pt; color: #3f3f46; }
 .anexo-cabeza { padding-bottom: 9pt; margin-bottom: 14pt; border-bottom: 1.5pt solid #09090b; }
 .anexo-cabeza .tipo { margin-top: 0; }
@@ -126,7 +124,7 @@ h2 + h3 { margin-top: 2pt; }
 <p class="tipo">Dental clinical note</p>
 <h1>{{patient_name}}</h1>
 {{#auto_generated}}<p class="aviso">Generated automatically when the encounter closed after 48 hours without activity. Workflow narratives are not included.</p>{{/auto_generated}}
-<dl class="resumen"><div><dt>Patient name</dt><dd>{{patient_name}}</dd></div><div><dt>Date of birth</dt><dd>{{patient_birth_date}}</dd></div><div><dt>Date of visit</dt><dd>{{visit_date}} — {{visit_time}}</dd></div><div><dt>Attending dentist</dt><dd>{{provider_name}}</dd></div><div><dt>Location</dt><dd>{{location_name}}</dd></div><div><dt>Contact</dt><dd>{{patient_phone}}</dd></div></dl>
+<dl class="resumen"><div><dt>Patient name</dt><dd>{{patient_name}}</dd></div><div><dt>Date of birth</dt><dd>{{patient_birth_date}}</dd></div><div><dt>Date of visit</dt><dd>{{visit_date}} — {{visit_time}}</dd></div><div><dt>Attending dentist</dt><dd>{{provider_name}}</dd></div><div><dt>Contact</dt><dd>{{patient_phone}}</dd></div></dl>
 {{#has_vitals}}<section>
 <h2>Vital Signs</h2>
 <p>Patient vitals were taken:</p>
@@ -136,9 +134,9 @@ h2 + h3 { margin-top: 2pt; }
 <section>
 <h2>Medical History</h2>
 <p class="rotulo">Past medical conditions:{{^past_medical_conditions}} <span>Patient reports no known medical conditions.</span>{{/past_medical_conditions}}</p>
-<ul class="lista">{{#past_medical_conditions}}<li><b>{{name}}</b> ({{start_date}}).{{#notes}} {{notes}}{{/notes}}</li>{{/past_medical_conditions}}</ul>
+<ul class="lista">{{#past_medical_conditions}}<li>{{name}} {{status}} ({{start_date}}).{{#notes}} {{notes}}{{/notes}}</li>{{/past_medical_conditions}}</ul>
 <p class="rotulo">Current medications:</p><ul class="lista">{{#current_medications}}<li><b>{{name}}</b> {{dose}} {{unit}} · {{frequency}} · {{status}} ({{start_date}}).{{#notes}} {{notes}}{{/notes}}</li>{{/current_medications}}{{^current_medications}}<li>Patient reports no current medications.</li>{{/current_medications}}</ul>
-<p class="rotulo">Known allergies:</p><ul class="lista">{{#known_allergies}}<li><b>Allergy to {{allergen}}</b> {{reactions}} ({{start_date}}).{{#notes}} {{notes}}{{/notes}}</li>{{/known_allergies}}{{^known_allergies}}<li>No known allergies reported.</li>{{/known_allergies}}</ul>
+<p class="rotulo">Known allergies:</p><ul class="lista">{{#known_allergies}}<li>Allergy to {{allergen}} ({{start_date}}).{{#notes}} {{notes}}{{/notes}}<ul class="lista">{{#reactions}}<li>{{category}} – {{symptom}}</li>{{/reactions}}{{#severity}}<li>Severity: {{severity}}</li>{{/severity}}</ul></li>{{/known_allergies}}{{^known_allergies}}<li>No known allergies reported.</li>{{/known_allergies}}</ul>
 <p class="rotulo">Past surgeries and/or hospitalizations:</p><ul class="lista">{{#past_surgeries}}<li>{{name}} ({{date}}).</li>{{/past_surgeries}}{{^past_surgeries}}<li>No past surgeries or hospitalizations reported.</li>{{/past_surgeries}}</ul>
 {{#encounter_questionnaires}}<div class="narrativa"><p class="narrativa-titulo">{{name}}</p><p>{{narrative}}</p></div>{{/encounter_questionnaires}}
 {{#has_history_questionnaires}}<h3>Patient History</h3>{{/has_history_questionnaires}}
@@ -155,17 +153,19 @@ h2 + h3 { margin-top: 2pt; }
 {{#has_bleeding}}<p class="rotulo">Bleeding on probing</p><ul class="lista">{{#bleeding}}<li>#{{tooth}} {{surface}}.</li>{{/bleeding}}</ul>{{/has_bleeding}}
 {{#has_suppuration}}<p class="rotulo">Suppuration</p><ul class="lista">{{#suppuration}}<li>#{{tooth}} {{surface}}.</li>{{/suppuration}}</ul>{{/has_suppuration}}{{/new_charting}}</div>{{/periodontal_exams}}
 </section>{{/has_exams}}
-{{#consent_presented}}<section>
-<h2>Consent Summary</h2>
-<p><b>Consent Summary:</b> The treatment plan(s) presented, including full BRAINS discussion (Benefits, Risks, Alternatives, Including No Treatment, and Sensible Expectations) for each individual option, were thoroughly reviewed and discussed with the patient in clear, understandable language.</p>
+{{#has_treatment_plan}}<section>
+<h2>Treatment Plan</h2>
+{{#has_treatment_cases}}<p>Treatment plan(s) were proposed that included the following sequence(s) of events for each option presented:</p>
+{{#treatment_cases}}<div class="bloque"><p class="bloque-titulo">{{name}} – {{case_type}}{{#recommended}} (Recommended){{/recommended}} · Est. total cost: {{total}}</p>{{#visits}}<p>{{visit_name}} (Est. cost: {{visit_cost}})</p><ul class="lista">{{#procedures}}<li><b>{{code}}</b> — {{description}}{{#anatomic_area}} — {{anatomic_area}}{{/anatomic_area}}.</li>{{/procedures}}</ul>{{/visits}}<p>Patient Decision: {{decision}}</p></div>{{/treatment_cases}}{{/has_treatment_cases}}
+{{#consent_presented}}<p><b>Consent Summary:</b> The treatment plan(s) presented, including full BRAINS discussion (Benefits, Risks, Alternatives, Including No Treatment, and Sensible Expectations) for each individual option, were thoroughly reviewed and discussed with the patient in clear, understandable language.</p>
 <p>All procedures, potential complications, prognosis, financial implications, treatment sequences, and patient decisions (accepted/declined) for every presented plan were explained in detail. The patient had ample opportunity to ask questions, which were fully answered to their satisfaction. Patient verbalized understanding of each proposed treatment option, associated risks (including but not limited to infection, pain, nerve injury, failure rates &lt;5%, tooth fracture), benefits, reasonable alternatives, and consequences of declination or no treatment.</p>
-<p>Written informed consent forms were recorded separately for each presented treatment plan (accepted and/or declined options). All patient decisions have been documented accordingly.</p>
+<p>Written informed consent forms were recorded separately for each presented treatment plan (accepted and/or declined options). All patient decisions have been documented accordingly.</p>{{/consent_presented}}
 {{#has_accepted_consents}}<p class="rotulo">The following informed consent(s) were accepted by the patient:</p><ul class="lista">{{#accepted_consents}}<li>{{consent_name}} – {{plan_name}}</li>{{/accepted_consents}}</ul>{{/has_accepted_consents}}
-</section>{{/consent_presented}}
+</section>{{/has_treatment_plan}}
 {{#has_procedures}}<section>
 <h2>Operative Report</h2>
 <h3>Procedure</h3>
-<ul class="lista">{{#procedures}}<li>{{code}} — {{description}} on {{location}} [{{status}}].</li>{{/procedures}}</ul>
+<ul class="lista">{{#procedures}}<li><b>{{code}}</b> — {{description}}{{#location}} on <b>{{location}}</b>{{/location}} <em>[{{status}}]</em>.</li>{{/procedures}}</ul>
 </section>{{/has_procedures}}
 {{#has_workflows}}<section>
 <h2>Workflows</h2>
