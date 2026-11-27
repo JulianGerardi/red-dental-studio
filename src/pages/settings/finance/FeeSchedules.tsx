@@ -4,7 +4,7 @@ import { Archive, ArchiveRestore, ChevronDown, Copy, GitCompareArrows, Plus, Pow
 import { cn } from '@/lib/utils'
 import { SettingsPageHeader } from '@/components/settings/SettingsPageHeader'
 import { BillingHeader } from '@/components/finance/BillingHeader'
-import { FieldLabel, SelectField, TextField, control } from '@/components/patients/form'
+import { FieldError, FieldHint, FieldLabel, SelectField, TextField, control } from '@/components/patients/form'
 import { Alert, type AlertTone } from '@/components/ui/alert'
 import { EmptyState } from '@/components/ui/empty-state'
 import { useAvisoSalida } from '@/lib/useAvisoSalida'
@@ -128,19 +128,18 @@ function MenuVersion({ opciones, actual, onElegir }: { opciones: OpcionVersion[]
   )
 }
 
-/* Debajo de Available from: qué va a pasar con esa fecha al publicar. */
+/* Debajo de Available from: qué va a pasar con esa fecha al publicar, con el aviso de la app (`ui/alert`) en el tono del
+   estado que va a tener la versión (settings-billing.md, 2026-11-27). */
 function ResultadoFecha({ desde, hoy, hayActiva }: { desde: string; hoy: string; hayActiva: boolean }) {
-  if (desde < hoy) return <span className="text-[11px] text-field-error">{FECHA_PASADA}</span>
-  const esHoy = desde === hoy
-  return (
-    <p className={cn('flex items-start gap-2 rounded-md px-2.5 py-2 text-[12px] leading-snug text-ink', esHoy ? 'bg-dash-ok-bg' : 'bg-info-bg')}>
-      <Pill tone={esHoy ? 'success' : 'info'} size="sm">{esHoy ? 'Active' : 'Scheduled'}</Pill>
-      <span>
-        {esHoy
-          ? <>Starts today. It becomes <b>Active</b> as soon as you publish.{hayActiva && ' The current version expires at that moment.'}</>
-          : <>Starts on {fechaMDA(desde)}. It stays <b>Scheduled</b> until then, then becomes Active automatically.{hayActiva && ' The current version remains active until that day.'}</>}
-      </span>
-    </p>
+  if (desde < hoy) return <FieldError>{FECHA_PASADA}</FieldError>
+  return desde === hoy ? (
+    <Alert tone="success" title="Starts today">
+      It becomes <b>Active</b> as soon as you publish.{hayActiva && ' The current version expires at that moment.'}
+    </Alert>
+  ) : (
+    <Alert tone="info" title={`Starts on ${fechaMDA(desde)}`}>
+      It stays <b>Scheduled</b> until then, then becomes Active automatically.{hayActiva && ' The current version remains active until that day.'}
+    </Alert>
   )
 }
 
@@ -366,9 +365,9 @@ export function FeeScheduleEditor({ arancel }: { arancel?: Arancel }) {
               {edita ? (
                 <>
                   <DatePicker value={desde} onChange={setDesde} className="h-9 w-full" error={faltaFecha || (!!dia && dia < hoy)} />
-                  {faltaFecha && <span className="-mt-1 text-[11px] text-field-error">{OBLIGATORIO}</span>}
+                  {faltaFecha ? <FieldError>{OBLIGATORIO}</FieldError>
+                    : modo !== 'scheduled' && <FieldHint>Used when you publish. Saving as a draft doesn’t keep a date.</FieldHint>}
                   {dia && <ResultadoFecha desde={dia} hoy={hoy} hayActiva={!!activa} />}
-                  {modo !== 'scheduled' && <span className="text-[11px] leading-snug text-ink-muted">Used when you publish. Saving as a draft doesn’t keep a date.</span>}
                 </>
               ) : <span className={cn(control(), 'flex h-9 items-center bg-surface-muted px-3 text-ink-muted tabular-nums')}>{version ? fechaMDA(version.desde) : 'No date'}</span>}
             </div>

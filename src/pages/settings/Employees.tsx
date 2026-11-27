@@ -356,7 +356,7 @@ export function SettingsEmployeeDetail() {
                         type="button"
                         aria-label="Remove credential"
                         onClick={() => setCredenciales((p) => p.filter((x) => x !== c))}
-                        className="mb-1 rounded p-2 text-ink hover:bg-dash-bad-bg hover:text-field-error"
+                        className="mb-1 rounded p-2 text-dash-bad-fg hover:bg-dash-bad-bg"
                       >
                         <Trash2 className="size-4" />
                       </button>

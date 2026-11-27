@@ -780,6 +780,19 @@ mismo diseño. Se va `settings/HojaConsentimientoPdf` (el formato de cards de re
 una página A4 con Helvetica).
 
 
+## Regla: el tacho va en rojo (2026-11-27)
+
+Sin historia de Jira. Julián: *"pasalos a rojo en toda la app"*. Todo tacho (`Trash2`) que borra o quita algo va en
+`text-dash-bad-fg`, también en reposo: antes varios estaban en gris y sólo se ponían rojos al pasar el mouse.
+
+- **Fila o ítem** (rangos, excepciones, salas, credenciales, asignaciones): sólo ícono, `cn(ICONO_SUELTO, 'text-dash-bad-fg')`,
+  16 px, con el nombre en el `aria-label` (*Remove …* / *Delete …*). Sin botón con texto.
+- **Menú ⋮**: `DropdownMenuItem variant="destructive"`.
+- **Botón con texto** (acción de un bloque o del pie: *Remove* de una credencial, *Discard draft*, *Delete* del turno):
+  `text-dash-bad-fg hover:text-dash-bad-fg` sobre `secondary` o `ghost`.
+- Pasaron a rojo: Location (Rooms, Exceptions, Working hours, New exception), Employees (credenciales, Roles & location),
+  Clinical Mode (procedimientos de la ficha, radiografías, credenciales) y el popover clínico del paciente.
+
 ## Regla: breadcrumb y título van de la mano (2026-11-27)
 
 Sin historia de Jira (no hay reglas de negocio sobre el rastro; las que lo nombran son de diseño o están canceladas).

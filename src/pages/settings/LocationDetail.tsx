@@ -484,7 +484,7 @@ export function RoomsTab() {
               >
                 <Pencil className="size-3" /> <span className="max-lg:hidden">Edit room</span>
               </button>
-              <button type="button" aria-label={`Delete ${s.nombre}`} onClick={() => borrar(s)} className={ICONO_SUELTO}>
+              <button type="button" aria-label={`Delete ${s.nombre}`} onClick={() => borrar(s)} className={cn(ICONO_SUELTO, 'text-dash-bad-fg')}>
                 <Trash2 className="size-4" />
               </button>
             </span>
@@ -614,7 +614,7 @@ export function ExceptionsTab() {
               >
                 <Pencil className="size-3" /> <span className="max-lg:hidden">Edit exception</span>
               </button>
-              <button type="button" aria-label={`Delete ${e.nombre}`} onClick={() => borrar(e)} className={ICONO_SUELTO}>
+              <button type="button" aria-label={`Delete ${e.nombre}`} onClick={() => borrar(e)} className={cn(ICONO_SUELTO, 'text-dash-bad-fg')}>
                 <Trash2 className="size-4" />
               </button>
             </span>

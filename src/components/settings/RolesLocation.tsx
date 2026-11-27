@@ -87,7 +87,7 @@ export function FilaRol({
           type="button"
           aria-label={`Remove ${rol.nombre}`}
           onClick={onBorrar}
-          className="rounded p-1 text-ink hover:bg-dash-bad-bg hover:text-dash-bad-fg"
+          className="rounded p-1 text-dash-bad-fg hover:bg-dash-bad-bg"
         >
           <Trash2 className="size-4" />
         </button>

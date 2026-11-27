@@ -116,7 +116,7 @@ export function ClinicalPopover({
                 type="button"
                 aria-label={`Delete ${it.name}`}
                 onClick={() => onDelete(it)}
-                className="shrink-0 text-ink hover:text-field-error"
+                className="shrink-0 text-dash-bad-fg hover:text-dash-bad-hover"
               >
                 <Trash2 className="size-3.5" />
               </button>

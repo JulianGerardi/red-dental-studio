@@ -26,7 +26,7 @@ export function Pill({
   tone, size = 'md', className, children,
 }: { tone: PillTone; size?: keyof typeof PILL_SIZES; className?: string; children: ReactNode }) {
   return (
-    <span className={cn('inline-flex items-center rounded-full border font-semibold', PILL_SIZES[size], PILL_TONES[tone], className)}>
+    <span data-slot="pill" className={cn('inline-flex items-center rounded-full border font-semibold', PILL_SIZES[size], PILL_TONES[tone], className)}>
       {children}
     </span>
   )

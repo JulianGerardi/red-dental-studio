@@ -192,7 +192,7 @@ export function ProcedimientosVinculados({ items, onRemove, disabled }: { items:
           {!disabled && (
             <button
               type="button" aria-label={`Remove ${p.codigo}`} title="Remove" onClick={() => onRemove(p)}
-              className="flex size-8 shrink-0 items-center justify-center rounded-md text-ink-muted hover:bg-dash-bad-bg hover:text-field-error focus-visible:outline-2 focus-visible:outline-dash-blue"
+              className="flex size-8 shrink-0 items-center justify-center rounded-md text-dash-bad-fg hover:bg-dash-bad-bg focus-visible:outline-2 focus-visible:outline-dash-blue"
             >
               <Trash2 className="size-4" />
             </button>

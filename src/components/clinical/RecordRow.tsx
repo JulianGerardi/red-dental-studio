@@ -55,7 +55,7 @@ export function RecordRow({
 
       <div className="text-muted-foreground flex shrink-0 gap-2">
         <button aria-label="Document"><FileText className="size-4" /></button>
-        <button aria-label="Delete"><Trash2 className="size-4" /></button>
+        <button aria-label="Delete" className="text-dash-bad-fg"><Trash2 className="size-4" /></button>
         <button aria-label="More"><MoreVertical className="size-4" /></button>
       </div>
     </div>
