@@ -3,9 +3,9 @@
     "id": "clinical-note",
     "category": "Clinical records",
     "name": "Clinical note",
-    "generated": "View PDF in a clinical note (Pending tasks, Clinical Mode history, patient documents).",
-    "signed_by": "The provider who attended the visit.",
-    "layout": "same as the app",
+    "generated": "Generate Clinical Note in Clinical Mode (as many times as needed until it is signed), or on its own when the encounter closes after 48 hours. View PDF in Pending tasks, Treatment history and patient documents.",
+    "signed_by": "The provider who attended the visit. Addenda are signed by their author.",
+    "layout": "proposal, pending approval",
     "template": "clinical-note.html",
     "sample_pdf": "clinical-note.pdf",
     "variables": [
@@ -17,26 +17,174 @@
       "practice_phone",
       "practice_email",
       "visit_date",
+      "auto_generated",
       "patient_birth_date",
       "visit_time",
       "provider_name",
       "patient_phone",
+      "has_vitals",
+      "vitals_notes",
+      "has_exams",
+      "has_periodontal_measures",
+      "has_procedures",
+      "has_treatment_cases",
+      "treatment_discussion",
+      "has_prescriptions",
+      "has_lab_orders",
+      "has_referrals",
+      "has_workflows",
       "clinical_notes_html",
       "provider_signed_date",
-      "provider_signature_image"
+      "provider_signature_image",
+      "has_addenda"
     ],
     "lists": {
-      "medical_conditions": [
+      "encounter_questionnaires": [
+        "name",
+        "narrative"
+      ],
+      "history_questionnaires": [
+        "name",
+        "completed_at",
+        "narrative"
+      ],
+      "patient_conditions": [
+        "type",
+        "description",
+        "severity",
+        "start_date",
+        "status",
+        "note"
+      ],
+      "patient_conditions.reactions": [
         "name"
       ],
-      "current_medications": [
-        "name"
+      "patient_medications": [
+        "drug_brand",
+        "drug",
+        "strength",
+        "strength_unit",
+        "dosage_form",
+        "dose",
+        "dose_unit",
+        "route",
+        "frequency",
+        "start_date",
+        "status"
       ],
-      "allergies": [
-        "name"
+      "vitals": [
+        "observation",
+        "value",
+        "measure"
       ],
-      "surgeries": [
-        "name"
+      "exams": [
+        "exam_type",
+        "review"
+      ],
+      "exams.exam_findings": [
+        "description",
+        "anatomic_area",
+        "status",
+        "note"
+      ],
+      "exams.exam_findings.descriptors": [
+        "name",
+        "answer"
+      ],
+      "periodontal_measures": [
+        "tooth",
+        "surface",
+        "measure",
+        "value"
+      ],
+      "procedures": [
+        "code",
+        "description",
+        "anatomic_area",
+        "status"
+      ],
+      "procedures.findings": [
+        "description"
+      ],
+      "procedures.diagnoses": [
+        "code",
+        "description"
+      ],
+      "treatment_cases": [
+        "name",
+        "case_type",
+        "recommended",
+        "status",
+        "total"
+      ],
+      "treatment_cases.case_procedures": [
+        "visit",
+        "code",
+        "description",
+        "anatomic_area",
+        "status"
+      ],
+      "treatment_cases.case_procedures.findings": [
+        "description"
+      ],
+      "treatment_cases.case_procedures.diagnoses": [
+        "code",
+        "description"
+      ],
+      "prescriptions": [
+        "status",
+        "indications"
+      ],
+      "prescriptions.medications": [
+        "drug_brand",
+        "drug",
+        "strength",
+        "strength_unit",
+        "dosage_form",
+        "dose",
+        "dose_unit",
+        "frequency",
+        "duration_number",
+        "duration_unit"
+      ],
+      "lab_orders": [
+        "laboratory",
+        "status",
+        "work_requested",
+        "special_instructions",
+        "asap",
+        "mandatory_to_continue_treatment",
+        "expiration_date",
+        "document_sent"
+      ],
+      "lab_orders.lab_treatments": [
+        "cdt_code",
+        "description",
+        "anatomic_area",
+        "treatment_plan"
+      ],
+      "referrals": [
+        "referral",
+        "specialties",
+        "status",
+        "notes",
+        "document_sent"
+      ],
+      "referrals.referral_procedures": [
+        "cdt_code",
+        "description",
+        "anatomic_area"
+      ],
+      "workflows": [
+        "workflow_name",
+        "workflow_type",
+        "narrative"
+      ],
+      "addenda": [
+        "author",
+        "created_at",
+        "text",
+        "signed_date"
       ]
     },
     "raw_html": [
@@ -59,26 +207,444 @@
       "provider_email": "emartinez@confidentally.com",
       "visit_date": "November 25, 2026",
       "visit_time": "09:00 AM to 09:45 AM",
-      "medical_conditions": [
+      "auto_generated": false,
+      "encounter_questionnaires": [
         {
-          "name": "Hypertension, controlled with medication."
-        }
-      ],
-      "current_medications": [
-        {
-          "name": "Amoxicillin 500 mg, once daily."
+          "name": "Chief Complaint",
+          "narrative": "Patient reports throbbing pain in the lower left back tooth for five days, worse when chewing and with cold drinks."
         },
         {
-          "name": "Ibuprofen 400 mg, as needed."
+          "name": "Triage",
+          "narrative": "Pain severity: 7/10. No facial swelling reported. Patient denies fever or difficulty swallowing."
         }
       ],
-      "allergies": [],
-      "surgeries": [],
+      "history_questionnaires": [
+        {
+          "name": "Dental and Oral Health History",
+          "completed_at": "November 20, 2026 at 10:12 AM",
+          "narrative": "Patient reports occasional gum bleeding during brushing and sensitivity to cold. Last dental visit two years ago."
+        },
+        {
+          "name": "Family History",
+          "completed_at": "November 20, 2026 at 10:15 AM",
+          "narrative": "Patient reports a family history of diabetes in mother and hypertension in father."
+        },
+        {
+          "name": "Social History",
+          "completed_at": "November 20, 2026 at 10:16 AM",
+          "narrative": "Patient reports no tobacco use and occasional alcohol consumption."
+        }
+      ],
+      "patient_conditions": [
+        {
+          "type": "Medical condition",
+          "description": "Hypertension",
+          "start_date": "March 2019",
+          "status": "Active",
+          "note": "Controlled with medication.",
+          "severity": "",
+          "reactions": []
+        },
+        {
+          "type": "Allergy",
+          "description": "Latex",
+          "start_date": "2015",
+          "status": "Active",
+          "note": "Use nitrile gloves.",
+          "severity": "Mild",
+          "reactions": [
+            {
+              "name": "Skin rash"
+            }
+          ]
+        },
+        {
+          "type": "Surgery",
+          "description": "Appendectomy",
+          "start_date": "2012",
+          "status": "Resolved",
+          "note": "",
+          "severity": "",
+          "reactions": []
+        }
+      ],
+      "patient_medications": [
+        {
+          "drug_brand": "Zestril",
+          "drug": "Lisinopril",
+          "strength": "10",
+          "strength_unit": "mg",
+          "dosage_form": "Tablet",
+          "dose": "1",
+          "dose_unit": "tablet",
+          "route": "oral",
+          "frequency": "once daily",
+          "start_date": "March 2019",
+          "status": "Active"
+        }
+      ],
+      "has_vitals": true,
+      "vitals": [
+        {
+          "observation": "Blood pressure",
+          "value": "128/82",
+          "measure": "mmHg"
+        },
+        {
+          "observation": "Heart rate",
+          "value": "74",
+          "measure": "bpm"
+        },
+        {
+          "observation": "Temperature",
+          "value": "98.4",
+          "measure": "°F"
+        },
+        {
+          "observation": "Respiration",
+          "value": "16",
+          "measure": "bpm"
+        },
+        {
+          "observation": "SpO2",
+          "value": "98",
+          "measure": "%"
+        },
+        {
+          "observation": "Weight",
+          "value": "187",
+          "measure": "lb"
+        }
+      ],
+      "vitals_notes": "Taken seated, before local anesthesia.",
+      "has_exams": true,
+      "exams": [
+        {
+          "exam_type": "Review of Systems",
+          "review": "",
+          "exam_findings": [
+            {
+              "description": "Hypertension",
+              "anatomic_area": "—",
+              "status": "Positive",
+              "note": "Controlled with medication.",
+              "descriptors": []
+            },
+            {
+              "description": "Diabetes",
+              "anatomic_area": "—",
+              "status": "Negative",
+              "note": "",
+              "descriptors": []
+            }
+          ]
+        },
+        {
+          "exam_type": "Intra Oral",
+          "review": "Pain to percussion and to cold on #19; lingering more than 30 seconds.",
+          "exam_findings": [
+            {
+              "description": "Deep caries",
+              "anatomic_area": "19 (O, D)",
+              "status": "—",
+              "note": "Caries close to the pulp.",
+              "descriptors": [
+                {
+                  "name": "Extent",
+                  "answer": "Deep"
+                }
+              ]
+            },
+            {
+              "description": "Gingival inflammation",
+              "anatomic_area": "Lower left",
+              "status": "—",
+              "note": "",
+              "descriptors": [
+                {
+                  "name": "Severity",
+                  "answer": "Mild"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "exam_type": "Radiographic",
+          "review": "Periapical image of #19 taken today.",
+          "exam_findings": [
+            {
+              "description": "Periapical radiolucency",
+              "anatomic_area": "19",
+              "status": "—",
+              "note": "Consistent with chronic apical periodontitis.",
+              "descriptors": []
+            }
+          ]
+        }
+      ],
+      "has_periodontal_measures": true,
+      "periodontal_measures": [
+        {
+          "tooth": "18",
+          "surface": "Distobuccal",
+          "measure": "Probing depth",
+          "value": "5 mm"
+        },
+        {
+          "tooth": "19",
+          "surface": "Buccal",
+          "measure": "Probing depth",
+          "value": "6 mm"
+        },
+        {
+          "tooth": "19",
+          "surface": "Lingual",
+          "measure": "Gingival recession",
+          "value": "2 mm"
+        }
+      ],
+      "has_procedures": true,
+      "procedures": [
+        {
+          "code": "D0140",
+          "description": "Limited oral evaluation – problem focused",
+          "anatomic_area": "Full mouth",
+          "status": "Completed",
+          "findings": [],
+          "diagnoses": []
+        },
+        {
+          "code": "D0220",
+          "description": "Intraoral – periapical first radiographic image",
+          "anatomic_area": "19",
+          "status": "Completed",
+          "findings": [],
+          "diagnoses": []
+        },
+        {
+          "code": "D3221",
+          "description": "Pulpal debridement, primary and permanent teeth",
+          "anatomic_area": "19",
+          "status": "Completed",
+          "findings": [
+            {
+              "description": "Deep caries"
+            }
+          ],
+          "diagnoses": [
+            {
+              "code": "K04.5",
+              "description": "Chronic apical periodontitis"
+            }
+          ]
+        }
+      ],
+      "has_treatment_cases": true,
+      "treatment_cases": [
+        {
+          "name": "Restorative plan",
+          "case_type": "Restorative",
+          "recommended": true,
+          "status": "Presented",
+          "total": "$2,430.00",
+          "case_procedures": [
+            {
+              "visit": "1",
+              "code": "D3330",
+              "description": "Endodontic therapy, molar tooth",
+              "anatomic_area": "19",
+              "status": "Referred",
+              "findings": [
+                {
+                  "description": "Periapical radiolucency"
+                }
+              ],
+              "diagnoses": [
+                {
+                  "code": "K04.5",
+                  "description": "Chronic apical periodontitis"
+                }
+              ]
+            },
+            {
+              "visit": "1",
+              "code": "D1110",
+              "description": "Prophylaxis, adult",
+              "anatomic_area": "Full mouth",
+              "status": "Planned",
+              "findings": [],
+              "diagnoses": []
+            },
+            {
+              "visit": "2",
+              "code": "D2740",
+              "description": "Crown, porcelain/ceramic",
+              "anatomic_area": "19",
+              "status": "Planned",
+              "findings": [
+                {
+                  "description": "Deep caries"
+                }
+              ],
+              "diagnoses": [
+                {
+                  "code": "K02.52",
+                  "description": "Dental caries penetrating into dentin"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Extraction and implant",
+          "case_type": "Surgical",
+          "recommended": false,
+          "status": "Presented",
+          "total": "$2,350.00",
+          "case_procedures": [
+            {
+              "visit": "1",
+              "code": "D7140",
+              "description": "Extraction, erupted tooth",
+              "anatomic_area": "19",
+              "status": "Planned",
+              "findings": [
+                {
+                  "description": "Periapical radiolucency"
+                }
+              ],
+              "diagnoses": [
+                {
+                  "code": "K04.5",
+                  "description": "Chronic apical periodontitis"
+                }
+              ]
+            },
+            {
+              "visit": "2",
+              "code": "D6010",
+              "description": "Implant body, endosteal",
+              "anatomic_area": "19",
+              "status": "Planned",
+              "findings": [],
+              "diagnoses": []
+            }
+          ]
+        }
+      ],
+      "treatment_discussion": "Both options explained. Patient prefers to keep the tooth and will decide after the endodontic evaluation.",
+      "has_prescriptions": true,
+      "prescriptions": [
+        {
+          "status": "Active",
+          "indications": "Take after meals. Stop ibuprofen if stomach pain appears.",
+          "medications": [
+            {
+              "drug_brand": "Amoxil",
+              "drug": "Amoxicillin",
+              "strength": "500",
+              "strength_unit": "mg",
+              "dosage_form": "capsule",
+              "dose": "1",
+              "dose_unit": "capsule",
+              "frequency": "every 8 hours",
+              "duration_number": "7",
+              "duration_unit": "days"
+            },
+            {
+              "drug_brand": "Advil",
+              "drug": "Ibuprofen",
+              "strength": "400",
+              "strength_unit": "mg",
+              "dosage_form": "tablet",
+              "dose": "1",
+              "dose_unit": "tablet",
+              "frequency": "every 6 hours",
+              "duration_number": "3",
+              "duration_unit": "days"
+            }
+          ]
+        }
+      ],
+      "has_lab_orders": true,
+      "lab_orders": [
+        {
+          "laboratory": "Olivos Laboratory",
+          "status": "Requested",
+          "work_requested": "Zirconia crown, shade A2.",
+          "special_instructions": "Send the try-in before final glazing.",
+          "asap": "No",
+          "mandatory_to_continue_treatment": "Yes",
+          "expiration_date": "December 9, 2026",
+          "document_sent": "Yes",
+          "lab_treatments": [
+            {
+              "cdt_code": "D2740",
+              "description": "Crown, porcelain/ceramic",
+              "anatomic_area": "19",
+              "treatment_plan": "Restorative plan"
+            }
+          ]
+        }
+      ],
+      "has_referrals": true,
+      "referrals": [
+        {
+          "referral": "Dr. Mark Bennett",
+          "specialties": "Endodontics",
+          "status": "Sent",
+          "notes": "Please evaluate #19 for root canal treatment before we place the crown.",
+          "document_sent": "Yes",
+          "referral_procedures": [
+            {
+              "cdt_code": "D3330",
+              "description": "Endodontic therapy, molar tooth",
+              "anatomic_area": "19"
+            }
+          ]
+        }
+      ],
+      "has_workflows": true,
+      "workflows": [
+        {
+          "workflow_name": "Local anesthesia",
+          "workflow_type": "Procedure",
+          "narrative": "Inferior alveolar nerve block with 1.7 ml of 2% lidocaine with 1:100,000 epinephrine. Aspiration negative. Patient tolerated the procedure well."
+        }
+      ],
       "clinical_notes_html": "<p>Patient responsibilities were discussed including but not limited to daily care, use/misuse, regular maintenance appointments, and routine examination of underlying oral tissues.</p><p>The patient was discharged to return home in satisfactory condition.</p>",
       "provider_signed_date": "November 25, 2026",
-      "provider_signature_image": ""
+      "provider_signature_image": "",
+      "has_addenda": true,
+      "addenda": [
+        {
+          "author": "Elena Martinez",
+          "created_at": "November 26, 2026 at 8:40 AM",
+          "text": "Patient called: pain went down to 2/10. Continue the antibiotic as prescribed.",
+          "signed_date": "November 26, 2026"
+        }
+      ]
     },
     "jira": [
+      "CON-2728",
+      "CON-2816",
+      "CON-2617",
+      "CON-3605",
+      "CON-1619",
+      "CON-2055",
+      "CON-2191",
+      "CON-2198",
+      "CON-2199",
+      "CON-2204",
+      "CON-2614",
+      "CON-2615",
+      "CON-2616",
+      "CON-2620",
+      "CON-2621",
+      "CON-2772",
+      "CON-2730",
+      "CON-2937",
       "CON-2641",
       "CON-2643",
       "CON-4115"
@@ -326,12 +892,11 @@
       "practice_email",
       "expiration_date",
       "provider_name",
-      "lab_order_id",
+      "lab_name",
       "patient_phone",
       "provider_email",
       "patient_email",
       "patient_address",
-      "lab_name",
       "lab_phone",
       "lab_email",
       "lab_address",
@@ -360,7 +925,6 @@
       "patient_address": "Av Siempreviva 1237, 222, New York, 1232, NY, US",
       "provider_name": "Elena Martinez",
       "provider_email": "emartinez@confidentally.com",
-      "lab_order_id": "4f1c2a9e-7b3d-4e21-9c55-1a8f0d6b3e72",
       "expiration_date": "December 9, 2026",
       "lab_name": "Olivos Laboratory",
       "lab_phone": "+1 212 5550142",
@@ -411,7 +975,6 @@
       "patient_birth_date",
       "patient_phone",
       "provider_name",
-      "prescription_id",
       "expiration_date",
       "additional_indications",
       "provider_signed_date",
@@ -449,7 +1012,6 @@
       "provider_name": "Elena Martinez",
       "provider_email": "emartinez@confidentally.com",
       "issued_date": "November 25, 2026",
-      "prescription_id": "RX-000184",
       "expiration_date": "May 25, 2027",
       "medications": [
         {
@@ -527,11 +1089,21 @@
       "procedures": [
         "code",
         "description",
-        "tooth",
-        "surface"
+        "anatomic_area"
+      ],
+      "procedures.findings": [
+        "description"
+      ],
+      "procedures.diagnoses": [
+        "code",
+        "description"
       ],
       "attachments": [
-        "name"
+        "annex_label",
+        "name",
+        "file_type",
+        "is_image",
+        "file_url"
       ]
     },
     "raw_html": [],
@@ -563,17 +1135,35 @@
         {
           "code": "D3330",
           "description": "Endodontic therapy, molar tooth",
-          "tooth": "19",
-          "surface": "—"
+          "anatomic_area": "19",
+          "findings": [
+            {
+              "description": "Periapical radiolucency"
+            }
+          ],
+          "diagnoses": [
+            {
+              "code": "K04.5",
+              "description": "Chronic apical periodontitis"
+            }
+          ]
         }
       ],
       "referral_note": "Periapical radiolucency on #19. Please evaluate for root canal treatment before we place the crown.",
       "attachments": [
         {
-          "name": "Periapical_19.jpg"
+          "annex_label": "A",
+          "name": "Periapical_19.jpg",
+          "file_type": "Image",
+          "is_image": true,
+          "file_url": "https://juliangerardi.github.io/red-dental-studio/pdfs/sample-periapical.jpg"
         },
         {
-          "name": "Radiographic report.pdf"
+          "annex_label": "B",
+          "name": "Radiographic report.pdf",
+          "file_type": "PDF",
+          "is_image": false,
+          "file_url": ""
         }
       ],
       "provider_signed_date": "November 25, 2026",
@@ -583,6 +1173,7 @@
       "CON-2322",
       "CON-3033",
       "CON-3128",
+      "CON-2616",
       "CON-4115"
     ]
   },
@@ -610,23 +1201,36 @@
       "provider_name",
       "case_status",
       "insurance_name",
-      "total_fees",
-      "total_insurance_estimate",
-      "total_patient_estimate",
+      "case_total",
+      "total_insurance_portion",
+      "total_insurance_adjustments",
+      "total_patient_portion",
+      "deductible_applied",
       "case_notes"
     ],
     "lists": {
       "visits": [
         "visit_name",
-        "visit_total"
+        "visit_fee",
+        "visit_insurance_portion",
+        "visit_insurance_adjustment",
+        "visit_patient_portion"
       ],
       "visits.procedures": [
         "code",
         "description",
-        "tooth",
+        "anatomic_area",
         "fee",
-        "insurance_estimate",
-        "patient_estimate"
+        "insurance_portion",
+        "insurance_adjustment",
+        "patient_portion"
+      ],
+      "visits.procedures.findings": [
+        "description"
+      ],
+      "visits.procedures.diagnoses": [
+        "code",
+        "description"
       ]
     },
     "raw_html": [],
@@ -652,50 +1256,87 @@
       "visits": [
         {
           "visit_name": "Visit 1",
-          "visit_total": "$1,180.00",
+          "visit_fee": "$1,180.00",
+          "visit_insurance_portion": "$780.00",
+          "visit_insurance_adjustment": "$173.00",
+          "visit_patient_portion": "$227.00",
           "procedures": [
             {
               "code": "D3330",
               "description": "Endodontic therapy, molar tooth",
-              "tooth": "19",
+              "anatomic_area": "19",
               "fee": "$1,100.00",
-              "insurance_estimate": "$708.00",
-              "patient_estimate": "$227.00"
+              "insurance_portion": "$708.00",
+              "insurance_adjustment": "$165.00",
+              "patient_portion": "$227.00",
+              "findings": [
+                {
+                  "description": "Periapical radiolucency"
+                }
+              ],
+              "diagnoses": [
+                {
+                  "code": "K04.5",
+                  "description": "Chronic apical periodontitis"
+                }
+              ]
             },
             {
               "code": "D1110",
               "description": "Prophylaxis, adult",
-              "tooth": "—",
+              "anatomic_area": "Full mouth",
               "fee": "$80.00",
-              "insurance_estimate": "$72.00",
-              "patient_estimate": "$0.00"
+              "insurance_portion": "$72.00",
+              "insurance_adjustment": "$8.00",
+              "patient_portion": "$0.00",
+              "findings": [],
+              "diagnoses": []
             }
           ]
         },
         {
           "visit_name": "Visit 2",
-          "visit_total": "$1,250.00",
+          "visit_fee": "$1,250.00",
+          "visit_insurance_portion": "$850.00",
+          "visit_insurance_adjustment": "$187.50",
+          "visit_patient_portion": "$212.50",
           "procedures": [
             {
               "code": "D2740",
               "description": "Crown, porcelain/ceramic",
-              "tooth": "19",
+              "anatomic_area": "19",
               "fee": "$1,250.00",
-              "insurance_estimate": "$531.25",
-              "patient_estimate": "$531.25"
+              "insurance_portion": "$850.00",
+              "insurance_adjustment": "$187.50",
+              "patient_portion": "$212.50",
+              "findings": [
+                {
+                  "description": "Deep caries"
+                }
+              ],
+              "diagnoses": [
+                {
+                  "code": "K02.52",
+                  "description": "Dental caries penetrating into dentin"
+                }
+              ]
             }
           ]
         }
       ],
-      "total_fees": "$2,430.00",
-      "total_insurance_estimate": "$1,311.25",
-      "total_patient_estimate": "$758.25",
+      "case_total": "$2,430.00",
+      "total_insurance_portion": "$1,630.00",
+      "total_insurance_adjustments": "$360.50",
+      "total_patient_portion": "$439.50",
+      "deductible_applied": "$50.00",
       "case_notes": "Root canal first; crown once the tooth is asymptomatic."
     },
     "jira": [
       "CON-1634",
       "CON-2036",
       "CON-1598",
+      "CON-2204",
+      "CON-3710",
       "CON-4115"
     ]
   },
@@ -807,8 +1448,11 @@
       "patient_id",
       "provider_name",
       "treatment_plan_name",
-      "total_patient_estimate",
-      "total_fees",
+      "total_patient_portion",
+      "case_total",
+      "total_insurance_portion",
+      "total_insurance_adjustments",
+      "deductible_applied",
       "consent_text_html",
       "patient_signed_date",
       "patient_signature_image",
@@ -819,9 +1463,18 @@
       "procedures": [
         "code",
         "description",
-        "tooth",
+        "anatomic_area",
         "fee",
-        "patient_estimate"
+        "insurance_portion",
+        "insurance_adjustment",
+        "patient_portion"
+      ],
+      "procedures.findings": [
+        "description"
+      ],
+      "procedures.diagnoses": [
+        "code",
+        "description"
       ]
     },
     "raw_html": [
@@ -849,27 +1502,60 @@
         {
           "code": "D3330",
           "description": "Endodontic therapy, molar tooth",
-          "tooth": "19",
+          "anatomic_area": "19",
           "fee": "$1,100.00",
-          "patient_estimate": "$227.00"
+          "insurance_portion": "$708.00",
+          "insurance_adjustment": "$165.00",
+          "patient_portion": "$227.00",
+          "findings": [
+            {
+              "description": "Periapical radiolucency"
+            }
+          ],
+          "diagnoses": [
+            {
+              "code": "K04.5",
+              "description": "Chronic apical periodontitis"
+            }
+          ]
         },
         {
           "code": "D1110",
           "description": "Prophylaxis, adult",
-          "tooth": "—",
+          "anatomic_area": "Full mouth",
           "fee": "$80.00",
-          "patient_estimate": "$0.00"
+          "insurance_portion": "$72.00",
+          "insurance_adjustment": "$8.00",
+          "patient_portion": "$0.00",
+          "findings": [],
+          "diagnoses": []
         },
         {
           "code": "D2740",
           "description": "Crown, porcelain/ceramic",
-          "tooth": "19",
+          "anatomic_area": "19",
           "fee": "$1,250.00",
-          "patient_estimate": "$531.25"
+          "insurance_portion": "$850.00",
+          "insurance_adjustment": "$187.50",
+          "patient_portion": "$212.50",
+          "findings": [
+            {
+              "description": "Deep caries"
+            }
+          ],
+          "diagnoses": [
+            {
+              "code": "K02.52",
+              "description": "Dental caries penetrating into dentin"
+            }
+          ]
         }
       ],
-      "total_fees": "$2,430.00",
-      "total_patient_estimate": "$758.25",
+      "case_total": "$2,430.00",
+      "total_insurance_portion": "$1,630.00",
+      "total_insurance_adjustments": "$360.50",
+      "total_patient_portion": "$439.50",
+      "deductible_applied": "$50.00",
       "consent_text_html": "<p>Your provider explained the treatment described above, why it is recommended, what it involves and what you can expect afterwards.</p><ul><li>Results can vary from patient to patient.</li><li>Follow the care instructions your provider gives you.</li></ul>",
       "patient_signed_date": "November 25, 2026",
       "patient_signature_image": "",
@@ -880,6 +1566,7 @@
       "CON-2923",
       "CON-2715",
       "CON-3571",
+      "CON-2204",
       "CON-4115"
     ]
   },
@@ -917,7 +1604,14 @@
       "procedures": [
         "code",
         "description",
-        "tooth"
+        "anatomic_area"
+      ],
+      "procedures.findings": [
+        "description"
+      ],
+      "procedures.diagnoses": [
+        "code",
+        "description"
       ]
     },
     "raw_html": [
@@ -946,12 +1640,25 @@
         {
           "code": "D7140",
           "description": "Extraction, erupted tooth",
-          "tooth": "19"
+          "anatomic_area": "19",
+          "findings": [
+            {
+              "description": "Periapical radiolucency"
+            }
+          ],
+          "diagnoses": [
+            {
+              "code": "K04.5",
+              "description": "Chronic apical periodontitis"
+            }
+          ]
         },
         {
           "code": "D6010",
           "description": "Implant body, endosteal",
-          "tooth": "19"
+          "anatomic_area": "19",
+          "findings": [],
+          "diagnoses": []
         }
       ],
       "consent_text_html": "<p>Your provider explained the treatment described above and what can happen if it is not done, including worsening infection, pain, and the loss of the tooth.</p><p>You can ask for this treatment again at any time.</p>",
@@ -963,6 +1670,7 @@
     "jira": [
       "CON-2923",
       "CON-2716",
+      "CON-2204",
       "CON-4115"
     ]
   }
