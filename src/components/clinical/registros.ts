@@ -179,12 +179,12 @@ export function asegurarRegistro(t: PendingTask | undefined) {
 }
 
 let serie = 1
-/** Un registro nuevo, en Pending, a nombre del provider del encuentro (CON-2215: se registra el proveedor y la fecha). */
 /* Una derivación no pide vencimiento en su ficha (red.dev tampoco); la lista lo muestra: 30 días desde que se crea. */
 const enUnMes = () => { const d = new Date(); return new Date(d.getFullYear(), d.getMonth(), d.getDate() + 30).toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric' }) }
 /** Un registro nuevo, en Pending, a nombre del provider del encuentro (CON-2215: se registra el proveedor y la fecha). */
 export const nuevoRegistro = (kind: TipoRegistro, paciente?: Partial<Pick<PendingTask, 'person' | 'initials' | 'patientId'>>): Registro => ({
-  id: `nuevo-${kind.toLowerCase().replace(/\s+/g, '-')}-${serie++}`, kind, state: 'Pending', ...PACIENTE, ...paciente, provider: MARTINEZ,
+  ...PACIENTE, person: paciente?.person ?? PACIENTE.person, initials: paciente?.initials ?? PACIENTE.initials, patientId: paciente?.patientId ?? PACIENTE.patientId,
+  id: `nuevo-${kind.toLowerCase().replace(/\s+/g, '-')}-${serie++}`, kind, state: 'Pending', provider: MARTINEZ,
   register: hoy(), updated: hoy(), expiration: kind === 'Referrals' ? enUnMes() : '', pdf: false,
 })
 
@@ -216,7 +216,8 @@ const PLANTILLA: Record<TipoRegistro, string> = { 'Lab orders': 'lab-order', Pre
 export function hojaDeRegistro(t: PendingTask): string | undefined {
   const pdf = PDFS.find((x) => x.id === PLANTILLA[t.kind as TipoRegistro])
   if (!pdf) return undefined
-  const r: Registro = registroDe(t.id) ?? { ...t, id: t.id ?? '', kind: t.kind as TipoRegistro, updated: t.register, ...contenidoDe(t) }
+  /* La tarea llega con sus cambios (tareaViva): si ya se pidió, `updated` es la fecha de ese cambio. */
+  const r: Registro = registroDe(t.id) ?? { ...t, id: t.id ?? '', kind: t.kind as TipoRegistro, updated: (t as { updated?: string }).updated ?? t.register, ...contenidoDe(t) }
   const p = paciente(r.person)
   const provider = (r.provider ?? '').replace(/^Dr\.\s*/, '')
   const edad = Math.floor((Date.now() - p.nacimiento.getTime()) / 31557600000)

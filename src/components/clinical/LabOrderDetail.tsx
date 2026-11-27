@@ -125,7 +125,7 @@ export function LabOrderDetail({ registro, nuevo, abierto, onVolver, onAccion }:
         </>}
       />
 
-      <AvisosFicha abierto={abierto || !!nuevo} editable={editable} nombre="lab order" incompleto={Object.values(errores).includes(OBLIGATORIO)} />
+      <AvisosFicha abierto={abierto || !!nuevo} editable={editable} nombre="lab order" incompleto={Object.values(errores).includes(OBLIGATORIO)} error={errores.vence && errores.vence !== OBLIGATORIO ? errores.vence : undefined} />
 
       {/* Una card debajo de la otra, con la misma diagramación que Prescription y Referral (Julián, 2026-11-27). */}
       <Card title="General information">

@@ -120,7 +120,7 @@ export function PrescriptionDetail({ registro, nuevo, abierto, onVolver, onAccio
         </>}
       />
 
-      <AvisosFicha abierto={abierto || !!nuevo} editable={editable} nombre="prescription" incompleto={incompleto} />
+      <AvisosFicha abierto={abierto || !!nuevo} editable={editable} nombre="prescription" incompleto={incompleto} error={errorVence && errorVence !== OBLIGATORIO ? errorVence : undefined} />
 
       {/* Una card debajo de la otra, como los formularios de la app: las medicaciones y, al final, las indicaciones. */}
       <Card title="Medications" action={editable && <Button size="sm" variant="secondary" onClick={agregar}><Plus /> Add medication</Button>}>

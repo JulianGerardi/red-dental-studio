@@ -77,6 +77,12 @@ test('Edit abre la orden editable: New laboratory crea el laboratorio y lo elige
   await expect(screen.getByText('Uncompleted fields')).toBeVisible()
   await expect(screen.getByText('This field is required.')).toBeVisible()
   await screen.getByLabel(/Dental work requested/).fill('Porcelain crown')
+  /* La orden venció: guardarla así avisa; con una fecha que viene, se guarda (CON-2215). */
+  await screen.getByRole('button', 'Save').tap()
+  await expect(screen.getByText('Date cannot be in the past').first()).toBeVisible()
+  await screen.getByRole('button', /^Delivery expiration date/).tap()
+  await screen.getByRole('button', 'Next year').tap()
+  await screen.getByRole('button', /15, 2027$/).tap()
   await screen.getByRole('button', 'Save').tap()
   await expect(screen.getByText('The lab order has been successfully updated.')).toBeVisible()
 })

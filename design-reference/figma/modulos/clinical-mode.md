@@ -4022,3 +4022,24 @@ el dibujo anatómico se toca bien en celular (los dientes anteriores son chicos)
 Código: `clinical/dental/{ArcadaAnatomica,arcadasRed,RuedaSuperficies}`, `clinical/{FichaClinica,LabOrderDetail,
 PrescriptionDetail,ReferralDetail,RegistrosPanel,registros}`, `dashboard/{tareas,documentoTarea}`, `data/recetas`;
 `tests/{registros-clinicos,pending-tasks}.e2e.ts`.
+
+### Fichas apiladas en las tres, fechas y "+N" con las piezas de la app (2026-11-27, 5ª vuelta)
+
+**CON-2214 · CON-2212 · CON-2321.** Pedido de Julián sobre el link de prueba; corrige la 4ª vuelta donde la contradice.
+
+- **Lab order con la misma diagramación que Prescription y Referral**: una card debajo de la otra (*General information*
+  con Teeth & surface, y *Details* con *Dental work requested* | *Special instructions* y los adjuntos). Ya no hay
+  ficha en dos columnas: salen `COLUMNAS_FICHA`, `DatoFicha`, `TextArea.crecer` y `Card.bodyClassName`.
+- **Prescription:** el rótulo *Expiration date\** va arriba del campo, en el título.
+- **Referral:** *Referral note* a todo el ancho y *Attachments* debajo.
+- **Fechas con los componentes de la app:** el `DatePicker` de las fichas no apaga días (igual que en el resto de los
+  formularios); que el vencimiento no quede en el pasado (*Date cannot be in the past*) ni a más de seis meses en una
+  receta se revisa al guardar, con el aviso arriba y debajo del campo. Una Lab order Pending ya vencida pide una fecha
+  nueva para guardarse. CON-2230 pide bloquear la selección en el calendario: se cambió por pedido de Julián. El filtro
+  de las tablas es el `DateFilter` de toda la app (*All dates*, Today, Last 7 / 30 / 90 days); en Lab order y
+  Prescription también deja elegir días que vienen, y abre en el mes actual. Sale `emptyLabel`.
+- **"+N" de Medication** (`ui/chip` › `ChipMas`, el mismo "+N" de Working hours, sin la ✕): despliega el resto de las
+  medicaciones en la fila, sin abrir la ficha.
+- **Corregido en la revisión:** *New* después de entrar por una tarea de Pending Task tomaba el id y el estado de esa
+  tarea y la pisaba al guardar; ahora crea un registro nuevo en Pending. El documento de una tarea pedida desde el
+  Dashboard firmaba con la fecha de creación. El foco de un diente se distingue del diente elegido (trazo negro).

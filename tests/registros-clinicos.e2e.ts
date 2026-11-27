@@ -17,6 +17,11 @@ test('New está siempre activo: sin encuentro abierto se puede crear; lo ya carg
   await expect(screen.getByText('Read-only mode')).toHaveCount(0)
   await expect(screen.getByRole('button', 'Save')).toBeEnabled()
   await screen.getByRole('button', 'Cancel').tap()
+  /* "+N" despliega el resto de las medicaciones en la fila, sin abrir la ficha. */
+  await expect(screen.getByText('Ibuprofen 400 mg')).toHaveCount(0)
+  await screen.getByRole('button', /^Show 1 more medications/).first().tap()
+  await expect(screen.getByText('Ibuprofen 400 mg').first()).toBeVisible()
+  await expect(screen.getByRole('button', /New prescription/)).toBeVisible()
   await screen.getByText('Chlorhexidine gluconate 0.12%').first().tap()
   await expect(screen.getByText('Read-only mode')).toBeVisible()
   await expect(screen.getByRole('button', 'Save')).toBeDisabled()
@@ -202,4 +207,20 @@ test('Pending Task → Prescription: Complete this task abre la receta y Activat
   await screen.getByRole('dialog', 'Activate prescription').getByRole('button', 'Mark as active').tap()
   await expect(screen.getByText('The prescription has been successfully marked as Active.')).toBeVisible()
   await expect(screen.getByRole('button', 'PDF')).toBeVisible()
+})
+
+/* Regresión: New después de entrar por una tarea crea un registro nuevo, en Pending, y no pisa el de la tarea. */
+test('New después de Complete this task suma un registro y deja el de la tarea como estaba', async ({ app, screen }) => {
+  await app.open('/patients/john-smith/clinical-mode?tab=Referral&task=paciente-referrals-1')
+  await expect(screen.getByRole('heading', 'Referral')).toBeVisible()
+  await screen.getByRole('button', 'Back to referrals').tap()
+  await expect(screen.getByText(/Showing 1 to 8 of 8 results/)).toBeVisible()
+  await screen.getByRole('button', /New referral/).tap()
+  await expect(screen.getByRole('heading', 'New referral')).toBeVisible()
+  await screen.getByPlaceholder('Search by name or surname').fill('Omar')
+  await screen.getByRole('button', /^Dr\. Omar Haddad/).tap()
+  await screen.getByRole('textbox', /^Referral note/).fill('Please evaluate for surgical extraction.')
+  await screen.getByRole('button', 'Save').tap()
+  await expect(screen.getByText('The referral has been successfully created.')).toBeVisible()
+  await expect(screen.getByText(/Showing 1 to 9 of 9 results/)).toBeVisible()
 })

@@ -158,7 +158,7 @@ export function RegistrosPanel({ kind, paciente, tarea, encuentroAbierto = false
   }
 
   /* New está siempre activo, con o sin encuentro, como red.dev (Julián, 2026-11-27). */
-  const nuevo = <Button size="md" onClick={() => setVista({ modo: 'nuevo', borrador: nuevoRegistro(kind, tarea ?? (paciente ? { person: paciente, initials: paciente.split(/\s+/).map((x) => x[0]).join('').slice(0, 2).toUpperCase() } : undefined)) })}><Plus /> New {c.nombre}</Button>
+  const nuevo = <Button size="md" onClick={() => setVista({ modo: 'nuevo', borrador: nuevoRegistro(kind, tarea ? { person: tarea.person, initials: tarea.initials, patientId: tarea.patientId } : paciente ? { person: paciente, initials: paciente.split(/\s+/).map((x) => x[0]).join('').slice(0, 2).toUpperCase() } : undefined) })}><Plus /> New {c.nombre}</Button>
   const fechaDe = (r: Registro) => new Date(c.fecha.de(r))
   const visibles = registros.filter((r) =>
     c.texto(r).toLowerCase().includes(q.trim().toLowerCase())

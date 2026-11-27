@@ -32,7 +32,8 @@ export function ArcadaAnatomica({ denticion, marcados, actual, onToggle, disable
                   onClick={() => { if (!disabled) onToggle(t.id) }}
                   onKeyDown={(e) => { if (!disabled && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); onToggle(t.id) } }}
                   className={cn(
-                    'outline-none transition-colors [fill-opacity:0.45] focus-visible:stroke-dash-blue focus-visible:stroke-2',
+                    /* El foco, con trazo negro y más grueso: no se confunde con el diente elegido (azul). */
+                    'outline-none transition-colors [fill-opacity:0.45] focus-visible:stroke-ink focus-visible:stroke-[3]',
                     marcado ? 'fill-dash-blue' : 'fill-transparent',
                     !disabled && 'cursor-pointer',
                     !disabled && !marcado && 'hover:fill-dash-blue hover:[fill-opacity:0.2]',
