@@ -17,6 +17,19 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 - **Para el dev:** `tests/breadcrumb-titulo.e2e.ts` falla si una pantalla con rastro no tiene el último tramo como H1. Al
   sumar una pantalla, sumala ahí. Sin historia de Jira.
 
+### PDFs: nota clínica como red.dev, findings y diagnósticos, importes iguales y anexos (CON-2975, CON-3081, CON-2204, CON-2730) ([#210](https://github.com/JulianGerardi/red-dental-studio/pull/210))
+- **Clinical note completa** (especificación de reconstrucción + las notas de red.dev): Vital Signs, Medical History,
+  Exams, Treatment Plan con el Consent Summary, Operative Report, Workflows, órdenes, firma del provider con hash y
+  adendas después de la firma. Lo que no pasó en la visita no sale.
+- **Treatment plan, aceptación, rechazo y Referral:** findings y diagnósticos debajo de cada procedimiento. Importes
+  iguales en treatment plan y aceptación (Fee / Insurance / Adjustment / Patient y el bloque Estimate).
+- **Lab order** sin el UUID interno; **Prescription** sin ID. **Adjuntos del Referral** como anexos, uno por hoja.
+- **Todos los PDF:** títulos en azul sin número y sin cajas.
+- **Para el dev/backend:** en `src/pdfs/marco.ts`, bloques `importes`, `narrativas`, `subtitulo` y `libre`;
+  `tabla.subtotal` reemplaza a `totales`; `Seccion.si`, `Hoja.aviso`, `Hoja.posdata`, `Hoja.anexos` y `Firma.hash`. Las
+  secciones condicionales usan booleanos (`has_vitals`…); un PDF adjunto se agrega detrás de su hoja y *Page N of M* se
+  cuenta después de unir. Detalle en `modulos/pdfs.md` (2026-11-27).
+
 ### Lab order y Referral: dos columnas, mismo procedimiento y lo de los videos de red.dev (CON-2214, CON-2321, CON-2584) ([#209](https://github.com/JulianGerardi/red-dental-studio/pull/209))
 - **Layout:** *General information* a la izquierda (Lab order con *Teeth & surface* adentro) y *Details* a la derecha, con
   el texto libre a todo el alto (`COLUMNAS_FICHA`, `TextArea.crecer`, `Card.bodyClassName`). En celular, una columna.
