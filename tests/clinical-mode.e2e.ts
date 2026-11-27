@@ -162,23 +162,16 @@ test('el detalle de un procedimiento lleva a su caso y a su hallazgo', async ({ 
   await expect(screen.getByRole('button', /Bridge Option, Accepted/)).toBeVisible()
 })
 
-/* Lab order sobre la tabla estándar: Filter filtra por estado y Cancel order se deshace con Undo. */
-test('Lab order filtra por estado y cancela una orden con Undo', async ({ app, screen }) => {
+/* Lab order sobre la tabla estándar: Filter filtra por estado; el flujo completo está en registros-clinicos.e2e.ts. */
+test('Lab order filtra por estado', async ({ app, screen }) => {
   await app.open('/patients/patient-0001/clinical-mode')
   await screen.getByRole('button', /^Exams/).tap()
   await screen.getByRole('menuitem', 'Lab order').tap()
   await expect(screen.getByText(/Showing 1 to 9 of 9 results/)).toBeVisible()
 
-  await screen.getByRole('button', /Filter lab orders by status/).tap()
+  await screen.getByRole('button', 'Filter lab orders').tap()
   await screen.getByRole('menuitemcheckbox', /Requested/).tap()
   await screen.getByRole('menuitemcheckbox', /Requested/).press('Escape')
-  await expect(screen.getByText(/Showing 1 to 2 of 2 results/)).toBeVisible()
-
-  await screen.getByRole('button', 'Actions for Diego Garcia').tap()
-  await screen.getByRole('menuitem', /Cancel order/).tap()
-  await expect(screen.getByText('Lab order for Diego Garcia canceled.')).toBeVisible()
-  await expect(screen.getByText(/Showing 1 to 1 of 1 results/)).toBeVisible()
-  await screen.getByRole('button', 'Undo').tap()
   await expect(screen.getByText(/Showing 1 to 2 of 2 results/)).toBeVisible()
 })
 
@@ -450,58 +443,4 @@ test('End Encounter registra fases en orden, completa antes de tiempo y cierra e
   await drawer.getByRole('button', 'End Encounter').tap()
   await expect(screen.getByText('Encounter completed.')).toBeVisible()
   await expect(screen.getByRole('dialog', 'Clinical note')).toBeVisible()
-})
-
-/* Prescription (CON-2230, CON-2354, CON-2356): la tabla estándar, New prescription valida cada medicación y Delete pregunta. */
-test('Prescription crea una receta, valida los campos y borra una Pending', async ({ app, screen }) => {
-  await app.open('/patients/patient-0001/clinical-mode?tab=Prescription')
-  await expect(screen.getByText(/Showing 1 to 10 of 14 results/)).toBeVisible()
-
-  await screen.getByRole('button', 'Filter prescriptions').tap()
-  await screen.getByRole('menuitemcheckbox', /Pending/).tap()
-  await screen.getByRole('menuitemcheckbox', /Pending/).press('Escape')
-  await expect(screen.getByText(/Showing 1 to 2 of 2 results/)).toBeVisible()
-
-  await screen.getByRole('button', 'Actions for Chlorhexidine 0.12% rinse 15 ml').tap()
-  await screen.getByRole('menuitem', /Delete prescription/).tap()
-  await screen.getByRole('button', 'Delete').tap()
-  await expect(screen.getByText('The prescription has been successfully deleted.')).toBeVisible()
-  await expect(screen.getByText(/Showing 1 to 1 of 1 results/)).toBeVisible()
-
-  await screen.getByRole('button', 'New prescription').tap()
-  await screen.getByRole('button', 'Save').tap()
-  await expect(screen.getByText(/Uncompleted fields/)).toBeVisible()
-
-  await screen.getByRole('button', /Expiration date/).tap()
-  await screen.getByRole('button', 'Next month').tap()
-  await screen.getByRole('button', /15, 20/).first().tap()
-  await screen.getByPlaceholder('Search by drug name or brand name').fill('Amoxi')
-  await screen.getByRole('button', /^Amoxicillin$/).tap()
-  await screen.getByPlaceholder('e.g. 500').fill('500')
-  await screen.getByRole('button', 'Strength unit').tap()
-  await screen.getByRole('button', 'mg').tap()
-  // Los SelectField sin elegir dicen "Select": Dosage form, Route y Frequency, en ese orden.
-  await screen.getByRole('button', 'Select').first().tap()
-  await screen.getByRole('button', 'Oral capsule').tap()
-  await screen.getByPlaceholder('e.g. 30').fill('21')
-  await screen.getByPlaceholder('e.g. 1').fill('1')
-  await screen.getByRole('button', 'Dose unit').tap()
-  await screen.getByRole('button', 'Capsules').tap()
-  await screen.getByRole('button', 'Select').first().tap()
-  await screen.getByRole('button', 'Oral').tap()
-  await screen.getByRole('button', 'Select').first().tap()
-  await screen.getByRole('button', 'Three times daily').tap()
-  await screen.getByPlaceholder('e.g. 7').fill('7')
-  // La indicación se arma sola, como en red.dev.
-  await expect(screen.getByText('Take 1 capsule orally three times daily for 7 days')).toBeVisible()
-  await screen.getByRole('button', 'Save').tap()
-  await expect(screen.getByText('The prescription has been successfully created.')).toBeVisible()
-  await expect(screen.getByText(/Showing 1 to 2 of 2 results/)).toBeVisible()
-
-  // Activate pregunta antes, con el texto de red.dev.
-  await screen.getByRole('button', 'Actions for Amoxicillin 500 mg').first().tap()
-  await screen.getByRole('menuitem', /Activate/).tap()
-  await expect(screen.getByText(/you will no longer be able to edit this prescription/)).toBeVisible()
-  await screen.getByRole('button', 'Activate').tap()
-  await expect(screen.getByText('The prescription has been successfully marked as Active.')).toBeVisible()
 })

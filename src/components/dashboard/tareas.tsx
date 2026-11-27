@@ -1,6 +1,6 @@
 import { useEffect, useState, type ReactNode } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Ban, CircleCheck, CircleX, Pencil, Send, Trash2, type LucideIcon } from 'lucide-react'
+import { Ban, CalendarX, CircleCheck, CircleX, Clock, PackageCheck, Pencil, Send, Trash2, type LucideIcon } from 'lucide-react'
 import { aviso } from '@/components/ui/toaster'
 import { ConfirmDialog } from '@/components/ui/confirm-dialog'
 import { DropdownMenuItem, DropdownMenuLabel } from '@/components/ui/dropdown-menu'
@@ -9,14 +9,16 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 import { cn } from '@/lib/utils'
 import type { PillTone } from '@/components/ui/pill'
 import type { PendingTask } from './PendingTaskCard'
-import { abrirDocumento, documentoTarea } from './documentoTarea'
+import { abrirDocumento } from './documentoTarea'
+/* Ciclo a propósito (registros usa tareaViva): se llaman sólo dentro de funciones. */
+import { documentoRegistro } from '@/components/clinical/registros'
 
 /* Lo que hacen los botones de una tarea de Pending Task, en el Dashboard, en el Patient Dashboard y en el detalle de la
    orden en Clinical Mode. Sale de los videos de red.dev de Julián (sólo lo que muestran); ver
    design-reference/figma/modulos/dashboard.md (2026-11-20). */
 
 /* `Finish` es el *Complete* de una Referral pedida (CON-2398): no confundir con `Complete`, que abre la tarea. */
-export type AccionTarea = 'Edit' | 'Request' | 'Activate' | 'Finish' | 'Reject' | 'Cancel' | 'Delete'
+export type AccionTarea = 'Edit' | 'Request' | 'Activate' | 'Deliver' | 'Delay' | 'Finish' | 'Expire' | 'Reject' | 'Cancel' | 'Delete'
 export type AccionUI = AccionTarea | 'Complete' | 'PDF'
 
 export const SIN_ENCUENTRO = 'You do not have permission to perform this action because there is no open encounter for the selected patient.'
@@ -27,26 +29,42 @@ export const nombreTarea = (t: PendingTask) => SINGULAR[t.kind] ?? t.kind
 /* La pestaña de Clinical Mode que abre Complete this Task. La Clinical Note abre su propia pantalla. */
 export const PESTANA_TAREA: Record<string, string> = { 'Lab orders': 'Lab order', Prescriptions: 'Prescription', Referrals: 'Referral' }
 
-/* Los colores de red.dev: Pending naranja, Requested azul, Fulfilled rojo. */
-export const TONO_ESTADO: Record<string, PillTone> = { Pending: 'warning', Requested: 'info', Delayed: 'warning', Fulfilled: 'danger', Completed: 'success', Rejected: 'danger' }
-
-/* El menú ⋮ de red.dev: Lab Order con Edit, Request, Cancel y Delete; Prescription con Activate y Cancel. La Clinical
-   Note no lleva. Referral, según su estado en Jira: Pending pide, cancela o borra (CON-2394, CON-2391, CON-3436);
-   Requested se completa, se rechaza o se cancela (CON-2398, CON-2392; video de red.dev del 2026-11-27). */
-export function accionesDe(t: PendingTask): AccionTarea[] {
-  if (t.kind === 'Lab orders') return ['Edit', 'Request', 'Cancel', 'Delete']
-  if (t.kind === 'Prescriptions') return ['Activate', 'Cancel']
-  if (t.kind === 'Referrals') return t.state === 'Pending' ? ['Request', 'Cancel', 'Delete'] : ['Finish', 'Reject', 'Cancel']
-  return []
+/* Un color por estado, el mismo en Pending Task, en las tres tablas de Clinical Mode y en sus fichas. */
+export const TONO_ESTADO: Record<string, PillTone> = {
+  Pending: 'warning', Requested: 'info', Delayed: 'warning', Fulfilled: 'danger', Active: 'success', Delivered: 'success',
+  Completed: 'success', Rejected: 'danger', Canceled: 'danger', Expired: 'neutral',
 }
 
-const ICONO: Record<AccionTarea, LucideIcon> = { Edit: Pencil, Request: Send, Activate: CircleCheck, Finish: CircleCheck, Reject: CircleX, Cancel: Ban, Delete: Trash2 }
+/* La máquina de estados de cada registro, como red.dev (recorrido del 2026-11-27) y Jira: sólo se edita y se borra en
+   Pending. Lab order (CON-2222): Pending → Requested → Delivered / Delayed / Rejected, y se cancela mientras esté
+   abierta. Prescription (CON-2357): Pending → Active, que se puede dar por vencida (Expire) y se cancela en Pending o Active (CON-2355). Referral (CON-2324):
+   Pending → Requested → Completed / Rejected. Un estado final no tiene acciones. Ver clinical-mode.md (2026-11-27). */
+const MAQUINA: Record<string, Record<string, AccionTarea[]>> = {
+  'Lab orders': { Pending: ['Edit', 'Request', 'Cancel', 'Delete'], Requested: ['Deliver', 'Delay', 'Reject', 'Cancel'], Delayed: ['Deliver', 'Reject', 'Cancel'] },
+  Prescriptions: { Pending: ['Edit', 'Activate', 'Cancel', 'Delete'], Active: ['Expire', 'Cancel'] },
+  Referrals: { Pending: ['Edit', 'Request', 'Cancel', 'Delete'], Requested: ['Finish', 'Reject', 'Cancel'] },
+}
+export const accionesDe = (t: PendingTask): AccionTarea[] => MAQUINA[t.kind]?.[t.state] ?? []
+/** El registro todavía se puede editar: sólo en Pending (CON-2218, CON-2354, CON-2323). */
+export const esEditable = (t: PendingTask) => accionesDe(t).includes('Edit')
+
+/* A qué estado lleva cada acción y si el registro sigue siendo una tarea pendiente (CON-2643). */
+const DESTINO: Partial<Record<AccionTarea, string>> = {
+  Request: 'Requested', Activate: 'Active', Deliver: 'Delivered', Delay: 'Delayed', Finish: 'Completed', Expire: 'Expired', Reject: 'Rejected', Cancel: 'Canceled',
+}
+const PENDIENTES: Record<string, string[]> = { 'Lab orders': ['Pending', 'Requested', 'Delayed'], Prescriptions: ['Pending'], Referrals: ['Pending', 'Requested'] }
+
+const ICONO: Record<AccionTarea, LucideIcon> = {
+  Edit: Pencil, Request: Send, Activate: CircleCheck, Deliver: PackageCheck, Delay: Clock, Finish: CircleCheck, Expire: CalendarX, Reject: CircleX, Cancel: Ban, Delete: Trash2,
+}
 const ETIQUETA: Partial<Record<AccionTarea, string>> = { Finish: 'Complete' }
-const DESTRUCTIVA: AccionTarea[] = ['Reject', 'Cancel', 'Delete']
+const DESTRUCTIVA: AccionTarea[] = ['Expire', 'Reject', 'Cancel', 'Delete']
 
 /* ── Estado de las tareas, fuera de React como el del encuentro (lib/encuentro): un cambio hecho en el Dashboard se ve
    en Clinical Mode y al revés. ── */
-type Cambio = { state?: string; pdf?: boolean; fuera?: boolean }
+/* `fuera`: dejó de ser una tarea pendiente (sigue en su tabla de Clinical Mode con el estado nuevo). `borrada`: se
+   eliminó (Delete) y no se ve en ningún lado. */
+type Cambio = { state?: string; pdf?: boolean; fuera?: boolean; borrada?: boolean; updated?: string }
 let cambios: Record<string, Cambio> = {}
 const oyentes = new Set<() => void>()
 const guardar = (id: string, c: Cambio | undefined) => {
@@ -56,7 +74,12 @@ const guardar = (id: string, c: Cambio | undefined) => {
   oyentes.forEach((f) => f())
 }
 
-export const tareaViva = (t: PendingTask): PendingTask & { fuera?: boolean } => ({ ...t, ...(t.id ? cambios[t.id] : undefined) })
+export const tareaViva = <T extends PendingTask>(t: T): T & { fuera?: boolean; borrada?: boolean; updated?: string } => ({ ...t, ...(t.id ? cambios[t.id] : undefined) })
+
+/** Para los almacenes que dependen del estado de las tareas (clinical/registros). */
+export const suscribirTareas = (f: () => void) => { oyentes.add(f); return () => { oyentes.delete(f) } }
+export const avisarTareas = () => oyentes.forEach((f) => f())
+
 
 /** Las tareas con sus cambios; las que dejaron de estar pendientes salen de la lista (CON-2643, CA8). */
 export function useTareasVivas(base: PendingTask[]) {
@@ -72,43 +95,70 @@ export function useTareasVivas(base: PendingTask[]) {
 /** Vuelve todas las tareas a como estaban (Storybook y tests). */
 export const reiniciarTareas = () => { cambios = {}; oyentes.forEach((f) => f()) }
 
-/* Request y Activate se hacen al toque y se deshacen desde el aviso; Cancel y Delete ya pasaron por la pregunta. */
-/* `sinAviso`: el que llama ya avisó (Prescription en Clinical Mode, que tiene sus propios textos de Jira). */
-export function aplicarAccion(t: PendingTask, accion: AccionTarea | 'Sign', { sinAviso = false } = {}) {
+const HOY = () => new Date().toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric' })
+
+/* El documento existe según el estado, como red.dev: la Lab order desde que se pide (CON-2584: cancelada desde Pending
+   no tiene), la Prescription mientras está Active (CON-2287) y la Referral mientras está Requested. */
+const conPdf = (t: PendingTask, estado: string) =>
+  t.kind === 'Prescriptions' ? estado === 'Active' : t.kind === 'Referrals' ? estado === 'Requested' : estado === 'Requested' || (estado !== 'Pending' && !!t.pdf)
+
+/* Los avisos, con el texto de Jira ("The lab order has been successfully marked as Requested.", CON-2221). */
+const HECHO: Partial<Record<AccionTarea, string>> = {
+  Request: 'marked as Requested', Activate: 'marked as Active', Deliver: 'marked as Delivered', Delay: 'marked as Delayed',
+  Finish: 'completed', Expire: 'marked as Expired', Reject: 'rejected', Cancel: 'canceled', Delete: 'deleted',
+}
+/* Lab order y Prescription avisan el estado como red.dev ("…successfully marked as Canceled."); Referral, la acción. */
+const MARCADO: Partial<Record<AccionTarea, string>> = { Reject: 'marked as Rejected', Cancel: 'marked as Canceled' }
+
+/** Aplica la acción ya confirmada: cambia el estado, el documento y si sigue pendiente, y avisa. */
+export function aplicarAccion(t: PendingTask, accion: AccionTarea | 'Sign') {
   if (!t.id) return
-  if (sinAviso) { guardar(t.id, { ...cambios[t.id], ...(accion === 'Cancel' ? { state: 'Canceled' } : {}), fuera: true }); return }
   const id = t.id
   const antes = cambios[id]
-  const nombre = nombreTarea(t)
-  const deshacer = { label: 'Undo', onClick: () => guardar(id, antes) }
-  if (accion === 'Request') { guardar(id, { ...antes, state: 'Requested', pdf: true }); aviso.ok(`${nombre} for ${t.person} requested.`, deshacer) }
-  else if (accion === 'Activate') { guardar(id, { ...antes, fuera: true }); aviso.ok(`${nombre} for ${t.person} activated.`, deshacer) }
-  else if (accion === 'Finish') { guardar(id, { ...antes, state: 'Completed', fuera: true }); aviso.ok('The referral has been successfully completed.') }
-  else if (accion === 'Reject') { guardar(id, { ...antes, state: 'Rejected', fuera: true }); aviso.ok('The referral has been successfully rejected.') }
-  else if (accion === 'Cancel') { guardar(id, { ...antes, state: 'Canceled', fuera: true }); aviso.ok(`${nombre} for ${t.person} canceled.`) }
-  else if (accion === 'Delete') { guardar(id, { ...antes, fuera: true }); aviso.ok(`${nombre} for ${t.person} deleted.`) }
-  else if (accion === 'Sign') { guardar(id, { ...antes, fuera: true }); aviso.ok('Clinical note signed.') }
+  if (accion === 'Sign') { guardar(id, { ...antes, fuera: true }); aviso.ok('Clinical note signed.'); return }
+  if (accion === 'Edit') return
+  const viva = tareaViva(t)
+  const nombre = nombreTarea(t).toLowerCase()
+  if (accion === 'Delete') guardar(id, { ...antes, fuera: true, borrada: true })
+  else {
+    const estado = DESTINO[accion]!
+    guardar(id, { ...antes, state: estado, pdf: conPdf(viva, estado), fuera: !PENDIENTES[t.kind]?.includes(estado), updated: HOY() })
+  }
+  const hecho = (t.kind !== 'Referrals' && MARCADO[accion]) || HECHO[accion]
+  aviso.ok(`The ${nombre} has been successfully ${hecho}.`)
 }
 
 /* El PDF de la tarea (formato de red.dev, documentoTarea.ts) en una pestaña nueva. */
 export const abrirPdf = (t: PendingTask) =>
-  abrirDocumento(documentoTarea(t), () => aviso.error("We couldn't open the PDF. Allow pop-ups for this site and try again."))
+  abrirDocumento(documentoRegistro(tareaViva(t)), () => aviso.error("We couldn't open the PDF. Allow pop-ups for this site and try again."))
 
-type Pregunta = { t: PendingTask; accion: 'Cancel' | 'Delete' | 'Request' | 'Finish' | 'Reject' }
+type Pregunta = { t: PendingTask; accion: Exclude<AccionTarea, 'Edit'> }
+type TextoPregunta = { title: string; confirm: string; keep?: string; texto: string }
 
-/* Las preguntas de Referral, con los textos de red.dev (video del 2026-11-27) y de Jira (CON-2391, CON-3436). */
-const PREGUNTA_REFERRAL = {
-  Request: { title: 'Request referral', confirm: 'Mark as requested', keep: 'Cancel', texto: 'Are you sure you want to mark this referral as Requested? Once marked as Requested, you will no longer be able to edit this referral.' },
-  Finish: { title: 'Complete referral', confirm: 'Complete', keep: 'Cancel', texto: 'Are you sure you want to complete this referral?' },
-  Reject: { title: 'Reject referral', confirm: 'Reject', keep: 'Cancel', texto: 'Are you sure you want to reject this referral?' },
-  Cancel: { title: 'Cancel this referral?', confirm: 'Cancel referral', keep: 'Keep it', texto: 'The referral will not be sent to the provider or followed by the patient.' },
-  Delete: { title: 'Delete referral', confirm: 'Delete', keep: 'Cancel', texto: 'Are you sure you want to delete this referral? This action cannot be undone.' },
-}
-
-/* Lab order, con los textos de red.dev (video de Julián del 2026-11-27): Request y Delete preguntan antes. */
-const PREGUNTA_LAB = {
-  Request: { title: 'Request lab order', confirm: 'Mark as requested', keep: 'Cancel', texto: 'Are you sure you want to mark this order as Requested? Once marked as Requested, you will no longer be able to edit this order.' },
-  Delete: { title: 'Delete lab order', confirm: 'Delete', keep: 'Cancel', texto: 'Are you sure you want to delete this lab order? This action cannot be undone.' },
+/* Toda acción que cambia el estado pregunta antes, con el título y el texto de red.dev (recorrido del 2026-11-27) o de
+   Jira cuando red.dev no lo tiene (CON-2356, CON-3436). El botón dice lo que hace, no "Confirm". */
+const PREGUNTAS: Record<string, Partial<Record<Pregunta['accion'], TextoPregunta>>> = {
+  'Lab orders': {
+    Request: { title: 'Request lab order', confirm: 'Mark as requested', texto: 'Are you sure you want to mark this order as Requested? Once marked as Requested, you will no longer be able to edit this order.' },
+    Deliver: { title: 'Deliver lab order', confirm: 'Mark as delivered', texto: 'Are you sure you want to mark this lab order as Delivered?' },
+    Delay: { title: 'Delay lab order', confirm: 'Mark as delayed', texto: 'Are you sure you want to mark this lab order as Delayed?' },
+    Reject: { title: 'Reject lab order', confirm: 'Mark as rejected', texto: 'Are you sure you want to mark this order as Rejected?' },
+    Cancel: { title: 'Cancel lab order', confirm: 'Cancel lab order', keep: 'Keep it', texto: 'Are you sure you want to mark this lab order as Canceled?' },
+    Delete: { title: 'Delete lab order', confirm: 'Delete', texto: 'Are you sure you want to delete this lab order? This action cannot be undone.' },
+  },
+  Prescriptions: {
+    Activate: { title: 'Activate prescription', confirm: 'Mark as active', texto: 'Are you sure you want to mark this prescription as Active? Once marked as Active, you will no longer be able to edit this prescription.' },
+    Expire: { title: 'Expire prescription', confirm: 'Mark as expired', texto: 'Are you sure you want to mark this prescription as Expired?' },
+    Cancel: { title: 'Cancel prescription', confirm: 'Cancel prescription', keep: 'Keep it', texto: 'Are you sure you want to mark this prescription as Canceled?' },
+    Delete: { title: 'Delete prescription', confirm: 'Delete', texto: 'Are you sure you want to delete this prescription? This action cannot be undone.' },
+  },
+  Referrals: {
+    Request: { title: 'Request referral', confirm: 'Mark as requested', texto: 'Are you sure you want to mark this referral as Requested? Once marked as Requested, you will no longer be able to edit this referral.' },
+    Finish: { title: 'Complete referral', confirm: 'Complete', texto: 'Are you sure you want to complete this referral?' },
+    Reject: { title: 'Reject referral', confirm: 'Reject', texto: 'Are you sure you want to reject this referral?' },
+    Cancel: { title: 'Cancel referral', confirm: 'Cancel referral', keep: 'Keep it', texto: 'Are you sure you want to cancel this referral?' },
+    Delete: { title: 'Delete referral', confirm: 'Delete', texto: 'Are you sure you want to delete this referral? This action cannot be undone.' },
+  },
 }
 
 /** Lo que hace cada botón de la tarea y las preguntas que abre. `paciente` fuerza la ficha (Patient Dashboard);
@@ -129,48 +179,29 @@ export function useAccionesTarea({ paciente, alAbrir }: { paciente?: string; alA
   const hacer = (t: PendingTask, accion: AccionUI) => {
     if (accion === 'PDF') abrirPdf(t)
     else if (accion === 'Complete' || accion === 'Edit') abrir(t)
-    else if (accion === 'Cancel' || accion === 'Delete' || accion === 'Finish' || accion === 'Reject' || (accion === 'Request' && (t.kind === 'Referrals' || t.kind === 'Lab orders'))) setPregunta({ t, accion })
-    else aplicarAccion(t, accion)
+    else setPregunta({ t, accion })
   }
 
-  const nombre = pregunta ? nombreTarea(pregunta.t) : ''
-  const referral = pregunta?.t.kind === 'Referrals' ? PREGUNTA_REFERRAL[pregunta.accion]
-    : pregunta?.t.kind === 'Lab orders' && (pregunta.accion === 'Request' || pregunta.accion === 'Delete') ? PREGUNTA_LAB[pregunta.accion] : undefined
-  const dialogo: ReactNode = !pregunta ? null : referral ? (
+  const texto = pregunta && PREGUNTAS[pregunta.t.kind]?.[pregunta.accion]
+  const positiva = pregunta && !DESTRUCTIVA.includes(pregunta.accion)
+  const dialogo: ReactNode = pregunta && texto ? (
     <ConfirmDialog
-      title={referral.title} confirmLabel={referral.confirm} cancelLabel={referral.keep}
-      tone={pregunta.accion === 'Request' || pregunta.accion === 'Finish' ? undefined : 'danger'} icon={pregunta.accion === 'Delete' ? 'delete' : undefined}
+      title={texto.title} confirmLabel={texto.confirm} cancelLabel={texto.keep ?? 'Cancel'}
+      tone={positiva ? undefined : 'danger'} icon={pregunta.accion === 'Delete' ? 'delete' : undefined}
       onCancel={() => setPregunta(null)}
       onConfirm={() => { aplicarAccion(pregunta.t, pregunta.accion); setPregunta(null) }}
     >
-      <p>{referral.texto}</p>
+      <p>{texto.texto}</p>
     </ConfirmDialog>
-  ) : pregunta.accion !== 'Cancel' && pregunta.accion !== 'Delete' ? null : (
-    <ConfirmDialog
-      title={`${pregunta.accion === 'Cancel' ? 'Cancel' : 'Delete'} this ${nombre.toLowerCase()}?`}
-      confirmLabel={`${pregunta.accion === 'Cancel' ? 'Cancel' : 'Delete'} ${nombre.toLowerCase()}`}
-      cancelLabel={pregunta.accion === 'Cancel' ? 'Keep it' : 'Cancel'}
-      tone="danger" icon={pregunta.accion === 'Delete' ? 'delete' : undefined}
-      onCancel={() => setPregunta(null)}
-      onConfirm={() => { aplicarAccion(pregunta.t, pregunta.accion); setPregunta(null) }}
-    >
-      <p>
-        {pregunta.accion === 'Cancel'
-          ? `The ${nombre.toLowerCase()} for ${pregunta.t.person} will be canceled and leave Pending Task.`
-          : `The ${nombre.toLowerCase()} for ${pregunta.t.person} will be deleted. This can't be undone.`}
-      </p>
-    </ConfirmDialog>
-  )
+  ) : null
 
   return { hacer, dialogo }
 }
 
-/* El ⋮ de la tarea, como red.dev: *Options* y las acciones. Sin un encuentro abierto con el paciente se ven apagadas y
-   cada una explica por qué en un tooltip, que también abre con el foco del teclado (por eso no van `disabled`: Radix les
-   quita el puntero y el foco). */
-export function MenuTarea({ task, abierto, onAccion, sin = [] }: { task: PendingTask; abierto: boolean; onAccion: (t: PendingTask, a: AccionUI) => void; sin?: AccionTarea[] }) {
-  const acciones = accionesDe(task).filter((a) => !sin.includes(a))
-  if (!acciones.length) return null
+/* Las acciones de un registro según su estado, como ítems de menú: las usan el ⋮ de Pending Task, el de la ficha y el
+   de las tablas de Clinical Mode. Sin un encuentro abierto con el paciente se ven apagadas y cada una explica por qué en
+   un tooltip, que también abre con el foco del teclado (por eso no van `disabled`: Radix les quita el puntero y el foco). */
+export function ItemsTarea({ task, abierto, onAccion, sin = [] }: { task: PendingTask; abierto: boolean; onAccion: (t: PendingTask, a: AccionUI) => void; sin?: AccionTarea[] }) {
   const item = (a: AccionTarea) => {
     const Icono = ICONO[a]
     const opcion = (
@@ -190,12 +221,16 @@ export function MenuTarea({ task, abierto, onAccion, sin = [] }: { task: Pending
       </Tooltip>
     )
   }
+  return <TooltipProvider delayDuration={100}>{accionesDe(task).filter((a) => !sin.includes(a)).map(item)}</TooltipProvider>
+}
+
+/** El ⋮ de la tarea, como red.dev: *Options* y las acciones de su estado. Un estado final no tiene menú. */
+export function MenuTarea({ task, abierto, onAccion, sin = [] }: { task: PendingTask; abierto: boolean; onAccion: (t: PendingTask, a: AccionUI) => void; sin?: AccionTarea[] }) {
+  if (!accionesDe(task).some((a) => !sin.includes(a))) return null
   return (
     <RowActionsMenu label={`${nombreTarea(task)} for ${task.person}`}>
-      <TooltipProvider delayDuration={100}>
-        <DropdownMenuLabel className="text-[12px] font-semibold text-ink">Options</DropdownMenuLabel>
-        {acciones.map(item)}
-      </TooltipProvider>
+      <DropdownMenuLabel className="text-[12px] font-semibold text-ink">Options</DropdownMenuLabel>
+      <ItemsTarea task={task} abierto={abierto} onAccion={onAccion} sin={sin} />
     </RowActionsMenu>
   )
 }

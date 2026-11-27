@@ -37,12 +37,12 @@ function paciente(nombre: string) {
    de red.dev (dashboard.md, 2026-11-25). */
 const PEDIDOS: { trabajo: string; denticion: Denticion; piezas: [string, string[]][] }[] = [
   { trabajo: 'Stainless steel crowns for primary molars, mixed dentition.', denticion: 'Primary', piezas: [['A', ['O']], ['T', []], ['K', ['M', 'D']]] },
-  { trabajo: 'Porcelain-fused-to-metal crown, shade A2.', denticion: 'Permanent', piezas: [['14', ['O', 'MB']]] },
+  { trabajo: 'Porcelain-fused-to-metal crown, shade A2.', denticion: 'Permanent', piezas: [['14', ['O', 'B']]] },
   { trabajo: 'Zirconia bridge, three units, shade B1.', denticion: 'Permanent', piezas: [['19', []], ['20', ['O']], ['21', ['M', 'D']]] },
 ]
 /* FNV-1a: reparte mejor que la suma de caracteres entre ids parecidos. */
-const hash = (s: string) => [...s].reduce((h, c) => Math.imul(h ^ c.charCodeAt(0), 16777619) >>> 0, 2166136261)
-function ordenLab(t: PendingTask) {
+export const hash = (s: string) => [...s].reduce((h, c) => Math.imul(h ^ c.charCodeAt(0), 16777619) >>> 0, 2166136261)
+export function ordenLab(t: PendingTask) {
   const n = hash(t.id ?? t.person)
   /* Un id con el formato de red.dev (UUID), siempre el mismo para la misma tarea. */
   let x = n
