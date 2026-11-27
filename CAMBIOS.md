@@ -5,6 +5,24 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-11-27
 
+### Fee schedules: versiones Draft, Scheduled, Active y Expired, y pestaña Assignments (CON-1151, CON-1369, CON-1375, CON-495, CON-496, CON-497, CON-1276, CON-1108) ([#PR](https://github.com/JulianGerardi/red-dental-studio/pull/PR))
+- **Flujo de versiones** (guía funcional y prototipo de Julián): la versión Active, las Expired y un fee schedule archivado
+  son de sólo lectura. *Create new version* pasa a editar; *Save draft* guarda el borrador sin fecha (`Arancel.borrador`,
+  uno por fee schedule); *Publish…* pide *Available from* (hoy o después), muestra el resumen y crea la versión: Active si
+  empieza hoy, Scheduled si no. Una Scheduled se edita en el lugar (*Save changes*), sin versión nueva.
+- **Datos (`data/finanzas.ts`):** `versionActiva`, `versionProgramada` y `estadoVersion`; `versionVigente` ya no asume que
+  hay versiones (un fee schedule guardado sólo como borrador tiene `versiones: []` y queda `Inactive`). Backend: el estado
+  de una versión sale de su fecha; el borrador es aparte y no tiene fecha.
+- **Lista:** el filtro es de una opción (*Active and inactive* al entrar; los archivados sólo con el filtro, CON-497). El ⋮:
+  *Deactivate / Activate*, *Archive*, *Restore* (`useAccionesArancel`). Con asociaciones, Deactivate y Archive muestran el
+  error de CON-496 en un toast y no hacen nada; Restore deja Active (CON-1108).
+- **Pestaña Assignments** (`finance/AssignmentsTab`): Locations, Insurance plans, Providers y Patients con *Remove*.
+  Reemplaza a *View assignments*; `AssignmentsDrawer` y `AssignmentsCount` quedan sin uso.
+- **`ui/alert`** suma `action` (un botón a la derecha) y el tono `neutral`. **`PieEditor`** suma `etiquetaGuardar` y
+  `secundario`.
+- Se van de esta pantalla el switch *Save in draft state*, el lápiz *Rename* y el banner *Uncompleted fields* (la validación
+  es un toast más cada campo en rojo). Detalle y lo que quedó fuera del prototipo: `settings-billing.md` (2026-11-27).
+
 ### Mails: Employee, Rescheduled (booked) y Subscription canceled como en el Figma ([#212](https://github.com/JulianGerardi/red-dental-studio/pull/212))
 - **Employee account ready:** "…access {{practice_name}}’s Confidentally workspace and use the features included in your role."
 - **Rescheduled (booked):** título "Appointment scheduled" y primera línea "…has been canceled.", como el Figma.
