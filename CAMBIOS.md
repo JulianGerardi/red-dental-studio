@@ -5,7 +5,7 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-11-27
 
-### Breadcrumb y título van de la mano ([#PR](https://github.com/JulianGerardi/red-dental-studio/pull/PR))
+### Breadcrumb y título van de la mano ([#211](https://github.com/JulianGerardi/red-dental-studio/pull/211))
 - **Regla:** en toda pantalla con breadcrumb, el H1 dice lo mismo que el último tramo. Sección = nombre del menú; ítem =
   su nombre, sin verbo (*Edit …* sólo en Edit patient); lo que no existe todavía, *New …*. Las pestañas no cambian el
   título. Detalle en `design-reference/figma/README.md` (*Regla: breadcrumb y título van de la mano*).
