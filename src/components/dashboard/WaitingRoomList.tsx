@@ -7,8 +7,9 @@ import { ETAPAS_ESPERA, claveTurno, minutosDesde, type EnEspera, type EtapaEsper
 
 /* La Waiting Room agrupada por etapa (comparativa del 2026-11-19, CON-1670): Checked in, On hold y Ready to check out,
    cada grupo con su cuenta total. La acción depende de la etapa: sólo Ready to check out lleva Check Out; las otras
-   dicen cuánto lleva la espera o la pausa. El rótulo del grupo va montado sobre el borde de su primera card y no ocupa
-   alto: las cards quedan a la misma altura que las de Appointments (dashboard.md, 2026-11-27). */
+   dicen cuánto lleva la espera o la pausa. El rótulo del grupo va aparte, arriba de su primera card, y mide lo mismo
+   que la separación entre cards: así las cards quedan a la misma altura que las de Appointments (dashboard.md,
+   2026-11-27). */
 
 /* Primero quien más espera (el `desde` más temprano); los que salen, por hora. */
 const porDesde = (a: EnEspera, b: EnEspera) => (a.desde ?? '').localeCompare(b.desde ?? '')
@@ -53,13 +54,15 @@ export function WaitingRoomList({ pacientes, ahora, limit, seleccionada, onSelec
   if (grupos.length === 0) return null
   const total = pacientes.length
   return (
-    <ShowMore total={total} limit={limit ?? total} alPie label="patients in the waiting room" className="flex flex-col gap-3">
+    /* -mt-4: el rótulo del primer grupo sube al aire que queda debajo del título del panel. */
+    <div className="-mt-4 flex min-h-0 flex-1 flex-col">
+    <ShowMore total={total} limit={limit ?? total} alPie label="patients in the waiting room" className="flex flex-col">
       {(n) => {
         const cuantos = n >= total ? grupos.map((g) => g.filas.length) : repartir(grupos.map((g) => g.filas.length), n)
         return grupos.map((g, gi) => (
-          <section key={g.etapa} aria-label={g.etapa} className="relative">
-            <p className="absolute -top-1.5 left-2.5 z-10 rounded bg-surface px-1.5 text-[10px] leading-3 font-semibold tracking-wide text-ink-muted uppercase">{g.etapa} · {g.filas.length}</p>
-            <ul className="flex flex-col gap-3">
+          <section key={g.etapa} aria-label={g.etapa}>
+            <p className="flex h-4 items-center px-0.5 text-[10px] leading-none font-semibold tracking-wide text-ink-muted uppercase">{g.etapa} · {g.filas.length}</p>
+            <ul className="flex flex-col gap-4">
               {g.filas.slice(0, cuantos[gi]).map((p) => {
                 const id = `wait-${claveTurno(p)}`
                 const min = minutosDesde(p.desde, ahora)
@@ -81,5 +84,6 @@ export function WaitingRoomList({ pacientes, ahora, limit, seleccionada, onSelec
         ))
       }}
     </ShowMore>
+    </div>
   )
 }

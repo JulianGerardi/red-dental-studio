@@ -16,7 +16,7 @@ export const LIST_GROUP_TONES = {
 export type ListGroupTone = keyof typeof LIST_GROUP_TONES
 
 export function ListGroup({
-  title, tone = 'default', collapsible, defaultOpen = true, limit, maxHeight, alPie, label, className, children,
+  title, tone = 'default', collapsible, defaultOpen = true, limit, maxHeight, alPie, amplio, label, className, children,
 }: {
   /** Nombre del grupo; va en versalitas con la cuenta. Sin título, es sólo la lista. */
   title?: string
@@ -31,6 +31,9 @@ export function ListGroup({
   maxHeight?: string
   /** "Show N more" al pie del panel (ver ShowMore). */
   alPie?: boolean
+  /** 16 px entre cards en vez de 12: Appointments del Dashboard, para coincidir con Waiting room, que pone ahí el rótulo
+      de cada etapa (dashboard.md, 2026-11-27). */
+  amplio?: boolean
   /** Nombre de lo que se lista, para el lector de pantalla. */
   label?: string
   className?: string
@@ -67,7 +70,7 @@ export function ListGroup({
       {abierto && (
         <ShowMore total={items.length} limit={limit ?? items.length} maxHeight={maxHeight} alPie={alPie} label={label ?? title}>
           {(cuantos) => (
-            <ul className="flex flex-col gap-3">
+            <ul className={cn('flex flex-col', amplio ? 'gap-4' : 'gap-3')}>
               {items.slice(0, cuantos).map((it) => <li key={it.key} className={TARJETA_INTERNA}>{it}</li>)}
             </ul>
           )}

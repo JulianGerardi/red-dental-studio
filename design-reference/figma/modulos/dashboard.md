@@ -1227,15 +1227,18 @@ no coincidían con las de Appointments. Resuelve lo que quedó "para validar" el
 1. **Causa:** los rótulos de etapa (*Checked in · 1*, *On hold · 2*, *Ready to check out · 5*) ocupaban una línea cada uno
    y las filas con pill (*Waiting · 12 min*) medían 7 px menos que las que llevan botón. Con eso entraban cinco cards y
    sobraba alto.
-2. **El rótulo va montado sobre el borde de la primera card de su grupo**, como la leyenda de un fieldset: 10 px en
-   versalitas, fondo de la card. No ocupa alto, así que las cards van una debajo de la otra con la misma separación
-   (12 px) que en Appointments. La idea de Julián ("más chico y más arriba") llevada hasta que no mueva nada.
-3. **Todas las filas miden lo mismo:** el final de la fila (`AppointmentRow`) reserva el alto del botón aunque lleve una
-   pill.
-4. **Seis cards en cada columna** (`TOPE.espera` pasa de 5 a 6): Appointments y Waiting room coinciden card por card y
-   los dos "Show N more" quedan a la misma altura, sin hueco.
+2. **El rótulo sigue aparte, arriba de la primera card de su grupo**, como en el resto de la app, pero más chico (10 px,
+   en versalitas) y del alto exacto de la separación entre cards: no suma alto. El del primer grupo usa el aire que ya
+   había debajo del título del panel. **Descartado** (Julián, mismo día): montarlo sobre el borde de la card como la
+   leyenda de un fieldset; se confundía con la card y no es como se rotulan los grupos en la app.
+3. **16 px entre cards en las dos columnas** (antes 12): es lo mínimo para que el rótulo entre con aire. Appointments
+   lo toma con `ListGroup amplio`; el resto de las listas de la app sigue en 12.
+4. **Todas las filas miden lo mismo:** el final de la fila (`AppointmentRow`) reserva el alto del botón aunque lleve una
+   pill. **Seis cards en cada columna** (`TOPE.espera` pasa de 5 a 6): Appointments y Waiting room coinciden card por
+   card y los dos "Show N more" quedan a la misma altura, sin hueco.
 5. **Sin cambios:** el orden, la cuenta de cada grupo, que cada etapa muestre al menos una (`repartir`), el filtro por
    *Visit stage*, y celular y tablet (los paneles van uno debajo del otro).
 
-**A validar:** si el rótulo de 10 px se lee bien en la pantalla de recepción, que suele estar lejos.
+**A validar:** si el rótulo de 10 px se lee bien en la pantalla de recepción, que suele estar lejos, y si los 16 px
+entre cards no hacen que entren menos turnos de los que recepción necesita ver de un vistazo.
 
