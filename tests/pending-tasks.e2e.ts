@@ -23,12 +23,12 @@ test('Request pasa la orden a Requested y Cancel la saca de la lista', async ({ 
   await screen.getByRole('button', 'Actions for Lab order for Olivia Brooks').tap()
   await screen.getByRole('menuitem', 'Request').tap()
   await screen.getByRole('dialog', 'Request lab order').getByRole('button', 'Mark as requested').tap()
-  await expect(screen.getByText('Lab order for Olivia Brooks requested.')).toBeVisible()
+  await expect(screen.getByText('The lab order has been successfully marked as Requested.')).toBeVisible()
   await expect(screen.getByRole('button', 'Open PDF of the lab order for Olivia Brooks')).toBeVisible()
 
   await screen.getByRole('button', 'Actions for Lab order for Olivia Brooks').tap()
   await screen.getByRole('menuitem', 'Cancel').tap()
-  await screen.getByRole('dialog', 'Cancel this lab order?').getByRole('button', 'Cancel lab order').tap()
+  await screen.getByRole('dialog', 'Cancel lab order').getByRole('button', 'Cancel lab order').tap()
   await expect(screen.getByRole('tab', 'Lab orders (1)')).toBeVisible()
 })
 
@@ -39,8 +39,8 @@ test('Complete this Task abre el detalle de la orden, en sólo lectura sin encue
   await screen.getByRole('button', /Complete this task/).first().tap()
   await expect(screen.getByText('Read-only mode')).toBeVisible()
   await expect(screen.getByRole('button', 'Save')).toBeDisabled()
-  await screen.getByRole('button', 'Cancel').tap()
-  await expect(screen.getByRole('button', 'View history')).toBeVisible()
+  await screen.getByRole('button', 'Back').tap()
+  await expect(screen.getByRole('button', /New lab order/)).toBeVisible()
 })
 
 test('Edit abre la orden editable: New laboratory crea el laboratorio y lo elige, y Save pide el trabajo (CON-2218, CON-2285)', async ({ app, screen }) => {
@@ -72,8 +72,10 @@ test('Edit abre la orden editable: New laboratory crea el laboratorio y lo elige
   await expect(screen.getByText('The laboratory has been successfully created.')).toBeVisible()
   await expect(screen.getByPlaceholder('Search laboratory')).toHaveValue('Bay Dental Lab')
 
+  await screen.getByLabel(/Dental work requested/).fill('')
   await screen.getByRole('button', 'Save').tap()
-  await expect(screen.getByText('Describe the dental work requested.')).toBeVisible()
+  await expect(screen.getByText('Uncompleted fields')).toBeVisible()
+  await expect(screen.getByText('This field is required.')).toBeVisible()
   await screen.getByLabel(/Dental work requested/).fill('Porcelain crown')
   await screen.getByRole('button', 'Save').tap()
   await expect(screen.getByText('The lab order has been successfully updated.')).toBeVisible()
@@ -125,15 +127,16 @@ test('Una Referral Pending con encuentro abierto se edita, valida y se pide desd
   await screen.getByRole('button', 'Actions for Referral for Olivia Brooks').tap()
   await screen.getByRole('menuitem', 'Request').tap()
   await screen.getByRole('dialog', 'Request referral').getByRole('button', 'Mark as requested').tap()
-  await expect(screen.getByText('Referral for Olivia Brooks requested.')).toBeVisible()
-  await expect(screen.getByText("This referral can't be edited")).toBeVisible()
+  await expect(screen.getByText('The referral has been successfully marked as Requested.')).toBeVisible()
+  await expect(screen.getByText('This referral cannot be edited because it is not in an editable state.')).toBeVisible()
 })
 
 /* Teeth & surface como red.dev: lo marcado en Permanent queda al pasar a Primary, y Toggle all marca las cinco
    superficies del diente elegido (Lingual arriba en la mandíbula). */
 test('Lab order: dentición mixta y Toggle all por diente', async ({ app, screen }) => {
-  await app.open('/patients/john-smith/clinical-mode?tab=Lab%20order&task=paciente-lab-orders-1')
+  await app.open('/patients/john-smith/clinical-mode?tab=Lab%20order')
   await screen.getByRole('button', /Start encounter/).tap()
+  await screen.getByRole('button', /New lab order/).tap()
   await screen.getByRole('button', 'Initialize permanent dentition').tap()
   await screen.getByRole('button', 'Tooth 17').tap()
   await screen.getByRole('button', 'Primary').tap()

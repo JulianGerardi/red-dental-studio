@@ -1,44 +1,38 @@
-import { useState, type ReactNode } from 'react'
+import { useState } from 'react'
 import { FileText, Plus } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { aviso } from '@/components/ui/toaster'
-import { Alert } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
 import { SearchPicker } from '@/components/ui/search-picker'
 import { FieldHint, FieldLabel, FormFooter, SearchField, TextArea } from '@/components/patients/form'
 import { Card } from '@/components/settings/primitives'
 import { OBLIGATORIO } from '@/lib/validacion'
-import { DERIVACION_TAREA, PROCEDIMIENTOS, PROVEEDORES_DERIVACION, VINCULOS_PROCEDIMIENTO, type ProveedorDerivacion } from '@/data/clinical-mode'
-import { CASOS, NO_ASIGNADOS } from '@/data/treatment-plan'
+import type { DatosDerivacion, ProveedorDerivacion } from '@/data/clinical-mode'
 import type { PendingTask } from '@/components/dashboard/PendingTaskCard'
-import { MenuTarea, SIN_ENCUENTRO, TONO_ESTADO, tareaViva, useAccionesTarea, useTareasVivas, type AccionUI } from '@/components/dashboard/tareas'
+import { MenuTarea, TONO_ESTADO, esEditable, type AccionUI } from '@/components/dashboard/tareas'
 import { NewProviderDrawer } from './NewProviderDrawer'
-import { Adjuntos, COLUMNAS_FICHA, EncabezadoFicha, ProcedimientoResumen, ProcedimientosVinculados, type Adjunto, type ProcedimientoFicha } from './FichaClinica'
+import { Adjuntos, AvisosFicha, COLUMNAS_FICHA, DatoFicha, EncabezadoFicha, ProcedimientoResumen, ProcedimientosVinculados, type Adjunto } from './FichaClinica'
+import { PROCEDIMIENTOS_REFERRAL, agregarProveedor, guardarRegistro, hoy, proveedoresDerivacion, type Registro } from './registros'
 
-/* El detalle de una Referral, el que abre Complete this task desde Pending Task (video de red.dev de Julián, 2026-11-25).
-   Mismos datos y acciones que red.dev, con el armado de FichaClinica (General information | Details). Reglas de CON-2322 /
-   CON-2323. Ver design-reference/figma/modulos/clinical-mode.md (2026-11-27). */
+/* La ficha de una Referral: la misma para New referral, Edit y la vista de una derivación que ya no se edita. Mismos datos
+   y acciones que red.dev (videos de Julián del 2026-11-25 y 27), con el armado de FichaClinica (General information |
+   Details). Reglas de CON-2322 / CON-2323. Ver design-reference/figma/modulos/clinical-mode.md (2026-11-27). */
 
 const MAX_NOTA = 500
+const VACIA: DatosDerivacion = { proveedor: '', nota: '', procedimientos: [], asap: false, obligatoria: false, adjuntos: [] }
 
-/* Sólo se derivan procedimientos Planned del paciente (CON-2322): los sueltos del Treatment plan y los de un caso. */
-const PLANNED: ProcedimientoFicha[] = [
-  ...NO_ASIGNADOS.slice(0, 5).map((p) => ({ id: p.id, codigo: p.codigo, nombre: p.nombre, estado: 'Planned' as const, fecha: p.fecha, pieza: p.pieza, superficie: p.superficie, ubicacion: p.ubicacion })),
-  ...PROCEDIMIENTOS.filter((p) => p.estado === 'Planned').map((p) => ({
-    ...p, pieza: p.pieza ? String(p.pieza) : undefined, caso: CASOS.find((c) => c.id === VINCULOS_PROCEDIMIENTO[p.id]?.caso?.id)?.nombre,
-  })),
-]
-
-export function ReferralDetail({ tarea, abierto, onVolver, onAccion }: {
-  tarea: PendingTask
+export function ReferralDetail({ registro, nuevo, abierto, onVolver, onAccion }: {
+  registro: Registro
+  /** Todavía no existe: Save la crea en Pending. */
+  nuevo?: boolean
   /** Hay un encuentro abierto con el paciente. */
   abierto: boolean
   onVolver: () => void
   onAccion: (t: PendingTask, a: AccionUI) => void
 }) {
-  const inicio = DERIVACION_TAREA
-  const [proveedores, setProveedores] = useState<ProveedorDerivacion[]>(PROVEEDORES_DERIVACION)
+  const inicio = registro.derivacion ?? VACIA
+  const [proveedores, setProveedores] = useState<ProveedorDerivacion[]>(proveedoresDerivacion)
   const [proveedor, setProveedor] = useState(inicio.proveedor)
   const [procedimientos, setProcedimientos] = useState<string[]>(inicio.procedimientos)
   const [asap, setAsap] = useState(inicio.asap)
@@ -49,8 +43,8 @@ export function ReferralDetail({ tarea, abierto, onVolver, onAccion }: {
   const [nuevoProveedor, setNuevoProveedor] = useState(false)
 
   /* Sólo se edita en Pending (CON-2323) y con un encuentro abierto. */
-  const pendiente = tarea.state === 'Pending'
-  const editable = abierto && pendiente
+  const editable = abierto && (nuevo || esEditable(registro))
+  const elegidos = PROCEDIMIENTOS_REFERRAL.filter((p) => procedimientos.includes(p.id))
 
   const guardar = () => {
     const e = {
@@ -58,8 +52,9 @@ export function ReferralDetail({ tarea, abierto, onVolver, onAccion }: {
       nota: nota.trim() ? undefined : OBLIGATORIO,
     }
     setErrores(e)
-    if (e.proveedor || e.nota) { aviso.error('All required fields marked with (*) must be completed before proceeding.'); return }
-    aviso.ok('The referral has been successfully updated.')
+    if (e.proveedor || e.nota) return
+    guardarRegistro({ ...registro, updated: hoy(), derivacion: { proveedor, nota: nota.trim(), procedimientos, asap, obligatoria, adjuntos: adjuntos.map((a) => ({ nombre: a.nombre, bytes: a.bytes ?? 0 })) } })
+    aviso.ok(`The referral has been successfully ${nuevo ? 'created' : 'updated'}.`)
     onVolver()
   }
 
@@ -68,35 +63,36 @@ export function ReferralDetail({ tarea, abierto, onVolver, onAccion }: {
   return (
     <div className="flex flex-col gap-4">
       <EncabezadoFicha
-        titulo="Referral" estado={tarea.state} tono={TONO_ESTADO[tarea.state] ?? 'info'}
-        acciones={<>
-          {tarea.pdf && <Button variant="secondary" onClick={() => onAccion(tarea, 'PDF')}><FileText /> PDF</Button>}
-          <MenuTarea task={tarea} abierto={abierto} onAccion={onAccion} sin={['Delete']} />
+        titulo={nuevo ? 'New referral' : 'Referral'} estado={registro.state} tono={TONO_ESTADO[registro.state]} onVolver={onVolver} volverA="referrals"
+        acciones={!nuevo && <>
+          {registro.pdf && <Button variant="secondary" onClick={() => onAccion(registro, 'PDF')}><FileText /> PDF</Button>}
+          <MenuTarea task={registro} abierto={abierto} onAccion={onAccion} sin={['Edit']} />
         </>}
       />
 
-      {!abierto
-        ? <Alert tone="warning" title="Read-only mode">{SIN_ENCUENTRO}</Alert>
-        : !pendiente && <Alert tone="info" title="This referral can't be edited">It was already requested. Only pending referrals can be edited.</Alert>}
+      <AvisosFicha abierto={abierto} editable={editable} nombre="referral" incompleto={Object.values(errores).some(Boolean)} />
 
       <div className={COLUMNAS_FICHA}>
         <Card title="General information">
           <fieldset disabled={!editable} className="flex min-w-0 flex-col gap-6">
             <legend className="sr-only">General information</legend>
-            <div className="flex flex-col gap-4">
-              <div className="flex flex-col gap-2 sm:flex-row sm:items-end">
+            <div className="grid gap-4 sm:grid-cols-2">
+              {/* Quién deriva y cuándo (CON-2609: provider creador y Referral date), de sólo lectura como en Lab order. */}
+              <DatoFicha label="Referring provider">{registro.provider}</DatoFicha>
+              <DatoFicha label="Referral date">{registro.register}</DatoFicha>
+              <div className="flex flex-col gap-2 sm:col-span-2 sm:flex-row sm:items-end">
                 <SearchField
-                  label="Referral provider" required className="min-w-0 flex-1" placeholder="Search by name or surname"
+                  label="Referral provider" required clearable className="min-w-0 flex-1" placeholder="Search by name or surname"
                   options={proveedores.map((p) => p.nombre)} subtext={especialidad} emptyText="No results found."
                   value={proveedor} onChange={setProveedor} error={errores.proveedor} disabled={!editable}
                 />
                 <Button variant="secondary" size="lg" className={cn(errores.proveedor && 'sm:mb-6')} disabled={!editable} onClick={() => setNuevoProveedor(true)}><Plus /> New provider</Button>
               </div>
-              <div className="flex flex-wrap items-center gap-x-6 gap-y-3">
-                <label className="flex w-fit items-center gap-2 text-[13px] text-ink">
+              <div className={cn('flex flex-wrap items-center gap-x-6 gap-y-3 sm:col-span-2', !editable && 'opacity-60')}>
+                <label className="flex w-fit items-center gap-2 text-[13px] font-medium text-ink">
                   <Checkbox on={asap} onChange={setAsap} label="ASAP" disabled={!editable} /> ASAP
                 </label>
-                <label className="flex w-fit items-center gap-2 text-[13px] text-ink">
+                <label className="flex w-fit items-center gap-2 text-[13px] font-medium text-ink">
                   <Checkbox on={obligatoria} onChange={setObligatoria} label="Mandatory to continue treatment" disabled={!editable} /> Mandatory to continue treatment
                 </label>
               </div>
@@ -104,18 +100,15 @@ export function ReferralDetail({ tarea, abierto, onVolver, onAccion }: {
             <div className="flex flex-col gap-2">
               <FieldLabel>Procedures</FieldLabel>
               <SearchPicker
-                multiple ocultarElegidos items={PLANNED} getId={(p) => p.id} getText={(p) => `${p.codigo} ${p.nombre} ${p.caso ?? ''} ${p.pieza ?? ''}`}
+                multiple ocultarElegidos items={PROCEDIMIENTOS_REFERRAL} getId={(p) => p.id} getText={(p) => `${p.codigo} ${p.nombre} ${p.caso ?? ''} ${p.pieza ?? ''}`}
                 renderOption={(p) => <ProcedimientoResumen p={p} />}
-                selected={PLANNED.filter((p) => procedimientos.includes(p.id))}
+                selected={elegidos}
                 onSelect={(p) => setProcedimientos((a) => [...new Set([...a, p.id])])}
                 placeholder="Search by code or description" ariaLabel="Search procedures" emptyText="No planned procedure matches that search."
                 accion="vincular" disabled={!editable}
               />
-              <FieldHint>Only planned procedures can be referred.</FieldHint>
-              <ProcedimientosVinculados
-                items={PLANNED.filter((p) => procedimientos.includes(p.id))} disabled={!editable}
-                onRemove={(p) => setProcedimientos((a) => a.filter((id) => id !== p.id))}
-              />
+              {editable && <FieldHint>Only planned procedures can be referred.</FieldHint>}
+              <ProcedimientosVinculados items={elegidos} disabled={!editable} onRemove={(p) => setProcedimientos((a) => a.filter((id) => id !== p.id))} />
             </div>
           </fieldset>
         </Card>
@@ -135,33 +128,15 @@ export function ReferralDetail({ tarea, abierto, onVolver, onAccion }: {
       </div>
 
       <div className="mt-1 flex justify-end">
-        <FormFooter onCancel={onVolver} onSave={guardar} saveDisabled={!editable} />
+        <FormFooter onCancel={onVolver} onSave={guardar} saveDisabled={!editable} cancelLabel={editable ? 'Cancel' : 'Back'} />
       </div>
 
       {nuevoProveedor && (
         <NewProviderDrawer
           onClose={() => setNuevoProveedor(false)}
-          onGuardar={(p) => { setProveedores((x) => [...x, p]); setProveedor(p.nombre); setErrores((e) => ({ ...e, proveedor: undefined })); aviso.ok(`${p.nombre} added and selected.`) }}
+          onGuardar={(p) => { agregarProveedor(p); setProveedores((x) => [...x, p]); setProveedor(p.nombre); setErrores((e) => ({ ...e, proveedor: undefined })); aviso.ok(`${p.nombre} added and selected.`) }}
         />
       )}
     </div>
-  )
-}
-
-/** La pestaña Referral: con la tarea de Pending Task, su detalle; sin ella (o al salir con Cancel), lo que había. */
-export function ReferralPanel({ tarea, encuentroAbierto, children }: { tarea?: PendingTask; encuentroAbierto: boolean; children: ReactNode }) {
-  const [detalle, setDetalle] = useState(tarea?.id)
-  useTareasVivas(tarea ? [tarea] : [])
-  const viva = tarea && tareaViva(tarea)
-  const acciones = useAccionesTarea({ paciente: tarea?.patientId })
-
-  if (!viva || detalle !== viva.id) return <>{children}</>
-  /* Cancelada o borrada desde su ⋮: ya no hay detalle que mostrar. */
-  if (viva.fuera) { setDetalle(undefined); return null }
-  return (
-    <>
-      <ReferralDetail key={viva.state} tarea={viva} abierto={encuentroAbierto} onVolver={() => setDetalle(undefined)} onAccion={acciones.hacer} />
-      {acciones.dialogo}
-    </>
   )
 }

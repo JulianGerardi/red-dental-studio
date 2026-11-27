@@ -14,8 +14,8 @@ import { TreatmentPlanList } from '@/components/clinical/TreatmentPlanList'
 import { ProblemListFlotante } from '@/components/clinical/ProblemListFlotante'
 import { NavegacionClinica, examenDePestana, type DestinoClinico } from '@/components/clinical/RecordDetail'
 import { VitalsPanel } from '@/components/clinical/VitalsPanel'
-import { LabOrderPanel } from '@/components/clinical/LabOrderPanel'
-import { ReferralPanel } from '@/components/clinical/ReferralDetail'
+import { RegistrosPanel } from '@/components/clinical/RegistrosPanel'
+import type { TipoRegistro } from '@/components/clinical/registros'
 import { RadiographyPanel } from '@/components/clinical/RadiographyPanel'
 import { TreatmentPlanSection } from '@/components/clinical/TreatmentPlanSection'
 import { TreatmentPanel } from '@/components/clinical/TreatmentPanel'
@@ -109,14 +109,14 @@ export default function ClinicalMode() {
       />
     </div>
   )
+  /* Lab order, Prescription y Referral comparten panel: tabla, ficha y acciones (clinical-mode.md, 2026-11-27). */
+  const registroDePestana = ({ 'Lab order': 'Lab orders', Prescription: 'Prescriptions', Referral: 'Referrals' } as Partial<Record<Pestana, TipoRegistro>>)[pestana]
   const contenido = enOverview
     ? overview
     : pestana === 'Vitals'
       ? <ExamLayout findings={false}><VitalsPanel /></ExamLayout>
-      : pestana === 'Lab order'
-        ? <LabOrderPanel tarea={tareaPedida?.kind === 'Lab orders' ? tareaPedida : undefined} encuentroAbierto={encuentro !== 'sinEmpezar'} />
-        : pestana === 'Referral'
-          ? <ReferralPanel tarea={tareaPedida?.kind === 'Referrals' ? tareaPedida : undefined} encuentroAbierto={encuentro !== 'sinEmpezar'}>{enConstruccion}</ReferralPanel>
+      : registroDePestana
+        ? <RegistrosPanel key={registroDePestana} kind={registroDePestana} tarea={tareaPedida?.kind === registroDePestana ? tareaPedida : undefined} encuentroAbierto={encuentro !== 'sinEmpezar'} />
         : pestana === 'Radiographic'
           ? <RadiographyPanel />
           : pestana === 'Treatment plan'

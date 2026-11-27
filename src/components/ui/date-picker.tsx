@@ -49,8 +49,10 @@ export const POPOVER_FECHA = 'w-auto max-w-[calc(100vw-24px)] p-3'
 
 /* Un mes, con su navegación: lo usan DatePicker (un día) y DateFilter (un día o un rango). */
 export function MonthCalendar({
-  month, onMonthChange, from, to, onPick, onHover, marked = [], max, yearNav,
+  month, onMonthChange, from, to, onPick, onHover, marked = [], max, min, yearNav,
 }: {
+  /** Primer día que se puede elegir: los de antes, deshabilitados (un vencimiento no puede quedar en el pasado). */
+  min?: Date
   month: Date
   onMonthChange: (m: Date) => void
   /** Lo elegido: un día (from = to) o un rango, los dos extremos incluidos. */
@@ -67,6 +69,7 @@ export function MonthCalendar({
   yearNav?: boolean
 }) {
   const tope = max && dia(max)
+  const piso = min && dia(min)
   const mover = (n: number) => onMonthChange(new Date(month.getFullYear(), month.getMonth() + n, 1))
   const celdas = Array.from({ length: 42 }, (_, i) => new Date(month.getFullYear(), month.getMonth(), 1 + i - month.getDay()))
   const hayDespues = (n: number) => !tope || new Date(month.getFullYear(), month.getMonth() + n, 1) <= tope
@@ -93,7 +96,7 @@ export function MonthCalendar({
           <span key={d} className="flex size-9 items-center justify-center text-[0.8rem] text-muted-foreground">{d}</span>
         ))}
         {celdas.map((d) => {
-          const despues = !!tope && d > tope
+          const despues = (!!tope && d > tope) || (!!piso && d < piso)
           const extremo = !!from && !!to && (sameDay(d, from) || sameDay(d, to))
           const medio = !!from && !!to && !extremo && d > dia(from) && d < dia(to)
           const fuera = d.getMonth() !== month.getMonth()
@@ -170,9 +173,17 @@ export function DatePicker({
   className,
   error,
   variant = 'field',
+  min,
+  max,
+  ariaLabel,
 }: {
   value: Date | null
   onChange: (d: Date) => void
+  /** Rango elegible: fuera de él los días quedan deshabilitados. */
+  min?: Date
+  max?: Date
+  /** Nombre del campo para el lector de pantalla (el rótulo visible va afuera). */
+  ariaLabel?: string
   marked?: Date[]
   placeholder?: string
   /** Para usarlo como campo de formulario: h-9, ancho completo. */
@@ -195,6 +206,7 @@ export function DatePicker({
         <button
           type="button"
           aria-invalid={error || undefined}
+          aria-label={ariaLabel && `${ariaLabel}: ${value ? formatMDY(value) : placeholder}`}
           className={cn(
             fechaTriggerClasses(variant),
             !value && 'text-ink-faint',
@@ -213,6 +225,8 @@ export function DatePicker({
           from={value}
           to={value}
           marked={marked}
+          min={min}
+          max={max}
           yearNav
           onPick={(d) => {
             onChange(d)
