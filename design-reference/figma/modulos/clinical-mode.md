@@ -4069,3 +4069,63 @@ del encuentro y del filtro de fecha.
 
 **A validar con usuarios:** si filtrar por mes alcanza o piden un rango libre; y si *Today* se entiende como "este mes"
 en una tabla.
+
+## CON-4157 · CON-4156 · End Encounter: sin rótulo y Edit / historial dentro del mismo drawer (2026-11-27)
+
+**Jira:** CON-4157 (HU 4, el drawer End Encounter), CON-4156 (HU 3: *Edit* "respeta las reglas existentes", o sea el Edit
+procedure de siempre), CON-4158 (HU 5, el historial), CON-4211 y CON-2529 (el estimado dentro de Edit procedure). Pedido
+de Julián sobre el drawer: "el título *appointment procedure* aparece expandido, no debe ser así, sacalo" y "cuando pongo
+edit procedure el flujo es el de la tabla de Procedures; no me gusta cómo se superpone en el drawer, buscaría otra idea
+pero que no se superponga".
+
+**El problema.** *Edit* y *View execution history* abrían un segundo drawer encima de End Encounter. El de Edit es más
+angosto (480 px contra 560), así que a su izquierda quedaba asomando una franja del de atrás con los nombres cortados:
+dos paneles, dos X y dos pies a la vista.
+
+**Decisiones**
+
+1. **Sin el rótulo *APPOINTMENT PROCEDURES · N*.** El drawer tiene una sola lista y el título ya dice qué es; el rótulo
+   en versalitas repetía. `ListGroup` va sin `title`, con `label` para el lector de pantalla (ahora nombra la sección
+   también sin título).
+2. **Un solo drawer con tres vistas** (`EndEncounterDrawer`): la lista, *Edit procedure* y *Execution history*. Lo que se
+   abre desde el ⋮ de una fila **reemplaza** el contenido del drawer (título, pestañas, contenido y pie) en vez de apilar
+   otro: entra desde la derecha (`paso-entra`, la animación de los pasos) y al volver la lista entra desde la izquierda.
+   Mismo ancho (`lg`) en las tres, para que el panel no salte.
+3. **Cómo se vuelve:** en Edit procedure, *Cancel* y *Save* (con el aviso `D3330 updated.`); en el historial, *Back*. La X
+   y Escape vuelven **un paso** (a la lista), no cierran End Encounter: es lo que hacía antes la X del drawer de arriba, y
+   evita perder el cierre del encuentro por querer salir de la edición. Al volver, el foco queda en el ⋮ de la fila de la
+   que se salió y esa fila queda a la vista.
+4. **Edit es el Edit procedure de las tablas** (cierra el "a confirmar" del 2026-11-25): General information, Findings,
+   Diagnostic y Estimate, con un solo Save. `EditProcedureDrawer` expone sus partes con `useEdicionProcedimiento` (título,
+   pestañas, pie y contenido) para mostrarse en un drawer que ya está abierto; el componente sigue igual para el resto.
+   Se guarda nota, proveedor, vínculos y estimado en el procedimiento del turno (`guardarEdicionCita`, reemplaza a
+   `guardarNotaCita`); no toca el estado ni las fases.
+5. **El estimado se ve bloqueado** (*Estimate locked*): un procedimiento del turno ya está en un caso aceptado, y el
+   estimado sólo se edita en Planning (CON-2529). El texto es el de `bloqueoEstimadoDe`, con "This treatment case" en
+   lugar del nombre del caso.
+6. Las preguntas sí/no (*Complete procedure?*, Refer, Discard, Discontinue) siguen como `ConfirmDialog`, y *View clinical
+   note* del historial sigue abriendo el visor de documentos a pantalla completa: no son drawers apilados.
+
+**Alternativas descartadas:** Edit al costado del drawer (el `aside` de New Appointment): no se superpone y deja la lista
+a la vista, pero necesita más de 1000 px y en tablet y celular habría que caer igual en el reemplazo, o sea dos
+comportamientos. Edit desplegado dentro de la fila: cuatro pestañas no entran en una fila compacta. Cerrar End Encounter
+y abrir Edit como drawer aparte: parpadea el fondo y el panel vuelve a entrar.
+
+**Anomalías y pendientes**
+
+1. **Inventado para el mock:** la *Creation date* de cada procedimiento del turno (`fecha` en `data/ejecucion.ts`). El
+   proveedor es el del turno hasta que se cambia en Edit; el fee, el UCR del código.
+2. Los procedimientos del turno no dicen de qué caso son (el mock no los une con `treatment-plan.ts`, pendiente desde el
+   2026-11-25): por eso el aviso del estimado no nombra el caso.
+3. `DialogoEditar` (el drawer que sólo editaba la nota) ya no se usa en la app: queda en `accionesProcedimiento` y en su
+   story hasta que se limpie.
+4. Al cambiar de vista el título del drawer cambia pero el lector de pantalla no lo anuncia solo (el foco queda en el
+   panel). A revisar si se documenta el patrón para otros drawers.
+
+**A validar con usuarios:** si queda claro que *Edit procedure* es un paso dentro de End Encounter y no otra pantalla (se
+vuelve con Cancel, Save o la X); si esperan que la X cierre todo; y si en el cierre del encuentro alguien necesita ver la
+lista mientras edita (ahí pesaría la opción del costado).
+
+Código: `clinical/EndEncounterDrawer.tsx` (`HistorialEjecucion` reemplaza a `ExecutionHistoryDrawer`),
+`clinical/dental/EditProcedureDrawer.tsx`, `ui/list-group.tsx`, `lib/ejecucion.ts`, `data/ejecucion.ts`,
+`tests/clinical-mode.e2e.ts`. Storybook sin tocar.
