@@ -26,5 +26,10 @@
   "pdfs/main.tsx": "Entrada de la página de PDFs (/pdfs/), sin interfaz propia.",
   "components/finance/BillingHeader.tsx": "Encabezado de las tres pantallas de Billing: se ve en Pages (Settings / Billing). Story propia al documentar la tanda (2026-11-26).",
   "components/ui/tabs.tsx#TabLinks": "Variante de Tabs con links, nueva en la tanda del 2026-11-26: se documenta en Elements / Tabs al cerrar la tanda.",
-  "components/settings/RoleCard.tsx": "Card de un rol en Settings → Roles: se ve en Pages (Settings / Roles). Story propia al documentar la tanda (2026-11-26)."
+  "components/settings/RoleCard.tsx": "Card de un rol en Settings → Roles: se ve en Pages (Settings / Roles). Story propia al documentar la tanda (2026-11-26).",
+  "components/clinical/FichaClinica.tsx#DatoFicha": "Lab order / Referral (2026-11-27): se ve en Pages (Clinical Mode). Story propia al documentar la tanda.",
+  "components/clinical/FichaClinica.tsx#ProcedimientoResumen": "Lab order / Referral (2026-11-27): se ve en Pages (Clinical Mode). Story propia al documentar la tanda.",
+  "components/clinical/FichaClinica.tsx#ProcedimientosVinculados": "Lab order / Referral (2026-11-27): se ve en Pages (Clinical Mode). Story propia al documentar la tanda.",
+  "components/clinical/Credenciales.tsx#Credenciales": "Lab order / Referral (2026-11-27): se ve en Pages (Clinical Mode). Story propia al documentar la tanda.",
+  "components/clinical/dental/RuedaSuperficies.tsx#RuedaSuperficies": "Lab order / Referral (2026-11-27): se ve en Pages (Clinical Mode). Story propia al documentar la tanda."
 }
