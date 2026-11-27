@@ -6,6 +6,22 @@
 Sin historia de Jira. Regla transversal en `../README.md` (*Regla: breadcrumb y título van de la mano*). Edit carrier pasa a **el nombre del carrier** (*Aetna Dental Plans*) y Edit insurance plan a **el del plan** (*Acme Corp*), como el último tramo. El encabezado del editor de Fee schedules y Coverage tables es el ítem elegido (*UCR - Red* · Active · Default) en vez de *Edit fee schedule* / *Edit coverage table*. Resuelve el *Queda para decidir* de abajo.
 
 
+## Tachos y métricas de Compare fees como el resto de la app (2026-11-27)
+
+Sin historia de Jira. Julián: *"fijate que los trash estén alineados al design system"* y *"que las métricas de Compare
+fees estén alineadas a como tenemos en Billing"*.
+
+1. **Tacho de una fila**: sólo ícono, en rojo (`ICONO_SUELTO` + `text-dash-bad-fg`, Trash2 de 16), como los rangos de la
+   Coverage table, las excepciones y la Payment table. En *Assignments* había un botón con texto *Remove* (venía del
+   prototipo); el nombre queda en el `aria-label` (*Remove BeneCare Dental Plan (Plan: BeneCare Family)*). *Discard draft*
+   sigue con texto (es una acción del pie, no de una fila) y pasa a rojo.
+2. **Métricas de Compare fees** con `ui/stat-card` (`interna`), la card de métricas de Billing, el Ledger y Edit Account:
+   ícono en caja celeste, rótulo, ⓘ con lo que cuenta el número y valor en azul. Mismos cuatro números (*Higher, Lower,
+   Same, Missing a fee*); antes eran cajas grises propias. De a cuatro en el drawer y de a dos en celular.
+
+Pendiente fuera de Billing (no se tocó): el tacho de fila sigue en gris en Locations (Working hours, Exceptions), Employees
+(Roles & location) y la ficha clínica.
+
 ## Versiones de un Fee Schedule: guía funcional y prototipo (2026-11-27) · CON-1151, CON-1369, CON-1375, CON-495, CON-496, CON-497, CON-1276, CON-1108
 
 Julián pasó la *Guía funcional: ¿Cómo funciona un Fee Schedule?* y después un **prototipo en HTML** (*Fee schedules ·
