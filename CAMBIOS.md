@@ -5,7 +5,7 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-11-27
 
-### Prescription en Clinical Mode: la lista y New / Edit prescription (CON-2230, CON-2354, CON-2355, CON-2356, CON-2846) ([#PR](https://github.com/JulianGerardi/red-dental-studio/pull/PR))
+### Prescription en Clinical Mode: la lista y New / Edit prescription (CON-2230, CON-2354, CON-2355, CON-2356, CON-2846) ([#214](https://github.com/JulianGerardi/red-dental-studio/pull/214))
 - **Pestaña Prescription** (antes *Planned*): `clinical/PrescriptionPanel.tsx`. Tabla estándar como Lab order, con
   *Search prescriptions*, Filter (Status y Provider) y filtro por fecha de vencimiento. La fila abre la ficha.
 - **⋮ según el estado:** Pending → Edit, Activate, Cancel, Delete; Active → View, Download PDF, Expire, Cancel; Expired y
