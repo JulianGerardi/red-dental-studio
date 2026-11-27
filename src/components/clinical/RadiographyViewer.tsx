@@ -67,7 +67,7 @@ export function FichaHallazgo({ h, onBorrar }: { h: Hallazgo; onBorrar: () => vo
           <button
             onClick={onBorrar}
             aria-label={`Delete finding on ${h.zona}`}
-            className="flex size-7 items-center justify-center rounded-md bg-surface text-ink transition-colors hover:bg-dash-bad-bg hover:text-dash-bad-fg"
+            className="flex size-7 items-center justify-center rounded-md bg-surface text-dash-bad-fg transition-colors hover:bg-dash-bad-bg"
           >
             <Trash2 className="size-3.5" />
           </button>

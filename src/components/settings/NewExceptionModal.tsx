@@ -103,7 +103,7 @@ export function NewExceptionModal({
               type="button"
               aria-label="Clear range"
               onClick={() => { setInicio(''); setFin(''); aviso.info('Time range cleared.') }}
-              className="rounded-md p-1.5 text-ink-muted transition-colors hover:bg-dash-bad-bg hover:text-dash-bad-fg"
+              className="rounded-md p-1.5 text-dash-bad-fg transition-colors hover:bg-dash-bad-bg"
             >
               <Trash2 className="size-4" />
             </button>

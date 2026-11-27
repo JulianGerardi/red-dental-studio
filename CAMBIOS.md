@@ -5,6 +5,14 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-11-27
 
+### El tacho va en rojo en toda la app ([#PR](https://github.com/JulianGerardi/red-dental-studio/pull/PR))
+- **Regla** (`design-reference/figma/README.md`): todo `Trash2` que borra o quita algo va en `text-dash-bad-fg`, también en
+  reposo. En una fila, sólo ícono con `cn(ICONO_SUELTO, 'text-dash-bad-fg')`; en un ⋮, `variant="destructive"`; un botón
+  con texto, `text-dash-bad-fg hover:text-dash-bad-fg`.
+- **Pasaron de gris a rojo:** Location (Rooms, Exceptions, Working hours, New exception), Employees (credenciales y Roles &
+  location), Clinical Mode (procedimientos de la ficha, radiografías, credenciales) y el popover clínico del paciente. Sólo
+  cambia el color: mismos botones y acciones.
+
 ### Fee schedules: tachos de fila y métricas de Compare fees como el resto de la app ([#215](https://github.com/JulianGerardi/red-dental-studio/pull/215))
 - **Tacho de una fila:** sólo ícono, en rojo (`ICONO_SUELTO` + `text-dash-bad-fg`, `Trash2` de 16 px), con el nombre en el
   `aria-label`. Así queda *Remove* en `finance/AssignmentsTab`, como los rangos, las excepciones y la Payment table. No usar

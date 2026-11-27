@@ -146,7 +146,7 @@ export function LocationHoursModal({
                   type="button"
                   aria-label="Delete time range"
                   onClick={() => setRangos((p) => p.filter((_, j) => j !== i))}
-                  className="mt-7 shrink-0 rounded p-1 text-ink-muted hover:bg-surface-muted hover:text-dash-bad-fg"
+                  className="mt-7 shrink-0 rounded p-1 text-dash-bad-fg hover:bg-dash-bad-bg"
                 >
                   <Trash2 className="size-4" />
                 </button>
