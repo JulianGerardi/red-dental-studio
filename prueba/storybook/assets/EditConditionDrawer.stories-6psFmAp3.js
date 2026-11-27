@@ -1,9 +1,0 @@
-import{n as e}from"./rolldown-runtime-DkW27tQK.js";import{n as t,t as n}from"./EditConditionDrawer-Hi1gDs2E.js";import{a as r,n as i,o as a,r as o}from"./play-Dr1R_I1D.js";var s,c,l,u,d;function f(){return(f=e((()=>{o(),t(),s={title:`Components/Clinical/Dental/EditConditionDrawer`,component:n,parameters:{layout:`fullscreen`,docs:{jira:[`CON-2770`,`CON-1751`],story:{inline:!1,iframeHeight:640},description:{component:`**Edit Finding** de una condition cargada en un diente (Figma 5301:149072; CON-2770): arriba los datos del finding de lectura, y en pestañas lo que se edita -superficies, descriptores y notas-. Un solo *Save* guarda todo. Lo abre [EditFindingDrawer](/docs/components-clinical-dental-editfindingdrawer--docs), que elige el drawer según el tipo de finding.
-
-**Probalo:** en *Default* cambiá de pestaña y elegí otro descriptor; *Descriptors* abre directo en esa pestaña.`}}},args:{finding:{id:`F-1`,area:`Tooth 3`,condition:`chronic enamel dental caries`,descriptor:`Deep`,date:`May 14, 2026`,status:`Active`,tooth:3,provider:`Elena Martinez`,surfaces:[`O`,`DB`],notes:`Occlusal decay detected on routine exam.`,linked:[],diagnoses:[],kind:`condition`,descriptors:{borders:`Raised`},examen:`Dental assessment`},onClose:()=>{},onSave:()=>{}}},c={},l={play:a(r(`tab`,/descriptors/i),i(/descriptors/i))},u={args:{finding:null}},d=[`Default`,`Descriptors`,`Closed`],c.parameters={...c.parameters,docs:{...c.parameters?.docs,source:{originalSource:`{}`,...c.parameters?.docs?.source}}},l.parameters={...l.parameters,docs:{...l.parameters?.docs,source:{originalSource:`{
-  play: secuencia(pulsarRol('tab', /descriptors/i), esperar(/descriptors/i))
-}`,...l.parameters?.docs?.source}}},u.parameters={...u.parameters,docs:{...u.parameters?.docs,source:{originalSource:`{
-  args: {
-    finding: null
-  }
-}`,...u.parameters?.docs?.source}}}})))()}f();export{u as Closed,c as Default,l as Descriptors,d as __namedExportsOrder,s as default};
