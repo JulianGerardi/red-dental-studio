@@ -3708,3 +3708,136 @@ Código: `clinical/{FichaClinica,LabOrderDetail,ReferralDetail,LabOrderPanel,Cre
 NewLaboratoryDrawer}.tsx`, `clinical/dental/RuedaSuperficies.tsx`, `dashboard/tareas.tsx`, `patients/form.tsx`
 (`TextArea.crecer`), `settings/primitives.tsx` (`Card.bodyClassName`); e2e en `tests/pending-tasks.e2e.ts`. Storybook sin
 tocar.
+
+## CON-2230 · CON-2354 · CON-2356 · Prescription: la lista y New / Edit prescription (2026-11-27)
+
+**Jira:** CON-2212 (epic) · CON-2230 (New Prescription: campos, listas y validaciones) · CON-2354 (Edit: sólo Pending, al
+menos una medicación) · CON-2355 (Cancel: Pending o Active) · CON-2356 (Delete: sólo Pending) · CON-2358 (Expired al
+vencer) · CON-2286 (Consult: lista con filtros y detalle) · CON-2287 (PDF de una Active) · CON-2337 (Update Patient
+Medications por medicación) · CON-2846 (reutilizar la medicación ya activa) · CON-2347 (valores por defecto). Dos videos
+de red.dev de Julián: la lista con *Filters* (Status, Provider, Expiration From / To), ⋮ → *Edit*, y *New Prescription*
+con *Medication 1 / 2*, *Medication Details*, *Directions for Use*, *Additional* y el error *Uncompleted fields*. Pedido:
+"respetando el diseño de nosotros, estética y también tablas". Antes la pestaña era el placeholder *Planned*.
+
+Código: `clinical/PrescriptionPanel.tsx` (lista, ⋮, preguntas, PDF), `clinical/PrescriptionForm.tsx` (la ficha),
+`data/prescripciones.ts` (catálogos y mock), `pages/ClinicalMode.tsx`, `tests/clinical-mode.e2e.ts`.
+
+Qué se copió del video (contenido) y cómo quedó (diseño):
+
+1. **Lista = tabla estándar**, como Lab order: sin card alrededor, *Search prescriptions* con su botón Search, **Filter**
+   (`FilterMenu` con dos grupos, Status y Provider, con cantidades) y la fecha de vencimiento con `DateFilter` (*Any
+   expiration date*; atajos Next 7 / Next 30 / Last 30 / Last 90 days). red.dev arma las filas como cards con el avatar
+   del provider, un chip azul con la droga y tres íconos sueltos; acá son columnas: *Medication* (la primera y "+N
+   more"), *Provider* (sólo el nombre: el avatar queda para Patients y Employees), *Status*, *Created date*, *Last
+   update*, *Expiration date*. La fila abre la ficha.
+2. **El ⋮ según el estado** (los íconos de PDF y tacho de red.dev pasan al menú, como en toda tabla): Pending → Edit
+   prescription, Activate, Cancel prescription, Delete prescription; Active → View prescription, Download PDF, Cancel
+   prescription; Expired / Canceled → View prescription.
+3. **Ficha con la estructura de Edit account** (`FichaClinica`), igual que Lab order y Referral: título *New
+   prescription* / *Prescription* con el estado; PDF y ⋮ a la derecha en una Active; dos cards apiladas y Cancel / Save
+   abajo a la derecha.
+   - *General information*: **Expiration date\*** (en red.dev iba suelta en la barra del título) y **Additional
+     instructions** (500 caracteres con contador). Se juntaron en la misma card: son de toda la receta y así no queda una
+     card de un solo campo al final.
+   - *Medications*: *New medication* en el título de la card; una pestaña por medicación (`ui/tabs`, *Medication 1*,
+     *Medication 2*…) con el punto rojo si tiene errores; *Remove medication N* (sólo con más de una, CON-2354) en vez
+     de la ✕ chiquita de la pestaña. Adentro, *Medication details* | *Directions for use* en dos columnas desde 1280px
+     (abajo, una debajo de la otra) y los campos de a dos.
+   - Valor y unidad en la misma fila (Strength, Dose, Duration): un rótulo, el número y la unidad.
+   - **Casillas y no switches** para Allow generic substitution, Controlled substance y Update patient medications: se
+     guardan con Save (regla de `ui/switch`; CON-2230 también dice Checkbox).
+4. **Validaciones (CON-2230):** obligatorios con *This field is required.* por campo y el aviso *Uncompleted fields: All
+   required fields marked with (\*) must be completed before proceeding.*; si el error está en otra medicación, se abre
+   esa. Medication tiene que salir de la lista (*Select a medication from the list.*; sin coincidencias, *No results
+   found.*). Números positivos (decimales en Strength y Dose) y mayores a 0. El calendario sólo deja elegir de mañana a
+   seis meses; una Pending vieja que abre con la fecha vencida avisa *Date cannot be in the past* al guardar.
+5. **Mensajes de Jira:** *The prescription has been successfully created / updated / canceled / deleted.* Cancel y Delete
+   preguntan con los textos de CON-2355 y CON-2356. **Activate** pregunta sólo si una medicación con *Update patient
+   medications* ya está activa en el paciente: *This medication is already active for the patient. Do you want to reuse
+   the existing medication?* → *Reuse existing medication* / *Cancel* (CON-2846, que reemplaza el error de CON-2337).
+6. **Sólo lectura** fuera de Pending: aviso *This prescription can't be edited · Only pending prescriptions can be
+   edited.* y *Back to prescriptions* en lugar de Cancel / Save.
+7. **Pending Task:** *Complete this task* de una Prescription abre la pestaña con su ficha (`?tab=Prescription&task=`).
+   Activate, Cancel o Delete desde ahí también la sacan de Pending Task (`aplicarAccion(…, { sinAviso })`).
+8. **Piezas que cambian:** `ui/date-picker` suma `min`, `max`, `disabled` y `label` (y `MonthCalendar`, `min`);
+   `ui/date-filter`, `emptyLabel`. El Storybook no se tocó (se documenta al final, si se pide).
+
+Anomalías y supuestos:
+
+1. **Inventado para el mock:** las 14 recetas, la lista de drogas (las de uso dental), las unidades, las vías y la
+   medicación activa del paciente (Ibuprofen, para ver la pregunta de CON-2846). CON-2230 deja Unit of Measure y Route
+   con "etc.". El video tiene un solo provider y drogas sin unidad real ("clonazepam 1 G").
+2. El video escribe **Cancelled**; Jira y el resto de la app, **Canceled**. Se sigue Jira.
+3. El video pinta todas las fechas de vencimiento en rojo; acá sólo las de recetas *Expired* (el color dice algo).
+4. Los placeholders del video (500, 30, 1, 7) parecían valores cargados: van como *e.g. 500*.
+5. **Activate no tiene historia propia:** el cambio a Active sale de CON-2337 / CON-2846 y del ⋮ de Pending Task. No pide
+   encuentro abierto (ninguna historia de Prescription lo pide; Lab order y Referral sí). **A confirmar con Julián.**
+6. CON-2354 dice que en Edit "puede mantener Draft o cambiarlo a Active" desde el formulario; acá Activate queda en el ⋮
+   (un solo lugar para cambiar de estado, como Lab order y Referral).
+7. *Expired* es automático (CON-2358): el mock trae los estados fijos.
+
+**A validar con usuarios:** si el odontólogo prefiere ver todas las medicaciones a la vez (filas) en vez de pestañas cuando
+receta tres o más; si *Update patient medications* se entiende sin explicación; y si el filtro de vencimiento se usa más
+para lo que vence pronto o para lo ya vencido.
+
+### Prescription: el funcionamiento de red.dev (2026-11-27, 2ª vuelta)
+
+Julián pasó acceso a red.dev para relevar cómo funciona Prescription. Se miró sin cambiar nada (sin guardar, activar,
+cancelar ni borrar): la lista de *Aaa Test Aaa*, Edit de una Pending, New Prescription con Save vacío, el ⋮ de cada
+estado, los filtros y Pending Tasks; los textos de las preguntas salen del código publicado de la app. Lo que cambió acá
+para funcionar igual (el diseño sigue siendo el nuestro):
+
+1. **Listas de opciones de red.dev**, no las de CON-2230 (la app real las cambió por unas odontológicas): Dosage form
+   (33, de *Buccal tablet* a *Vaginal tablet*), Strength unit (g, mcg, mEq, mg, ml, mmol, %, IU, Unknown), Dose unit
+   (Applications, Capsules, Drops, Puffs, Sprays, Suppository, Tablespoons, Tablets, Teaspoons, Unknown), Route (Buccal,
+   Dental, Intramuscular, Intrathecal, Intravenous, Oral, Periodontal, Sublingual, Submucosal, Topical), Frequency (As
+   needed, At bedtime, Every 4 to 6 hours, Four times daily, Immediately, Once daily, Three times daily, Twice daily,
+   Unknown) y Duration (Days, Weeks, Months). Los códigos en mayúsculas de red.dev (MG, APPLICATIONS) se escriben como se
+   leen.
+2. **La indicación armada** debajo de Directions for use, como red.dev: *Take 1 tablet orally every 4-6 hours for 5 days*
+   (`indicacionesDeUso`), sólo con todos los datos.
+3. **La pestaña lleva el nombre de la droga** elegida (red.dev: *clonazepam*); sin droga, *Medication N*. *Remove …* usa
+   el mismo nombre.
+4. **Cada cambio de estado pregunta antes**, con los textos de red.dev:
+   - *Activate prescription* (Pending): *…Once marked as Active, you will no longer be able to edit this prescription.* →
+     *The prescription has been successfully marked as Active.*
+   - *Cancel prescription* (Pending o Active) → *…successfully marked as Canceled.*
+   - **Expire** (nuevo, sólo Active): *Expire prescription* → *…successfully marked as Expired.*
+   - *Delete prescription* (Pending, el tacho de la fila): el texto de CON-2356, igual en red.dev.
+5. **Medicación ya activa: al guardar**, no al activar. red.dev la detecta al crear o editar, cuando una medicación con
+   *Update patient medications* ya está activa en el paciente: *Medication already active* · *This medication is already
+   active for the patient. Do you want to reuse the existing medication?* → *Reuse existing medication* guarda
+   reutilizándola; *Cancel* vuelve al formulario. El campo de red.dev se llama `activated` (CON-2854 lo renombró a
+   *Update Patient Medications*).
+6. **Textos:** sólo lectura *This prescription can only be edited while Pending.*; vacío *No prescriptions* · *This
+   patient doesn't have any prescriptions yet.*; con filtros *No prescriptions match the current filters*.
+7. Se confirmó lo que ya estaba: PDF sólo en Active y tacho sólo en Pending (en red.dev, deshabilitados en el resto);
+   Expired y Cancelled sólo tienen *Edit* deshabilitado (acá, *View prescription*); New Prescription sin ⋮ ni PDF; los
+   campos numéricos vacíos con placeholder; Refills opcional; error *Uncompleted fields*.
+
+Diferencias que se dejan como están (a confirmar con Julián):
+
+1. **Expiration date:** red.dev deja elegir desde hoy y sin tope; CON-2230 pide posterior a hoy y hasta 6 meses. Se sigue
+   Jira.
+2. **Strength** en red.dev sólo acepta enteros; acá admite decimales (clonazepam 0.5 mg no se podría recetar).
+3. red.dev escribe **Cancelled** y agrega una "s" de más en la indicación (*applicationss*); acá *Canceled* y el plural
+   bien hecho. La unidad **UI** de red.dev va como *IU*.
+4. **Filters** en red.dev se aplican con *Apply Filters*; acá al tocar, como todos los filtros de la app.
+5. **Pending Tasks** de red.dev marca con *Expired date* las Pending vencidas, y su ⋮ (Edit, Activate, Cancel) aparece
+   deshabilitado sin encuentro abierto. No se sumó acá: es otra pantalla (dashboard.md).
+6. El buscador de red.dev consulta una base de drogas real (amoxapine, AMOXICILINA, Soltamox…); acá, la lista corta del mock.
+
+### Prescription: la ficha en dos columnas, como Lab order y Referral (2026-11-27, 3ª vuelta)
+
+Al traer `main` (#209 a #211), Lab order y Referral ya no eran cards apiladas: pasaron a dos columnas 7:5
+(`COLUMNAS_FICHA`). Prescription se alinea para que las tres fichas sean iguales:
+
+- **Izquierda, *Medications*** (lo que define la receta): pestañas, *Medication details* y debajo *Directions for use*,
+  campos de a dos. Reemplaza las dos columnas internas de la primera versión.
+- **Derecha, *Details*** (lo de toda la receta): *Expiration date* y *Additional instructions*, que se lleva el alto que
+  deja la columna de la izquierda (`TextArea crecer`). Reemplaza la card *General information* de arriba.
+- En celular y tablet, una columna: primero las medicaciones.
+- La unidad de Strength / Dose / Duration se ensancha para que entren *Applications* y *Tablespoons*.
+
+**A confirmar con Julián:** Lab order y Referral muestran arriba *Ordering provider* y *Order date* de sólo lectura
+(CON-2215). Prescription no los lleva: red.dev no los muestra en el formulario y ninguna historia los pide ahí.

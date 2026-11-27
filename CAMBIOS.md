@@ -5,6 +5,22 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-11-27
 
+### Prescription en Clinical Mode: la lista y New / Edit prescription (CON-2230, CON-2354, CON-2355, CON-2356, CON-2846) ([#214](https://github.com/JulianGerardi/red-dental-studio/pull/214))
+- **Pestaña Prescription** (antes *Planned*): `clinical/PrescriptionPanel.tsx`. Tabla estándar como Lab order, con
+  *Search prescriptions*, Filter (Status y Provider) y filtro por fecha de vencimiento. La fila abre la ficha.
+- **⋮ según el estado:** Pending → Edit, Activate, Cancel, Delete; Active → View, Download PDF, Expire, Cancel; Expired y
+  Canceled → View. Activate, Cancel, Expire y Delete preguntan antes, con los textos de red.dev.
+- **Ficha** (`clinical/PrescriptionForm.tsx`), en dos columnas como Lab order y Referral (`COLUMNAS_FICHA`): *Medications*
+  (una pestaña por medicación con el nombre de la droga, *New medication*, *Remove …*) y *Details* (Expiration date,
+  Additional instructions). Sólo se edita en Pending.
+- **Reglas:** obligatorios por campo y el aviso *Uncompleted fields…*; Expiration date de mañana a 6 meses; al guardar,
+  si una medicación con *Update patient medications* ya está activa en el paciente, pregunta *Reuse existing medication*
+  (CON-2846). La indicación (*Take 1 capsule orally three times daily for 7 days*) se arma sola (`indicacionesDeUso`).
+- **Para el dev:** los catálogos (`data/prescripciones.ts`) son los de red.dev, no los de CON-2230. `ui/date-picker`
+  suma `min`, `max`, `disabled` y `label`; `ui/date-filter`, `emptyLabel`; `aplicarAccion` (Pending Task) acepta
+  `{ sinAviso }`. *Complete this task* de una Prescription abre su ficha (`?tab=Prescription&task=`). Diferencias con
+  red.dev y supuestos, en `clinical-mode.md` (2026-11-27). Storybook sin tocar.
+
 ### Fee schedules: versiones Draft, Scheduled, Active y Expired, y pestaña Assignments (CON-1151, CON-1369, CON-1375, CON-495, CON-496, CON-497, CON-1276, CON-1108) ([#213](https://github.com/JulianGerardi/red-dental-studio/pull/213))
 - **Flujo de versiones** (guía funcional y prototipo de Julián): la versión Active, las Expired y un fee schedule archivado
   son de sólo lectura. *Create new version* pasa a editar; *Save draft* guarda el borrador sin fecha (`Arancel.borrador`,
