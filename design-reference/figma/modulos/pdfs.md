@@ -112,3 +112,95 @@ flujo en `scripts/figma/flujos/pdfs.mjs`.
 - **Anomalías:** la firma escrita usa Times New Roman Italic, que Figma no tiene (quedó en Playfair Display Italic); en la
   pantalla *Variables* el cuadro de iniciales de la clínica queda con `{{practice_initials}}` cortado, igual que en la vista
   previa; la pestaña PDF no está en el Figma.
+
+## 2026-11-27 · Nota clínica completa, findings y diagnósticos, importes y anexos (CON-2617, CON-3605, CON-2204, CON-2730)
+
+Devolución de Julián sobre la primera versión: la nota clínica estaba incompleta ("una nota clínica tiene MUCHAS
+cosas"), el Lab Order ID es un UUID interno de Confidentally, los adjuntos convenía mostrarlos como anexo en página aparte,
+al treatment plan y al consentimiento les faltaban los findings/diagnosis, y los importes del treatment plan y del
+consentimiento estaban armados distinto.
+
+### 1. Nota clínica (pasa a propuesta)
+
+**Fuente: la especificación que pasó Julián** (*Especificación de Reconstrucción: Nota Clínica Completa*, CON-2816,
+CON-2975, CON-3081, CON-3605, CON-3668, CON-2727). CON-2975 y CON-3081 son las pruebas de QA con los textos exactos.
+**Se comparó con las 8 notas que genera red.dev** (Dashboard › Pending Tasks › Clinical Notes, sin firmar; sólo
+lectura, no se firmó ni se creó nada). Son todas de un paciente y no traen vitales, exámenes ni órdenes: esas partes
+siguen saliendo de la especificación.
+
+- **La nota es texto, no tablas**, con los textos de la especificación copiados tal cual y en su orden: Vital Signs →
+  Medical History (antecedentes, Chief Complaint y Triage sin título de grupo, *Patient History* en orden alfabético) →
+  Exams → Consent Summary → Operative Report → Workflows → órdenes → firma.
+- **Omisión estricta:** lo que no tuvo actividad en la visita no sale, ni la sección ni la línea. Cada sección lleva su
+  booleano (`has_vitals`, `has_exams`, `consent_presented`, `has_procedures`…) y cada subtítulo condicional también
+  (`has_probing_depths`, `has_recession`…): Mustache no sabe si una lista está vacía sin repetir el bloque.
+- **Exams** sale sólo si hay al menos un finding o una review (CON-3668). Cada examen repetible lleva su fecha. Dental
+  Assessment y Radiographic tienen sus tres textos (sin findings —sólo si se usó *No findings*—, con findings y
+  reviewed); Periodontal, el de review o el del nuevo sondaje con PD ≥ 4 mm, recesión, agrandamiento, sangrado y
+  supuración. Las zonas van con el nombre anatómico (*Left Mandibular Gingiva*), no "Zone 14".
+- **Treatment Plan, como la nota real:** "Treatment plan(s) were proposed…", cada caso con "{nombre} – {tipo}
+  (Recommended) · Est. total cost", sus visitas con el costo, los procedimientos (código en negrita, descripción y zona)
+  y "Patient Decision". El **Consent Summary** va adentro de esta sección, como en red.dev, y sale si hubo interacción
+  con un consentimiento (CON-3081); la lista de aceptados, sólo si el paciente firmó en esa sesión.
+- **Antecedentes con el formato de red.dev:** "{condición} {estado} ({fecha}). {nota}", el medicamento en negrita y cada
+  alergia con su reacción ("Gastrointestinal – Abdominal Pain") y su severidad debajo.
+- **Resumen con los 5 datos de la nota real** (sin Location).
+- **Operative Report:** "**{código}** — {descripción} on **#{diente}** *[in progress / completed]*", una vez por
+  procedimiento aunque tenga varias visitas; sin zona, sin "on".
+- **Firma:** sólo el provider (CON-2975 pide sacar la del paciente), con fecha, hora y hash del contenido (CON-2727).
+- Recetas, lab orders y referrals siguen como cajas con rótulo y valor: la especificación no da su texto. *Documents
+  sent: Yes* sólo si se adjuntó un archivo.
+- **Fuera de la especificación y se mantienen:** *Additional Notes* (el texto libre de la hoja de la app; sólo si hay) y
+  las **adendas** después de la firma (CON-2730). El aviso de nota generada sola (CON-2937) también.
+- **Títulos sin número, en azul** (pedido de Julián), en todos los PDF. Los números no aportaban en documentos cortos y
+  cambiaban con cada sección que se omite. La hoja de la app (`ui/document-sheet`) sigue numerada: queda distinta.
+- **Sin cajas** (pedido de Julián: "deben estar todos iguales"): los medicamentos de la receta y las órdenes de la nota
+  dejan la caja con borde y quedan como el resto (título en negrita y sus datos). Lo mismo el aviso de nota generada
+  sola y la portada del anexo PDF. Con borde quedan sólo el resumen (igual en todos) y el diagrama de la boca de la Lab
+  order (como la app).
+
+### 2. Treatment plan y consentimientos
+
+- **Findings y diagnósticos debajo de cada procedimiento** (los trae CON-2204 por procedimiento): en el treatment plan, la
+  aceptación, el rechazo y el referral (CON-2616). La columna *Tooth* pasa a *Area* con el `anatomic_area` del evento
+  ("19 (O, D)", "Full mouth", "Upper arch").
+- **Importes iguales en los dos documentos**: las columnas Fee / Insurance / Adjustment / Patient y el bloque *Estimate*
+  alineado a la derecha (Plan case total, Insurance portion, Insurance adjustments y Patient portion resaltado), con los
+  nombres y el aviso de *Estimate details* de la app. El subtotal de cada visita es una fila al pie de su tabla con un
+  importe por columna (antes era un número suelto al lado del título, sin decir de qué).
+- **Los importes del ejemplo no sumaban** (faltaba el ajuste del seguro): ahora salen del cálculo de `data/estimaciones` y
+  Fee = Insurance + Adjustment + Patient. El deducible va en la nota ("includes $50.00 of deductible") para que la columna
+  sume de arriba abajo.
+
+### 3. Lab order, Prescription y anexos
+
+- **Lab order:** sale el *Lab Order ID* (UUID interno); en su lugar, *Laboratory*. **Prescription:** sale el *Prescription
+  ID* (`RX-000184` era inventado y no hay un número legible en Jira).
+- **Adjuntos como anexo:** la sección *Attachments* es un índice (Annex, File, Type) y cada adjunto va después del
+  documento en su propia hoja (`Hoja.anexos`): una imagen se ve en la hoja; un PDF tiene una hoja de portada y el backend
+  le agrega sus páginas detrás. Campos: `annex_label`, `name`, `file_type`, `is_image`, `file_url`.
+
+### 4. Anomalías
+
+1. **Page N of M** cuenta las hojas que arma la plantilla: si el backend agrega las páginas de un PDF adjunto, el total
+   tiene que salir después de unir los archivos (o numerar sólo el documento).
+2. CON-2191 manda `measure: vm.value` (el valor dos veces); la plantilla espera la unidad en `measure`.
+3. CON-2615 dice "Para cada [lab_orders]" en la historia de recetas, y CON-2616 llama `record_prescription_event` en la de
+   referrals: copias de otra historia.
+4. CON-3605 y la especificación dicen "Oral History"; la app lo llama *Dental and Oral Health History*. La nota usa el
+   de la especificación.
+5. La especificación dice "Finding on #{tooth}/{surface}": se tomó "Finding" como el nombre del finding
+   ("Deep caries on #19/O, D").
+6. En red.dev el Consent Summary es un párrafo de la sección Treatment Plan; la especificación lo trata como sección
+   aparte. Se siguió la nota real. Si hay consentimiento sin plan presentado, la sección igual tiene que salir
+   (`has_treatment_plan` lo decide el backend).
+7. **En red.dev:** los costos salen sin formato ("Est. total cost: 110.0", "Est. cost: 0"); la plantilla espera el
+   importe con moneda ("$110.00"). Falta el espacio después de la raya en el plan ("D0140 —Limited…"). El bloque de
+   firma sin firmar dice "Date:" vacío; la plantilla dice "Not signed yet".
+
+### Para validar
+
+- En red.dev: generar una nota real con todos los registros de Clinical Mode y compararla con el PDF de ejemplo,
+  sobre todo exámenes, órdenes y workflows.
+- Con odontólogos: si el BRAINS fijo del Consent Summary alcanza o esperan el detalle de cada plan.
+- Con recepción: si el paciente entiende *Adjustment* o conviene "Insurance discount".

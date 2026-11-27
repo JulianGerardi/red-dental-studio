@@ -32,6 +32,10 @@ todas "New Patient Form (With Guardian)", que no tiene nada que ver.
 Se llega desde el ítem **Insurance** del panel lateral
 (`/patients/:id/insurance`).
 
+## Breadcrumb y título iguales (2026-11-27)
+
+Sin historia de Jira. Regla transversal en `../README.md` (*Regla: breadcrumb y título van de la mano*). El título pasa de *Insurance plans* a **Insurance**, como el menú del paciente y el rastro.
+
 ## La pantalla
 
 Breadcrumb **Patients › Search Patients › Documents ›**, título

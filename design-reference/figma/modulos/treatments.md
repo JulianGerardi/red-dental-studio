@@ -22,6 +22,10 @@ Sección **"Patient Profile — Treatment Plan & Documents"** (`3763:254355`), 4
 Se llega desde el ítem **Treatments** del panel lateral del perfil
 (`/patients/:id/treatments`).
 
+## Breadcrumb y título iguales (2026-11-27)
+
+Sin historia de Jira. Regla transversal en `../README.md` (*Regla: breadcrumb y título van de la mano*). Los títulos del paciente usan el nombre de su menú: *Treatment plan* → **Treatments**, *Documents manager* → **Documents**.
+
 ## Especificación de la card
 
 Header blanco: avatar `#eff4ff` con iniciales `#0056ef`, nombre 13px bold +

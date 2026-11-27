@@ -102,7 +102,7 @@ export function SettingsLedgerOptions() {
 
   return (
     <div className={PADDING_PAGINA}>
-      <SettingsPageHeader titulo="Ledger options" />
+      <SettingsPageHeader titulo="Ledger" />
 
       {/* Primero qué lista se ve (pestañas) y debajo el buscador y el Filter de esa lista (settings-ledger.md, 2026-11-24). */}
       <Tabs className="mt-5" aria-label="Ledger options" tabs={TABS} value={tab} onChange={cambiarTab} />

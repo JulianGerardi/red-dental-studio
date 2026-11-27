@@ -23,8 +23,8 @@ import { StatCard } from '@/components/ui/stat-card'
 
    Corrección importante sobre la versión anterior: esta pantalla es
    siempre sobre la CUENTA -la clínica-, nunca sobre "mi perfil personal".
-   El título fijo del sitio real es "Edit account" en las tres pestañas, no
-   uno por tab; Information trae Name/Subdomain/Fee Schedule Name/Logo +
+   El título es fijo en las tres pestañas, no uno por tab (el sitio real dice "Edit account"; acá
+   "Account", como el breadcrumb); Information trae Name/Subdomain/Fee Schedule Name/Logo +
    Contact + Address de LA CLÍNICA (nada de First Name/Last Name ahí). La
    persona -nombre, apellido, fecha de nacimiento- vive en Owner, que es el
    dueño de la cuenta, no el usuario logueado.
@@ -103,7 +103,8 @@ export function SettingsAccount() {
 
   return (
     <div className={PADDING_PAGINA}>
-      <PageTitle>Edit account</PageTitle>
+      {/* Account, como el menú y el breadcrumb; el sitio real dice "Edit account" (README, 2026-11-27). */}
+      <PageTitle>Account</PageTitle>
 
       <Tabs size="sm" className="mt-4" aria-label="Account sections" tabs={TABS} value={tab} onChange={setTab} />
 
