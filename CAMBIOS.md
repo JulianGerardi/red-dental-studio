@@ -5,6 +5,13 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-11-27
 
+### Fee schedules: tachos de fila y métricas de Compare fees como el resto de la app ([#PR](https://github.com/JulianGerardi/red-dental-studio/pull/PR))
+- **Tacho de una fila:** sólo ícono, en rojo (`ICONO_SUELTO` + `text-dash-bad-fg`, `Trash2` de 16 px), con el nombre en el
+  `aria-label`. Así queda *Remove* en `finance/AssignmentsTab`, como los rangos, las excepciones y la Payment table. No usar
+  un botón con texto para quitar una fila. *Discard draft* (acción del pie) sigue con texto, en rojo.
+- **Compare fees:** el resumen (*Higher, Lower, Same, Missing a fee*) usa `ui/stat-card` con `interna`, la card de métricas
+  de Billing, el Ledger y Edit Account; cada una con su ⓘ. Se van las cajas grises propias.
+
 ### Prescription en Clinical Mode: la lista y New / Edit prescription (CON-2230, CON-2354, CON-2355, CON-2356, CON-2846) ([#214](https://github.com/JulianGerardi/red-dental-studio/pull/214))
 - **Pestaña Prescription** (antes *Planned*): `clinical/PrescriptionPanel.tsx`. Tabla estándar como Lab order, con
   *Search prescriptions*, Filter (Status y Provider) y filtro por fecha de vencimiento. La fila abre la ficha.
