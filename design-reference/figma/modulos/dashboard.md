@@ -1218,3 +1218,24 @@ sección del 2026-11-20.
    equipo** si el backend la mantiene: si la API rechaza la acción sin encuentro, la app tiene que mostrar ese error.
 4. **Sin cambios:** lo que no está en Pending sigue en sólo lectura (CON-2218, CON-2354, CON-2323), y el botón de
    encuentro de la ficha y de Clinical Mode (Start, Complete, Pause) funciona igual que antes.
+
+## Waiting room alineada con Appointments (2026-11-27)
+
+Sin historia de Jira; pedido de Julián: quedaba un hueco entre la última card de Waiting room y "Show N more", y las cards
+no coincidían con las de Appointments. Resuelve lo que quedó "para validar" el 2026-11-20.
+
+1. **Causa:** los rótulos de etapa (*Checked in · 1*, *On hold · 2*, *Ready to check out · 5*) ocupaban una línea cada uno
+   y las filas con pill (*Waiting · 12 min*) medían 7 px menos que las que llevan botón. Con eso entraban cinco cards y
+   sobraba alto.
+2. **El rótulo va montado sobre el borde de la primera card de su grupo**, como la leyenda de un fieldset: 10 px en
+   versalitas, fondo de la card. No ocupa alto, así que las cards van una debajo de la otra con la misma separación
+   (12 px) que en Appointments. La idea de Julián ("más chico y más arriba") llevada hasta que no mueva nada.
+3. **Todas las filas miden lo mismo:** el final de la fila (`AppointmentRow`) reserva el alto del botón aunque lleve una
+   pill.
+4. **Seis cards en cada columna** (`TOPE.espera` pasa de 5 a 6): Appointments y Waiting room coinciden card por card y
+   los dos "Show N more" quedan a la misma altura, sin hueco.
+5. **Sin cambios:** el orden, la cuenta de cada grupo, que cada etapa muestre al menos una (`repartir`), el filtro por
+   *Visit stage*, y celular y tablet (los paneles van uno debajo del otro).
+
+**A validar:** si el rótulo de 10 px se lee bien en la pantalla de recepción, que suele estar lejos.
+

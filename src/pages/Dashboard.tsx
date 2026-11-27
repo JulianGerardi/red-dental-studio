@@ -90,7 +90,7 @@ export function FiltroFecha({
 const conDiaCargado = (dias: Record<string, DiaDashboard>) => ({ ...dias, [claveFecha(HOY_DEMO)]: DIA_CARGADO })
 
 /* Cuántas filas se ven en cada panel antes de "Show N more" (ver ui/show-more): los de la comparativa del 2026-11-19. */
-const TOPE = { turnos: 6, espera: 5, tareas: 5 }
+const TOPE = { turnos: 6, espera: 6, tareas: 5 }
 
 /* Qué deja editar Edit appointment desde la Waiting Room, según la etapa (dashboard.md, 2026-11-19). Lo bloqueado se ve
    en sólo lectura. */

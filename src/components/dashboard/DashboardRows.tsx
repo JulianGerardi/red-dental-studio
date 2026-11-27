@@ -98,10 +98,11 @@ export function AppointmentRow({ appt, id, activa, onSelect, onEdit, ocultarOper
               {chips && <ChipsTurno />}
               {menu}
             </div>
-            {/* Provider y sala a la izquierda, la acción o el estado a la derecha; si no entran, el final baja. */}
+            {/* Provider y sala a la izquierda, la acción o el estado a la derecha; si no entran, el final baja. El final
+                reserva el alto del botón: una fila con pill mide lo mismo que una con Check in (dashboard.md, 2026-11-27). */}
             <div className="flex flex-wrap items-center gap-x-2 gap-y-1.5">
               <span className="min-w-[120px] flex-1 truncate text-[12px] text-ink-muted" title={donde}>{donde}</span>
-              <span className="ml-auto flex shrink-0">{fin}</span>
+              <span className="ml-auto flex min-h-7 shrink-0 items-center">{fin}</span>
             </div>
           </div>
         </div>

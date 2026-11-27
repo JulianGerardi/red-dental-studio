@@ -11,6 +11,9 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 - **Para el dev:** `ItemsTarea` y `MenuTarea` pierden `abierto`; `TaskRow` y `PendingTaskList`, `encuentroAbierto`; sale
   `SIN_ENCUENTRO`. Es distinto de red.dev, que apaga esas opciones sin encuentro: si el backend mantiene la regla, hay
   que mostrar su error. Detalle en `design-reference/figma/modulos/dashboard.md` (2026-11-27).
+- **Waiting room alineada con Appointments** (Dashboard): el rótulo de cada etapa va montado sobre el borde de la primera
+  card del grupo (`WaitingRoomList`), todas las filas miden lo mismo (`AppointmentRow` reserva el alto del botón) y se
+  ven seis cards en cada columna (`TOPE.espera` 5 → 6). Ya no queda hueco antes de "Show N more".
 
 ### Lab order, Prescription y Referral: Teeth & surface de red.dev, datos en el título, sin encuentro y PDF nuevo (CON-2214, CON-2212, CON-2321) ([#219](https://github.com/JulianGerardi/red-dental-studio/pull/219))
 - **Teeth & surface (Lab order):** `clinical/dental/ArcadaAnatomica` dibuja las arcadas de red.dev (`arcadasRed.ts`, SVG
