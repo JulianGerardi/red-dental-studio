@@ -8,6 +8,7 @@ shadcn/ui (Radix), con datos mock en `src/data/` (no hay backend). Lo pide y apr
   (`~/Desktop/Claude/red-dental-studio`, ni el viejo `~/red-clone`).
 - App publicada: https://juliangerardi.github.io/red-dental-studio/
 - Mails para el backend (página aparte de la app): https://juliangerardi.github.io/red-dental-studio/emails/
+- PDFs para el backend (página aparte de la app): https://juliangerardi.github.io/red-dental-studio/pdfs/
 - Design system (Storybook, "Confidentally UI"): https://juliangerardi.github.io/red-dental-studio/storybook/
 - Design system en Figma ("Confidentally UI · Design System", una página por familia: Foundations, Actions, Forms,
   Feedback & Overlays…): https://www.figma.com/design/iJvnuV8TLStMXpNjdwsuDe

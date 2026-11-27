@@ -5,6 +5,25 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-11-26
 
+### PDFs para el backend: plantillas de los 10 documentos y página aparte ([#208](https://github.com/JulianGerardi/red-dental-studio/pull/208))
+- **Página aparte** https://juliangerardi.github.io/red-dental-studio/pdfs/ (como `/emails/`): cada documento con su link
+  (`#lab-order`), datos de ejemplo o `{{variables}}`, firmado o sin firmar, el PDF de ejemplo y la plantilla para bajar.
+  Como la app: Clinical note, Lab order y Procedure consent. **Propuestas, esperan ok:** Periodontal exam, Radiographic
+  exam, Prescription, Referral, Treatment plan, Treatment acceptance consent e Informed refusal.
+- **Para el backend:** `public/pdfs/` trae `<id>.html` (hoja A4 con `{{variables}}` y listas Mustache `{{#lista}}`,
+  `{{^lista}}`; las `*_html` van sin escapar), `<id>.pdf` de ejemplo y `pdfs.json` (cuándo se genera, quién firma,
+  variables, listas, datos de ejemplo). Hay que pasarlo a PDF con un motor que entienda `@page` (Chromium o WeasyPrint) e
+  instalar Inter. Se regenera con `npm run pdfs:exportar` (`--check`, `--todos`). Fuente: `src/pdfs/`.
+- **Para el dev:** `diagramaBoca` pasa a `lib/diagramaBoca.ts` (`documentoTarea` lo re-exporta). Vite suma la entrada
+  `pdfs/index.html`. Detalle y anomalías en `modulos/pdfs.md`.
+- **Figma:** página 📄 PDFs (4 flujos, 13 pantallas, `scripts/figma/flujos/pdfs.mjs`).
+
+### Mails: descargar el mail en PDF ([#207](https://github.com/JulianGerardi/red-dental-studio/pull/207))
+- **Vista previa** (`/emails/`): botón *Download PDF* al lado de *Download HTML*. Baja `<id>.pdf`, una página del tamaño
+  del mail, tal como se ve (ancho, datos o variables y logo). Se arma en el navegador con `html-to-image` y `jspdf`
+  (dependencia nueva, carga diferida).
+- El PDF es imagen: el texto no se selecciona y los links no funcionan. No cambia nada de lo que se le entrega al backend.
+
 ### Settings: Overview, Roles en cards con una página por rol y atajos de Billing en un ⋮ (CON-3130, CON-3131, CON-4065) ([#206](https://github.com/JulianGerardi/red-dental-studio/pull/206))
 - **Overview:** la portada de Settings se titula *Overview* y así se llama en el menú (`settings-nav.ts`; antes *General*).
   La ruta sigue siendo `/settings/general`.
