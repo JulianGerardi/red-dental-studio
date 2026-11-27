@@ -381,7 +381,7 @@ export type DatosDerivacion = { proveedor: string; nota: string; procedimientos:
 export const DERIVACION_TAREA: DatosDerivacion = {
   proveedor: 'Dr. Laura Chen',
   nota: 'Please evaluate tooth 19 for root canal treatment. The patient reports lingering pain to cold.',
-  procedimientos: [],
+  procedimientos: ['pr12'],
   asap: false,
   obligatoria: false,
   adjuntos: [{ nombre: 'periapical-19.jpg', bytes: 8806 }],

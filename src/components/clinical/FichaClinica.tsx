@@ -1,13 +1,20 @@
 import { useState, type ReactNode } from 'react'
-import { Paperclip, X } from 'lucide-react'
+import { Paperclip, Trash2, X } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { Chip } from '@/components/ui/chip'
 import { Pill, type PillTone } from '@/components/ui/pill'
+import { TONO_PROCEDIMIENTO } from './accionesProcedimiento'
+import type { EstadoProcedimiento } from '@/data/clinical-mode'
 import { FieldError, FieldLabel } from '@/components/patients/form'
 import { ICONO_SUELTO, TARJETA_INTERNA } from '@/lib/estilos'
 
-/* Las fichas de Clinical Mode que se completan desde Pending Task (Lab order, Referral) tienen la estructura de Edit
-   account: título con estado y acciones, cards apiladas a todo el ancho con campos de a dos (settings `Card`) y Cancel /
-   Save abajo a la derecha (`FormFooter`). Ver design-reference/figma/modulos/clinical-mode.md (2026-11-25). */
+/* Las fichas de Clinical Mode que se completan desde Pending Task (Lab order, Referral): título con estado y acciones,
+   dos cards (settings `Card`) lado a lado en desktop -General information a la izquierda, Details a la derecha con el
+   texto libre ocupando todo el alto- y Cancel / Save abajo a la derecha (`FormFooter`). Ver
+   design-reference/figma/modulos/clinical-mode.md (2026-11-27). */
+
+/** Las dos columnas de la ficha: lo que define el pedido a la izquierda y lo que se escribe a la derecha; en celular y tablet, una debajo de la otra. */
+export const COLUMNAS_FICHA = 'grid items-stretch gap-4 lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)]'
 
 /** El título de la ficha, del tamaño de un título de pantalla, con su estado y sus acciones a la derecha. */
 export function EncabezadoFicha({ titulo, estado, tono, acciones }: { titulo: string; estado: string; tono: PillTone; acciones?: ReactNode }) {
@@ -16,6 +23,16 @@ export function EncabezadoFicha({ titulo, estado, tono, acciones }: { titulo: st
       <h2 className="text-xl leading-[1.3] font-semibold text-ink">{titulo}</h2>
       <Pill tone={tono}>{estado}</Pill>
       {acciones && <span className="ml-auto flex items-center gap-2">{acciones}</span>}
+    </div>
+  )
+}
+
+/** Un dato de la ficha que no se edita (quién pidió la orden, cuándo): rótulo de campo y el valor como texto. */
+export function DatoFicha({ label, children }: { label: string; children: ReactNode }) {
+  return (
+    <div className="flex flex-col gap-2">
+      <FieldLabel>{label}</FieldLabel>
+      <span className="text-[13px] leading-5 text-ink">{children}</span>
     </div>
   )
 }
@@ -83,5 +100,59 @@ export function Adjuntos({ value, onChange, disabled, error = 'Invalid file form
         </ul>
       )}
     </div>
+  )
+}
+
+/** Un procedimiento como lo muestran Lab order y Referral, en el buscador y vinculado: el caso (o Independent, como red.dev:
+ *  el Treatment plan los llama Unassigned), el estado, código y nombre, y diente / superficie o zona con la fecha (CON-2584). */
+export type ProcedimientoFicha = {
+  id: string
+  codigo: string
+  nombre: string
+  estado: EstadoProcedimiento
+  fecha: string
+  caso?: string
+  pieza?: string
+  superficie?: string
+  ubicacion?: string
+}
+
+const valor = (v?: string) => (v && v.trim() && v !== '-' ? v : undefined)
+/** "Tooth 19 · O, D" o, sin diente, la zona ("Upper arch"). */
+export const zonaProcedimiento = (p: ProcedimientoFicha) =>
+  valor(p.pieza) ? [`Tooth ${p.pieza}`, valor(p.superficie)].filter(Boolean).join(' · ') : valor(p.ubicacion)
+
+export function ProcedimientoResumen({ p }: { p: ProcedimientoFicha }) {
+  return (
+    <span className="flex min-w-0 flex-col gap-1.5">
+      <span className="flex flex-wrap items-center gap-1.5">
+        <Chip tone={p.caso ? 'blue' : 'neutral'}>{p.caso ?? 'Independent'}</Chip>
+        <Pill tone={TONO_PROCEDIMIENTO[p.estado]}>{p.estado}</Pill>
+      </span>
+      <span className="text-[13px] text-ink"><span className="font-semibold text-dash-blue">{p.codigo}</span> - {p.nombre}</span>
+      <span className="text-[11px] text-ink-muted">{[zonaProcedimiento(p), `Created date: ${p.fecha}`].filter(Boolean).join(' · ')}</span>
+    </span>
+  )
+}
+
+/** Los procedimientos vinculados, uno debajo del otro, cada uno con su tacho (si se puede editar). */
+export function ProcedimientosVinculados({ items, onRemove, disabled }: { items: ProcedimientoFicha[]; onRemove: (p: ProcedimientoFicha) => void; disabled?: boolean }) {
+  if (!items.length) return <p className="text-[12px] text-ink-muted">No procedures linked.</p>
+  return (
+    <ul className="flex flex-col gap-2" aria-label="Linked procedures">
+      {items.map((p) => (
+        <li key={p.id} className={cn(TARJETA_INTERNA, 'flex items-start gap-3 p-3')}>
+          <span className="min-w-0 flex-1"><ProcedimientoResumen p={p} /></span>
+          {!disabled && (
+            <button
+              type="button" aria-label={`Remove ${p.codigo}`} title="Remove" onClick={() => onRemove(p)}
+              className="flex size-8 shrink-0 items-center justify-center rounded-md text-ink-muted hover:bg-dash-bad-bg hover:text-field-error focus-visible:outline-2 focus-visible:outline-dash-blue"
+            >
+              <Trash2 className="size-4" />
+            </button>
+          )}
+        </li>
+      ))}
+    </ul>
   )
 }

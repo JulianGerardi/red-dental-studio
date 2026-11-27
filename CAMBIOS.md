@@ -17,6 +17,19 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 - **Para el dev:** `tests/breadcrumb-titulo.e2e.ts` falla si una pantalla con rastro no tiene el último tramo como H1. Al
   sumar una pantalla, sumala ahí. Sin historia de Jira.
 
+### Lab order y Referral: dos columnas, mismo procedimiento y lo de los videos de red.dev (CON-2214, CON-2321, CON-2584) ([#209](https://github.com/JulianGerardi/red-dental-studio/pull/209))
+- **Layout:** *General information* a la izquierda (Lab order con *Teeth & surface* adentro) y *Details* a la derecha, con
+  el texto libre a todo el alto (`COLUMNAS_FICHA`, `TextArea.crecer`, `Card.bodyClassName`). En celular, una columna.
+- **Procedimiento único** en las dos fichas (`ProcedimientoResumen`, `ProcedimientosVinculados`): caso o *Independent*,
+  estado, código, diente / zona y fecha (CON-2584).
+- **Lab order:** *Ordering provider* y *Order date* (CON-2215); dentición mixta con la lista de dientes elegidos; rueda de
+  5 superficies (`dental/RuedaSuperficies`); *Toggle all* por diente; Request y Delete preguntan; Edit desde la tabla abre
+  la ficha.
+- **Referral:** *Request referral* con texto de red.dev; Requested suma *Complete* y *Reject* (`AccionTarea` `Finish` y
+  `Reject`); sin Delete en la ficha; New provider con *Credentials* (`clinical/Credenciales`, compartido con New
+  laboratory).
+- Piezas nuevas en `exentos.json` hasta documentarlas. Detalle y anomalías en `modulos/clinical-mode.md`.
+
 ## 2026-11-26
 
 ### PDFs para el backend: plantillas de los 10 documentos y página aparte ([#208](https://github.com/JulianGerardi/red-dental-studio/pull/208))

@@ -29,6 +29,13 @@ const ABIERTAS: EstadoOrden[] = ['Requested', 'Pending', 'Delayed']
 /* Sólo el nombre: el avatar queda para las tablas de personas, Patients y Employees (tablas estandarizadas v2, 2026-11-24). */
 const persona = (nombre: string) => <TextCell>{nombre}</TextCell>
 
+/* Edit y View abren el detalle de la orden, como Edit en red.dev (video de Julián del 2026-11-27): la orden de la tabla
+   pasa por la misma ficha y el mismo ⋮ que la de Pending Task. */
+const comoTarea = (o: OrdenLab): PendingTask => ({
+  id: `orden-${o.id}`, kind: 'Lab orders', state: o.estado, person: o.paciente, initials: o.paciente.split(' ').map((x) => x[0]).join('').slice(0, 2),
+  provider: o.proveedor, register: o.creado, expiration: o.vence, pdf: o.estado !== 'Pending',
+})
+
 const COLUMNAS: DataTableColumn<OrdenLab>[] = [
   { key: 'proveedor', header: 'Provider', cell: (o) => persona(o.proveedor) },
   { key: 'paciente', header: 'Patient', cell: (o) => persona(o.paciente) },
@@ -51,7 +58,9 @@ export function LabOrderPanel({ ordenes: inicio = ORDENES, tarea, encuentroAbier
   const [detalle, setDetalle] = useState(tarea?.id)
   /* La tarea con sus cambios: Request o Cancel desde el ⋮ del detalle se ven acá y en Pending Task. */
   useTareasVivas(tarea ? [tarea] : [])
-  const viva = tarea && tareaViva(tarea)
+  const deTabla = ordenes.map(comoTarea).find((t) => t.id === detalle)
+  const abierta = deTabla ?? tarea
+  const viva = abierta && tareaViva(abierta)
   const acciones = useAccionesTarea({ paciente: tarea?.patientId })
 
   if (viva && detalle === viva.id) {
@@ -71,8 +80,10 @@ export function LabOrderPanel({ ordenes: inicio = ORDENES, tarea, encuentroAbier
     aviso.ok(`Lab order for ${o.paciente} canceled.`, { label: 'Undo', onClick: () => setOrdenes(antes) })
   }
 
+  /* Lo hecho desde el ⋮ del detalle (Request, Cancel, Delete) se ve en la fila. */
+  const vivas = ordenes.flatMap((o) => { const t = tareaViva(comoTarea(o)); return t.state === 'Canceled' || !t.fuera ? [{ ...o, estado: t.state as EstadoOrden }] : [] })
   /* Como el resto de las tablas: buscador con su botón Search, sin card alrededor (tablas estandarizadas, 2026-11-25). */
-  const visibles = ordenes.filter((o) => `${o.proveedor} ${o.paciente} ${o.estado}`.toLowerCase().includes(q.trim().toLowerCase()))
+  const visibles = vivas.filter((o) => `${o.proveedor} ${o.paciente} ${o.estado}`.toLowerCase().includes(q.trim().toLowerCase()))
 
   return (
     <div>
@@ -84,7 +95,7 @@ export function LabOrderPanel({ ordenes: inicio = ORDENES, tarea, encuentroAbier
         toolbarStart={<SettingsSearch value={q} onChange={setQ} placeholder="Search lab orders" />}
         filter={{
           label: 'Filter lab orders by status',
-          options: ESTADOS.map((e) => ({ value: e, count: ordenes.filter((o) => o.estado === e).length })),
+          options: ESTADOS.map((e) => ({ value: e, count: vivas.filter((o) => o.estado === e).length })),
           match: (o, sel) => sel.includes(o.estado),
         }}
         actions={(
@@ -99,12 +110,14 @@ export function LabOrderPanel({ ordenes: inicio = ORDENES, tarea, encuentroAbier
         )}
         rowActions={(o) => (
           <>
-            <DropdownMenuItem onSelect={() => aviso.info('The lab order detail is not available in this release.')}>
+            <DropdownMenuItem onSelect={() => setDetalle(comoTarea(o).id)}>
               <FileText className="size-4 shrink-0" /> View order
             </DropdownMenuItem>
-            <DropdownMenuItem onSelect={() => aviso.info('Editing is not available in this release.')}>
-              <Pencil className="size-4 shrink-0" /> Edit order
-            </DropdownMenuItem>
+            {o.estado === 'Pending' && (
+              <DropdownMenuItem onSelect={() => setDetalle(comoTarea(o).id)}>
+                <Pencil className="size-4 shrink-0" /> Edit order
+              </DropdownMenuItem>
+            )}
             {ABIERTAS.includes(o.estado) && (
               <DropdownMenuItem variant="destructive" onSelect={() => cancelar(o)}>
                 <Ban className="size-4 shrink-0" /> Cancel order
