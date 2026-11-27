@@ -1,1 +1,0 @@
-import{t as e}from"./iframe-BCy-FIX2.js";e();
