@@ -15,10 +15,10 @@ import {
   indicacionesDeUso, medicacionNueva,
   type Medicacion, type Receta,
 } from '@/data/prescripciones'
-import { EncabezadoFicha } from './FichaClinica'
+import { COLUMNAS_FICHA, EncabezadoFicha } from './FichaClinica'
 
-/* New / Edit prescription: la ficha de Clinical Mode con la estructura de Edit account (FichaClinica), como Lab order y
-   Referral. Campos y validaciones de CON-2230 y CON-2354. Ver design-reference/figma/modulos/clinical-mode.md
+/* New / Edit prescription: la ficha de Clinical Mode en dos columnas (FichaClinica), como Lab order y Referral: las
+   medicaciones a la izquierda y lo de toda la receta a la derecha. Campos y validaciones de CON-2230 y CON-2354. Ver design-reference/figma/modulos/clinical-mode.md
    (2026-11-27). */
 
 const MAX_TEXTO = 500
@@ -64,7 +64,7 @@ function ConUnidad({ label, valor, unidad, opciones, decimales, error, errorUnid
   return (
     <div className="flex min-w-0 flex-col gap-2">
       <FieldLabel required>{label}</FieldLabel>
-      <div className="grid grid-cols-[minmax(0,1fr)_6.5rem] items-start gap-2">
+      <div className="grid grid-cols-[minmax(0,1fr)_8.5rem] items-start gap-2">
         <TextField hideLabel label={label} value={valor} placeholder={placeholder} error={error} onChange={(v) => onValor(numero(v, decimales))} />
         <SelectField hideLabel label={`${label} unit`} placeholder="Unit" options={opciones} value={unidad} error={errorUnidad && 'Select a unit.'} onChange={onUnidad} />
       </div>
@@ -163,88 +163,91 @@ export function PrescriptionForm({ receta, onVolver, onGuardar, acciones }: {
         <Alert tone="info" title="This prescription can't be edited">This prescription can only be edited while Pending.</Alert>
       )}
 
-      <Card title="General information">
-        <fieldset disabled={!editable} className="grid min-w-0 gap-4 sm:grid-cols-2">
-          <legend className="sr-only">General information</legend>
-          <div className="flex flex-col gap-2">
-            <FieldLabel required>Expiration date</FieldLabel>
-            <DatePicker
-              value={vence} onChange={(d) => { setVence(d); setErrorVence(undefined) }}
-              min={MINIMO()} max={MAXIMO()} placeholder="Select date" label="Expiration date"
-              error={!!errorVence} disabled={!editable} className="h-9 w-full"
+      <div className={COLUMNAS_FICHA}>
+        <Card
+          title="Medications"
+          action={editable && <Button variant="secondary" size="md" onClick={agregar}><Plus /> New medication</Button>}
+        >
+          <div className="flex flex-wrap items-center gap-2">
+            <Tabs
+              aria-label="Medications" size="sm" value={m.id} onChange={setActiva}
+              tabs={meds.map((x, i) => ({ value: x.id, label: nombreTab(x, i), alerta: Object.keys(errores[x.id] ?? {}).length > 0 }))}
             />
-            {errorVence ? <FieldError>{errorVence}</FieldError> : editable && <FieldHint>From tomorrow up to 6 months.</FieldHint>}
+            {editable && meds.length > 1 && (
+              <Button variant="ghost" size="sm" className="ml-auto text-field-error hover:text-field-error" onClick={quitar}>
+                <Trash2 /> Remove {nombreTab(m, meds.findIndex((x) => x.id === m.id))}
+              </Button>
+            )}
           </div>
-          <TextArea
-            label="Additional instructions" rows={3} placeholder="Enter additional instructions..."
-            value={indicaciones} onChange={(v) => setIndicaciones(v.slice(0, MAX_TEXTO))} disabled={!editable}
-            hint={editable && `${indicaciones.length}/${MAX_TEXTO}`}
-          />
-        </fieldset>
-      </Card>
 
-      <Card
-        title="Medications"
-        action={editable && <Button variant="secondary" size="md" onClick={agregar}><Plus /> New medication</Button>}
-      >
-        <div className="flex flex-wrap items-center gap-2">
-          <Tabs
-            aria-label="Medications" size="sm" value={m.id} onChange={setActiva}
-            tabs={meds.map((x, i) => ({ value: x.id, label: nombreTab(x, i), alerta: Object.keys(errores[x.id] ?? {}).length > 0 }))}
-          />
-          {editable && meds.length > 1 && (
-            <Button variant="ghost" size="sm" className="ml-auto text-field-error hover:text-field-error" onClick={quitar}>
-              <Trash2 /> Remove {nombreTab(m, meds.findIndex((x) => x.id === m.id))}
-            </Button>
-          )}
-        </div>
+          <fieldset key={m.id} disabled={!editable} className="mt-5 flex min-w-0 flex-col gap-6">
+            <legend className="sr-only">{nombreTab(m, meds.findIndex((x) => x.id === m.id))}</legend>
+            <section className="flex min-w-0 flex-col gap-4" aria-label="Medication details">
+              <Subtitulo>Medication details</Subtitulo>
+              <SearchField
+                label="Medication" required clearable placeholder="Search by drug name or brand name" emptyText="No results found."
+                options={DROGAS} value={m.droga} onChange={(v) => cambiar({ droga: v })} error={e.droga} disabled={!editable}
+              />
+              <div className="grid gap-4 sm:grid-cols-2">
+                <ConUnidad
+                  label="Strength" decimales placeholder="e.g. 500" valor={m.fuerza} unidad={m.fuerzaUnidad} opciones={FUERZA_UNIDADES}
+                  error={e.fuerza} errorUnidad={e.fuerzaUnidad} onValor={(v) => cambiar({ fuerza: v })} onUnidad={(v) => cambiar({ fuerzaUnidad: v })}
+                />
+                <SelectField label="Dosage form" required options={FORMAS} value={m.forma} error={e.forma} onChange={(v) => cambiar({ forma: v })} />
+                <TextField
+                  label="Quantity to dispense" required placeholder="e.g. 30" value={m.cantidad} error={e.cantidad}
+                  onChange={(v) => cambiar({ cantidad: numero(v) })}
+                />
+                <TextField label="Refills" placeholder="0" value={m.recargas} onChange={(v) => cambiar({ recargas: numero(v) })} />
+              </div>
+              <div className="flex flex-col gap-3 pt-1">
+                <Opcion label="Allow generic substitution" on={m.generico} onChange={(v) => cambiar({ generico: v })} />
+                <Opcion label="Controlled substance" on={m.controlada} onChange={(v) => cambiar({ controlada: v })} />
+                <Opcion label="Update patient medications" on={m.actualizar} onChange={(v) => cambiar({ actualizar: v })} />
+              </div>
+            </section>
 
-        <fieldset key={m.id} disabled={!editable} className="mt-5 grid min-w-0 gap-x-8 gap-y-6 xl:grid-cols-2">
-          <legend className="sr-only">{nombreTab(m, meds.findIndex((x) => x.id === m.id))}</legend>
-          <section className="flex min-w-0 flex-col gap-4" aria-label="Medication details">
-            <Subtitulo>Medication details</Subtitulo>
-            <SearchField
-              label="Medication" required clearable placeholder="Search by drug name or brand name" emptyText="No results found."
-              options={DROGAS} value={m.droga} onChange={(v) => cambiar({ droga: v })} error={e.droga} disabled={!editable}
+            <section className="flex min-w-0 flex-col gap-4" aria-label="Directions for use">
+              <Subtitulo>Directions for use</Subtitulo>
+              <div className="grid gap-4 sm:grid-cols-2">
+                <ConUnidad
+                  label="Dose" decimales placeholder="e.g. 1" valor={m.dosis} unidad={m.dosisUnidad} opciones={DOSIS_UNIDADES}
+                  error={e.dosis} errorUnidad={e.dosisUnidad} onValor={(v) => cambiar({ dosis: v })} onUnidad={(v) => cambiar({ dosisUnidad: v })}
+                />
+                <SelectField label="Route" required options={VIAS} value={m.via} error={e.via} onChange={(v) => cambiar({ via: v })} />
+                <SelectField label="Frequency" required options={FRECUENCIAS} value={m.frecuencia} error={e.frecuencia} onChange={(v) => cambiar({ frecuencia: v })} />
+                <ConUnidad
+                  label="Duration" placeholder="e.g. 7" valor={m.duracion} unidad={m.duracionUnidad} opciones={DURACION_UNIDADES}
+                  error={e.duracion} errorUnidad={e.duracionUnidad} onValor={(v) => cambiar({ duracion: v })} onUnidad={(v) => cambiar({ duracionUnidad: v })}
+                />
+              </div>
+              {/* La indicación armada con los datos, como red.dev: se lee igual que en la receta. */}
+              <p aria-live="polite" className="text-[12px] leading-[1.4] text-ink-muted">{indicacionesDeUso(m)}</p>
+            </section>
+          </fieldset>
+        </Card>
+
+        {/* Lo que vale para toda la receta; las indicaciones se llevan el alto que deja la columna de las medicaciones. */}
+        <Card title="Details" className="flex flex-col" bodyClassName="flex flex-1 flex-col">
+          <fieldset disabled={!editable} className="flex min-w-0 flex-1 flex-col gap-4">
+            <legend className="sr-only">Details</legend>
+            <div className="flex flex-col gap-2">
+              <FieldLabel required>Expiration date</FieldLabel>
+              <DatePicker
+                value={vence} onChange={(d) => { setVence(d); setErrorVence(undefined) }}
+                min={MINIMO()} max={MAXIMO()} placeholder="Select date" label="Expiration date"
+                error={!!errorVence} disabled={!editable} className="h-9 w-full"
+              />
+              {errorVence ? <FieldError>{errorVence}</FieldError> : editable && <FieldHint>From tomorrow up to 6 months.</FieldHint>}
+            </div>
+            <TextArea
+              label="Additional instructions" crecer rows={7} className="flex-1" placeholder="Enter additional instructions..."
+              value={indicaciones} onChange={(v) => setIndicaciones(v.slice(0, MAX_TEXTO))} disabled={!editable}
+              hint={editable && `${indicaciones.length}/${MAX_TEXTO}`}
             />
-            <div className="grid gap-4 sm:grid-cols-2">
-              <ConUnidad
-                label="Strength" decimales placeholder="e.g. 500" valor={m.fuerza} unidad={m.fuerzaUnidad} opciones={FUERZA_UNIDADES}
-                error={e.fuerza} errorUnidad={e.fuerzaUnidad} onValor={(v) => cambiar({ fuerza: v })} onUnidad={(v) => cambiar({ fuerzaUnidad: v })}
-              />
-              <SelectField label="Dosage form" required options={FORMAS} value={m.forma} error={e.forma} onChange={(v) => cambiar({ forma: v })} />
-              <TextField
-                label="Quantity to dispense" required placeholder="e.g. 30" value={m.cantidad} error={e.cantidad}
-                onChange={(v) => cambiar({ cantidad: numero(v) })}
-              />
-              <TextField label="Refills" placeholder="0" value={m.recargas} onChange={(v) => cambiar({ recargas: numero(v) })} />
-            </div>
-            <div className="flex flex-col gap-3 pt-1">
-              <Opcion label="Allow generic substitution" on={m.generico} onChange={(v) => cambiar({ generico: v })} />
-              <Opcion label="Controlled substance" on={m.controlada} onChange={(v) => cambiar({ controlada: v })} />
-              <Opcion label="Update patient medications" on={m.actualizar} onChange={(v) => cambiar({ actualizar: v })} />
-            </div>
-          </section>
-
-          <section className="flex min-w-0 flex-col gap-4" aria-label="Directions for use">
-            <Subtitulo>Directions for use</Subtitulo>
-            <div className="grid gap-4 sm:grid-cols-2">
-              <ConUnidad
-                label="Dose" decimales placeholder="e.g. 1" valor={m.dosis} unidad={m.dosisUnidad} opciones={DOSIS_UNIDADES}
-                error={e.dosis} errorUnidad={e.dosisUnidad} onValor={(v) => cambiar({ dosis: v })} onUnidad={(v) => cambiar({ dosisUnidad: v })}
-              />
-              <SelectField label="Route" required options={VIAS} value={m.via} error={e.via} onChange={(v) => cambiar({ via: v })} />
-              <SelectField label="Frequency" required options={FRECUENCIAS} value={m.frecuencia} error={e.frecuencia} onChange={(v) => cambiar({ frecuencia: v })} />
-              <ConUnidad
-                label="Duration" placeholder="e.g. 7" valor={m.duracion} unidad={m.duracionUnidad} opciones={DURACION_UNIDADES}
-                error={e.duracion} errorUnidad={e.duracionUnidad} onValor={(v) => cambiar({ duracion: v })} onUnidad={(v) => cambiar({ duracionUnidad: v })}
-              />
-            </div>
-            {/* La indicación armada con los datos, como red.dev: se lee igual que en la receta. */}
-            <p aria-live="polite" className="text-[12px] leading-[1.4] text-ink-muted">{indicacionesDeUso(m)}</p>
-          </section>
-        </fieldset>
-      </Card>
+          </fieldset>
+        </Card>
+      </div>
 
       <div className="mt-1 flex justify-end">
         {editable

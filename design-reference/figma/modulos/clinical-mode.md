@@ -3826,3 +3826,18 @@ Diferencias que se dejan como están (a confirmar con Julián):
 5. **Pending Tasks** de red.dev marca con *Expired date* las Pending vencidas, y su ⋮ (Edit, Activate, Cancel) aparece
    deshabilitado sin encuentro abierto. No se sumó acá: es otra pantalla (dashboard.md).
 6. El buscador de red.dev consulta una base de drogas real (amoxapine, AMOXICILINA, Soltamox…); acá, la lista corta del mock.
+
+### Prescription: la ficha en dos columnas, como Lab order y Referral (2026-11-27, 3ª vuelta)
+
+Al traer `main` (#209 a #211), Lab order y Referral ya no eran cards apiladas: pasaron a dos columnas 7:5
+(`COLUMNAS_FICHA`). Prescription se alinea para que las tres fichas sean iguales:
+
+- **Izquierda, *Medications*** (lo que define la receta): pestañas, *Medication details* y debajo *Directions for use*,
+  campos de a dos. Reemplaza las dos columnas internas de la primera versión.
+- **Derecha, *Details*** (lo de toda la receta): *Expiration date* y *Additional instructions*, que se lleva el alto que
+  deja la columna de la izquierda (`TextArea crecer`). Reemplaza la card *General information* de arriba.
+- En celular y tablet, una columna: primero las medicaciones.
+- La unidad de Strength / Dose / Duration se ensancha para que entren *Applications* y *Tablespoons*.
+
+**A confirmar con Julián:** Lab order y Referral muestran arriba *Ordering provider* y *Order date* de sólo lectura
+(CON-2215). Prescription no los lleva: red.dev no los muestra en el formulario y ninguna historia los pide ahí.
