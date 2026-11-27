@@ -5,7 +5,7 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-11-27
 
-### Tachos en rojo en toda la app, aviso de fecha de Fee schedules y pill en los menús ([#PR](https://github.com/JulianGerardi/red-dental-studio/pull/PR))
+### Tachos en rojo en toda la app, aviso de fecha de Fee schedules y pill en los menús ([#217](https://github.com/JulianGerardi/red-dental-studio/pull/217))
 - **Regla** (`design-reference/figma/README.md`): todo `Trash2` que borra o quita algo va en `text-dash-bad-fg`, también en
   reposo. En una fila, sólo ícono con `cn(ICONO_SUELTO, 'text-dash-bad-fg')`; en un ⋮, `variant="destructive"`; un botón
   con texto, `text-dash-bad-fg hover:text-dash-bad-fg`.
