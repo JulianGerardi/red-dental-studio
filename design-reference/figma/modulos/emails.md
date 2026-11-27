@@ -240,3 +240,17 @@ Pedido de Julián: poder bajar el mail en PDF, sólo el mail.
   encabezados. **Contra:** el texto del PDF es imagen, no se puede seleccionar ni buscar. Si hace falta texto, la
   alternativa es generarlos al exportar con Playwright (`page.pdf()`), pero quedarían fijos con los datos de ejemplo.
 - Los links del mail no se pueden tocar en el PDF.
+
+## 2026-11-27 · Tres mails alineados al Figma (CON-4061, CON-478, CON-3501)
+
+Pedido de Julián: Employee account ready (`554:916`), Rescheduled (booked) (`557:1663`) y Subscription canceled
+(`557:2030`) tienen que decir lo mismo que el Figma. Los tres pasan de *Proposal* a *From the Figma*; sólo queda como
+propuesta *Treatment plan ready*.
+
+- **Employee account ready:** "With your account, you can access {{practice_name}}’s Confidentally workspace and use the
+  features included in your role.".
+- **Rescheduled (booked):** título "Appointment scheduled" y "Your appointment at {{practice_name}} has been canceled.",
+  como en el Figma. **Anomalía:** el mail dice "canceled" en la primera línea y "rescheduled" en la segunda; el paciente
+  puede entender que perdió el turno. Se copió tal cual, como pidió Julián.
+- **Subscription canceled:** suma el aviso de solo lectura (*Your account is in read-only mode*) debajo de *Subscription
+  details*.
