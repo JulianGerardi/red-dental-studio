@@ -3,7 +3,7 @@ import { FileSearch, Trash2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { SelectField, TextField } from '@/components/patients/form'
 import { EmptyState } from '@/components/ui/empty-state'
-import { ICONO_SUELTO, TABLA_ENCABEZADO, TABLA_FILA, TABLA_MARCO } from '@/lib/estilos'
+import { TABLA_ENCABEZADO, TABLA_FILA, TABLA_MARCO, ICONO_TACHO } from '@/lib/estilos'
 import { TIPOS_DEDUCIBLE, excepcionesEnRango, type Excepcion, type Rango, type TipoCobertura, type TipoDeducible } from '@/data/finanzas'
 import { OBLIGATORIO } from '@/lib/validacion'
 
@@ -85,7 +85,7 @@ export function RangesTable({
               <span className="mr-1 text-xs @3xl:hidden">Exceptions</span>{excepcionesEnRango(r, excepciones)}
             </span>
             <span role="cell" className="flex h-9 items-center justify-end">
-              <button type="button" aria-label={`Remove range ${i + 1}`} onClick={() => onChange(rangos.filter((x) => x.id !== r.id))} className={cn(ICONO_SUELTO, 'text-dash-bad-fg')}>
+              <button type="button" aria-label={`Remove range ${i + 1}`} onClick={() => onChange(rangos.filter((x) => x.id !== r.id))} className={ICONO_TACHO}>
                 <Trash2 className="size-4" />
               </button>
             </span>

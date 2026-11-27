@@ -12,7 +12,7 @@ import { FieldError, FieldLabel, FormFooter, SearchField, SelectField, TextArea,
 import { Card } from '@/components/settings/primitives'
 import { OBLIGATORIO } from '@/lib/validacion'
 import { formatMDY } from '@/lib/fecha'
-import { TARJETA_INTERNA } from '@/lib/estilos'
+import { TARJETA_INTERNA, BOTON_BORRAR } from '@/lib/estilos'
 import {
   FORMAS, FRECUENCIAS, MEDICACION_ACTIVA, MEDICAMENTOS, UNIDADES_DOSIS, UNIDADES_DURACION, UNIDADES_FUERZA, VIAS, erroresDe, fraseDeUso, medicacionVacia, nombreMedicacion,
   type Medicacion,
@@ -146,7 +146,7 @@ export function PrescriptionDetail({ registro, nuevo, abierto, onVolver, onAccio
                 <div className="flex min-h-7 items-center gap-2">
                   <SubTitulo>Medication details</SubTitulo>
                   {editable && medicaciones.length > 1 && (
-                    <Button size="sm" variant="ghost" className="ml-auto text-field-error hover:text-field-error" onClick={quitar}><Trash2 /> Remove medication</Button>
+                    <Button size="sm" variant="ghost" className={cn(BOTON_BORRAR, 'ml-auto')} onClick={quitar}><Trash2 /> Remove medication</Button>
                   )}
                 </div>
                 <div className={TRES}>

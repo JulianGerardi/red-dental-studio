@@ -20,7 +20,7 @@ import {
   PlanAddressFields, PlanConfigurationFields, PlanContactFields, PlanGeneralFields, formDePlan, obligatoriosPlan, planDeForm,
 } from '@/components/finance/PlanFields'
 import { useFormPasos } from '@/lib/useFormPasos'
-import { ICONO_SUELTO, TABLA_ENCABEZADO, TABLA_FILA, TABLA_MARCO, TARJETA_INTERNA, PADDING_PAGINA } from '@/lib/estilos'
+import { TABLA_ENCABEZADO, TABLA_FILA, TABLA_MARCO, TARJETA_INTERNA, PADDING_PAGINA, ICONO_TACHO } from '@/lib/estilos'
 import { LOCACIONES } from '@/pages/settings/Locations'
 import { rutaPlanes } from '@/pages/settings/finance/Carriers'
 import { useFinanzas } from '@/data/finanzasStore'
@@ -224,7 +224,7 @@ export function PlanPaymentTable({ plan, onGuardar, onSucio }: PropsSeccion) {
                 <span role="cell">{descripcionDe(f.codigo)}</span>
                 <span role="cell"><MoneyInput label={`${f.codigo} value`} value={f.valor} onChange={(v) => setD(d.map((x) => (x.codigo === f.codigo ? { ...x, valor: v ?? 0 } : x)))} /></span>
                 <span role="cell" className="flex justify-end">
-                  <button type="button" aria-label={`Remove ${f.codigo}`} onClick={() => setD(d.filter((x) => x.codigo !== f.codigo))} className={cn(ICONO_SUELTO, 'text-dash-bad-fg')}><Trash2 className="size-4" /></button>
+                  <button type="button" aria-label={`Remove ${f.codigo}`} onClick={() => setD(d.filter((x) => x.codigo !== f.codigo))} className={ICONO_TACHO}><Trash2 className="size-4" /></button>
                 </span>
               </div>
             ))}

@@ -22,7 +22,7 @@ import { AssignmentsTab, cuantasAsignaciones } from '@/components/finance/Assign
 import { CompareFeesDrawer } from '@/components/finance/CompareFeesDrawer'
 import { MoneyInput } from '@/components/finance/fields'
 import { CopyFormDrawer, IncreaseAllDrawer, aumentar } from '@/components/finance/FeeScheduleTools'
-import { TABLA_ENCABEZADO, TABLA_FILA, TABLA_MARCO, PADDING_PAGINA } from '@/lib/estilos'
+import { TABLA_ENCABEZADO, TABLA_FILA, TABLA_MARCO, PADDING_PAGINA, BOTON_BORRAR } from '@/lib/estilos'
 import { useFinanzas } from '@/data/finanzasStore'
 import {
   ESTADOS_ARANCEL, PROCEDIMIENTOS, SIN_ASIGNAR, TIPOS_ARANCEL, TONO_ARANCEL, conImporte, dinero, estadoVersion, fechaMDA, hoyIso,
@@ -327,7 +327,7 @@ export function FeeScheduleEditor({ arancel }: { arancel?: Arancel }) {
     : modo === 'scheduled' ? <PieEditor onCancelar={cancelar} onGuardar={guardarProgramada} etiquetaGuardar="Save changes" guardarDeshabilitado={!cambiado} />
     : (
       <PieEditor
-        izquierda={modo === 'draft' && arancel && arancel.versiones.length > 0 && <Button variant="ghost" className="text-dash-bad-fg hover:text-dash-bad-fg" onClick={() => setPregunta('descartar')}><Trash2 /> Discard draft</Button>}
+        izquierda={modo === 'draft' && arancel && arancel.versiones.length > 0 && <Button variant="ghost" className={BOTON_BORRAR} onClick={() => setPregunta('descartar')}><Trash2 /> Discard draft</Button>}
         onCancelar={cancelar}
         secundario={<Button variant="secondary" className="px-6" onClick={guardarBorrador}>{arancel ? 'Save draft' : 'Save as draft'}</Button>}
         onGuardar={() => { if (validar(true)) setPregunta('publicar') }} etiquetaGuardar={arancel ? 'Publish…' : 'Create and publish…'}

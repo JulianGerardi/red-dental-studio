@@ -1,4 +1,5 @@
 import { DrawerActions } from '@/components/ui/drawer'
+import { ICONO_TACHO } from '@/lib/estilos'
 import { useState } from 'react'
 import { Trash2, Save } from 'lucide-react'
 import {
@@ -103,7 +104,7 @@ export function NewExceptionModal({
               type="button"
               aria-label="Clear range"
               onClick={() => { setInicio(''); setFin(''); aviso.info('Time range cleared.') }}
-              className="rounded-md p-1.5 text-dash-bad-fg transition-colors hover:bg-dash-bad-bg"
+              className={ICONO_TACHO}
             >
               <Trash2 className="size-4" />
             </button>

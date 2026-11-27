@@ -8,7 +8,7 @@ import { FilterTrigger } from '@/components/ui/filter-menu'
 import { cn } from '@/lib/utils'
 import { aviso } from '@/components/ui/toaster'
 import { PANORAMICA_GRANDE, PANORAMICA_CHICA } from '@/assets/panoramic'
-import { BOTON_ICONO_REDONDO } from '@/lib/estilos'
+import { BOTON_ICONO_REDONDO, ICONO_TACHO } from '@/lib/estilos'
 import {
   HALLAZGOS, ZONAS, PROCEDIMIENTOS_CONDICION, type Hallazgo, type Radiografia,
 } from '@/data/clinical-mode'
@@ -67,9 +67,9 @@ export function FichaHallazgo({ h, onBorrar }: { h: Hallazgo; onBorrar: () => vo
           <button
             onClick={onBorrar}
             aria-label={`Delete finding on ${h.zona}`}
-            className="flex size-7 items-center justify-center rounded-md bg-surface text-dash-bad-fg transition-colors hover:bg-dash-bad-bg"
+            className={cn(ICONO_TACHO, 'bg-surface')}
           >
-            <Trash2 className="size-3.5" />
+            <Trash2 className="size-4" />
           </button>
           <button
             onClick={() => aviso.info('Editing a finding is not available in this release.')}

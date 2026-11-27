@@ -1,4 +1,6 @@
 import { Plus, Trash2 } from 'lucide-react'
+import { cn } from '@/lib/utils'
+import { BOTON_BORRAR } from '@/lib/estilos'
 import { Button } from '@/components/ui/button'
 import { DateTextField, SelectField, TextField } from '@/components/patients/form'
 import { OBLIGATORIO } from '@/lib/validacion'
@@ -35,7 +37,7 @@ export function Credenciales({ value, onChange, intento }: {
           />
           <TextField label="Number" required placeholder="Credential number" value={c.numero} onChange={cambiar(c.id, 'numero')} error={falta(c, 'numero')} />
           <DateTextField label="Expiration date" required={CON_VENCIMIENTO.includes(c.tipo)} value={c.vence} onChange={cambiar(c.id, 'vence')} error={falta(c, 'vence')} />
-          <Button variant="secondary" className="self-end text-dash-bad-fg hover:text-dash-bad-fg sm:w-fit" aria-label={`Remove credential ${i + 1}`} onClick={() => onChange(value.filter((x) => x.id !== c.id))}>
+          <Button variant="secondary" className={cn(BOTON_BORRAR, 'self-end sm:w-fit')} aria-label={`Remove credential ${i + 1}`} onClick={() => onChange(value.filter((x) => x.id !== c.id))}>
             <Trash2 /> Remove
           </Button>
         </div>
