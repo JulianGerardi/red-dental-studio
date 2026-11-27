@@ -23,7 +23,7 @@ export function CompareFeesDrawer({ arancel, aranceles, onClose, onEditar }: {
   onClose: () => void
   onEditar: () => void
 }) {
-  const opciones = aranceles.filter((a) => a.id !== arancel.id && a.estado !== 'Archived')
+  const opciones = aranceles.filter((a) => a.id !== arancel.id && a.estado !== 'Archived' && a.versiones.length > 0)
   const [refId, setRefId] = useState((opciones.find((a) => a.porDefecto) ?? opciones[0])?.id ?? '')
   const ref = opciones.find((a) => a.id === refId)
   const propios = versionVigente(arancel).precios
