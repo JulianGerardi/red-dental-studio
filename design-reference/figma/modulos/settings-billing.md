@@ -5,6 +5,72 @@
 
 Sin historia de Jira. Regla transversal en `../README.md` (*Regla: breadcrumb y título van de la mano*). Edit carrier pasa a **el nombre del carrier** (*Aetna Dental Plans*) y Edit insurance plan a **el del plan** (*Acme Corp*), como el último tramo. El encabezado del editor de Fee schedules y Coverage tables es el ítem elegido (*UCR - Red* · Active · Default) en vez de *Edit fee schedule* / *Edit coverage table*. Resuelve el *Queda para decidir* de abajo.
 
+
+## Versiones de un Fee Schedule: guía funcional y prototipo (2026-11-27) · CON-1151, CON-1369, CON-1375, CON-495, CON-496, CON-497, CON-1276, CON-1108
+
+Julián pasó la *Guía funcional: ¿Cómo funciona un Fee Schedule?* y después un **prototipo en HTML** (*Fee schedules ·
+version flow*) con cada botón, pop up y validación. Manda el prototipo; los textos son los suyos (que salen de Jira). Dos
+capas: el **fee schedule** (nombre, tipo, estado) y sus **versiones** (las hojas de precios en el tiempo). Se mantiene el
+diseño de la app (Billing con pestañas, lista y editor en dos cards): del prototipo se toma el funcionamiento.
+
+### Lista
+
+1. **Filter › Fee schedule status** (una opción): *Active and inactive* (al entrar), *Active*, *Inactive*, *Archived*,
+   *All*. Los archivados sólo se ven con el filtro (CON-497). Corrige el "sin filtro se ve todo" del 2026-11-25. El Default
+   va primero y el resto por nombre.
+2. **⋮**: *Deactivate* o *Activate*, *Archive*; archivado, *Restore*. Con asociaciones, Deactivate y Archive muestran el
+   error de CON-496 / CON-1276 en un toast rojo y no hacen nada. Archive confirma (*It will become read-only and stop being
+   available in the system.*); Restore confirma (CON-1108) y lo deja **Active**. Toasts de Jira (*Fee Schedule deactivate
+   successfully.*, tal cual). Sin Undo.
+
+### Editor
+
+3. **Encabezado**: el nombre del fee schedule con sus pills y, a la derecha, **Version** (`MenuVersion`): fecha y estado
+   de cada una, de la más nueva a la más vieja, con el Draft (*No date yet*) arriba. Con una sola, no abre.
+4. **Pestañas** *General information* y *Assignments (n)*.
+5. **Aviso de arriba** (`ui/alert`, ahora con `action` y tono `neutral`), según lo que se ve:
+   - *Active*: *Current version, active since …* y el botón **Create new version**. Si ya hay una Scheduled o un Draft, el
+     botón queda deshabilitado con su tooltip y el aviso dice cuál editar.
+   - *Creando versión*: *You’re creating a new version.* · *Draft*: *This is a draft.* · *Scheduled*: *Scheduled. Replaces
+     the current version on …* · *Expired*: *Expired on …. View only.* · *Archived*: *Archived. View only.*
+6. **Active, Expired y Archived son sólo lectura** (CON-495, CON-1369, CON-1276): campos deshabilitados, la tabla en
+   texto (*Fee*) y sin pie.
+7. **Create new version / Draft**: se editan nombre, tipo, *Available from* y los fees, con *Current fee* (lo que rige hoy)
+   al lado de *New fee*. Debajo de la fecha, qué va a pasar: *Starts today. It becomes Active as soon as you publish…* o
+   *Starts on …. It stays Scheduled until then…*. Pie: *Cancel · Save draft · Publish…*.
+   - **Save draft** no pide fecha (el borrador no la guarda): uno por fee schedule (`Arancel.borrador`).
+   - **Publish…** pide la fecha (hoy o después) y abre el resumen (*Name, Available from, Result*) con *Back* y *Publish*.
+     Crea la versión: Active si empieza hoy, Scheduled si empieza después. Toast de CON-1151.
+   - **Cancel** descarta lo cambiado y queda en la pantalla (*Changes discarded*).
+8. **Scheduled** se edita en el lugar, sin versión nueva (CON-1375): *Cancel · Save changes* → *Changes saved.*
+9. **Validación**: toast *Please review the highlighted fields.* y cada campo en rojo (*This field is required.*, nombre
+   repetido, *The available date must be today or a future date.*). Se va el banner *Uncompleted fields* de esta pantalla.
+   Buscar sin resultados: *No results found for the selected filter.* (CON-495; antes el vacío de red.dev).
+10. **Assignments** (`finance/AssignmentsTab`): *Locations, Insurance plans, Providers, Patients* con su cantidad, buscador y
+    **Remove** por fila (confirma: *… will stop using <fee schedule>.*). Un plan por fila, con su carrier. Sin publicar:
+    *Assignments become available once this fee schedule is published.* Reemplaza a *View assignments* del ⋮.
+11. **New fee schedule**: *Cancel · Save as draft · Create and publish…*. Save as draft lo deja **Inactive** con su
+    borrador y sin versiones; publicar lo deja Active (o con su versión Scheduled). Publicar hoy un fee schedule que sólo era
+    borrador lo pasa a Active.
+12. Se van el switch *Save in draft state*, el lápiz *Rename* (el nombre se edita al crear una versión) y *Update fees*.
+13. Datos: *Delta Dental PPO 2026* suma el aumento publicado para el 01/01/2027 (expirada, activa y programada).
+
+### Fuera del prototipo (a confirmar con Julián)
+
+- **Type** no está en el prototipo; se mantiene (lo pidió el 2026-10-09) y se edita junto con el nombre.
+- **Compare fees** tampoco; sigue en el ⋮ (pedido del 2026-10-09), salvo en un fee schedule sin publicar.
+- **Discard draft** (pie, a la izquierda, sólo si hay otra versión): la guía dice que el borrador se descarta; sin eso, un
+  borrador guardado bloquea *Create new version* hasta publicarlo.
+- Cambiar de versión con cambios sin guardar pregunta antes (el prototipo los pierde).
+- *Copy form* y *Bulk edit* funcionan (en el prototipo son de muestra).
+- Pendientes del propio prototipo: qué tarifa usa un origen después de quitarle la asignación y si el nombre es del fee
+  schedule o de cada versión. Draft y Publish no tienen historia en Jira.
+- El paso de Scheduled a Active es por fecha (se calcula con el día de hoy). `AssignmentsDrawer` y `AssignmentsCount` quedan
+  sin uso en la app.
+
+**A validar con usuarios:** si *Create new version* se entiende como "cambiar precios", y si quitar asignaciones desde acá
+alcanza o esperan reasignar a otro fee schedule en el mismo paso.
+
 ## Atajos de Billing en un ⋮ y Settings › Overview (2026-11-26)
 
 Julián: *"los accesos rápidos de Billing ponelo en un elipsis, así quedan las cards iguales"*. Los tres atajos de la card

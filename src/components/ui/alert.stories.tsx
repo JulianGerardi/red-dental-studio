@@ -11,6 +11,7 @@ const USO: Record<AlertTone, string> = {
   success: 'Salió bien: se guardó, se envió.',
   warning: 'Hay que tenerlo en cuenta: acceso limitado, un dato que falta.',
   danger: 'Algo falló o se bloqueó: no se pudo guardar.',
+  neutral: 'Sólo lectura: una versión expirada, un fee schedule archivado.',
 }
 
 const meta = {
