@@ -14,7 +14,7 @@ import { OBLIGATORIO } from '@/lib/validacion'
 import { RuedaSuperficies, superficiesDe, type SuperficieLab } from './dental/RuedaSuperficies'
 import { ArcadaAnatomica } from './dental/ArcadaAnatomica'
 import { NewLaboratoryDrawer } from './NewLaboratoryDrawer'
-import { Adjuntos, AvisosFicha, COLUMNAS_FICHA, EncabezadoFicha, ProcedimientoResumen, ProcedimientosVinculados, type ProcedimientoFicha } from './FichaClinica'
+import { Adjuntos, AvisosFicha, EncabezadoFicha, ProcedimientoResumen, ProcedimientosVinculados, type ProcedimientoFicha } from './FichaClinica'
 import { LAB_VACIO, PROCEDIMIENTOS_LAB, agregarLaboratorio, guardarRegistro, hoy, laboratorios as listaLaboratorios, type Registro } from './registros'
 import type { Denticion, Laboratorio } from '@/data/laboratorios'
 import type { PendingTask } from '@/components/dashboard/PendingTaskCard'
@@ -22,14 +22,15 @@ import { MenuTarea, TONO_ESTADO, esEditable, type AccionUI } from '@/components/
 import { formatMDY } from '@/lib/fecha'
 
 /* La ficha de una Lab order: la misma para New lab order, Edit y la vista de una orden que ya no se edita. Mismos datos
-   y acciones que red.dev (videos de Julián del 2026-11-20 al 27) con el armado de FichaClinica: General information (con
-   Teeth & surface adentro) a la izquierda y Details a la derecha. Sólo se edita con un encuentro abierto y la orden en
+   y acciones que red.dev (videos de Julián del 2026-11-20 al 27) con el armado de FichaClinica: quién la pide y cuándo
+   en el título y dos cards, una debajo de la otra: General information (con Teeth & surface adentro) y Details. Sólo se edita con un encuentro abierto y la orden en
    Pending (CON-2218); se crea en Pending (CON-2215). Ver design-reference/figma/modulos/clinical-mode.md (2026-11-27). */
 
 const MAX_TEXTO = 500
 const casoDe = (p: ProcedimientoFicha) => p.caso ?? 'Independent'
 const aFecha = (s: string) => { const f = new Date(s); return s && !Number.isNaN(f.getTime()) ? f : null }
 const esPermanente = (d: string) => /^\d+$/.test(d)
+const hoyDia = () => { const d = new Date(); return new Date(d.getFullYear(), d.getMonth(), d.getDate()) }
 
 export function LabOrderDetail({ registro, nuevo, abierto, onVolver, onAccion }: {
   registro: Registro
@@ -99,7 +100,7 @@ export function LabOrderDetail({ registro, nuevo, abierto, onVolver, onAccion }:
   const guardar = () => {
     const e = {
       lab: laboratorios.some((l) => l.nombre === lab) ? undefined : OBLIGATORIO,
-      vence: vence ? undefined : OBLIGATORIO,
+      vence: !vence ? OBLIGATORIO : vence < hoyDia() ? 'Date cannot be in the past' : undefined,
       trabajo: trabajo.trim() ? undefined : OBLIGATORIO,
     }
     setErrores(e)
@@ -124,10 +125,10 @@ export function LabOrderDetail({ registro, nuevo, abierto, onVolver, onAccion }:
         </>}
       />
 
-      <AvisosFicha abierto={abierto || !!nuevo} editable={editable} nombre="lab order" incompleto={Object.values(errores).some(Boolean)} />
+      <AvisosFicha abierto={abierto || !!nuevo} editable={editable} nombre="lab order" incompleto={Object.values(errores).includes(OBLIGATORIO)} />
 
-      <div className={COLUMNAS_FICHA}>
-        <Card title="General information">
+      {/* Una card debajo de la otra, con la misma diagramación que Prescription y Referral (Julián, 2026-11-27). */}
+      <Card title="General information">
           <div className="flex min-w-0 flex-col gap-6">
            <fieldset disabled={!editable} className="flex min-w-0 flex-col gap-6">
             <legend className="sr-only">General information</legend>
@@ -141,8 +142,8 @@ export function LabOrderDetail({ registro, nuevo, abierto, onVolver, onAccion }:
               </div>
               <div className="flex flex-col gap-2">
                 <FieldLabel required>Delivery expiration date</FieldLabel>
-                {/* CON-2215: no puede quedar en el pasado; los días anteriores no se eligen. */}
-                <DatePicker value={vence} onChange={setVence} error={!!errores.vence} min={new Date()} label="Delivery expiration date" disabled={!editable} />
+                {/* El calendario de toda la app; que no quede en el pasado (CON-2215) se revisa al guardar. */}
+                <DatePicker value={vence} onChange={setVence} error={!!errores.vence} label="Delivery expiration date" disabled={!editable} className="h-9 w-full" />
                 {errores.vence && <FieldError>{errores.vence}</FieldError>}
               </div>
               <label className={cn('flex w-fit items-center gap-2 text-[13px] font-medium text-ink sm:mt-[26px] sm:h-9', editable ? 'cursor-pointer' : 'opacity-60')}>
@@ -231,22 +232,22 @@ export function LabOrderDetail({ registro, nuevo, abierto, onVolver, onAccion }:
           </div>
         </Card>
 
-        {/* El texto libre se lleva el alto que deja la columna de la izquierda: es donde más se escribe y lo que lee el laboratorio. */}
-        <Card title="Details" className="flex flex-col" bodyClassName="flex flex-1 flex-col">
-          <fieldset disabled={!editable} className="flex min-w-0 flex-1 flex-col gap-4">
-            <legend className="sr-only">Details</legend>
+      <Card title="Details">
+        <fieldset disabled={!editable} className="flex min-w-0 flex-col gap-4">
+          <legend className="sr-only">Details</legend>
+          <div className="grid gap-4 sm:grid-cols-2">
             <TextArea
-              label="Dental work requested" required crecer rows={7} className="flex-[2]" placeholder="Describe the work the laboratory has to do"
+              label="Dental work requested" required rows={6} placeholder="Describe the work the laboratory has to do"
               value={trabajo} onChange={(v) => setTrabajo(v.slice(0, MAX_TEXTO))} error={errores.trabajo} disabled={!editable} hint={`${trabajo.length}/${MAX_TEXTO}`}
             />
             <TextArea
-              label="Special instructions" crecer rows={4} className="flex-1" placeholder="Enter special instructions"
+              label="Special instructions" rows={6} placeholder="Enter special instructions"
               value={indicaciones} onChange={(v) => setIndicaciones(v.slice(0, MAX_TEXTO))} disabled={!editable} hint={`${indicaciones.length}/${MAX_TEXTO}`}
             />
-            <Adjuntos value={adjuntos} onChange={setAdjuntos} disabled={!editable} error="Invalid file type or size." />
-          </fieldset>
-        </Card>
-      </div>
+          </div>
+          <Adjuntos value={adjuntos} onChange={setAdjuntos} disabled={!editable} error="Invalid file type or size." />
+        </fieldset>
+      </Card>
 
       <div className="mt-1 flex justify-end">
         <FormFooter onCancel={onVolver} onSave={guardar} saveDisabled={!editable} cancelLabel={editable ? 'Cancel' : 'Back'} />

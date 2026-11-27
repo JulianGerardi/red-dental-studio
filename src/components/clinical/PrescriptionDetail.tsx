@@ -104,14 +104,14 @@ export function PrescriptionDetail({ registro, nuevo, abierto, onVolver, onAccio
         titulo={nuevo ? 'New prescription' : 'Prescription'} estado={registro.state} tono={TONO_ESTADO[registro.state]} onVolver={onVolver} volverA="prescriptions"
         /* CON-2230: se guarda quién la hizo y cuándo; van en el título, como en Lab order y Referral. */
         datos={[['Prescribing provider', registro.provider ?? '—'], ['Prescription date', registro.register]]}
-        /* El vencimiento también va en el título, como red.dev. CON-2230: ni en el pasado ni más allá del límite. */
+        /* El vencimiento también va en el título, como red.dev. El calendario es el de toda la app, sin días apagados:
+           que no quede en el pasado ni más allá del límite (CON-2230) se revisa al guardar. */
         campo={(
-          <div className="flex flex-col gap-1">
-            <div className="flex items-center gap-2">
-              <FieldLabel required>Expiration date</FieldLabel>
-              <DatePicker value={vence} onChange={setVence} error={!!errorVence} min={manana()} max={limite()} label="Expiration date" disabled={!editable} className="h-8 w-[150px]" />
-            </div>
-            {errorVence && <span className="text-right"><FieldError>{errorVence}</FieldError></span>}
+          <div className="flex w-[180px] flex-col gap-2">
+            {/* El rótulo arriba y el campo de fecha de los formularios de la app (h-9, ancho completo). */}
+            <FieldLabel required>Expiration date</FieldLabel>
+            <DatePicker value={vence} onChange={setVence} error={!!errorVence} label="Expiration date" disabled={!editable} className="h-9 w-full" />
+            {errorVence && <FieldError>{errorVence}</FieldError>}
           </div>
         )}
         acciones={!nuevo && (registro.pdf || accionesDe(registro).some((x) => x !== 'Edit')) && <>

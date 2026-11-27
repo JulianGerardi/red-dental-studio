@@ -9,15 +9,11 @@ import type { EstadoProcedimiento } from '@/data/clinical-mode'
 import { FieldError, FieldLabel } from '@/components/patients/form'
 import { ICONO_SUELTO, TARJETA_INTERNA } from '@/lib/estilos'
 
-/* Las fichas de Clinical Mode que se completan desde Pending Task (Lab order, Referral): título con estado y acciones,
-   dos cards (settings `Card`) lado a lado en desktop -General information a la izquierda, Details a la derecha con el
-   texto libre ocupando todo el alto- y Cancel / Save abajo a la derecha (`FormFooter`). Ver
-   design-reference/figma/modulos/clinical-mode.md (2026-11-27). */
+/* Las fichas de Lab order, Prescription y Referral en Clinical Mode: el título con el estado, quién lo hizo y cuándo y
+   las acciones; las cards (settings `Card`) una debajo de la otra, como los formularios de la app; y Cancel / Save abajo
+   a la derecha (`FormFooter`). Ver design-reference/figma/modulos/clinical-mode.md (2026-11-27). */
 
 const SIN_ENCUENTRO_FICHA = 'You do not have permission to perform this action because there is no open encounter for the selected patient.'
-
-/** Las dos columnas de la ficha: lo que define el pedido a la izquierda y lo que se escribe a la derecha; en celular y tablet, una debajo de la otra. */
-export const COLUMNAS_FICHA = 'grid items-stretch gap-4 lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)]'
 
 /** El título de la ficha, del tamaño de un título de pantalla: la vuelta a la lista, el nombre y el estado a la izquierda;
  *  a la derecha, quién lo hizo y cuándo (`datos`, de sólo lectura), un campo propio del encabezado (`campo`: el vencimiento
@@ -92,16 +88,6 @@ export function AvisosFicha({ abierto, editable, nombre, incompleto, error }: {
         </div>
       )}
     </>
-  )
-}
-
-/** Un dato de la ficha que no se edita (quién pidió la orden, cuándo): rótulo de campo y el valor como texto. */
-export function DatoFicha({ label, children }: { label: string; children: ReactNode }) {
-  return (
-    <div className="flex flex-col gap-2">
-      <FieldLabel>{label}</FieldLabel>
-      <span className="text-[13px] leading-5 text-ink">{children}</span>
-    </div>
   )
 }
 

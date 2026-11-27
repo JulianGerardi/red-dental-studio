@@ -114,7 +114,8 @@ export function ReferralDetail({ registro, nuevo, abierto, onVolver, onAccion }:
       </Card>
 
       <Card title="Details">
-        <fieldset disabled={!editable} className="grid min-w-0 gap-4 sm:grid-cols-2">
+        {/* La nota a todo el ancho y los adjuntos debajo (Julián, 2026-11-27). */}
+        <fieldset disabled={!editable} className="flex min-w-0 flex-col gap-4">
           <legend className="sr-only">Details</legend>
           <TextArea
             label="Referral note" required rows={6} placeholder="Why the patient is being referred"

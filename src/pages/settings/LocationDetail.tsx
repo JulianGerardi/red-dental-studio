@@ -2,7 +2,7 @@ import { Tabs } from '@/components/ui/tabs'
 import { Pill } from '@/components/ui/pill'
 import { PageTitle } from '@/components/ui/page-title'
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
-import { Chip } from '@/components/ui/chip'
+import { Chip, ChipMas } from '@/components/ui/chip'
 import { useParams, useSearchParams } from 'react-router-dom'
 import { Pencil, DoorOpen, Plus, Trash2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
@@ -200,16 +200,7 @@ export function FranjasDia({ label, rangos, onQuitar, onEditar }: {
       <Pencil className="size-3" /> Edit hours
     </button>
   )
-  const mas = (n: number, onClick?: () => void) => (
-    <button
-      type="button"
-      onClick={onClick}
-      aria-label={`Show ${n} more hours on ${label}`}
-      className="inline-flex h-6 shrink-0 items-center rounded-full bg-dash-count-bg px-2.5 text-[12px] font-medium text-dash-blue hover:underline"
-    >
-      +{n}
-    </button>
-  )
+  const mas = (n: number, onClick?: () => void) => <ChipMas n={n} label={`Show ${n} more hours on ${label}`} onClick={onClick} />
 
   return (
     <div ref={caja} className="relative col-span-2 min-w-0 sm:col-span-1">

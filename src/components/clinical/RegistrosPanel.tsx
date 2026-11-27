@@ -3,9 +3,9 @@ import { ArrowRightLeft, Eye, FileText, FlaskConical, Pill as IconoPastilla, Plu
 import { cn } from '@/lib/utils'
 import { ICONO_SUELTO } from '@/lib/estilos'
 import { Button } from '@/components/ui/button'
-import { Chip } from '@/components/ui/chip'
+import { Chip, ChipMas } from '@/components/ui/chip'
 import { DataTable, TextCell, type DataTableColumn } from '@/components/ui/data-table'
-import { DateFilter, inRange, type DatePreset, type DateRange } from '@/components/ui/date-filter'
+import { DateFilter, inRange, type DateRange } from '@/components/ui/date-filter'
 import { DropdownMenuItem } from '@/components/ui/dropdown-menu'
 import { FilterMenu, type FilterGroup } from '@/components/ui/filter-menu'
 import { Pill } from '@/components/ui/pill'
@@ -36,18 +36,30 @@ const columnasFecha = (): DataTableColumn<Registro>[] => [
 const proveedor = (header: string): DataTableColumn<Registro> => ({ key: 'proveedor', header, cell: (r) => <TextCell>{r.provider ?? '—'}</TextCell> })
 const especialidadDe = (nombre?: string) => proveedoresDerivacion().find((p) => p.nombre === nombre)?.especialidad
 
-const enDias = (n: number) => { const d = new Date(); return new Date(d.getFullYear(), d.getMonth(), d.getDate() + n) }
-/* Atajos de vencimiento: hacia adelante (lo que vence pronto) y hacia atrás (lo que ya venció). */
-const ATAJOS_VENCE: DatePreset[] = [
-  { label: 'Next 7 days', range: () => ({ from: enDias(0), to: enDias(6) }) },
-  { label: 'Next 30 days', range: () => ({ from: enDias(0), to: enDias(29) }) },
-  { label: 'Last 30 days', range: () => ({ from: enDias(-29), to: enDias(0) }) },
-  { label: 'Last 90 days', range: () => ({ from: enDias(-89), to: enDias(0) }) },
-]
+/* Las medicaciones de una receta en la fila: la primera en un chip y el resto detrás de "+N", que las despliega (como las
+   franjas de Working hours, sin la ✕). */
+function MedicacionesCelda({ r }: { r: Registro }) {
+  const [abierto, setAbierto] = useState(false)
+  const todas = r.receta?.medicaciones ?? []
+  if (!todas.length) return <>—</>
+  const visibles = abierto ? todas : todas.slice(0, 1)
+  return (
+    <span className="flex min-w-0 flex-wrap items-center gap-1.5">
+      {visibles.map((m) => <Chip key={m.id} title={nombreMedicacion(m)}>{nombreMedicacion(m)}</Chip>)}
+      {todas.length > visibles.length && (
+        <ChipMas
+          n={todas.length - visibles.length} label={`Show ${todas.length - visibles.length} more medications: ${todas.slice(1).map(nombreMedicacion).join(', ')}`}
+          onClick={(e) => { e.stopPropagation(); setAbierto(true) }}
+        />
+      )}
+    </span>
+  )
+}
 
+const enDias = (n: number) => { const d = new Date(); return new Date(d.getFullYear(), d.getMonth(), d.getDate() + n) }
 const CONFIG: Record<TipoRegistro, {
   /** El filtro de fecha de red.dev: el vencimiento (Lab order, Prescription) o la fecha de la derivación (CON-2609). */
-  fecha: { de: (r: Registro) => string; vacio: string; nombre: string; futura?: boolean }
+  fecha: { de: (r: Registro) => string; nombre: string; futura?: boolean }
   /** Además de Status y Provider, Lab order filtra por laboratorio (CON-2219). */
   grupoExtra?: { titulo: string; de: (r: Registro) => string }
   nombre: string
@@ -63,7 +75,7 @@ const CONFIG: Record<TipoRegistro, {
 }> = {
   'Lab orders': {
     nombre: 'lab order', plural: 'lab orders', icono: FlaskConical, Ficha: LabOrderDetail,
-    fecha: { de: (r) => r.expiration, vacio: 'Any expiration date', nombre: 'expiration date', futura: true },
+    fecha: { de: (r) => r.expiration, nombre: 'expiration date', futura: true },
     grupoExtra: { titulo: 'Laboratory', de: (r) => r.lab?.laboratorio ?? '' },
     estados: ['Pending', 'Requested', 'Delayed', 'Delivered', 'Rejected', 'Canceled'],
     columnas: [proveedor('Provider'), { key: 'laboratorio', header: 'Laboratory', cell: (r) => <TextCell>{r.lab?.laboratorio || '—'}</TextCell> }, columnaEstado, ...columnasFecha()],
@@ -72,19 +84,11 @@ const CONFIG: Record<TipoRegistro, {
   },
   Prescriptions: {
     nombre: 'prescription', plural: 'prescriptions', icono: IconoPastilla, Ficha: PrescriptionDetail,
-    fecha: { de: (r) => r.expiration, vacio: 'Any expiration date', nombre: 'expiration date', futura: true },
+    fecha: { de: (r) => r.expiration, nombre: 'expiration date', futura: true },
     estados: ['Pending', 'Active', 'Expired', 'Canceled'],
     columnas: [
       proveedor('Provider'),
-      { key: 'medicacion', header: 'Medication', cell: (r) => {
-        const [primera, ...resto] = r.receta?.medicaciones ?? []
-        return (
-          <span className="flex min-w-0 items-center gap-1.5">
-            {primera ? <Chip title={nombreMedicacion(primera)}>{nombreMedicacion(primera)}</Chip> : '—'}
-            {resto.length > 0 && <span className="shrink-0 text-xs text-ink-muted" title={resto.map(nombreMedicacion).join(', ')}>+{resto.length}</span>}
-          </span>
-        )
-      } },
+      { key: 'medicacion', header: 'Medication', cell: (r) => <MedicacionesCelda r={r} /> },
       columnaEstado, ...columnasFecha(),
     ],
     texto: (r) => `${r.provider} ${r.receta?.medicaciones.map(nombreMedicacion).join(' ')} ${r.state}`,
@@ -92,7 +96,7 @@ const CONFIG: Record<TipoRegistro, {
   },
   Referrals: {
     nombre: 'referral', plural: 'referrals', icono: ArrowRightLeft, Ficha: ReferralDetail,
-    fecha: { de: (r) => r.register, vacio: 'Any referral date', nombre: 'referral date' },
+    fecha: { de: (r) => r.register, nombre: 'referral date' },
     estados: ['Pending', 'Requested', 'Completed', 'Rejected', 'Canceled'],
     columnas: [
       proveedor('Referring provider'),
@@ -196,10 +200,8 @@ export function RegistrosPanel({ kind, paciente, tarea, encuentroAbierto = false
           <>
             <SettingsSearch value={q} onChange={setQ} placeholder={`Search ${c.plural}`} />
             <FilterMenu label={`Filter ${c.plural}`} groups={grupos} />
-            <DateFilter
-              value={rango} onChange={setRango} label={`Filter ${c.plural} by ${c.fecha.nombre}`} emptyLabel={c.fecha.vacio}
-              {...(c.fecha.futura ? { presets: ATAJOS_VENCE, max: enDias(365) } : {})}
-            />
+            {/* El filtro de fechas de toda la app (All dates y sus atajos); un vencimiento también puede ser futuro. */}
+            <DateFilter value={rango} onChange={setRango} label={`Filter ${c.plural} by ${c.fecha.nombre}`} max={c.fecha.futura ? enDias(365) : undefined} />
           </>
         )}
         actions={nuevo}

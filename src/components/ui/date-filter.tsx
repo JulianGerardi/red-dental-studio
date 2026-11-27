@@ -54,7 +54,8 @@ export function DateFilterPanel({
   /** Arranca con el primer día ya tocado, esperando el segundo (para mostrar ese estado). */
   defaultAnchor?: Date
 }) {
-  const [mes, setMes] = useState(() => primeroDelMes(value?.to ?? defaultAnchor ?? max))
+  /* Abre en el mes de lo elegido o, sin nada, en el actual (aunque `max` deje elegir fechas que vienen: un vencimiento). */
+  const [mes, setMes] = useState(() => primeroDelMes(value?.to ?? defaultAnchor ?? (max > new Date() ? new Date() : max)))
   const [ancla, setAncla] = useState<Date | null>(defaultAnchor ?? null)
   const [sobre, setSobre] = useState<Date | null>(null)
 
