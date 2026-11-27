@@ -59,7 +59,7 @@ export function CoverageTableEditor({ tabla, abrirExcepciones = false }: { tabla
 
   return (
     <section aria-label={tabla ? 'Edit coverage table' : 'New coverage table'} className={TARJETA_EDITOR}>
-      {tabla && <EncabezadoEditor titulo="Edit coverage table" activo={tabla.activo !== false} />}
+      {tabla && <EncabezadoEditor titulo={tabla.nombre} activo={tabla.activo !== false} />}
       {intentado && (!nombre.trim() || !rangos.every(rangoCompleto)) && (
         <Alert tone="danger" title="Uncompleted fields">All required fields marked with (*) must be completed before proceeding</Alert>
       )}

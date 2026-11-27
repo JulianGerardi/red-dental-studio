@@ -9,6 +9,10 @@
   ([Jira](https://confidetally.atlassian.net/issues?jql=key%20in%20%28CON-2890%29%20ORDER%20BY%20key%20ASC))
 - Insurance / Billing Profile del provider: ver [billing-profile.md](billing-profile.md) (CON-4003).
 
+## Breadcrumb y título iguales (2026-11-27)
+
+Sin historia de Jira. Regla transversal en `../README.md` (*Regla: breadcrumb y título van de la mano*). El H1 de la ficha es **el nombre del empleado** con su pill de estado al lado, en todas las pestañas (antes *Employee information*, o el nombre de la pestaña). La card ya no repite nombre y estado: quedan la foto y *Is clinical practitioner*.
+
 ## "Link existing person" no hacía nada en "New Employee" (2026-09-07)
 
 Comparando contra un proyecto hermano armado sobre el mismo Figma (ver

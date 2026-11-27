@@ -12,6 +12,10 @@
   CON-2945, CON-2953
   ([Jira](https://confidetally.atlassian.net/issues?jql=key%20in%20%28CON-2946%2CCON-2940%2CCON-2942%2CCON-2952%2CCON-2954%2CCON-2840%2CCON-2916%2CCON-2847%2CCON-2944%2CCON-2945%2CCON-2953%29%20ORDER%20BY%20key%20ASC))
 
+## Breadcrumb y título iguales (2026-11-27)
+
+Sin historia de Jira. Regla transversal en `../README.md` (*Regla: breadcrumb y título van de la mano*). El H1 oculto del Overview pasa de *John Smith · Overview* a **John Smith**, el último tramo del rastro.
+
 ## Patient Dashboard (`3646:58836`) y flujo de navegación
 
 Pantalla nueva: panel izquierdo de 218px (avatar, nombre, badge Active, edad,

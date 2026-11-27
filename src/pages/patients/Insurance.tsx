@@ -187,7 +187,7 @@ export default function Insurance() {
 
         <div className="flex min-w-0 flex-1 flex-col">
           <div className="flex flex-wrap items-center justify-between gap-3">
-            <PageTitle>Insurance plans</PageTitle>
+            <PageTitle>Insurance</PageTitle>
             <Switch on={historial} onChange={setHistorial} label="Show plan history" />
           </div>
 

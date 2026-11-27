@@ -14,6 +14,10 @@ se abre en un drawer, ver al final). Código en
 `src/pages/settings/Consents.tsx` (pantalla) y
 `src/components/settings/ConsentDocument.tsx` (la hoja del preview).
 
+## Breadcrumb y título iguales (2026-11-27)
+
+Sin historia de Jira. Regla transversal en `../README.md` (*Regla: breadcrumb y título van de la mano*). El título pasa de *Consent templates* a **Consents** (menú y rastro) y el encabezado del editor, de *Edit template* al **nombre del template elegido** con su estado; sin elegido, *New template*.
+
 ## El preview es una hoja de documento (2026-09-24)
 
 Pedido de Julián: el preview tenía que parecer **el documento que ve el
