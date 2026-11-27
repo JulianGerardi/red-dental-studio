@@ -15,7 +15,11 @@ export const ALERT_TONES: Record<AlertTone, { caja: string; color: string; icono
   neutral: { caja: 'border-line bg-surface-muted', color: 'text-ink-soft', icono: Info, nombre: 'Info' },
 }
 
-export function Alert({ tone = 'info', title, children, className }: { tone?: AlertTone; title: string; children?: ReactNode; className?: string }) {
+export function Alert({ tone = 'info', title, children, className, action }: {
+  tone?: AlertTone; title: string; children?: ReactNode; className?: string
+  /** Un botón a la derecha: lo que se puede hacer con lo que el aviso cuenta (Create new version). */
+  action?: ReactNode
+}) {
   const t = ALERT_TONES[tone]
   return (
     <div role="status" className={cn('flex items-start gap-3 rounded-lg border px-4 py-3', t.caja, className)}>
@@ -24,6 +28,7 @@ export function Alert({ tone = 'info', title, children, className }: { tone?: Al
         <p className={cn('text-[13px] font-semibold', t.color)}>{title}</p>
         {children && <p className="text-[13px] leading-relaxed text-ink">{children}</p>}
       </div>
+      {action && <div className="ml-auto shrink-0 self-center">{action}</div>}
     </div>
   )
 }

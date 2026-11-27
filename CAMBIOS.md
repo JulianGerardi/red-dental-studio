@@ -5,6 +5,13 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-11-27
 
+### Fee schedules: el aviso de la fecha va al lado del campo ([#PR](https://github.com/JulianGerardi/red-dental-studio/pull/PR))
+- **Available from:** el aviso de qué pasa con la fecha (*Starts today* / *Starts on …*, `ui/alert`) va en la columna de al
+  lado, a la altura del campo; en celular, debajo. El error de fecha pasada queda debajo del campo.
+- **Versión Scheduled:** ese aviso sólo aparece si se cambia la fecha (sin cambios repetía el de arriba), y dice *as soon as
+  you save* en vez de *publish*.
+- *Create new version* sigue en el aviso de la versión activa (`action` de `ui/alert`) y suma el ícono `Plus`.
+
 ### Lab order, Prescription y Referral: Teeth & surface de red.dev, datos en el título, sin encuentro y PDF nuevo (CON-2214, CON-2212, CON-2321) ([#219](https://github.com/JulianGerardi/red-dental-studio/pull/219))
 - **Teeth & surface (Lab order):** `clinical/dental/ArcadaAnatomica` dibuja las arcadas de red.dev (`arcadasRed.ts`, SVG
   generado; cada diente es un botón) y `RuedaSuperficies` usa sus cinco formas. Reemplaza a `DentalArch`, que se borra.

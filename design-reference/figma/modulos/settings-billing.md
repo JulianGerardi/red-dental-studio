@@ -6,7 +6,7 @@
 Sin historia de Jira. Regla transversal en `../README.md` (*Regla: breadcrumb y título van de la mano*). Edit carrier pasa a **el nombre del carrier** (*Aetna Dental Plans*) y Edit insurance plan a **el del plan** (*Acme Corp*), como el último tramo. El encabezado del editor de Fee schedules y Coverage tables es el ítem elegido (*UCR - Red* · Active · Default) en vez de *Edit fee schedule* / *Edit coverage table*. Resuelve el *Queda para decidir* de abajo.
 
 
-## Aviso de la fecha al lado del campo y Create new version con las acciones de la tabla (2026-11-27)
+## Aviso de la fecha al lado del campo (2026-11-27)
 
 Sin historia de Jira (CON-1375 y CON-1151 no piden estos mensajes: salen del prototipo). Devolución de Julián con captura.
 
@@ -17,9 +17,9 @@ Sin historia de Jira (CON-1375 y CON-1151 no piden estos mensajes: salen del pro
    01/02/2027*). Sin cambios en la fecha ya no se muestra: alcanza con el de arriba. Aparece cuando se **cambia** la fecha,
    que es cuando dice algo nuevo (por ejemplo *Starts today*). En ese caso dice *as soon as you save*, no *publish*: una
    Scheduled se guarda con *Save changes*.
-3. **Create new version** sale del aviso verde y va donde van las acciones de la tabla en toda la app: arriba de la tabla,
-   a la derecha, botón primario con `Plus`, como *Add range* en Coverage tables y en el lugar que ocupan *Copy form* y
-   *Bulk edit* al editar. Deshabilitado conserva su tooltip. `ui/alert` pierde `action`, que sólo se usaba acá.
+3. **Create new version** sigue adentro del aviso de la versión activa, a la derecha (`action` de `ui/alert`). Se probó
+   sacarlo arriba de la tabla, con las acciones, y Julián lo prefirió en el aviso. Suma el `Plus` de los botones que crean
+   algo (*New fee schedule*, *Add range*); deshabilitado conserva su tooltip.
 
 ## Aviso de la fecha con `ui/alert` y pill gris en el menú Version (2026-11-27)
 
@@ -71,7 +71,7 @@ diseño de la app (Billing con pestañas, lista y editor en dos cards): del prot
 3. **Encabezado**: el nombre del fee schedule con sus pills y, a la derecha, **Version** (`MenuVersion`): fecha y estado
    de cada una, de la más nueva a la más vieja, con el Draft (*No date yet*) arriba. Con una sola, no abre.
 4. **Pestañas** *General information* y *Assignments (n)*.
-5. **Aviso de arriba** (`ui/alert`, ahora con el tono `neutral`), según lo que se ve:
+5. **Aviso de arriba** (`ui/alert`, ahora con `action` y tono `neutral`), según lo que se ve:
    - *Active*: *Current version, active since …* y el botón **Create new version**. Si ya hay una Scheduled o un Draft, el
      botón queda deshabilitado con su tooltip y el aviso dice cuál editar.
    - *Creando versión*: *You’re creating a new version.* · *Draft*: *This is a draft.* · *Scheduled*: *Scheduled. Replaces

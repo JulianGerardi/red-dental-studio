@@ -354,7 +354,7 @@ export function FeeScheduleEditor({ arancel }: { arancel?: Arancel }) {
 
       {arancel && pestana === 'Assignments' ? <AssignmentsTab arancel={arancel} /> : (
         <>
-          {banner && <Alert tone={banner.tono} title={banner.titulo}>{banner.texto}</Alert>}
+          {banner && <Alert tone={banner.tono} title={banner.titulo} action={crearVersion}>{banner.texto}</Alert>}
 
           <div className="grid items-start gap-4 sm:grid-cols-2">
             <TextField label="Fee schedule name" required placeholder="Enter a fee schedule name" value={nombre} onChange={setNombre} disabled={!edita} error={errorNombre} />
@@ -388,13 +388,12 @@ export function FeeScheduleEditor({ arancel }: { arancel?: Arancel }) {
             <span className="text-[13px] text-ink-muted tabular-nums" title="Procedures whose fee is more than $0.00">
               Non-zero fees — <span className="font-semibold text-ink">{conImporte(nuevos)} / {PROCEDIMIENTOS.length}</span>
             </span>
-            {/* Create new version va donde van las acciones de la tabla, como Add range en Coverage. */}
-            {edita ? (
+            {edita && (
               <div className="flex flex-wrap gap-2 sm:ml-auto">
                 <Button variant="secondary" onClick={() => setHerramienta('copiar')}><Copy /> Copy form</Button>
                 <Button variant="secondary" onClick={() => setHerramienta('aumentar')}><SlidersHorizontal /> Bulk edit</Button>
               </div>
-            ) : crearVersion && <div className="sm:ml-auto">{crearVersion}</div>}
+            )}
           </div>
 
           {/* La tabla scrollea adentro con el encabezado fijo, así el pie queda a la vista (red.dev). */}
