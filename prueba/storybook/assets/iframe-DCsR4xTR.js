@@ -1,0 +1,1 @@
+import{t as e}from"./iframe-Cfigr-i7.js";e();
