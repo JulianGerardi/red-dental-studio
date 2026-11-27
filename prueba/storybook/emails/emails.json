@@ -118,7 +118,7 @@
     "subject": "Your appointment has been rescheduled",
     "preheader": "Your appointment has a new date and time.",
     "sender": "clinic",
-    "copy": "approved in Figma",
+    "copy": "proposal, pending approval",
     "template": "appointment-rescheduled.html",
     "variables": [
       "practice_logo_url",
@@ -290,7 +290,7 @@
     "subject": "Your account is ready",
     "preheader": "Your employee account is now ready.",
     "sender": "clinic",
-    "copy": "approved in Figma",
+    "copy": "proposal, pending approval",
     "template": "employee-welcome.html",
     "variables": [
       "practice_logo_url",
@@ -342,7 +342,7 @@
     "subject": "Your subscription has been canceled",
     "preheader": "The subscription of your clinic account has been canceled.",
     "sender": "platform",
-    "copy": "approved in Figma",
+    "copy": "proposal, pending approval",
     "template": "subscription-cancelled.html",
     "variables": [
       "assets_url",
