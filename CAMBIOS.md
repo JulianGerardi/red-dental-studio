@@ -5,7 +5,7 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-11-27
 
-### Fee schedules: tachos de fila y métricas de Compare fees como el resto de la app ([#PR](https://github.com/JulianGerardi/red-dental-studio/pull/PR))
+### Fee schedules: tachos de fila y métricas de Compare fees como el resto de la app ([#215](https://github.com/JulianGerardi/red-dental-studio/pull/215))
 - **Tacho de una fila:** sólo ícono, en rojo (`ICONO_SUELTO` + `text-dash-bad-fg`, `Trash2` de 16 px), con el nombre en el
   `aria-label`. Así queda *Remove* en `finance/AssignmentsTab`, como los rangos, las excepciones y la Payment table. No usar
   un botón con texto para quitar una fila. *Discard draft* (acción del pie) sigue con texto, en rojo.
