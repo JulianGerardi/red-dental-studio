@@ -5,7 +5,7 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-11-27
 
-### Mails: Employee, Rescheduled (booked) y Subscription canceled como en el Figma ([#PR](https://github.com/JulianGerardi/red-dental-studio/pull/PR))
+### Mails: Employee, Rescheduled (booked) y Subscription canceled como en el Figma ([#212](https://github.com/JulianGerardi/red-dental-studio/pull/212))
 - **Employee account ready:** "…access {{practice_name}}’s Confidentally workspace and use the features included in your role."
 - **Rescheduled (booked):** título "Appointment scheduled" y primera línea "…has been canceled.", como el Figma.
 - **Subscription canceled:** suma el aviso de solo lectura debajo de *Subscription details*.
