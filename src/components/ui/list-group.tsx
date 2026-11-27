@@ -48,7 +48,7 @@ export function ListGroup({
   const claseRotulo = cn('flex items-center gap-1 rounded text-[11px] font-semibold tracking-wide uppercase', LIST_GROUP_TONES[tone])
 
   return (
-    <section aria-label={title} className={cn('flex flex-col gap-1.5', alPie && 'min-h-0 flex-1', className)}>
+    <section aria-label={title ?? label} className={cn('flex flex-col gap-1.5', alPie && 'min-h-0 flex-1', className)}>
       {title && (
         <div className="flex min-h-6 items-center">
           {collapsible ? (
