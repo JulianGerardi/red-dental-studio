@@ -27,8 +27,17 @@ h1 { margin: 0; font-size: 15pt; line-height: 1.25; font-weight: 700; color: #09
 .resumen dt { font-size: 6.5pt; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: #71717a; }
 .resumen dd { margin: 1pt 0 0; font-weight: 500; color: #09090b; overflow-wrap: anywhere; }
 section { margin-top: 18pt; }
-h2 { display: flex; gap: 7pt; margin: 0 0 5pt; font-size: 10.5pt; font-weight: 700; color: #09090b; break-after: avoid; }
-h2 span { color: #1d56bc; font-weight: 600; }
+body { counter-reset: seccion; }
+h2 { display: flex; gap: 7pt; margin: 0 0 5pt; font-size: 10.5pt; font-weight: 700; color: #09090b; break-after: avoid; counter-increment: seccion; }
+h2::before { content: counter(seccion); color: #1d56bc; font-weight: 600; }
+.aviso { margin: 10pt 0 0; padding: 6pt 9pt; border-radius: 4pt; background: #e8eef8; font-size: 8pt; color: #3f3f46; }
+.anexo-cabeza { padding-bottom: 9pt; margin-bottom: 14pt; border-bottom: 1.5pt solid #09090b; }
+.anexo-cabeza .tipo { margin-top: 0; }
+.anexo-cabeza span { display: block; margin-top: 2pt; font-size: 8pt; color: #71717a; }
+.anexo-imagen { margin: 0; }
+.anexo-imagen img { display: block; width: 100%; max-height: 215mm; object-fit: contain; border-radius: 4pt; }
+.anexo-pdf { padding: 14pt; border: .75pt dashed #a1a1aa; border-radius: 4pt; text-align: center; color: #71717a; }
+.anexos-pie { margin-top: 6pt; }
 .campos { margin: 0; }
 .campos div { margin-bottom: 2pt; }
 .campos dt { display: inline; font-weight: 600; color: #09090b; }
@@ -45,10 +54,33 @@ h2 span { color: #1d56bc; font-weight: 600; }
 .tabla tr { break-inside: avoid; }
 .tabla .der { text-align: right; font-variant-numeric: tabular-nums; }
 .tabla .vacio { color: #71717a; }
-.tabla tfoot td { border-bottom: 0; padding-top: 3pt; padding-bottom: 0; font-weight: 600; }
-.tabla tfoot tr:last-child td { font-size: 9.5pt; padding-top: 5pt; }
+.tabla tfoot td { border-bottom: 0; padding-top: 4.5pt; font-weight: 600; background: #f4f4f5; }
+.tabla .sub { display: block; font-size: 7.5pt; line-height: 1.45; color: #71717a; }
+.tabla .sub b { font-weight: 600; color: #3f3f46; }
 .grupo { margin-bottom: 12pt; break-inside: avoid; }
-.grupo-titulo { display: flex; justify-content: space-between; margin: 0 0 2pt; font-weight: 600; color: #09090b; }
+.grupo-titulo { display: flex; justify-content: space-between; gap: 12pt; margin: 0 0 2pt; font-weight: 600; color: #09090b; }
+.grupo-detalle { font-weight: 500; color: #71717a; }
+.grupo-nota { margin: 4pt 0 0; font-size: 8pt; color: #3f3f46; }
+.grupo-nota b { font-weight: 600; color: #09090b; }
+.importes { display: flex; flex-direction: column; align-items: flex-end; break-inside: avoid; }
+.importes dl { width: 62mm; margin: 0 0 6pt; }
+.importes dl div { display: flex; justify-content: space-between; gap: 12pt; padding: 2.5pt 0; }
+.importes dt { color: #3f3f46; }
+.importes dd { margin: 0; font-variant-numeric: tabular-nums; color: #09090b; }
+.importes dl div:last-child { margin-top: 3pt; padding-top: 5pt; border-top: .75pt solid #09090b; font-size: 10pt; font-weight: 700; }
+.importes dl div:last-child dt { color: #09090b; }
+.importes .nota { max-width: 62mm; text-align: right; }
+.cuadros { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6pt; margin: 0 0 4pt; }
+.cuadros div { padding: 5pt 7pt; border: .75pt solid #e7e7e7; border-radius: 4pt; break-inside: avoid; }
+.cuadros dt { font-size: 6.5pt; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: #71717a; }
+.cuadros dd { margin: 1pt 0 0; font-weight: 600; color: #09090b; font-variant-numeric: tabular-nums; }
+.narrativa { margin-bottom: 7pt; break-inside: avoid; }
+.narrativa .firmado { display: block; margin-top: 2pt; font-size: 7.5pt; color: #71717a; }
+.campos .linea { display: block; }
+.narrativa-titulo { display: flex; justify-content: space-between; gap: 12pt; margin: 0 0 1pt; font-weight: 600; color: #09090b; }
+.narrativa-titulo span { font-weight: 400; font-size: 8pt; color: #71717a; }
+h3 { margin: 10pt 0 4pt; font-size: 9pt; font-weight: 700; color: #09090b; break-after: avoid; }
+h2 + h3 { margin-top: 2pt; }
 .tarjeta { padding: 8pt 10pt; margin-bottom: 7pt; border: .75pt solid #e7e7e7; border-radius: 4pt; break-inside: avoid; }
 .tarjeta-titulo { font-weight: 600; font-size: 9.5pt; color: #09090b; }
 .imagenes { display: grid; grid-template-columns: 1fr 1fr; gap: 10pt; }
@@ -78,9 +110,11 @@ h2 span { color: #1d56bc; font-weight: 600; }
 .firma b { color: #09090b; font-weight: 600; }
 .firma span { color: #71717a; }
 .pie-pantalla { display: none; }
+@media print { .anexo { break-before: page; } }
 /* En pantalla (vista previa y navegador) se ve como una hoja; el PDF usa @page. */
 @media screen {
   body { background: #f4f4f5; padding: 24px; }
+  .hoja + .hoja { margin-top: 24px; }
   .hoja { width: 210mm; min-height: 297mm; margin: 0 auto; padding: 18mm 18mm 12mm; display: flex; flex-direction: column; background: #fff; box-shadow: 0 0 0 1px rgb(0 0 0/.06), 0 2px 4px rgb(0 0 0/.05), 0 16px 32px -12px rgb(0 0 0/.22); }
   .pie-pantalla { display: flex; justify-content: space-between; margin-top: auto; padding-top: 24pt; font-size: 7pt; color: #a1a1aa; }
 }
@@ -94,16 +128,84 @@ h2 span { color: #1d56bc; font-weight: 600; }
 </header>
 <p class="tipo">Dental clinical note</p>
 <h1>{{patient_name}}</h1>
-<dl class="resumen"><div><dt>Patient name</dt><dd>{{patient_name}}</dd></div><div><dt>Date of birth</dt><dd>{{patient_birth_date}}</dd></div><div><dt>Date of visit</dt><dd>{{visit_date}} — {{visit_time}}</dd></div><div><dt>Attending dentist</dt><dd>{{provider_name}}</dd></div><div><dt>Contact</dt><dd>{{patient_phone}}</dd></div></dl>
+{{#auto_generated}}<p class="aviso">Generated automatically when the encounter closed after 48 hours without activity. Workflow narratives are not included.</p>{{/auto_generated}}
+<dl class="resumen"><div><dt>Patient name</dt><dd>{{patient_name}}</dd></div><div><dt>Date of birth</dt><dd>{{patient_birth_date}}</dd></div><div><dt>Date of visit</dt><dd>{{visit_date}} — {{visit_time}}</dd></div><div><dt>Attending dentist</dt><dd>{{provider_name}}</dd></div><div><dt>Location</dt><dd>{{location_name}}</dd></div><div><dt>Contact</dt><dd>{{patient_phone}}</dd></div></dl>
 <section>
-<h2><span>1</span>Medical History</h2>
-<p class="rotulo">Past medical conditions:</p><ul class="lista">{{#medical_conditions}}<li>{{name}}</li>{{/medical_conditions}}{{^medical_conditions}}<li>Patient reports no known medical conditions.</li>{{/medical_conditions}}</ul>
-<p class="rotulo">Current medications:</p><ul class="lista">{{#current_medications}}<li>{{name}}</li>{{/current_medications}}{{^current_medications}}<li>Patient reports no current medications.</li>{{/current_medications}}</ul>
-<p class="rotulo">Known allergies:</p><ul class="lista">{{#allergies}}<li>{{name}}</li>{{/allergies}}{{^allergies}}<li>No known allergies reported.</li>{{/allergies}}</ul>
-<p class="rotulo">Past surgeries and/or hospitalizations:</p><ul class="lista">{{#surgeries}}<li>{{name}}</li>{{/surgeries}}{{^surgeries}}<li>No past surgeries or hospitalizations reported.</li>{{/surgeries}}</ul>
+<h2>Medical History</h2>
+<h3>This visit</h3>
+{{#encounter_questionnaires}}<div class="narrativa"><p class="narrativa-titulo">{{name}}</p><p>{{narrative}}</p></div>{{/encounter_questionnaires}}{{^encounter_questionnaires}}<p class="nota">No questionnaires answered in this visit.</p>{{/encounter_questionnaires}}
+<h3>Patient history</h3>
+{{#history_questionnaires}}<div class="narrativa"><p class="narrativa-titulo">{{name}}<span>Completed on {{completed_at}}</span></p><p>{{narrative}}</p></div>{{/history_questionnaires}}{{^history_questionnaires}}<p class="nota">No history questionnaires answered.</p>{{/history_questionnaires}}
+<h3>Conditions, allergies and surgeries</h3>
+<table class="tabla">
+<thead><tr><th style="width:19%">Type</th><th>Description</th><th style="width:13%">Since</th><th style="width:11%">Status</th><th style="width:28%">Notes</th></tr></thead>
+<tbody>{{#patient_conditions}}<tr><td>{{type}}</td><td>{{description}}{{#severity}}<span class="sub"><b>Severity:</b> {{severity}}</span>{{/severity}}{{#reactions}}<span class="sub"><b>Reaction:</b> {{name}}</span>{{/reactions}}</td><td>{{start_date}}</td><td>{{status}}</td><td>{{note}}</td></tr>{{/patient_conditions}}
+{{^patient_conditions}}<tr><td class="vacio" colspan="5">Patient reports no known medical conditions, allergies or surgeries.</td></tr>{{/patient_conditions}}</tbody>
+</table>
+<h3>Medications</h3>
+<table class="tabla">
+<thead><tr><th>Medication</th><th style="width:30%">Directions</th><th style="width:13%">Since</th><th style="width:11%">Status</th></tr></thead>
+<tbody>{{#patient_medications}}<tr><td>{{drug_brand}} ({{drug}}) {{strength}} {{strength_unit}}<span class="sub">{{dosage_form}}</span></td><td>{{dose}} {{dose_unit}} {{route}}, {{frequency}}</td><td>{{start_date}}</td><td>{{status}}</td></tr>{{/patient_medications}}
+{{^patient_medications}}<tr><td class="vacio" colspan="4">Patient reports no current medications.</td></tr>{{/patient_medications}}</tbody>
+</table>
 </section>
+{{#has_vitals}}<section>
+<h2>Vitals</h2>
+<dl class="cuadros">{{#vitals}}<div><dt>{{observation}}</dt><dd>{{value}} {{measure}}</dd></div>{{/vitals}}</dl>{{^vitals}}<p class="nota">No vitals recorded.</p>{{/vitals}}
+<p>{{#vitals_notes}}<b>Notes:</b> {{vitals_notes}}{{/vitals_notes}}</p>
+</section>{{/has_vitals}}
+{{#has_exams}}<section>
+<h2>Exams and findings</h2>
+{{#exams}}<div class="grupo"><p class="grupo-titulo"><span>{{exam_type}}</span></p><table class="tabla">
+<thead><tr><th>Finding</th><th style="width:14%">Area</th><th style="width:11%">Result</th><th style="width:34%">Notes</th></tr></thead>
+<tbody>{{#exam_findings}}<tr><td>{{description}}{{#descriptors}}<span class="sub"><b>{{name}}:</b> {{answer}}</span>{{/descriptors}}</td><td>{{anatomic_area}}</td><td>{{status}}</td><td>{{note}}</td></tr>{{/exam_findings}}
+{{^exam_findings}}<tr><td class="vacio" colspan="4">No findings recorded.</td></tr>{{/exam_findings}}</tbody>
+</table><p class="grupo-nota">{{#review}}<b>Review:</b> {{review}}{{/review}}</p></div>{{/exams}}
+</section>{{/has_exams}}
+{{#has_periodontal_measures}}<section>
+<h2>Periodontal measures</h2>
+<table class="tabla">
+<thead><tr><th style="width:12%">Tooth</th><th style="width:14%">Surface</th><th>Measure</th><th class="der" style="width:14%">Value</th></tr></thead>
+<tbody>{{#periodontal_measures}}<tr><td>{{tooth}}</td><td>{{surface}}</td><td>{{measure}}</td><td class="der">{{value}}</td></tr>{{/periodontal_measures}}
+{{^periodontal_measures}}<tr><td class="vacio" colspan="4">No significant measures.</td></tr>{{/periodontal_measures}}</tbody>
+</table>
+<p class="nota">Only clinically significant measures: probing depth of 4 mm or more, gingival recession of 1 mm or more and gingival overgrowth.</p>
+</section>{{/has_periodontal_measures}}
+{{#has_procedures}}<section>
+<h2>Procedures performed</h2>
+<table class="tabla">
+<thead><tr><th style="width:9%">Code</th><th>Description</th><th style="width:12%">Area</th><th style="width:13%">Status</th></tr></thead>
+<tbody>{{#procedures}}<tr><td>{{code}}</td><td>{{description}}{{#findings}}<span class="sub"><b>Finding:</b> {{description}}</span>{{/findings}}{{#diagnoses}}<span class="sub"><b>Diagnosis:</b> {{code}} · {{description}}</span>{{/diagnoses}}</td><td>{{anatomic_area}}</td><td>{{status}}</td></tr>{{/procedures}}
+{{^procedures}}<tr><td class="vacio" colspan="4">No procedures performed.</td></tr>{{/procedures}}</tbody>
+</table>
+</section>{{/has_procedures}}
+{{#has_treatment_cases}}<section>
+<h2>Treatment plan</h2>
+{{#treatment_cases}}<div class="grupo"><p class="grupo-titulo"><span>{{name}} · {{case_type}}{{#recommended}} · Recommended{{/recommended}}</span><span class="grupo-detalle">{{status}} · {{total}}</span></p><table class="tabla">
+<thead><tr><th style="width:8%">Visit</th><th style="width:9%">Code</th><th>Description</th><th style="width:12%">Area</th><th style="width:12%">Status</th></tr></thead>
+<tbody>{{#case_procedures}}<tr><td>{{visit}}</td><td>{{code}}</td><td>{{description}}{{#findings}}<span class="sub"><b>Finding:</b> {{description}}</span>{{/findings}}{{#diagnoses}}<span class="sub"><b>Diagnosis:</b> {{code}} · {{description}}</span>{{/diagnoses}}</td><td>{{anatomic_area}}</td><td>{{status}}</td></tr>{{/case_procedures}}
+{{^case_procedures}}<tr><td class="vacio" colspan="5">No procedures.</td></tr>{{/case_procedures}}</tbody>
+</table></div>{{/treatment_cases}}
+<p>{{#treatment_discussion}}<b>Discussion:</b> {{treatment_discussion}}{{/treatment_discussion}}</p>
+</section>{{/has_treatment_cases}}
+{{#has_prescriptions}}<section>
+<h2>Prescriptions</h2>
+{{#prescriptions}}<div class="tarjeta"><p class="tarjeta-titulo">Prescription · {{status}}</p><dl class="campos"><div><dt>Medications:</dt> <dd>{{#medications}}<span class="linea">{{drug_brand}} ({{drug}}) {{strength}} {{strength_unit}} {{dosage_form}}: {{dose}} {{dose_unit}}, {{frequency}}, for {{duration_number}} {{duration_unit}}</span>{{/medications}}</dd></div><div><dt>Indications:</dt> <dd>{{indications}}</dd></div></dl></div>{{/prescriptions}}
+</section>{{/has_prescriptions}}
+{{#has_lab_orders}}<section>
+<h2>Lab orders</h2>
+{{#lab_orders}}<div class="tarjeta"><p class="tarjeta-titulo">{{laboratory}} · {{status}}</p><dl class="campos"><div><dt>Work requested:</dt> <dd>{{work_requested}}</dd></div><div><dt>Procedures:</dt> <dd>{{#lab_treatments}}<span class="linea">{{cdt_code}} {{description}} · {{anatomic_area}} · {{treatment_plan}}</span>{{/lab_treatments}}</dd></div><div><dt>Special instructions:</dt> <dd>{{special_instructions}}</dd></div><div><dt>ASAP:</dt> <dd>{{asap}}</dd></div><div><dt>Mandatory to continue treatment:</dt> <dd>{{mandatory_to_continue_treatment}}</dd></div><div><dt>Expiration date:</dt> <dd>{{expiration_date}}</dd></div><div><dt>Documents sent:</dt> <dd>{{document_sent}}</dd></div></dl></div>{{/lab_orders}}
+</section>{{/has_lab_orders}}
+{{#has_referrals}}<section>
+<h2>Referrals</h2>
+{{#referrals}}<div class="tarjeta"><p class="tarjeta-titulo">{{referral}} · {{specialties}} · {{status}}</p><dl class="campos"><div><dt>Procedures:</dt> <dd>{{#referral_procedures}}<span class="linea">{{cdt_code}} {{description}} · {{anatomic_area}}</span>{{/referral_procedures}}</dd></div><div><dt>Notes:</dt> <dd>{{notes}}</dd></div><div><dt>Documents sent:</dt> <dd>{{document_sent}}</dd></div></dl></div>{{/referrals}}
+</section>{{/has_referrals}}
+{{#has_workflows}}<section>
+<h2>Workflows</h2>
+{{#workflows}}<div class="narrativa"><p class="narrativa-titulo">{{workflow_name}}<span>{{workflow_type}}</span></p><p>{{narrative}}</p></div>{{/workflows}}
+</section>{{/has_workflows}}
 <section>
-<h2><span>2</span>Additional Notes</h2>
+<h2>Additional Notes</h2>
 <div class="prosa">{{{clinical_notes_html}}}</div>
 </section>
 <div class="firmas"><div class="firma">
@@ -111,6 +213,11 @@ h2 span { color: #1d56bc; font-weight: 600; }
 <b>{{provider_name}} · Provider</b>
 <span>{{#provider_signed_date}}Signed electronically · {{provider_signed_date}}{{/provider_signed_date}}{{^provider_signed_date}}Not signed yet{{/provider_signed_date}}</span>
 </div></div>
+{{#has_addenda}}<section>
+<h2>Addenda</h2>
+<p class="nota">Added after the note was signed. They do not change the signed note.</p>
+{{#addenda}}<div class="narrativa"><p class="narrativa-titulo">Addendum by {{author}}<span>{{created_at}}</span></p><p>{{text}}<span class="firmado">Signed electronically by {{author}} · {{signed_date}}</span></p></div>{{/addenda}}
+</section>{{/has_addenda}}
 <footer class="pie-pantalla"><span>{{practice_name}} · Dental clinical note · {{patient_name}}</span></footer>
 </main>
 </body>

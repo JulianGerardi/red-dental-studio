@@ -4,8 +4,8 @@ import { expect } from 'e2e'
 /* PDFs: la página aparte con las plantillas de los PDF del backend (/pdfs/, fuera de la app). Ver design-reference/figma/modulos/pdfs.md (2026-11-25). */
 
 test('Elegir un PDF muestra cuándo se genera, de dónde sale el diseño, sus variables y sus listas', async ({ app, screen }) => {
-  await app.open('/pdfs/')
-  await expect(screen.getByRole('heading', /^Clinical note$/)).toBeVisible()
+  await app.open('/pdfs/#lab-order')
+  await expect(screen.getByRole('heading', /^Lab order$/)).toBeVisible()
   await expect(screen.getByText(/^Same as the app$/)).toBeVisible()
 
   await screen.getByRole('link', /^Prescription/).tap()
@@ -36,4 +36,11 @@ test('Los PDF sin firmas no muestran el selector de firma', async ({ app, screen
   await app.open('/pdfs/#lab-order')
   await expect(screen.getByRole('heading', /^Lab order$/)).toBeVisible()
   await expect(screen.getByRole('tab', 'Signed')).not.toBeVisible()
+})
+
+test('La nota clínica arma una sección por evento del encounter y las adendas van después de la firma', async ({ app, screen }) => {
+  await app.open('/pdfs/#clinical-note')
+  await expect(screen.getByRole('heading', /^Clinical note$/)).toBeVisible()
+  await expect(screen.getByText(/^\{\{has_vitals\}\}$/)).toBeVisible()
+  await expect(screen.getByText(/^\{\{#addenda\}\}$/)).toBeVisible()
 })

@@ -3,7 +3,7 @@
    consentimientos de aceptación y de rechazo del caso). `origen`: 'app' es la hoja que ya muestra la app (mismo
    contenido), 'propuesta' la armamos con los campos de Jira y espera el ok. Detalle en
    design-reference/figma/modulos/pdfs.md. */
-import { armarHoja, type Datos, type Firma, type Hoja } from './marco.ts'
+import { armarHoja, type Bloque, type Columna, type Datos, type Firma, type Hoja } from './marco.ts'
 
 export type Categoria = 'Clinical records' | 'Orders' | 'Treatment & consent'
 export type Origen = 'app' | 'propuesta'
@@ -58,6 +58,31 @@ const RECONOCIMIENTOS = [
   'I understand that I may choose to decline the proposed treatment.',
   'I voluntarily consent to the proposed treatment.',
 ]
+/* La descripción del procedimiento con sus findings y diagnósticos debajo, como los trae el evento del caso (CON-2204):
+   el treatment plan y los consentimientos los muestran (pedido de Julián, 2026-11-27). */
+const CELDA_PROCEDIMIENTO = '{{description}}{{#findings}}<span class="sub"><b>Finding:</b> {{description}}</span>{{/findings}}{{#diagnoses}}<span class="sub"><b>Diagnosis:</b> {{code}} · {{description}}</span>{{/diagnoses}}'
+const COLS_PROCEDIMIENTO: Columna[] = [
+  { titulo: 'Code', valor: '{{code}}', ancho: '9%' }, { titulo: 'Description', valor: CELDA_PROCEDIMIENTO }, { titulo: 'Area', valor: '{{anatomic_area}}', ancho: '12%' },
+]
+/* Los importes con los nombres de Estimate details (EstimateDetails): lo cobrado, lo del seguro, el ajuste del plan y lo
+   del paciente suman el fee. La última fila de `importes` es lo que paga el paciente. */
+const COLS_IMPORTES: Columna[] = [
+  { titulo: 'Fee', valor: '{{fee}}', derecha: true, ancho: '10.5%' }, { titulo: 'Insurance', valor: '{{insurance_portion}}', derecha: true, ancho: '10.5%' },
+  { titulo: 'Adjustment', valor: '{{insurance_adjustment}}', derecha: true, ancho: '11.5%' }, { titulo: 'Patient', valor: '{{patient_portion}}', derecha: true, ancho: '10.5%' },
+]
+const IMPORTES: Bloque = {
+  tipo: 'importes',
+  filas: [['Plan case total', '{{case_total}}'], ['Insurance portion', '{{total_insurance_portion}}'], ['Insurance adjustments', '{{total_insurance_adjustments}}'], ['Patient portion', '{{total_patient_portion}}']],
+  nota: 'The patient portion includes {{deductible_applied}} of deductible. Estimates are not a guarantee of coverage or payment. Final insurance benefits and patient responsibility may vary.',
+}
+
+/* El caso del ejemplo (Restorative plan), con los importes que calcula Estimate details (data/estimaciones): cobertura
+   del 100 % en D1, 80 % en D2-D4, 85 % permitido y $50 de deducible. Fee = seguro + ajuste + paciente. */
+const PROC_ENDODONCIA = { code: 'D3330', description: 'Endodontic therapy, molar tooth', anatomic_area: '19', fee: '$1,100.00', insurance_portion: '$708.00', insurance_adjustment: '$165.00', patient_portion: '$227.00', findings: [{ description: 'Periapical radiolucency' }], diagnoses: [{ code: 'K04.5', description: 'Chronic apical periodontitis' }] }
+const PROC_PROFILAXIS = { code: 'D1110', description: 'Prophylaxis, adult', anatomic_area: 'Full mouth', fee: '$80.00', insurance_portion: '$72.00', insurance_adjustment: '$8.00', patient_portion: '$0.00', findings: [], diagnoses: [] }
+const PROC_CORONA = { code: 'D2740', description: 'Crown, porcelain/ceramic', anatomic_area: '19', fee: '$1,250.00', insurance_portion: '$850.00', insurance_adjustment: '$187.50', patient_portion: '$212.50', findings: [{ description: 'Deep caries' }], diagnoses: [{ code: 'K02.52', description: 'Dental caries penetrating into dentin' }] }
+const TOTALES_CASO = { case_total: '$2,430.00', total_insurance_portion: '$1,630.00', total_insurance_adjustments: '$360.50', total_patient_portion: '$439.50', deductible_applied: '$50.00' }
+
 /* El texto del consentimiento sale del template de Settings › Consents (HTML del editor). */
 const TEXTO_TEMPLATE = '<p>Your provider explained the treatment described above, why it is recommended, what it involves and what you can expect afterwards.</p><ul><li>Results can vary from patient to patient.</li><li>Follow the care instructions your provider gives you.</li></ul>'
 
@@ -66,38 +91,197 @@ export const PDFS: Pdf[] = [
     id: 'clinical-note',
     categoria: 'Clinical records',
     nombre: 'Clinical note',
-    cuando: 'View PDF in a clinical note (Pending tasks, Clinical Mode history, patient documents).',
-    firma: 'The provider who attended the visit.',
-    origen: 'app',
-    jira: ['CON-2641', 'CON-2643', 'CON-4115'],
+    cuando: 'Generate Clinical Note in Clinical Mode (as many times as needed until it is signed), or on its own when the encounter closes after 48 hours. View PDF in Pending tasks, Treatment history and patient documents.',
+    firma: 'The provider who attended the visit. Addenda are signed by their author.',
+    origen: 'propuesta',
+    completado: [
+      'Sections from the encounter events: one per event type (CON-2617), only when something happened in the visit',
+      'Medical History grouped as CON-3605',
+      'Addenda after the signature (CON-2730)',
+    ],
+    jira: ['CON-2728', 'CON-2816', 'CON-2617', 'CON-3605', 'CON-1619', 'CON-2055', 'CON-2191', 'CON-2198', 'CON-2199', 'CON-2204', 'CON-2614', 'CON-2615', 'CON-2616', 'CON-2620', 'CON-2621', 'CON-2772', 'CON-2730', 'CON-2937', 'CON-2641', 'CON-2643', 'CON-4115'],
     hoja: {
       tipo: 'Dental clinical note',
       titulo: '{{patient_name}}',
       meta: ['Date of visit', '{{visit_date}}'],
+      aviso: '{{#auto_generated}}<p class="aviso">Generated automatically when the encounter closed after 48 hours without activity. Workflow narratives are not included.</p>{{/auto_generated}}',
       resumen: [
         ['Patient name', '{{patient_name}}'], ['Date of birth', '{{patient_birth_date}}'], ['Date of visit', '{{visit_date}} — {{visit_time}}'],
-        ['Attending dentist', '{{provider_name}}'], ['Contact', '{{patient_phone}}'],
+        ['Attending dentist', '{{provider_name}}'], ['Location', '{{location_name}}'], ['Contact', '{{patient_phone}}'],
       ],
       secciones: [
         { titulo: 'Medical History', bloques: [
-          { tipo: 'lista', rotulo: 'Past medical conditions:', lista: 'medical_conditions', valor: '{{name}}', vacio: 'Patient reports no known medical conditions.' },
-          { tipo: 'lista', rotulo: 'Current medications:', lista: 'current_medications', valor: '{{name}}', vacio: 'Patient reports no current medications.' },
-          { tipo: 'lista', rotulo: 'Known allergies:', lista: 'allergies', valor: '{{name}}', vacio: 'No known allergies reported.' },
-          { tipo: 'lista', rotulo: 'Past surgeries and/or hospitalizations:', lista: 'surgeries', valor: '{{name}}', vacio: 'No past surgeries or hospitalizations reported.' },
+          { tipo: 'subtitulo', texto: 'This visit' },
+          { tipo: 'narrativas', lista: 'encounter_questionnaires', titulo: '{{name}}', texto: '{{narrative}}', vacio: 'No questionnaires answered in this visit.' },
+          { tipo: 'subtitulo', texto: 'Patient history' },
+          { tipo: 'narrativas', lista: 'history_questionnaires', titulo: '{{name}}', detalle: 'Completed on {{completed_at}}', texto: '{{narrative}}', vacio: 'No history questionnaires answered.' },
+          { tipo: 'subtitulo', texto: 'Conditions, allergies and surgeries' },
+          { tipo: 'tabla', lista: 'patient_conditions', vacio: 'Patient reports no known medical conditions, allergies or surgeries.', columnas: [
+            { titulo: 'Type', valor: '{{type}}', ancho: '19%' },
+            { titulo: 'Description', valor: '{{description}}{{#severity}}<span class="sub"><b>Severity:</b> {{severity}}</span>{{/severity}}{{#reactions}}<span class="sub"><b>Reaction:</b> {{name}}</span>{{/reactions}}' },
+            { titulo: 'Since', valor: '{{start_date}}', ancho: '13%' }, { titulo: 'Status', valor: '{{status}}', ancho: '11%' }, { titulo: 'Notes', valor: '{{note}}', ancho: '28%' },
+          ] },
+          { tipo: 'subtitulo', texto: 'Medications' },
+          { tipo: 'tabla', lista: 'patient_medications', vacio: 'Patient reports no current medications.', columnas: [
+            { titulo: 'Medication', valor: '{{drug_brand}} ({{drug}}) {{strength}} {{strength_unit}}<span class="sub">{{dosage_form}}</span>' },
+            { titulo: 'Directions', valor: '{{dose}} {{dose_unit}} {{route}}, {{frequency}}', ancho: '30%' },
+            { titulo: 'Since', valor: '{{start_date}}', ancho: '13%' }, { titulo: 'Status', valor: '{{status}}', ancho: '11%' },
+          ] },
+        ] },
+        { titulo: 'Vitals', si: 'has_vitals', bloques: [
+          { tipo: 'cuadros', lista: 'vitals', rotulo: '{{observation}}', valor: '{{value}} {{measure}}', vacio: 'No vitals recorded.' },
+          { tipo: 'texto', texto: '{{#vitals_notes}}<b>Notes:</b> {{vitals_notes}}{{/vitals_notes}}' },
+        ] },
+        { titulo: 'Exams and findings', si: 'has_exams', bloques: [
+          { tipo: 'grupos', lista: 'exams', titulo: '{{exam_type}}', nota: '{{#review}}<b>Review:</b> {{review}}{{/review}}', tabla: { lista: 'exam_findings', vacio: 'No findings recorded.', columnas: [
+            { titulo: 'Finding', valor: '{{description}}{{#descriptors}}<span class="sub"><b>{{name}}:</b> {{answer}}</span>{{/descriptors}}' },
+            { titulo: 'Area', valor: '{{anatomic_area}}', ancho: '14%' }, { titulo: 'Result', valor: '{{status}}', ancho: '11%' }, { titulo: 'Notes', valor: '{{note}}', ancho: '34%' },
+          ] } },
+        ] },
+        { titulo: 'Periodontal measures', si: 'has_periodontal_measures', bloques: [
+          { tipo: 'tabla', lista: 'periodontal_measures', vacio: 'No significant measures.', columnas: [
+            { titulo: 'Tooth', valor: '{{tooth}}', ancho: '12%' }, { titulo: 'Surface', valor: '{{surface}}', ancho: '14%' }, { titulo: 'Measure', valor: '{{measure}}' }, { titulo: 'Value', valor: '{{value}}', derecha: true, ancho: '14%' },
+          ] },
+          { tipo: 'nota', texto: 'Only clinically significant measures: probing depth of 4 mm or more, gingival recession of 1 mm or more and gingival overgrowth.' },
+        ] },
+        { titulo: 'Procedures performed', si: 'has_procedures', bloques: [
+          { tipo: 'tabla', lista: 'procedures', vacio: 'No procedures performed.', columnas: [...COLS_PROCEDIMIENTO, { titulo: 'Status', valor: '{{status}}', ancho: '13%' }] },
+        ] },
+        { titulo: 'Treatment plan', si: 'has_treatment_cases', bloques: [
+          { tipo: 'grupos', lista: 'treatment_cases', titulo: '{{name}} · {{case_type}}{{#recommended}} · Recommended{{/recommended}}', detalle: '{{status}} · {{total}}', tabla: { lista: 'case_procedures', vacio: 'No procedures.', columnas: [
+            { titulo: 'Visit', valor: '{{visit}}', ancho: '8%' }, ...COLS_PROCEDIMIENTO, { titulo: 'Status', valor: '{{status}}', ancho: '12%' },
+          ] } },
+          { tipo: 'texto', texto: '{{#treatment_discussion}}<b>Discussion:</b> {{treatment_discussion}}{{/treatment_discussion}}' },
+        ] },
+        { titulo: 'Prescriptions', si: 'has_prescriptions', bloques: [
+          { tipo: 'tarjetas', lista: 'prescriptions', titulo: 'Prescription · {{status}}', campos: [
+            ['Medications', '{{#medications}}<span class="linea">{{drug_brand}} ({{drug}}) {{strength}} {{strength_unit}} {{dosage_form}}: {{dose}} {{dose_unit}}, {{frequency}}, for {{duration_number}} {{duration_unit}}</span>{{/medications}}'],
+            ['Indications', '{{indications}}'],
+          ] },
+        ] },
+        { titulo: 'Lab orders', si: 'has_lab_orders', bloques: [
+          { tipo: 'tarjetas', lista: 'lab_orders', titulo: '{{laboratory}} · {{status}}', campos: [
+            ['Work requested', '{{work_requested}}'],
+            ['Procedures', '{{#lab_treatments}}<span class="linea">{{cdt_code}} {{description}} · {{anatomic_area}} · {{treatment_plan}}</span>{{/lab_treatments}}'],
+            ['Special instructions', '{{special_instructions}}'], ['ASAP', '{{asap}}'], ['Mandatory to continue treatment', '{{mandatory_to_continue_treatment}}'],
+            ['Expiration date', '{{expiration_date}}'], ['Documents sent', '{{document_sent}}'],
+          ] },
+        ] },
+        { titulo: 'Referrals', si: 'has_referrals', bloques: [
+          { tipo: 'tarjetas', lista: 'referrals', titulo: '{{referral}} · {{specialties}} · {{status}}', campos: [
+            ['Procedures', '{{#referral_procedures}}<span class="linea">{{cdt_code}} {{description}} · {{anatomic_area}}</span>{{/referral_procedures}}'],
+            ['Notes', '{{notes}}'], ['Documents sent', '{{document_sent}}'],
+          ] },
+        ] },
+        { titulo: 'Workflows', si: 'has_workflows', bloques: [
+          { tipo: 'narrativas', lista: 'workflows', titulo: '{{workflow_name}}', detalle: '{{workflow_type}}', texto: '{{narrative}}' },
         ] },
         { titulo: 'Additional Notes', bloques: [{ tipo: 'html', variable: 'clinical_notes_html' }] },
       ],
       firmas: [PROVIDER],
+      posdata: [
+        { titulo: 'Addenda', si: 'has_addenda', bloques: [
+          { tipo: 'nota', texto: 'Added after the note was signed. They do not change the signed note.' },
+          { tipo: 'narrativas', lista: 'addenda', titulo: 'Addendum by {{author}}', detalle: '{{created_at}}', texto: '{{text}}<span class="firmado">Signed electronically by {{author}} · {{signed_date}}</span>' },
+        ] },
+      ],
       pie: 'Dental clinical note',
     },
     ejemplo: {
       visit_date: 'November 25, 2026', visit_time: '09:00 AM to 09:45 AM',
-      medical_conditions: [{ name: 'Hypertension, controlled with medication.' }],
-      current_medications: [{ name: 'Amoxicillin 500 mg, once daily.' }, { name: 'Ibuprofen 400 mg, as needed.' }],
-      allergies: [],
-      surgeries: [],
+      auto_generated: false,
+      encounter_questionnaires: [
+        { name: 'Chief Complaint', narrative: 'Patient reports throbbing pain in the lower left back tooth for five days, worse when chewing and with cold drinks.' },
+        { name: 'Triage', narrative: 'Pain severity: 7/10. No facial swelling reported. Patient denies fever or difficulty swallowing.' },
+      ],
+      history_questionnaires: [
+        { name: 'Dental and Oral Health History', completed_at: 'November 20, 2026 at 10:12 AM', narrative: 'Patient reports occasional gum bleeding during brushing and sensitivity to cold. Last dental visit two years ago.' },
+        { name: 'Family History', completed_at: 'November 20, 2026 at 10:15 AM', narrative: 'Patient reports a family history of diabetes in mother and hypertension in father.' },
+        { name: 'Social History', completed_at: 'November 20, 2026 at 10:16 AM', narrative: 'Patient reports no tobacco use and occasional alcohol consumption.' },
+      ],
+      patient_conditions: [
+        { type: 'Medical condition', description: 'Hypertension', start_date: 'March 2019', status: 'Active', note: 'Controlled with medication.', severity: '', reactions: [] },
+        { type: 'Allergy', description: 'Latex', start_date: '2015', status: 'Active', note: 'Use nitrile gloves.', severity: 'Mild', reactions: [{ name: 'Skin rash' }] },
+        { type: 'Surgery', description: 'Appendectomy', start_date: '2012', status: 'Resolved', note: '', severity: '', reactions: [] },
+      ],
+      patient_medications: [
+        { drug_brand: 'Zestril', drug: 'Lisinopril', strength: '10', strength_unit: 'mg', dosage_form: 'Tablet', dose: '1', dose_unit: 'tablet', route: 'oral', frequency: 'once daily', start_date: 'March 2019', status: 'Active' },
+      ],
+      has_vitals: true,
+      vitals: [
+        { observation: 'Blood pressure', value: '128/82', measure: 'mmHg' }, { observation: 'Heart rate', value: '74', measure: 'bpm' },
+        { observation: 'Temperature', value: '98.4', measure: '°F' }, { observation: 'Respiration', value: '16', measure: 'bpm' },
+        { observation: 'SpO2', value: '98', measure: '%' }, { observation: 'Weight', value: '187', measure: 'lb' },
+      ],
+      vitals_notes: 'Taken seated, before local anesthesia.',
+      has_exams: true,
+      exams: [
+        { exam_type: 'Review of Systems', review: '', exam_findings: [
+          { description: 'Hypertension', anatomic_area: '—', status: 'Positive', note: 'Controlled with medication.', descriptors: [] },
+          { description: 'Diabetes', anatomic_area: '—', status: 'Negative', note: '', descriptors: [] },
+        ] },
+        { exam_type: 'Intra Oral', review: 'Pain to percussion and to cold on #19; lingering more than 30 seconds.', exam_findings: [
+          { description: 'Deep caries', anatomic_area: '19 (O, D)', status: '—', note: 'Caries close to the pulp.', descriptors: [{ name: 'Extent', answer: 'Deep' }] },
+          { description: 'Gingival inflammation', anatomic_area: 'Lower left', status: '—', note: '', descriptors: [{ name: 'Severity', answer: 'Mild' }] },
+        ] },
+        { exam_type: 'Radiographic', review: 'Periapical image of #19 taken today.', exam_findings: [
+          { description: 'Periapical radiolucency', anatomic_area: '19', status: '—', note: 'Consistent with chronic apical periodontitis.', descriptors: [] },
+        ] },
+      ],
+      has_periodontal_measures: true,
+      periodontal_measures: [
+        { tooth: '18', surface: 'Distobuccal', measure: 'Probing depth', value: '5 mm' },
+        { tooth: '19', surface: 'Buccal', measure: 'Probing depth', value: '6 mm' },
+        { tooth: '19', surface: 'Lingual', measure: 'Gingival recession', value: '2 mm' },
+      ],
+      has_procedures: true,
+      procedures: [
+        { code: 'D0140', description: 'Limited oral evaluation – problem focused', anatomic_area: 'Full mouth', status: 'Completed', findings: [], diagnoses: [] },
+        { code: 'D0220', description: 'Intraoral – periapical first radiographic image', anatomic_area: '19', status: 'Completed', findings: [], diagnoses: [] },
+        { code: 'D3221', description: 'Pulpal debridement, primary and permanent teeth', anatomic_area: '19', status: 'Completed', findings: [{ description: 'Deep caries' }], diagnoses: [{ code: 'K04.5', description: 'Chronic apical periodontitis' }] },
+      ],
+      has_treatment_cases: true,
+      treatment_cases: [
+        { name: 'Restorative plan', case_type: 'Restorative', recommended: true, status: 'Presented', total: '$2,430.00', case_procedures: [
+          { visit: '1', code: 'D3330', description: 'Endodontic therapy, molar tooth', anatomic_area: '19', status: 'Referred', findings: [{ description: 'Periapical radiolucency' }], diagnoses: [{ code: 'K04.5', description: 'Chronic apical periodontitis' }] },
+          { visit: '1', code: 'D1110', description: 'Prophylaxis, adult', anatomic_area: 'Full mouth', status: 'Planned', findings: [], diagnoses: [] },
+          { visit: '2', code: 'D2740', description: 'Crown, porcelain/ceramic', anatomic_area: '19', status: 'Planned', findings: [{ description: 'Deep caries' }], diagnoses: [{ code: 'K02.52', description: 'Dental caries penetrating into dentin' }] },
+        ] },
+        { name: 'Extraction and implant', case_type: 'Surgical', recommended: false, status: 'Presented', total: '$2,350.00', case_procedures: [
+          { visit: '1', code: 'D7140', description: 'Extraction, erupted tooth', anatomic_area: '19', status: 'Planned', findings: [{ description: 'Periapical radiolucency' }], diagnoses: [{ code: 'K04.5', description: 'Chronic apical periodontitis' }] },
+          { visit: '2', code: 'D6010', description: 'Implant body, endosteal', anatomic_area: '19', status: 'Planned', findings: [], diagnoses: [] },
+        ] },
+      ],
+      treatment_discussion: 'Both options explained. Patient prefers to keep the tooth and will decide after the endodontic evaluation.',
+      has_prescriptions: true,
+      prescriptions: [
+        { status: 'Active', indications: 'Take after meals. Stop ibuprofen if stomach pain appears.', medications: [
+          { drug_brand: 'Amoxil', drug: 'Amoxicillin', strength: '500', strength_unit: 'mg', dosage_form: 'capsule', dose: '1', dose_unit: 'capsule', frequency: 'every 8 hours', duration_number: '7', duration_unit: 'days' },
+          { drug_brand: 'Advil', drug: 'Ibuprofen', strength: '400', strength_unit: 'mg', dosage_form: 'tablet', dose: '1', dose_unit: 'tablet', frequency: 'every 6 hours', duration_number: '3', duration_unit: 'days' },
+        ] },
+      ],
+      has_lab_orders: true,
+      lab_orders: [
+        { laboratory: 'Olivos Laboratory', status: 'Requested', work_requested: 'Zirconia crown, shade A2.', special_instructions: 'Send the try-in before final glazing.', asap: 'No', mandatory_to_continue_treatment: 'Yes', expiration_date: 'December 9, 2026', document_sent: 'Yes', lab_treatments: [
+          { cdt_code: 'D2740', description: 'Crown, porcelain/ceramic', anatomic_area: '19', treatment_plan: 'Restorative plan' },
+        ] },
+      ],
+      has_referrals: true,
+      referrals: [
+        { referral: 'Dr. Mark Bennett', specialties: 'Endodontics', status: 'Sent', notes: 'Please evaluate #19 for root canal treatment before we place the crown.', document_sent: 'Yes', referral_procedures: [
+          { cdt_code: 'D3330', description: 'Endodontic therapy, molar tooth', anatomic_area: '19' },
+        ] },
+      ],
+      has_workflows: true,
+      workflows: [
+        { workflow_name: 'Local anesthesia', workflow_type: 'Procedure', narrative: 'Inferior alveolar nerve block with 1.7 ml of 2% lidocaine with 1:100,000 epinephrine. Aspiration negative. Patient tolerated the procedure well.' },
+      ],
       clinical_notes_html: '<p>Patient responsibilities were discussed including but not limited to daily care, use/misuse, regular maintenance appointments, and routine examination of underlying oral tissues.</p><p>The patient was discharged to return home in satisfactory condition.</p>',
       ...FIRMADO_PROVIDER,
+      has_addenda: true,
+      addenda: [
+        { author: 'Elena Martinez', created_at: 'November 26, 2026 at 8:40 AM', text: 'Patient called: pain went down to 2/10. Continue the antibiotic as prescribed.', signed_date: 'November 26, 2026' },
+      ],
     },
   },
   {
@@ -197,7 +381,7 @@ export const PDFS: Pdf[] = [
       titulo: '{{patient_name}}',
       meta: ['Expiration date', '{{expiration_date}}'],
       resumen: [
-        ['Provider', '{{provider_name}}'], ['Lab Order ID', '{{lab_order_id}}'], ['Patient Phone', '{{patient_phone}}'],
+        ['Provider', '{{provider_name}}'], ['Laboratory', '{{lab_name}}'], ['Patient Phone', '{{patient_phone}}'],
         ['Email', '{{provider_email}}'], ['Expiration Date', '{{expiration_date}}'],
       ],
       secciones: [
@@ -210,7 +394,6 @@ export const PDFS: Pdf[] = [
       pie: 'Lab order',
     },
     ejemplo: {
-      lab_order_id: '4f1c2a9e-7b3d-4e21-9c55-1a8f0d6b3e72',
       expiration_date: 'December 9, 2026',
       lab_name: 'Olivos Laboratory', lab_phone: '+1 212 5550142', lab_email: 'orders@olivoslab.com', lab_address: '410 Park Ave, 3, New York, 10022, NY, US',
       work_request: 'Zirconia bridge, three units, shade B1.',
@@ -233,7 +416,7 @@ export const PDFS: Pdf[] = [
       meta: ['Issued', '{{issued_date}}'],
       resumen: [
         ['Patient', '{{patient_name}}'], ['Date of birth', '{{patient_birth_date}}'], ['Phone', '{{patient_phone}}'],
-        ['Prescriber', '{{provider_name}}'], ['Prescription ID', '{{prescription_id}}'], ['Expiration date', '{{expiration_date}}'],
+        ['Prescriber', '{{provider_name}}'], ['Expiration date', '{{expiration_date}}'],
       ],
       secciones: [
         { titulo: 'Medications', bloques: [{ tipo: 'tarjetas', lista: 'medications', titulo: '{{drug_name}} {{strength}} · {{dosage_form}}', campos: [
@@ -247,7 +430,7 @@ export const PDFS: Pdf[] = [
       pie: 'Prescription',
     },
     ejemplo: {
-      issued_date: 'November 25, 2026', prescription_id: 'RX-000184', expiration_date: 'May 25, 2027',
+      issued_date: 'November 25, 2026', expiration_date: 'May 25, 2027',
       medications: [
         { drug_name: 'Amoxicillin', strength: '500 mg', dosage_form: 'Capsule', dose: '1 capsule', route: 'oral', frequency: 'every 8 hours', duration: '7 days', quantity: '21', refills: '0', generic_substitution: 'Allowed', controlled_substance: 'No' },
         { drug_name: 'Ibuprofen', strength: '400 mg', dosage_form: 'Tablet', dose: '1 tablet', route: 'oral', frequency: 'every 6 hours', duration: '3 days', quantity: '12', refills: '0', generic_substitution: 'Allowed', controlled_substance: 'No' },
@@ -263,8 +446,8 @@ export const PDFS: Pdf[] = [
     cuando: 'PDF of a referral (Pending tasks, Clinical Mode, patient documents).',
     firma: 'The referring provider. It goes to the referred contact.',
     origen: 'propuesta',
-    completado: ['Layout: the app PDF only lists the task data', 'Fields from New Referral (CON-2322) and the provider type and specialty (CON-3128)'],
-    jira: ['CON-2322', 'CON-3033', 'CON-3128', 'CON-4115'],
+    completado: ['Layout: the app PDF only lists the task data', 'Fields from New Referral (CON-2322) and the provider type and specialty (CON-3128)', 'Findings and diagnoses of each procedure (CON-2616)', 'Attachments as annexes, one page each'],
+    jira: ['CON-2322', 'CON-3033', 'CON-3128', 'CON-2616', 'CON-4115'],
     hoja: {
       tipo: 'Referral',
       titulo: '{{patient_name}}',
@@ -278,23 +461,29 @@ export const PDFS: Pdf[] = [
           ['Name', '{{contact_name}}'], ['Provider type', '{{contact_type}}'], ['Specialty', '{{contact_specialty}}'],
           ['Phone', '{{contact_phone}}'], ['Email', '{{contact_email}}'], ['Address', '{{contact_address}}'],
         ] }] },
-        { titulo: 'Procedures to refer', bloques: [{ tipo: 'tabla', lista: 'procedures', vacio: 'No procedures selected.', columnas: [
-          { titulo: 'Code', valor: '{{code}}', ancho: '12%' }, { titulo: 'Description', valor: '{{description}}' },
-          { titulo: 'Tooth', valor: '{{tooth}}', ancho: '10%' }, { titulo: 'Surface', valor: '{{surface}}', ancho: '12%' },
-        ] }] },
+        { titulo: 'Procedures to refer', bloques: [{ tipo: 'tabla', lista: 'procedures', vacio: 'No procedures selected.', columnas: COLS_PROCEDIMIENTO }] },
         { titulo: 'Referral note', bloques: [{ tipo: 'texto', texto: '{{referral_note}}' }] },
-        { titulo: 'Attachments', bloques: [{ tipo: 'lista', lista: 'attachments', valor: '{{name}}', vacio: 'No attachments.' }] },
+        { titulo: 'Attachments', bloques: [
+          { tipo: 'tabla', lista: 'attachments', vacio: 'No attachments.', columnas: [
+            { titulo: 'Annex', valor: '{{annex_label}}', ancho: '12%' }, { titulo: 'File', valor: '{{name}}' }, { titulo: 'Type', valor: '{{file_type}}', ancho: '16%' },
+          ] },
+          { tipo: 'nota', texto: 'Each attachment follows this document as an annex, on its own page.' },
+        ] },
       ],
       firmas: [{ rol: 'Referring provider', prefijo: 'provider' }],
+      anexos: 'attachments',
       pie: 'Referral',
     },
     ejemplo: {
       created_date: 'November 25, 2026', asap: 'Yes', mandatory: 'Yes',
       contact_name: 'Dr. Mark Bennett', contact_type: 'Dentist', contact_specialty: 'Endodontics',
       contact_phone: '+1 646 5550110', contact_email: 'mbennett@rootcare.com', contact_address: '120 W 57th St, 8, New York, 10019, NY, US',
-      procedures: [{ code: 'D3330', description: 'Endodontic therapy, molar tooth', tooth: '19', surface: '—' }],
+      procedures: [{ code: 'D3330', description: 'Endodontic therapy, molar tooth', anatomic_area: '19', findings: [{ description: 'Periapical radiolucency' }], diagnoses: [{ code: 'K04.5', description: 'Chronic apical periodontitis' }] }],
       referral_note: 'Periapical radiolucency on #19. Please evaluate for root canal treatment before we place the crown.',
-      attachments: [{ name: 'Periapical_19.jpg' }, { name: 'Radiographic report.pdf' }],
+      attachments: [
+        { annex_label: 'A', name: 'Periapical_19.jpg', file_type: 'Image', is_image: true, file_url: '{{assets_url}}/sample-periapical.jpg' },
+        { annex_label: 'B', name: 'Radiographic report.pdf', file_type: 'PDF', is_image: false, file_url: '' },
+      ],
       ...FIRMADO_PROVIDER,
     },
   },
@@ -305,22 +494,19 @@ export const PDFS: Pdf[] = [
     cuando: 'When the case is presented to the patient; download from the treatment plan and patient documents.',
     firma: 'Not signed. The patient accepts it with the treatment acceptance consent.',
     origen: 'propuesta',
-    completado: ['The whole layout', 'The estimate disclaimer'],
-    jira: ['CON-1634', 'CON-2036', 'CON-1598', 'CON-4115'],
+    completado: ['The whole layout', 'Findings and diagnoses of each procedure (CON-2204)', 'Amounts and estimate disclaimer from Estimate details'],
+    jira: ['CON-1634', 'CON-2036', 'CON-1598', 'CON-2204', 'CON-3710', 'CON-4115'],
     hoja: {
       tipo: 'Treatment plan',
       titulo: '{{case_name}}',
       meta: ['Presented', '{{presented_date}}'],
       resumen: [...RESUMEN_PACIENTE, ['Provider', '{{provider_name}}'], ['Status', '{{case_status}}'], ['Insurance', '{{insurance_name}}']],
       secciones: [
-        { titulo: 'Procedures by visit', bloques: [{ tipo: 'grupos', lista: 'visits', titulo: '{{visit_name}}', total: '{{visit_total}}', tabla: { lista: 'procedures', vacio: 'No procedures.', columnas: [
-          { titulo: 'Code', valor: '{{code}}', ancho: '11%' }, { titulo: 'Description', valor: '{{description}}' }, { titulo: 'Tooth', valor: '{{tooth}}', ancho: '9%' },
-          { titulo: 'Fee', valor: '{{fee}}', derecha: true, ancho: '13%' }, { titulo: 'Insurance', valor: '{{insurance_estimate}}', derecha: true, ancho: '13%' }, { titulo: 'Patient', valor: '{{patient_estimate}}', derecha: true, ancho: '13%' },
-        ] } }] },
-        { titulo: 'Estimate', bloques: [
-          { tipo: 'campos', campos: [['Total fees', '{{total_fees}}'], ['Insurance estimate', '{{total_insurance_estimate}}'], ['Patient estimate', '{{total_patient_estimate}}']] },
-          { tipo: 'nota', texto: 'This is an estimate. What your insurance pays depends on your plan and may change.' },
-        ] },
+        { titulo: 'Procedures by visit', bloques: [{ tipo: 'grupos', lista: 'visits', titulo: '{{visit_name}}', tabla: {
+          lista: 'procedures', vacio: 'No procedures.', columnas: [...COLS_PROCEDIMIENTO, ...COLS_IMPORTES],
+          subtotal: { rotulo: '{{visit_name}} subtotal', valores: ['{{visit_fee}}', '{{visit_insurance_portion}}', '{{visit_insurance_adjustment}}', '{{visit_patient_portion}}'] },
+        } }] },
+        { titulo: 'Estimate', bloques: [IMPORTES] },
         { titulo: 'Notes', bloques: [{ tipo: 'texto', texto: '{{case_notes}}{{^case_notes}}No notes.{{/case_notes}}' }] },
       ],
       pie: 'Treatment plan',
@@ -328,15 +514,10 @@ export const PDFS: Pdf[] = [
     ejemplo: {
       case_name: 'Restorative plan', presented_date: 'November 25, 2026', case_status: 'Presented', insurance_name: 'Delta Dental PPO',
       visits: [
-        { visit_name: 'Visit 1', visit_total: '$1,180.00', procedures: [
-          { code: 'D3330', description: 'Endodontic therapy, molar tooth', tooth: '19', fee: '$1,100.00', insurance_estimate: '$708.00', patient_estimate: '$227.00' },
-          { code: 'D1110', description: 'Prophylaxis, adult', tooth: '—', fee: '$80.00', insurance_estimate: '$72.00', patient_estimate: '$0.00' },
-        ] },
-        { visit_name: 'Visit 2', visit_total: '$1,250.00', procedures: [
-          { code: 'D2740', description: 'Crown, porcelain/ceramic', tooth: '19', fee: '$1,250.00', insurance_estimate: '$531.25', patient_estimate: '$531.25' },
-        ] },
+        { visit_name: 'Visit 1', visit_fee: '$1,180.00', visit_insurance_portion: '$780.00', visit_insurance_adjustment: '$173.00', visit_patient_portion: '$227.00', procedures: [PROC_ENDODONCIA, PROC_PROFILAXIS] },
+        { visit_name: 'Visit 2', visit_fee: '$1,250.00', visit_insurance_portion: '$850.00', visit_insurance_adjustment: '$187.50', visit_patient_portion: '$212.50', procedures: [PROC_CORONA] },
       ],
-      total_fees: '$2,430.00', total_insurance_estimate: '$1,311.25', total_patient_estimate: '$758.25',
+      ...TOTALES_CASO,
       case_notes: 'Root canal first; crown once the tooth is asymptomatic.',
     },
   },
@@ -379,18 +560,16 @@ export const PDFS: Pdf[] = [
     cuando: 'Generated and sent when every case of the treatment plan has a decision; one for the accepted case.',
     firma: 'The patient (or legal guardian) and the provider.',
     origen: 'propuesta',
-    completado: ['The whole layout', 'The acknowledgment statements'],
-    jira: ['CON-2923', 'CON-2715', 'CON-3571', 'CON-4115'],
+    completado: ['The whole layout', 'The acknowledgment statements', 'Findings and diagnoses of each procedure (CON-2204)'],
+    jira: ['CON-2923', 'CON-2715', 'CON-3571', 'CON-2204', 'CON-4115'],
     hoja: {
       tipo: 'Treatment acceptance consent',
       titulo: '{{case_name}}',
       meta: ['Consent sent', '{{sent_date}}'],
-      resumen: [...RESUMEN_PACIENTE, ['Provider', '{{provider_name}}'], ['Treatment plan', '{{treatment_plan_name}}'], ['Patient estimate', '{{total_patient_estimate}}']],
+      resumen: [...RESUMEN_PACIENTE, ['Provider', '{{provider_name}}'], ['Treatment plan', '{{treatment_plan_name}}'], ['Patient portion', '{{total_patient_portion}}']],
       secciones: [
-        { titulo: 'Accepted treatment', bloques: [{ tipo: 'tabla', lista: 'procedures', vacio: 'No procedures.', totales: [['Total fees', '{{total_fees}}'], ['Patient estimate', '{{total_patient_estimate}}']], columnas: [
-          { titulo: 'Code', valor: '{{code}}', ancho: '11%' }, { titulo: 'Description', valor: '{{description}}' }, { titulo: 'Tooth', valor: '{{tooth}}', ancho: '9%' },
-          { titulo: 'Fee', valor: '{{fee}}', derecha: true, ancho: '14%' }, { titulo: 'Patient', valor: '{{patient_estimate}}', derecha: true, ancho: '14%' },
-        ] }] },
+        { titulo: 'Accepted treatment', bloques: [{ tipo: 'tabla', lista: 'procedures', vacio: 'No procedures.', columnas: [...COLS_PROCEDIMIENTO, ...COLS_IMPORTES] }] },
+        { titulo: 'Estimate', bloques: [IMPORTES] },
         { titulo: 'Consent', bloques: [{ tipo: 'html', variable: 'consent_text_html' }] },
         { titulo: 'Patient acknowledgment', bloques: [{ tipo: 'casillas', marcada: 'patient_signed_date', items: [
           'I have reviewed the treatment and the procedures listed above.',
@@ -404,12 +583,8 @@ export const PDFS: Pdf[] = [
     },
     ejemplo: {
       case_name: 'Restorative plan', treatment_plan_name: 'Treatment plan 2026', sent_date: '11/25/2026 — 10:30 AM',
-      procedures: [
-        { code: 'D3330', description: 'Endodontic therapy, molar tooth', tooth: '19', fee: '$1,100.00', patient_estimate: '$227.00' },
-        { code: 'D1110', description: 'Prophylaxis, adult', tooth: '—', fee: '$80.00', patient_estimate: '$0.00' },
-        { code: 'D2740', description: 'Crown, porcelain/ceramic', tooth: '19', fee: '$1,250.00', patient_estimate: '$531.25' },
-      ],
-      total_fees: '$2,430.00', total_patient_estimate: '$758.25',
+      procedures: [PROC_ENDODONCIA, PROC_PROFILAXIS, PROC_CORONA],
+      ...TOTALES_CASO,
       consent_text_html: TEXTO_TEMPLATE,
       ...FIRMADO_PACIENTE, ...FIRMADO_PROVIDER,
     },
@@ -421,17 +596,15 @@ export const PDFS: Pdf[] = [
     cuando: 'Generated and sent with the acceptance consent; one for each discarded case.',
     firma: 'The patient (or legal guardian) and the provider.',
     origen: 'propuesta',
-    completado: ['The whole layout', 'The acknowledgment statements'],
-    jira: ['CON-2923', 'CON-2716', 'CON-4115'],
+    completado: ['The whole layout', 'The acknowledgment statements', 'Findings and diagnoses of each procedure (CON-2204)'],
+    jira: ['CON-2923', 'CON-2716', 'CON-2204', 'CON-4115'],
     hoja: {
       tipo: 'Informed refusal',
       titulo: '{{case_name}}',
       meta: ['Consent sent', '{{sent_date}}'],
       resumen: [...RESUMEN_PACIENTE, ['Provider', '{{provider_name}}'], ['Treatment plan', '{{treatment_plan_name}}'], ['Decision recorded', '{{decision_date}}']],
       secciones: [
-        { titulo: 'Declined treatment', bloques: [{ tipo: 'tabla', lista: 'procedures', vacio: 'No procedures.', columnas: [
-          { titulo: 'Code', valor: '{{code}}', ancho: '11%' }, { titulo: 'Description', valor: '{{description}}' }, { titulo: 'Tooth', valor: '{{tooth}}', ancho: '9%' },
-        ] }] },
+        { titulo: 'Declined treatment', bloques: [{ tipo: 'tabla', lista: 'procedures', vacio: 'No procedures.', columnas: COLS_PROCEDIMIENTO }] },
         { titulo: 'Consent', bloques: [{ tipo: 'html', variable: 'consent_text_html' }] },
         { titulo: 'Patient acknowledgment', bloques: [{ tipo: 'casillas', marcada: 'patient_signed_date', items: [
           'I was informed of the recommended treatment and why it is recommended.',
@@ -446,8 +619,8 @@ export const PDFS: Pdf[] = [
     ejemplo: {
       case_name: 'Extraction and implant', treatment_plan_name: 'Treatment plan 2026', sent_date: '11/25/2026 — 10:30 AM', decision_date: 'November 25, 2026',
       procedures: [
-        { code: 'D7140', description: 'Extraction, erupted tooth', tooth: '19' },
-        { code: 'D6010', description: 'Implant body, endosteal', tooth: '19' },
+        { code: 'D7140', description: 'Extraction, erupted tooth', anatomic_area: '19', findings: [{ description: 'Periapical radiolucency' }], diagnoses: [{ code: 'K04.5', description: 'Chronic apical periodontitis' }] },
+        { code: 'D6010', description: 'Implant body, endosteal', anatomic_area: '19', findings: [], diagnoses: [] },
       ],
       consent_text_html: '<p>Your provider explained the treatment described above and what can happen if it is not done, including worsening infection, pain, and the loss of the tooth.</p><p>You can ask for this treatment again at any time.</p>',
       ...FIRMADO_PACIENTE, ...FIRMADO_PROVIDER,
@@ -470,5 +643,5 @@ export function ejemploDe(p: Pdf, assets: string): Datos {
 export const llevaFirmas = (p: Pdf) => !!p.hoja.firmas?.length
 /** Los datos de ejemplo sin firmar: las fechas e imágenes de firma vacías. */
 export function sinFirmas(datos: Datos): Datos {
-  return Object.fromEntries(Object.entries(datos).map(([k, v]) => [k, /_signed_date$|_signature_image$/.test(k) ? '' : v]))
+  return Object.fromEntries(Object.entries(datos).map(([k, v]) => [k, /_signed_date$|_signature_image$/.test(k) ? '' : k === 'has_addenda' ? false : v]))
 }
