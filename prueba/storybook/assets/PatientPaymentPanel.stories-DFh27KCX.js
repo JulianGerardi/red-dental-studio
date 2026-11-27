@@ -1,6 +1,0 @@
-import{n as e}from"./rolldown-runtime-DkW27tQK.js";import{g as t,i as n,o as r,r as i,t as a}from"./ledger-CZ3NwwJq.js";import{i as o,n as s,o as c,r as l}from"./play-Dr1R_I1D.js";import{n as u,t as d}from"./PatientPaymentPanel-B94Z7KwQ.js";var f,p,m,h;function g(){return(g=e((()=>{t(),u(),l(),f={title:`Components/Ledger/PatientPaymentPanel`,component:d,parameters:{layout:`padded`,docs:{story:{inline:!1,iframeHeight:720}}},args:{movs:r,aplicaciones:a,garante:n,dependientes:i,onCancelar:()=>{},onGuardar:()=>{}}},p={},m={args:{movs:[]},play:c(o(/^save$/i),s(/required|at least|must|invalid/i))},h=[`Default`,`WithValidationErrors`],p.parameters={...p.parameters,docs:{...p.parameters?.docs,source:{originalSource:`{}`,...p.parameters?.docs?.source}}},m.parameters={...m.parameters,docs:{...m.parameters?.docs,source:{originalSource:`{
-  args: {
-    movs: []
-  },
-  play: secuencia(pulsar(/^save$/i), esperar(/required|at least|must|invalid/i))
-}`,...m.parameters?.docs?.source}}}})))()}g();export{p as Default,m as WithValidationErrors,h as __namedExportsOrder,f as default};
