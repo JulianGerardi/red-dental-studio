@@ -5,6 +5,15 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-11-27
 
+### Un solo formato para el tacho: `ICONO_TACHO` y `BOTON_BORRAR` ([#PR](https://github.com/JulianGerardi/red-dental-studio/pull/PR))
+- **`lib/estilos.ts`** suma las dos constantes y todo tacho usa una (regla en `design-reference/figma/README.md`):
+  - `ICONO_TACHO`: sólo ícono, para una fila o un ítem. Botón de 28 px, `Trash2` de 16, rojo en reposo y fondo rojo claro
+    (`dash-bad-bg`) al pasar el mouse. Reemplaza a `cn(ICONO_SUELTO, 'text-dash-bad-fg')` y a los armados a mano.
+  - `BOTON_BORRAR`: va en el `className` de un `ui/button` `secondary` o `ghost` con texto (*Remove*, *Discard draft*,
+    *Delete* del turno).
+- Antes unos tachos tenían fondo gris al pasar el mouse, otros rojo y otros ninguno, con íconos de 14 o 16 px. Sólo cambia
+  el aspecto: mismos botones, `aria-label` y acciones. En un ⋮ sigue `DropdownMenuItem variant="destructive"`.
+
 ### Tachos en rojo en toda la app, aviso de fecha de Fee schedules y pill en los menús ([#217](https://github.com/JulianGerardi/red-dental-studio/pull/217))
 - **Regla** (`design-reference/figma/README.md`): todo `Trash2` que borra o quita algo va en `text-dash-bad-fg`, también en
   reposo. En una fila, sólo ícono con `cn(ICONO_SUELTO, 'text-dash-bad-fg')`; en un ⋮, `variant="destructive"`; un botón
