@@ -48,3 +48,22 @@ export function Chip({ children, onRemove, removeLabel, disabled, className, ton
     </span>
   )
 }
+
+/** "+N": lo que no entra en la línea junto a los chips (franjas de Working hours, medicaciones de una receta). Tocarlo
+ *  despliega el resto. Mismo alto y color que un chip, sin ✕. */
+export function ChipMas({ n, label, onClick, className }: {
+  n: number
+  /** Qué despliega, para el lector de pantalla: "Show 2 more hours on Monday". */
+  label: string
+  onClick?: (e: React.MouseEvent) => void
+  className?: string
+}) {
+  return (
+    <button
+      type="button" onClick={onClick} aria-label={label}
+      className={cn('inline-flex h-6 shrink-0 items-center rounded-full bg-dash-count-bg px-2.5 text-[12px] font-medium text-dash-blue hover:underline focus-visible:outline-2 focus-visible:outline-dash-blue', className)}
+    >
+      +{n}
+    </button>
+  )
+}

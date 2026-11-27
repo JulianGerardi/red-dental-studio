@@ -5,6 +5,26 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-11-27
 
+### Lab order, Prescription y Referral: Teeth & surface de red.dev, datos en el título, sin encuentro y PDF nuevo (CON-2214, CON-2212, CON-2321) ([#219](https://github.com/JulianGerardi/red-dental-studio/pull/219))
+- **Teeth & surface (Lab order):** `clinical/dental/ArcadaAnatomica` dibuja las arcadas de red.dev (`arcadasRed.ts`, SVG
+  generado; cada diente es un botón) y `RuedaSuperficies` usa sus cinco formas. Reemplaza a `DentalArch`, que se borra.
+- **Título de la ficha** (`EncabezadoFicha` suma `datos` y `campo`): quién lo hizo y cuándo, junto al PDF y el ⋮; en
+  Prescription, también *Expiration date\**. Salen de *General information*.
+- **Sin encuentro:** en estas tres pestañas New, editar una Pending y las acciones del ⋮ ya no piden encuentro abierto
+  (`RegistrosPanel` y las fichas pierden `encuentroAbierto` / `abierto`; `AvisosFicha` también). Pending Task del
+  Dashboard y del Patient Dashboard sigue como estaba (CON-2643).
+- **Fichas apiladas:** una card debajo de la otra en las tres. Prescription sin *Summary*; salen `COLUMNAS_FICHA`,
+  `DatoFicha`, `TextArea.crecer` y `Card.bodyClassName`.
+- **Documento:** Lab order, Prescription y Referral abren la plantilla de `src/pdfs` completada con lo cargado
+  (`hojaDeRegistro`, `abrirHoja`); la Clinical note sigue con el PDF de la tarea. Botón de PDF en la fila de las tablas.
+- **Tablas:** el filtro de fecha es `ui/date-nav` (el bloque del Dashboard), por mes: `DateNav` admite `value: null` con
+  `vacio`, `onClear` y `label`. Referral suma *Expiration date*. El "+N" de Medication es `ui/chip` › `ChipMas` (el de
+  Working hours) y despliega el resto.
+- **Fechas de las fichas:** `DatePicker` sin `min` / `max`; el vencimiento pasado o a más de seis meses se avisa al
+  guardar. `ui/date-filter` pierde `emptyLabel`.
+- **Corregido:** *New* después de entrar por una tarea de Pending Task pisaba el registro de esa tarea.
+- Supuestos (una Referral nueva vence a los 30 días) y pendientes, en `modulos/clinical-mode.md` (4ª a 6ª vuelta).
+
 ### Un solo formato para el tacho: `ICONO_TACHO` y `BOTON_BORRAR` ([#218](https://github.com/JulianGerardi/red-dental-studio/pull/218))
 - **`lib/estilos.ts`** suma las dos constantes y todo tacho usa una (regla en `design-reference/figma/README.md`):
   - `ICONO_TACHO`: sólo ícono, para una fila o un ítem. Botón de 28 px, `Trash2` de 16, rojo en reposo y fondo rojo claro

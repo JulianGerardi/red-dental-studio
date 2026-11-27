@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, type ReactNode } from 'react'
 import { FileText, Plus } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { aviso } from '@/components/ui/toaster'
@@ -12,22 +12,20 @@ import type { DatosDerivacion, ProveedorDerivacion } from '@/data/clinical-mode'
 import type { PendingTask } from '@/components/dashboard/PendingTaskCard'
 import { MenuTarea, TONO_ESTADO, esEditable, type AccionUI } from '@/components/dashboard/tareas'
 import { NewProviderDrawer } from './NewProviderDrawer'
-import { Adjuntos, AvisosFicha, COLUMNAS_FICHA, DatoFicha, EncabezadoFicha, ProcedimientoResumen, ProcedimientosVinculados, type Adjunto } from './FichaClinica'
-import { PROCEDIMIENTOS_REFERRAL, agregarProveedor, guardarRegistro, hoy, proveedoresDerivacion, type Registro } from './registros'
+import { Adjuntos, AvisosFicha, EncabezadoFicha, ProcedimientoResumen, ProcedimientosVinculados, type Adjunto } from './FichaClinica'
+import { PROCEDIMIENTOS_REFERRAL, agregarProveedor, guardarRegistro, hoy, proveedoresDerivacion, urge, type Registro } from './registros'
 
 /* La ficha de una Referral: la misma para New referral, Edit y la vista de una derivación que ya no se edita. Mismos datos
-   y acciones que red.dev (videos de Julián del 2026-11-25 y 27), con el armado de FichaClinica (General information |
-   Details). Reglas de CON-2322 / CON-2323. Ver design-reference/figma/modulos/clinical-mode.md (2026-11-27). */
+   y acciones que red.dev (videos de Julián del 2026-11-25 y 27), con el armado de FichaClinica: quién deriva y cuándo en
+   el título y dos cards, una debajo de la otra (General information y Details). Reglas de CON-2322 / CON-2323. Ver design-reference/figma/modulos/clinical-mode.md (2026-11-27). */
 
 const MAX_NOTA = 500
 const VACIA: DatosDerivacion = { proveedor: '', nota: '', procedimientos: [], asap: false, obligatoria: false, adjuntos: [] }
 
-export function ReferralDetail({ registro, nuevo, abierto, onVolver, onAccion }: {
+export function ReferralDetail({ registro, nuevo, onVolver, onAccion }: {
   registro: Registro
   /** Todavía no existe: Save la crea en Pending. */
   nuevo?: boolean
-  /** Hay un encuentro abierto con el paciente. */
-  abierto: boolean
   onVolver: () => void
   onAccion: (t: PendingTask, a: AccionUI) => void
 }) {
@@ -42,8 +40,8 @@ export function ReferralDetail({ registro, nuevo, abierto, onVolver, onAccion }:
   const [errores, setErrores] = useState<{ proveedor?: string; nota?: string }>({})
   const [nuevoProveedor, setNuevoProveedor] = useState(false)
 
-  /* Sólo se edita en Pending (CON-2323) y con un encuentro abierto. */
-  const editable = abierto && (nuevo || esEditable(registro))
+  /* Sólo se edita en Pending (CON-2323); no pide un encuentro abierto (Julián, 2026-11-27). */
+  const editable = nuevo || esEditable(registro)
   const elegidos = PROCEDIMIENTOS_REFERRAL.filter((p) => procedimientos.includes(p.id))
 
   const guardar = () => {
@@ -64,68 +62,66 @@ export function ReferralDetail({ registro, nuevo, abierto, onVolver, onAccion }:
     <div className="flex flex-col gap-4">
       <EncabezadoFicha
         titulo={nuevo ? 'New referral' : 'Referral'} estado={registro.state} tono={TONO_ESTADO[registro.state]} onVolver={onVolver} volverA="referrals"
+        /* Quién deriva, cuándo (CON-2609) y hasta cuándo vale, de sólo lectura, en el título como en Lab order. */
+        datos={[['Referring provider', registro.provider ?? '—'], ['Referral date', registro.register], ...(registro.expiration ? [['Expiration date', <span key="vence" className={cn(urge(registro) && 'text-dash-bad-fg')}>{registro.expiration}</span>] as [string, ReactNode]] : [])]}
         acciones={!nuevo && <>
           {registro.pdf && <Button variant="secondary" onClick={() => onAccion(registro, 'PDF')}><FileText /> PDF</Button>}
-          <MenuTarea task={registro} abierto={abierto} onAccion={onAccion} sin={['Edit']} />
+          <MenuTarea task={registro} abierto onAccion={onAccion} sin={['Edit']} />
         </>}
       />
 
-      <AvisosFicha abierto={abierto} editable={editable} nombre="referral" incompleto={Object.values(errores).some(Boolean)} />
+      <AvisosFicha editable={editable} nombre="referral" incompleto={Object.values(errores).some(Boolean)} />
 
-      <div className={COLUMNAS_FICHA}>
-        <Card title="General information">
-          <fieldset disabled={!editable} className="flex min-w-0 flex-col gap-6">
-            <legend className="sr-only">General information</legend>
-            <div className="grid gap-4 sm:grid-cols-2">
-              {/* Quién deriva y cuándo (CON-2609: provider creador y Referral date), de sólo lectura como en Lab order. */}
-              <DatoFicha label="Referring provider">{registro.provider}</DatoFicha>
-              <DatoFicha label="Referral date">{registro.register}</DatoFicha>
-              <div className="flex flex-col gap-2 sm:col-span-2 sm:flex-row sm:items-end">
-                <SearchField
-                  label="Referral provider" required clearable className="min-w-0 flex-1" placeholder="Search by name or surname"
-                  options={proveedores.map((p) => p.nombre)} subtext={especialidad} emptyText="No results found."
-                  value={proveedor} onChange={setProveedor} error={errores.proveedor} disabled={!editable}
-                />
-                <Button variant="secondary" size="lg" className={cn(errores.proveedor && 'sm:mb-6')} disabled={!editable} onClick={() => setNuevoProveedor(true)}><Plus /> New provider</Button>
-              </div>
-              <div className={cn('flex flex-wrap items-center gap-x-6 gap-y-3 sm:col-span-2', !editable && 'opacity-60')}>
-                <label className="flex w-fit items-center gap-2 text-[13px] font-medium text-ink">
-                  <Checkbox on={asap} onChange={setAsap} label="ASAP" disabled={!editable} /> ASAP
-                </label>
-                <label className="flex w-fit items-center gap-2 text-[13px] font-medium text-ink">
-                  <Checkbox on={obligatoria} onChange={setObligatoria} label="Mandatory to continue treatment" disabled={!editable} /> Mandatory to continue treatment
-                </label>
-              </div>
-            </div>
-            <div className="flex flex-col gap-2">
-              <FieldLabel>Procedures</FieldLabel>
-              <SearchPicker
-                multiple ocultarElegidos items={PROCEDIMIENTOS_REFERRAL} getId={(p) => p.id} getText={(p) => `${p.codigo} ${p.nombre} ${p.caso ?? ''} ${p.pieza ?? ''}`}
-                renderOption={(p) => <ProcedimientoResumen p={p} />}
-                selected={elegidos}
-                onSelect={(p) => setProcedimientos((a) => [...new Set([...a, p.id])])}
-                placeholder="Search by code or description" ariaLabel="Search procedures" emptyText="No planned procedure matches that search."
-                accion="vincular" disabled={!editable}
+      {/* Una card debajo de la otra, como los formularios de la app. */}
+      <Card title="General information">
+        <fieldset disabled={!editable} className="flex min-w-0 flex-col gap-4">
+          <legend className="sr-only">General information</legend>
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-end">
+              <SearchField
+                label="Referral provider" required clearable className="min-w-0 flex-1" placeholder="Search by name or surname"
+                options={proveedores.map((p) => p.nombre)} subtext={especialidad} emptyText="No results found."
+                value={proveedor} onChange={setProveedor} error={errores.proveedor} disabled={!editable}
               />
-              {editable && <FieldHint>Only planned procedures can be referred.</FieldHint>}
-              <ProcedimientosVinculados items={elegidos} disabled={!editable} onRemove={(p) => setProcedimientos((a) => a.filter((id) => id !== p.id))} />
+              <Button variant="secondary" size="lg" className={cn(errores.proveedor && 'sm:mb-6')} disabled={!editable} onClick={() => setNuevoProveedor(true)}><Plus /> New provider</Button>
             </div>
-          </fieldset>
-        </Card>
-
-        {/* La nota es lo que lee el especialista: se lleva el alto que deja la columna de la izquierda. */}
-        <Card title="Details" className="flex flex-col" bodyClassName="flex flex-1 flex-col">
-          <fieldset disabled={!editable} className="flex min-w-0 flex-1 flex-col gap-4">
-            <legend className="sr-only">Details</legend>
-            <TextArea
-              label="Referral note" required crecer rows={7} className="flex-1" placeholder="Why the patient is being referred"
-              value={nota} onChange={(v) => setNota(v.slice(0, MAX_NOTA))} error={errores.nota} disabled={!editable}
-              hint={`${nota.length}/${MAX_NOTA}`}
+            <div className={cn('flex flex-wrap items-center gap-x-6 gap-y-3 sm:mt-[26px] sm:h-9', !editable && 'opacity-60')}>
+              <label className="flex w-fit items-center gap-2 text-[13px] font-medium text-ink">
+                <Checkbox on={asap} onChange={setAsap} label="ASAP" disabled={!editable} /> ASAP
+              </label>
+              <label className="flex w-fit items-center gap-2 text-[13px] font-medium text-ink">
+                <Checkbox on={obligatoria} onChange={setObligatoria} label="Mandatory to continue treatment" disabled={!editable} /> Mandatory to continue treatment
+              </label>
+            </div>
+          </div>
+          <div className="flex flex-col gap-2">
+            <FieldLabel>Procedures</FieldLabel>
+            <SearchPicker
+              multiple ocultarElegidos items={PROCEDIMIENTOS_REFERRAL} getId={(p) => p.id} getText={(p) => `${p.codigo} ${p.nombre} ${p.caso ?? ''} ${p.pieza ?? ''}`}
+              renderOption={(p) => <ProcedimientoResumen p={p} />}
+              selected={elegidos}
+              onSelect={(p) => setProcedimientos((a) => [...new Set([...a, p.id])])}
+              placeholder="Search by code or description" ariaLabel="Search procedures" emptyText="No planned procedure matches that search."
+              accion="vincular" disabled={!editable}
             />
-            <Adjuntos value={adjuntos} onChange={setAdjuntos} disabled={!editable} />
-          </fieldset>
-        </Card>
-      </div>
+            {editable && <FieldHint>Only planned procedures can be referred.</FieldHint>}
+            <ProcedimientosVinculados items={elegidos} disabled={!editable} onRemove={(p) => setProcedimientos((a) => a.filter((id) => id !== p.id))} />
+          </div>
+        </fieldset>
+      </Card>
+
+      <Card title="Details">
+        {/* La nota a todo el ancho y los adjuntos debajo (Julián, 2026-11-27). */}
+        <fieldset disabled={!editable} className="flex min-w-0 flex-col gap-4">
+          <legend className="sr-only">Details</legend>
+          <TextArea
+            label="Referral note" required rows={6} placeholder="Why the patient is being referred"
+            value={nota} onChange={(v) => setNota(v.slice(0, MAX_NOTA))} error={errores.nota} disabled={!editable}
+            hint={`${nota.length}/${MAX_NOTA}`}
+          />
+          <Adjuntos value={adjuntos} onChange={setAdjuntos} disabled={!editable} />
+        </fieldset>
+      </Card>
 
       <div className="mt-1 flex justify-end">
         <FormFooter onCancel={onVolver} onSave={guardar} saveDisabled={!editable} cancelLabel={editable ? 'Cancel' : 'Back'} />

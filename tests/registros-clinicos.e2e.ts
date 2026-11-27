@@ -5,17 +5,48 @@ import { expect } from 'e2e'
    sólo lectura) y la máquina de estados de cada uno, con las preguntas de red.dev y los avisos de Jira (CON-2214,
    CON-2212, CON-2321). Ver design-reference/figma/modulos/clinical-mode.md (2026-11-27). */
 
-const abrir = async (app: { open: (u: string) => Promise<unknown> }, screen: any, tab: string) => {
+/* Sin Start encounter: en Clinical Mode estos registros no piden un encuentro abierto. */
+const abrir = async (app: { open: (u: string) => Promise<unknown> }, _screen: unknown, tab: string) => {
   await app.open(`/patients/john-smith/clinical-mode?tab=${encodeURIComponent(tab)}`)
-  await screen.getByRole('button', /Start encounter/).tap()
 }
 
-test('Sin encuentro abierto New está apagado y la ficha se abre en sólo lectura', async ({ app, screen }) => {
+test('Sin encuentro abierto se crea y se edita; lo que ya no está en Pending se abre en sólo lectura', async ({ app, screen }) => {
   await app.open('/patients/john-smith/clinical-mode?tab=Prescription')
-  await expect(screen.getByRole('button', /New prescription/)).toHaveAttribute('aria-disabled', 'true')
+  /* En Clinical Mode nada pide un encuentro abierto: New y la ficha de una Pending se cargan igual. */
+  await screen.getByRole('button', /New prescription/).tap()
+  await expect(screen.getByText('Read-only mode')).toHaveCount(0)
+  await expect(screen.getByRole('button', 'Save')).toBeEnabled()
+  await screen.getByRole('button', 'Cancel').tap()
+  /* "+N" despliega el resto de las medicaciones en la fila, sin abrir la ficha. */
+  await expect(screen.getByText('Ibuprofen 400 mg')).toHaveCount(0)
+  await screen.getByRole('button', /^Show 1 more medications/).first().tap()
+  await expect(screen.getByText('Ibuprofen 400 mg').first()).toBeVisible()
+  await expect(screen.getByRole('button', /New prescription/)).toBeVisible()
   await screen.getByText('Chlorhexidine gluconate 0.12%').first().tap()
-  await expect(screen.getByText('Read-only mode')).toBeVisible()
+  await expect(screen.getByText('Read-only mode')).toHaveCount(0)
+  await expect(screen.getByRole('button', 'Save')).toBeEnabled()
+  await screen.getByRole('button', 'Back to prescriptions').tap()
+  /* Una receta Active no se edita, con o sin encuentro. */
+  await screen.getByRole('button', /^Actions for prescription of Ibuprofen 600 mg, Active/).tap()
+  await screen.getByRole('menuitem', 'View').tap()
+  await expect(screen.getByText('This prescription cannot be edited because it is not in an editable state.')).toBeVisible()
   await expect(screen.getByRole('button', 'Save')).toBeDisabled()
+})
+
+/* El filtro de fecha es el bloque del Dashboard (‹ Today › + calendario), por mes; la ✕ vuelve a All dates. */
+test('La fecha de la tabla filtra por mes y Clear date vuelve a todas', async ({ app, screen }) => {
+  await app.open('/patients/john-smith/clinical-mode?tab=Referral')
+  await expect(screen.getByText(/Showing 1 to 7 of 7 results/)).toBeVisible()
+  await screen.getByRole('button', 'Today').tap()
+  /* Los datos de ejemplo son de 2026: se llega a noviembre de 2026 desde el mes real, sea cual sea. */
+  const hoy = new Date()
+  const pasos = (2026 - hoy.getFullYear()) * 12 + (10 - hoy.getMonth())
+  for (let i = 0; i < Math.abs(pasos); i++) await screen.getByRole('button', pasos > 0 ? 'Next month' : 'Previous month').tap()
+  await expect(screen.getByText(/Showing 1 to 2 of 2 results/)).toBeVisible()
+  await screen.getByRole('button', 'Previous month').tap()
+  await expect(screen.getByText(/Showing 1 to 2 of 2 results/)).toBeVisible()
+  await screen.getByRole('button', 'Clear date').tap()
+  await expect(screen.getByText(/Showing 1 to 7 of 7 results/)).toBeVisible()
 })
 
 test('Prescription: New valida, crea en Pending, se edita, se activa y se cancela (CON-2230, CON-2354, CON-2355)', async ({ app, screen }) => {
@@ -27,7 +58,7 @@ test('Prescription: New valida, crea en Pending, se edita, se activa y se cancel
 
   await screen.getByRole('button', /^Expiration date/).tap()
   await screen.getByRole('button', 'Next month').tap()
-  await screen.getByRole('button', /^Tuesday, December 15, 2026$/).tap()
+  await screen.getByRole('button', / 15, \d{4}$/).tap()
   await screen.getByPlaceholder('Search by drug name or brand name').fill('ibu')
   await screen.getByRole('button', 'Ibuprofen').tap()
   await screen.getByRole('textbox', /^Strength/).fill('400')
@@ -72,9 +103,10 @@ test('Prescription: New valida, crea en Pending, se edita, se activa y se cancel
   await screen.getByRole('menuitem', 'Activate').tap()
   await screen.getByRole('dialog', 'Activate prescription').getByRole('button', 'Mark as active').tap()
   await expect(screen.getByText('The prescription has been successfully marked as Active.')).toBeVisible()
+  /* El documento existe desde que está Active: el botón de la fila se prende. */
+  await expect(screen.getByRole('button', /^View PDF of the prescription of Ibuprofen 600 mg, Active, created (?!10\/30)/)).toBeEnabled()
   await screen.getByRole('button', /^Actions for prescription of Ibuprofen 600 mg, Active, created (?!10\/30)/).tap()
   await expect(screen.getByRole('menuitem', 'Edit')).toHaveCount(0)
-  await expect(screen.getByRole('menuitem', 'View PDF')).toBeVisible()
   await expect(screen.getByRole('menuitem', 'Expire')).toBeVisible()
   await screen.getByRole('menuitem', 'Cancel').tap()
   await screen.getByRole('dialog', 'Cancel prescription').getByRole('button', 'Cancel prescription').tap()
@@ -116,7 +148,7 @@ test('Lab order: New crea en Pending; Request, Delay y Deliver siguen la máquin
   await screen.getByRole('button', 'Smile Lab Studio').tap()
   await screen.getByRole('button', /^Delivery expiration date/).tap()
   await screen.getByRole('button', 'Next month').tap()
-  await screen.getByRole('button', /^Tuesday, December 15, 2026$/).tap()
+  await screen.getByRole('button', / 15, \d{4}$/).tap()
   /* CON-2215: vincular un procedimiento con diente lo trae marcado en Teeth & surface. */
   await screen.getByLabel('Search procedures').fill('D2750')
   await screen.getByRole('button', /D2750/).tap()
@@ -191,10 +223,26 @@ test('Pending Task → Prescription: Complete this task abre la receta y Activat
   await screen.getByRole('button', 'Actions for Prescription for Henry Richardson').tap()
   await screen.getByRole('menuitem', 'Edit').tap()
   await expect(screen.getByRole('heading', 'Prescription')).toBeVisible()
-  await expect(screen.getByText('Summary')).toBeVisible()
+  await expect(screen.getByText('Directions for use')).toBeVisible()
   await screen.getByRole('button', /^Actions for Prescription/).tap()
   await screen.getByRole('menuitem', 'Activate').tap()
   await screen.getByRole('dialog', 'Activate prescription').getByRole('button', 'Mark as active').tap()
   await expect(screen.getByText('The prescription has been successfully marked as Active.')).toBeVisible()
   await expect(screen.getByRole('button', 'PDF')).toBeVisible()
+})
+
+/* Regresión: New después de entrar por una tarea crea un registro nuevo, en Pending, y no pisa el de la tarea. */
+test('New después de Complete this task suma un registro y deja el de la tarea como estaba', async ({ app, screen }) => {
+  await app.open('/patients/john-smith/clinical-mode?tab=Referral&task=paciente-referrals-1')
+  await expect(screen.getByRole('heading', 'Referral')).toBeVisible()
+  await screen.getByRole('button', 'Back to referrals').tap()
+  await expect(screen.getByText(/Showing 1 to 8 of 8 results/)).toBeVisible()
+  await screen.getByRole('button', /New referral/).tap()
+  await expect(screen.getByRole('heading', 'New referral')).toBeVisible()
+  await screen.getByPlaceholder('Search by name or surname').fill('Omar')
+  await screen.getByRole('button', /^Dr\. Omar Haddad/).tap()
+  await screen.getByRole('textbox', /^Referral note/).fill('Please evaluate for surgical extraction.')
+  await screen.getByRole('button', 'Save').tap()
+  await expect(screen.getByText('The referral has been successfully created.')).toBeVisible()
+  await expect(screen.getByText(/Showing 1 to 9 of 9 results/)).toBeVisible()
 })

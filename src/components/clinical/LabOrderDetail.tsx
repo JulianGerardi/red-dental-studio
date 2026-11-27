@@ -7,41 +7,41 @@ import { Checkbox } from '@/components/ui/checkbox'
 import { DatePicker } from '@/components/ui/date-picker'
 import { FilterMenu } from '@/components/ui/filter-menu'
 import { SearchPicker } from '@/components/ui/search-picker'
+import { Tabs } from '@/components/ui/tabs'
 import { FieldError, FieldLabel, FormFooter, SearchField, TextArea } from '@/components/patients/form'
 import { Card } from '@/components/settings/primitives'
 import { OBLIGATORIO } from '@/lib/validacion'
 import { RuedaSuperficies, superficiesDe, type SuperficieLab } from './dental/RuedaSuperficies'
-import { DentalArch } from './dental/DentalArch'
+import { ArcadaAnatomica } from './dental/ArcadaAnatomica'
 import { NewLaboratoryDrawer } from './NewLaboratoryDrawer'
-import { Adjuntos, AvisosFicha, COLUMNAS_FICHA, DatoFicha, EncabezadoFicha, ProcedimientoResumen, ProcedimientosVinculados, type ProcedimientoFicha } from './FichaClinica'
+import { Adjuntos, AvisosFicha, EncabezadoFicha, ProcedimientoResumen, ProcedimientosVinculados, type ProcedimientoFicha } from './FichaClinica'
 import { LAB_VACIO, PROCEDIMIENTOS_LAB, agregarLaboratorio, guardarRegistro, hoy, laboratorios as listaLaboratorios, type Registro } from './registros'
-import { ARCADAS, type Denticion, type Laboratorio } from '@/data/laboratorios'
+import type { Denticion, Laboratorio } from '@/data/laboratorios'
 import type { PendingTask } from '@/components/dashboard/PendingTaskCard'
 import { MenuTarea, TONO_ESTADO, esEditable, type AccionUI } from '@/components/dashboard/tareas'
 import { formatMDY } from '@/lib/fecha'
 
 /* La ficha de una Lab order: la misma para New lab order, Edit y la vista de una orden que ya no se edita. Mismos datos
-   y acciones que red.dev (videos de Julián del 2026-11-20 al 27) con el armado de FichaClinica: General information (con
-   Teeth & surface adentro) a la izquierda y Details a la derecha. Sólo se edita con un encuentro abierto y la orden en
-   Pending (CON-2218); se crea en Pending (CON-2215). Ver design-reference/figma/modulos/clinical-mode.md (2026-11-27). */
+   y acciones que red.dev (videos de Julián del 2026-11-20 al 27) con el armado de FichaClinica: quién la pide y cuándo
+   en el título y dos cards, una debajo de la otra: General information (con Teeth & surface adentro) y Details. Sólo se
+   edita con la orden en Pending (CON-2218); se crea en Pending (CON-2215). Ver design-reference/figma/modulos/clinical-mode.md (2026-11-27). */
 
 const MAX_TEXTO = 500
 const casoDe = (p: ProcedimientoFicha) => p.caso ?? 'Independent'
 const aFecha = (s: string) => { const f = new Date(s); return s && !Number.isNaN(f.getTime()) ? f : null }
 const esPermanente = (d: string) => /^\d+$/.test(d)
+const hoyDia = () => { const d = new Date(); return new Date(d.getFullYear(), d.getMonth(), d.getDate()) }
 
-export function LabOrderDetail({ registro, nuevo, abierto, onVolver, onAccion }: {
+export function LabOrderDetail({ registro, nuevo, onVolver, onAccion }: {
   registro: Registro
   /** Todavía no existe: Save la crea en Pending. */
   nuevo?: boolean
-  /** Hay un encuentro abierto con el paciente. */
-  abierto: boolean
   onVolver: () => void
   onAccion: (t: PendingTask, a: AccionUI) => void
 }) {
   const inicio = registro.lab ?? LAB_VACIO
-  /* Sin encuentro no se toca nada; fuera de Pending, tampoco (CON-2218, CON-3904). */
-  const editable = abierto && (nuevo || esEditable(registro))
+  /* Sólo se edita en Pending (CON-2218, CON-3904); no pide un encuentro abierto (Julián, 2026-11-27). */
+  const editable = nuevo || esEditable(registro)
   const [vence, setVence] = useState<Date | null>(() => aFecha(registro.expiration))
   const [laboratorios, setLaboratorios] = useState<Laboratorio[]>(listaLaboratorios)
   const [lab, setLab] = useState(inicio.laboratorio)
@@ -61,8 +61,7 @@ export function LabOrderDetail({ registro, nuevo, abierto, onVolver, onAccion }:
   const [adjuntos, setAdjuntos] = useState(inicio.adjuntos)
   const [errores, setErrores] = useState<{ vence?: string; lab?: string; trabajo?: string }>({})
 
-  const filas = ARCADAS[denticion ?? 'Permanent']
-  const tocarDiente = (d: string) => {
+    const tocarDiente = (d: string) => {
     const esta = dientes.includes(d)
     setDientes(esta ? dientes.filter((x) => x !== d) : [...dientes, d])
     setActual(esta ? (actual === d ? null : actual) : d)
@@ -98,7 +97,7 @@ export function LabOrderDetail({ registro, nuevo, abierto, onVolver, onAccion }:
   const guardar = () => {
     const e = {
       lab: laboratorios.some((l) => l.nombre === lab) ? undefined : OBLIGATORIO,
-      vence: vence ? undefined : OBLIGATORIO,
+      vence: !vence ? OBLIGATORIO : vence < hoyDia() ? 'Date cannot be in the past' : undefined,
       trabajo: trabajo.trim() ? undefined : OBLIGATORIO,
     }
     setErrores(e)
@@ -115,23 +114,24 @@ export function LabOrderDetail({ registro, nuevo, abierto, onVolver, onAccion }:
     <div className="flex flex-col gap-4">
       <EncabezadoFicha
         titulo={nuevo ? 'New lab order' : 'Lab order'} estado={registro.state} tono={TONO_ESTADO[registro.state]} onVolver={onVolver} volverA="lab orders"
+        /* CON-2215 (comentario de Abril): quién la pide y cuándo, de sólo lectura, en el título junto al PDF. */
+        datos={[['Ordering provider', registro.provider ?? '—'], ['Order date', registro.register]]}
         acciones={!nuevo && <>
           {registro.pdf && <Button variant="secondary" onClick={() => onAccion(registro, 'PDF')}><FileText /> PDF</Button>}
-          <MenuTarea task={registro} abierto={abierto} onAccion={onAccion} sin={['Edit']} />
+          <MenuTarea task={registro} abierto onAccion={onAccion} sin={['Edit']} />
         </>}
       />
 
-      <AvisosFicha abierto={abierto} editable={editable} nombre="lab order" incompleto={Object.values(errores).some(Boolean)} />
+      <AvisosFicha editable={editable} nombre="lab order" incompleto={Object.values(errores).includes(OBLIGATORIO)} error={errores.vence && errores.vence !== OBLIGATORIO ? errores.vence : undefined} />
 
-      <div className={COLUMNAS_FICHA}>
-        <Card title="General information">
-          <div className="flex min-w-0 flex-col gap-6">
+      {/* Una card debajo de la otra, con la misma diagramación que Prescription y Referral (Julián, 2026-11-27). */}
+      <Card title="General information">
+          {/* En pantallas anchas, lo que define la orden a la izquierda y Teeth & surface a la derecha: el dibujo y la
+              rueda ocupan media card en vez de quedar sueltos en el medio. Más angosto, uno debajo del otro. */}
+          <div className="grid min-w-0 gap-x-8 gap-y-6 xl:grid-cols-2 xl:items-start">
            <fieldset disabled={!editable} className="flex min-w-0 flex-col gap-6">
             <legend className="sr-only">General information</legend>
             <div className="grid gap-4 sm:grid-cols-2">
-              {/* CON-2215 (comentario de Abril): quién la pide y cuándo, de sólo lectura. */}
-              <DatoFicha label="Ordering provider">{registro.provider}</DatoFicha>
-              <DatoFicha label="Order date">{registro.register}</DatoFicha>
               <div className="flex flex-col gap-2 sm:col-span-2 sm:flex-row sm:items-end">
                 <SearchField
                   label="Receiving laboratory" required clearable className="min-w-0 flex-1" placeholder="Search laboratory"
@@ -141,8 +141,8 @@ export function LabOrderDetail({ registro, nuevo, abierto, onVolver, onAccion }:
               </div>
               <div className="flex flex-col gap-2">
                 <FieldLabel required>Delivery expiration date</FieldLabel>
-                {/* CON-2215: no puede quedar en el pasado; los días anteriores no se eligen. */}
-                <DatePicker value={vence} onChange={setVence} error={!!errores.vence} min={new Date()} label="Delivery expiration date" disabled={!editable} />
+                {/* El calendario de toda la app; que no quede en el pasado (CON-2215) se revisa al guardar. */}
+                <DatePicker value={vence} onChange={setVence} error={!!errores.vence} label="Delivery expiration date" disabled={!editable} className="h-9 w-full" />
                 {errores.vence && <FieldError>{errores.vence}</FieldError>}
               </div>
               <label className={cn('flex w-fit items-center gap-2 text-[13px] font-medium text-ink sm:mt-[26px] sm:h-9', editable ? 'cursor-pointer' : 'opacity-60')}>
@@ -172,26 +172,11 @@ export function LabOrderDetail({ registro, nuevo, abierto, onVolver, onAccion }:
             </div>
            </fieldset>
 
-            {/* Fuera del fieldset: en sólo lectura también se cambia de arcada y de diente para ver sus superficies. */}
+            {/* Teeth & surface como está armado en red.dev: la dentición debajo del rótulo, el dibujo de las arcadas a la
+                izquierda y, a la derecha, los dientes marcados, la rueda de superficies y sus dos botones. Fuera del
+                fieldset: en sólo lectura también se cambia de arcada y de diente para ver sus superficies. */}
             <div className="flex flex-col gap-3">
-              <div className="flex min-h-8 flex-wrap items-center gap-3">
-                <FieldLabel>Teeth & surface</FieldLabel>
-                {denticion && (
-                  <span className="ml-auto inline-flex rounded-lg bg-surface-subtle p-0.5" role="group" aria-label="Dentition">
-                    {(['Permanent', 'Primary'] as const).map((d) => (
-                      <button
-                        key={d} type="button" aria-pressed={denticion === d} onClick={() => setDenticion(d)}
-                        className={cn(
-                          'flex h-7 items-center rounded-md px-3 text-[12px] font-medium transition-colors focus-visible:outline-2 focus-visible:outline-dash-blue',
-                          denticion === d ? 'bg-surface text-dash-blue shadow-sm' : 'text-ink-muted hover:text-ink',
-                        )}
-                      >
-                        {d}
-                      </button>
-                    ))}
-                  </span>
-                )}
-              </div>
+              <FieldLabel>Teeth & surface</FieldLabel>
               {!denticion ? (
                 editable ? (
                   <span className="flex flex-wrap gap-2">
@@ -200,66 +185,69 @@ export function LabOrderDetail({ registro, nuevo, abierto, onVolver, onAccion }:
                   </span>
                 ) : <p className="text-[12px] text-ink-muted">No teeth selected.</p>
               ) : (
-                <div className="flex flex-col items-center gap-6 sm:flex-row sm:items-start sm:justify-around">
-                  <DentalArch
-                    arriba={filas.arriba} abajo={filas.abajo} marcados={dientes} actual={actual} disabled={!editable}
-                    conSuperficies={Object.keys(superficies).filter((d) => superficies[d]?.length)} onToggle={tocarDiente}
-                  />
-                  <div className="flex w-full shrink-0 flex-col items-center gap-3 sm:w-auto">
-                    {/* Los dientes marcados de las dos denticiones: tocar uno lo elige para marcarle (o ver) sus superficies. */}
-                    <div className="flex w-full flex-col gap-2 sm:w-44">
-                      {([['Permanent', permanentes], ['Primary', temporarios]] as const).map(([titulo, lista]) => (
-                        <div key={titulo} className="flex flex-col gap-1.5">
-                          <span className="text-[11px] font-medium text-ink-muted">{titulo}</span>
-                          {lista.length ? (
-                            <span className="flex flex-wrap gap-1.5" role="group" aria-label={`${titulo} teeth`}>
-                              {lista.map((d) => (
-                                <button
-                                  key={d} type="button" aria-pressed={actual === d} onClick={() => setActual(d)} aria-label={`${editable ? 'Edit' : 'View'} surfaces of tooth ${d}`}
-                                  className={cn(
-                                    'flex h-7 min-w-7 items-center justify-center rounded-md px-1.5 text-[12px] font-semibold tabular-nums transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-dash-blue',
-                                    actual === d ? 'bg-dash-blue text-white' : 'bg-dash-count-bg text-dash-blue hover:bg-dash-count-bg/70',
-                                  )}
-                                >
-                                  {d}
-                                </button>
-                              ))}
-                            </span>
-                          ) : <span className="text-[12px] text-ink-faint">No teeth selected</span>}
-                        </div>
-                      ))}
+                <>
+                  <Tabs size="sm" aria-label="Dentition" value={denticion} onChange={setDenticion} tabs={['Permanent', 'Primary']} />
+                  <div className="flex flex-col items-center gap-6 sm:flex-row sm:items-start sm:justify-center sm:gap-8">
+                    <ArcadaAnatomica denticion={denticion} marcados={dientes} actual={actual} disabled={!editable} onToggle={tocarDiente} />
+                    <div className="flex w-full shrink-0 flex-col gap-5 sm:w-[220px]">
+                      {/* Los dientes marcados de las dos denticiones: tocar uno lo elige para marcarle (o ver) sus superficies. */}
+                      <div className="flex flex-col gap-3">
+                        {([['Permanent', permanentes], ['Primary', temporarios]] as const).map(([titulo, lista]) => (
+                          <div key={titulo} className="flex flex-col gap-1.5">
+                            <span className="text-[11px] font-semibold tracking-wide text-ink-muted uppercase">{titulo}</span>
+                            {lista.length ? (
+                              <span className="flex flex-wrap gap-1.5" role="group" aria-label={`${titulo} teeth`}>
+                                {lista.map((d) => (
+                                  <button
+                                    key={d} type="button" aria-pressed={actual === d} onClick={() => setActual(d)} aria-label={`${editable ? 'Edit' : 'View'} surfaces of tooth ${d}`}
+                                    className={cn(
+                                      'flex h-8 min-w-8 items-center justify-center rounded-md px-2 text-[12px] font-semibold tabular-nums transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-dash-blue',
+                                      actual === d ? 'bg-dash-blue text-white' : 'bg-dash-count-bg text-dash-blue hover:bg-dash-count-bg/70',
+                                    )}
+                                  >
+                                    {d}
+                                  </button>
+                                ))}
+                              </span>
+                            ) : <span className="text-[12px] text-ink-faint">No teeth selected</span>}
+                          </div>
+                        ))}
+                      </div>
+                      <div className="flex flex-col items-center gap-3">
+                        <RuedaSuperficies diente={actual} value={actuales} disabled={!editable} onChange={(v) => actual && setSuperficies({ ...superficies, [actual]: v })} />
+                        <span className="text-[12px] font-medium text-ink">{actual ? `Surfaces of tooth ${actual}` : 'Pick a tooth to mark its surfaces'}</span>
+                        {editable && (
+                          <span className="flex gap-2">
+                            <Button size="sm" variant="secondary" disabled={!actual} onClick={alternarTodas}>Toggle all</Button>
+                            <Button size="sm" variant="secondary" disabled={!actuales.length} onClick={aplicarASinMarcar}>Apply to unset</Button>
+                          </span>
+                        )}
+                      </div>
                     </div>
-                    <RuedaSuperficies diente={actual} value={actuales} disabled={!editable} onChange={(v) => actual && setSuperficies({ ...superficies, [actual]: v })} />
-                    <span className="text-[12px] font-medium text-ink">{actual ? `Surfaces of tooth ${actual}` : 'Pick a tooth to mark its surfaces'}</span>
-                    {editable && (
-                      <span className="flex gap-2">
-                        <Button size="sm" variant="secondary" disabled={!actual} onClick={alternarTodas}>Toggle all</Button>
-                        <Button size="sm" variant="secondary" disabled={!actuales.length} onClick={aplicarASinMarcar}>Apply to unset</Button>
-                      </span>
-                    )}
                   </div>
-                </div>
+                </>
               )}
             </div>
           </div>
         </Card>
 
-        {/* El texto libre se lleva el alto que deja la columna de la izquierda: es donde más se escribe y lo que lee el laboratorio. */}
-        <Card title="Details" className="flex flex-col" bodyClassName="flex flex-1 flex-col">
-          <fieldset disabled={!editable} className="flex min-w-0 flex-1 flex-col gap-4">
-            <legend className="sr-only">Details</legend>
+      <Card title="Details">
+        <fieldset disabled={!editable} className="flex min-w-0 flex-col gap-4">
+          <legend className="sr-only">Details</legend>
+          {/* Uno debajo del otro, a todo el ancho: primero lo que se pide y después las indicaciones. */}
+          <div className="flex flex-col gap-4">
             <TextArea
-              label="Dental work requested" required crecer rows={7} className="flex-[2]" placeholder="Describe the work the laboratory has to do"
+              label="Dental work requested" required rows={5} placeholder="Describe the work the laboratory has to do"
               value={trabajo} onChange={(v) => setTrabajo(v.slice(0, MAX_TEXTO))} error={errores.trabajo} disabled={!editable} hint={`${trabajo.length}/${MAX_TEXTO}`}
             />
             <TextArea
-              label="Special instructions" crecer rows={4} className="flex-1" placeholder="Enter special instructions"
+              label="Special instructions" rows={4} placeholder="Enter special instructions"
               value={indicaciones} onChange={(v) => setIndicaciones(v.slice(0, MAX_TEXTO))} disabled={!editable} hint={`${indicaciones.length}/${MAX_TEXTO}`}
             />
-            <Adjuntos value={adjuntos} onChange={setAdjuntos} disabled={!editable} error="Invalid file type or size." />
-          </fieldset>
-        </Card>
-      </div>
+          </div>
+          <Adjuntos value={adjuntos} onChange={setAdjuntos} disabled={!editable} error="Invalid file type or size." />
+        </fieldset>
+      </Card>
 
       <div className="mt-1 flex justify-end">
         <FormFooter onCancel={onVolver} onSave={guardar} saveDisabled={!editable} cancelLabel={editable ? 'Cancel' : 'Back'} />

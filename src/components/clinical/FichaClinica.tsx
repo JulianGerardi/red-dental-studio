@@ -9,18 +9,14 @@ import type { EstadoProcedimiento } from '@/data/clinical-mode'
 import { FieldError, FieldLabel } from '@/components/patients/form'
 import { ICONO_SUELTO, TARJETA_INTERNA, ICONO_TACHO } from '@/lib/estilos'
 
-/* Las fichas de Clinical Mode que se completan desde Pending Task (Lab order, Referral): título con estado y acciones,
-   dos cards (settings `Card`) lado a lado en desktop -General information a la izquierda, Details a la derecha con el
-   texto libre ocupando todo el alto- y Cancel / Save abajo a la derecha (`FormFooter`). Ver
-   design-reference/figma/modulos/clinical-mode.md (2026-11-27). */
+/* Las fichas de Lab order, Prescription y Referral en Clinical Mode: el título con el estado, quién lo hizo y cuándo y
+   las acciones; las cards (settings `Card`) una debajo de la otra, como los formularios de la app; y Cancel / Save abajo
+   a la derecha (`FormFooter`). Ver design-reference/figma/modulos/clinical-mode.md (2026-11-27). */
 
-const SIN_ENCUENTRO_FICHA = 'You do not have permission to perform this action because there is no open encounter for the selected patient.'
-
-/** Las dos columnas de la ficha: lo que define el pedido a la izquierda y lo que se escribe a la derecha; en celular y tablet, una debajo de la otra. */
-export const COLUMNAS_FICHA = 'grid items-stretch gap-4 lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)]'
-
-/** El título de la ficha, del tamaño de un título de pantalla, con la vuelta a la lista, su estado y sus acciones a la derecha. */
-export function EncabezadoFicha({ titulo, estado, tono, acciones, onVolver, volverA }: {
+/** El título de la ficha, del tamaño de un título de pantalla: la vuelta a la lista, el nombre y el estado a la izquierda;
+ *  a la derecha, quién lo hizo y cuándo (`datos`, de sólo lectura), un campo propio del encabezado (`campo`: el vencimiento
+ *  de una Prescription, como red.dev) y las acciones (PDF, ⋮). En pantallas angostas la derecha baja a su propia fila. */
+export function EncabezadoFicha({ titulo, estado, tono, acciones, onVolver, volverA, datos, campo }: {
   titulo: string
   estado?: string
   tono?: PillTone
@@ -28,40 +24,65 @@ export function EncabezadoFicha({ titulo, estado, tono, acciones, onVolver, volv
   onVolver?: () => void
   /** A dónde vuelve la flecha: "lab orders". */
   volverA?: string
+  /** Pares rótulo / valor: "Ordering provider" · "Dr. Elena Martinez". */
+  datos?: [rotulo: string, valor: ReactNode][]
+  campo?: ReactNode
 }) {
   return (
-    <div className="flex min-h-8 flex-wrap items-center gap-3">
-      {onVolver && (
-        <button type="button" onClick={onVolver} aria-label={`Back to ${volverA ?? 'the list'}`} title={`Back to ${volverA ?? 'the list'}`} className={cn(ICONO_SUELTO, '-ml-1')}>
-          <ArrowLeft className="size-4" />
-        </button>
+    <div className="flex flex-wrap items-center gap-x-6 gap-y-3">
+      <div className="flex min-h-8 items-center gap-3">
+        {onVolver && (
+          <button type="button" onClick={onVolver} aria-label={`Back to ${volverA ?? 'the list'}`} title={`Back to ${volverA ?? 'the list'}`} className={cn(ICONO_SUELTO, '-ml-1')}>
+            <ArrowLeft className="size-4" />
+          </button>
+        )}
+        <h2 className="text-xl leading-[1.3] font-semibold text-ink">{titulo}</h2>
+        {estado && <Pill tone={tono ?? 'info'}>{estado}</Pill>}
+      </div>
+      {(datos?.length || campo || acciones) && (
+        <div className={cn('ml-auto flex flex-wrap justify-end gap-x-5 gap-y-3', campo ? 'items-start' : 'items-center')}>
+          {/* Con un campo al lado, los datos toman su misma grilla: el rótulo arriba, a 8 px, y el valor a la altura del
+              campo; así los tres se leen como una fila de formulario y no como texto pegado a un input. El campo va
+              fuera del <dl> (no es un dato): su línea divisoria aparece desde 640 px, donde entran en una fila. */}
+          {(!!datos?.length || campo) && (
+            <div className="flex flex-wrap items-stretch gap-x-4 gap-y-3">
+              {!!datos?.length && (
+                <dl className="flex flex-wrap items-stretch gap-y-3 divide-x divide-line">
+                  {datos.map(([rotulo, valor]) => (
+                    <div key={rotulo} className={cn('flex flex-col px-4 first:pl-0 last:pr-0', campo ? 'gap-2' : 'gap-0.5')}>
+                      <dt className={campo ? 'text-xs leading-4 font-medium text-ink' : 'text-[11px] leading-4 text-ink-muted'}>{rotulo}</dt>
+                      <dd className={cn('text-[13px] font-medium text-ink', campo ? 'flex h-9 items-center' : 'leading-5')}>{valor}</dd>
+                    </div>
+                  ))}
+                </dl>
+              )}
+              {campo && <div className={cn(!!datos?.length && 'sm:border-l sm:border-line sm:pl-4')}>{campo}</div>}
+            </div>
+          )}
+          {/* Las acciones, a la altura del campo (24 px = rótulo + separación) aunque debajo aparezca su error. */}
+          {acciones && <span className={cn('flex items-center gap-2', campo && 'h-9 sm:mt-6')}>{acciones}</span>}
+        </div>
       )}
-      <h2 className="text-xl leading-[1.3] font-semibold text-ink">{titulo}</h2>
-      {estado && <Pill tone={tono ?? 'info'}>{estado}</Pill>}
-      {acciones && <span className="ml-auto flex items-center gap-2">{acciones}</span>}
     </div>
   )
 }
 
-/** Los avisos de arriba de la ficha, iguales en Lab order, Prescription y Referral: por qué no se puede editar (sin
- *  encuentro, o fuera de Pending: CON-2218, CON-2354, CON-2323) y, al guardar con faltantes, el de Jira. */
-export function AvisosFicha({ abierto, editable, nombre, incompleto, error }: {
-  abierto: boolean
+/** Los avisos de arriba de la ficha, iguales en Lab order, Prescription y Referral: por qué no se puede editar (fuera de
+ *  Pending: CON-2218, CON-2354, CON-2323) y, al guardar con faltantes, el de Jira. */
+export function AvisosFicha({ editable, nombre, incompleto, error }: {
   editable: boolean
   /** "lab order", "prescription", "referral". */
   nombre: string
   /** Se intentó guardar con campos obligatorios vacíos. */
   incompleto?: boolean
-  /** Otro motivo por el que no se guardó ("A prescription must contain at least one medication."). */
+  /** Otro motivo por el que no se guardó ("Date cannot be in the past"). */
   error?: string
 }) {
   const ref = useRef<HTMLDivElement>(null)
   useEffect(() => { if (incompleto || error) ref.current?.scrollIntoView({ block: 'nearest', behavior: 'smooth' }) }, [incompleto, error])
   return (
     <>
-      {!abierto
-        ? <Alert tone="warning" title="Read-only mode">{SIN_ENCUENTRO_FICHA}</Alert>
-        : !editable && <Alert tone="warning" title="Read-only mode">{`This ${nombre} cannot be edited because it is not in an editable state.`}</Alert>}
+      {!editable && <Alert tone="warning" title="Read-only mode">{`This ${nombre} cannot be edited because it is not in an editable state.`}</Alert>}
       {(incompleto || error) && (
         <div ref={ref} className="scroll-mt-4">
           <Alert tone="danger" title={incompleto ? 'Uncompleted fields' : 'Check the form'}>
@@ -70,16 +91,6 @@ export function AvisosFicha({ abierto, editable, nombre, incompleto, error }: {
         </div>
       )}
     </>
-  )
-}
-
-/** Un dato de la ficha que no se edita (quién pidió la orden, cuándo): rótulo de campo y el valor como texto. */
-export function DatoFicha({ label, children }: { label: string; children: ReactNode }) {
-  return (
-    <div className="flex flex-col gap-2">
-      <FieldLabel>{label}</FieldLabel>
-      <span className="text-[13px] leading-5 text-ink">{children}</span>
-    </div>
   )
 }
 

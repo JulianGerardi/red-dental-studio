@@ -32,7 +32,7 @@ test('Request pasa la orden a Requested y Cancel la saca de la lista', async ({ 
   await expect(screen.getByRole('tab', 'Lab orders (1)')).toBeVisible()
 })
 
-test('Complete this Task abre el detalle de la orden, en sólo lectura sin encuentro', async ({ app, screen }) => {
+test('Complete this Task abre el detalle de la orden; una ya pedida, en sólo lectura', async ({ app, screen }) => {
   await app.open('/')
   await screen.getByRole('tab', /^Lab orders/).tap()
   /* Por vencimiento, la de James Foster (todavía no llegó) va primero. */
@@ -77,6 +77,12 @@ test('Edit abre la orden editable: New laboratory crea el laboratorio y lo elige
   await expect(screen.getByText('Uncompleted fields')).toBeVisible()
   await expect(screen.getByText('This field is required.')).toBeVisible()
   await screen.getByLabel(/Dental work requested/).fill('Porcelain crown')
+  /* La orden venció: guardarla así avisa; con una fecha que viene, se guarda (CON-2215). */
+  await screen.getByRole('button', 'Save').tap()
+  await expect(screen.getByText('Date cannot be in the past').first()).toBeVisible()
+  await screen.getByRole('button', /^Delivery expiration date/).tap()
+  await screen.getByRole('button', 'Next year').tap()
+  await screen.getByRole('button', /15, 2027$/).tap()
   await screen.getByRole('button', 'Save').tap()
   await expect(screen.getByText('The lab order has been successfully updated.')).toBeVisible()
 })
@@ -102,7 +108,7 @@ test('Complete this Task abre la Clinical Note; se firma con el login y Back to 
 })
 
 /* Referral (video de red.dev de Julián, 2026-11-25; CON-2322, CON-2323, CON-2394). Ver clinical-mode.md. */
-test('Complete this task abre el detalle de la Referral, en sólo lectura sin encuentro', async ({ app, screen }) => {
+test('Complete this task abre el detalle de la Referral; una ya pedida, en sólo lectura', async ({ app, screen }) => {
   await app.open('/')
   await screen.getByRole('tab', /^Referrals/).tap()
   /* Sophia Collins todavía no llegó: su derivación (Requested) se ve en sólo lectura. */
@@ -139,7 +145,7 @@ test('Lab order: dentición mixta y Toggle all por diente', async ({ app, screen
   await screen.getByRole('button', /New lab order/).tap()
   await screen.getByRole('button', 'Initialize permanent dentition').tap()
   await screen.getByRole('button', 'Tooth 17').tap()
-  await screen.getByRole('button', 'Primary').tap()
+  await screen.getByRole('tab', 'Primary').tap()
   await screen.getByRole('button', 'Tooth I').tap()
   await expect(screen.getByRole('button', 'Edit surfaces of tooth 17')).toBeVisible()
   await screen.getByRole('button', 'Edit surfaces of tooth 17').tap()

@@ -11,6 +11,6 @@ export const ORDEN_TONO: Record<EstadoOrden, PillTone> = {
 
 /** La pestaña Lab order: el panel compartido con Prescription y Referral (RegistrosPanel). `ordenes` sólo limita cuántas
  *  se ven (Storybook). Ver design-reference/figma/modulos/clinical-mode.md (2026-11-27). */
-export function LabOrderPanel({ ordenes, tarea, encuentroAbierto = false }: { ordenes?: OrdenLab[]; tarea?: PendingTask; encuentroAbierto?: boolean }) {
-  return <RegistrosPanel kind="Lab orders" tarea={tarea} encuentroAbierto={encuentroAbierto} maximo={ordenes?.length} />
+export function LabOrderPanel({ ordenes, tarea }: { ordenes?: OrdenLab[]; tarea?: PendingTask }) {
+  return <RegistrosPanel kind="Lab orders" tarea={tarea} maximo={ordenes?.length} />
 }

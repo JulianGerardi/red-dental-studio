@@ -1,11 +1,13 @@
 import { useEffect, useState } from 'react'
 import type { PendingTask } from '@/components/dashboard/PendingTaskCard'
-import { documentoTarea, hash, ordenLab, type Documento, type Seccion } from '@/components/dashboard/documentoTarea'
-/* Ciclo a propósito (tareas usa documentoRegistro): se llaman sólo dentro de funciones. */
+import { hash, largo, mailProvider, ordenLab, paciente } from '@/components/dashboard/documentoTarea'
+import { completar, type Datos } from '@/pdfs/marco'
+import { COMUNES, PDFS, htmlDe } from '@/pdfs/plantillas'
+/* Ciclo a propósito (tareas usa hojaDeRegistro): se llaman sólo dentro de funciones. */
 import { avisarTareas, suscribirTareas, tareaViva } from '@/components/dashboard/tareas'
 import { PROCEDIMIENTOS, PROCEDIMIENTOS_ORDEN, PROVEEDORES_DERIVACION, VINCULOS_PROCEDIMIENTO, type DatosDerivacion, type ProveedorDerivacion } from '@/data/clinical-mode'
 import { LABORATORIOS, type Denticion, type Laboratorio } from '@/data/laboratorios'
-import { fraseDeUso, medicacion, nombreMedicacion, type DatosReceta } from '@/data/recetas'
+import { medicacion, nombreMedicacion, unidadDeDosis, type DatosReceta } from '@/data/recetas'
 import { CASOS, NO_ASIGNADOS } from '@/data/treatment-plan'
 import type { Adjunto, ProcedimientoFicha } from './FichaClinica'
 import type { SuperficieLab } from './dental/RuedaSuperficies'
@@ -145,6 +147,13 @@ const SEMILLA: Registro[] = [
   ]),
 ]
 
+/* Vence en una semana o ya venció y sigue abierto: la fecha va en rojo, como red.dev. */
+const FINALES = ['Delivered', 'Rejected', 'Canceled', 'Completed', 'Expired']
+export const urge = (r: Pick<Registro, 'expiration' | 'state'>) => {
+  const f = new Date(r.expiration)
+  return !FINALES.includes(r.state) && !Number.isNaN(f.getTime()) && f.getTime() - Date.now() < 7 * 86400000
+}
+
 /* ── Almacén ── */
 
 let registros: Registro[] = SEMILLA
@@ -170,10 +179,13 @@ export function asegurarRegistro(t: PendingTask | undefined) {
 }
 
 let serie = 1
+/* Una derivación no pide vencimiento en su ficha (red.dev tampoco); la lista lo muestra: 30 días desde que se crea. */
+const enUnMes = () => { const d = new Date(); return new Date(d.getFullYear(), d.getMonth(), d.getDate() + 30).toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric' }) }
 /** Un registro nuevo, en Pending, a nombre del provider del encuentro (CON-2215: se registra el proveedor y la fecha). */
 export const nuevoRegistro = (kind: TipoRegistro, paciente?: Partial<Pick<PendingTask, 'person' | 'initials' | 'patientId'>>): Registro => ({
-  id: `nuevo-${kind.toLowerCase().replace(/\s+/g, '-')}-${serie++}`, kind, state: 'Pending', ...PACIENTE, ...paciente, provider: MARTINEZ,
-  register: hoy(), updated: hoy(), expiration: '', pdf: false,
+  ...PACIENTE, person: paciente?.person ?? PACIENTE.person, initials: paciente?.initials ?? PACIENTE.initials, patientId: paciente?.patientId ?? PACIENTE.patientId,
+  id: `nuevo-${kind.toLowerCase().replace(/\s+/g, '-')}-${serie++}`, kind, state: 'Pending', provider: MARTINEZ,
+  register: hoy(), updated: hoy(), expiration: kind === 'Referrals' ? enUnMes() : '', pdf: false,
 })
 
 export function useRegistros(kind: TipoRegistro) {
@@ -191,57 +203,65 @@ let proveedoresCreados: ProveedorDerivacion[] = []
 export const proveedoresDerivacion = () => [...PROVEEDORES_DERIVACION, ...proveedoresCreados]
 export const agregarProveedor = (p: ProveedorDerivacion) => { proveedoresCreados = [...proveedoresCreados, p] }
 
-/* ── El documento (PDF) con el contenido del registro ── */
+/* ── El documento con el contenido del registro: las plantillas de PDF de `src/pdfs` (las mismas que recibe el backend),
+   completadas con lo cargado en la ficha. Ver design-reference/figma/modulos/pdfs.md. ── */
 
 const procedimientosDe = (ids: string[], catalogo: ProcedimientoFicha[]) => catalogo.filter((p) => ids.includes(p.id))
-const zona = (p: ProcedimientoFicha) => (p.pieza && p.pieza !== '-' ? `Tooth ${p.pieza}${p.superficie && p.superficie !== '-' ? ` · ${p.superficie}` : ''}` : p.ubicacion && p.ubicacion !== '-' ? p.ubicacion : '')
-const lineaProcedimiento = (p: ProcedimientoFicha) => [`${p.codigo} - ${p.nombre}`, zona(p)].filter(Boolean).join(' · ')
+const zona = (p: ProcedimientoFicha) => (p.pieza && p.pieza !== '-' ? [p.pieza, p.superficie && p.superficie !== '-' ? p.superficie : ''].filter(Boolean).join(' · ') : p.ubicacion && p.ubicacion !== '-' ? p.ubicacion : '-')
+const fechaLarga = (s: string) => { const f = new Date(s); return s && !Number.isNaN(f.getTime()) ? largo(f) : s || '-' }
+const siNo = (v: boolean) => (v ? 'Yes' : 'No')
+const PLANTILLA: Record<TipoRegistro, string> = { 'Lab orders': 'lab-order', Prescriptions: 'prescription', Referrals: 'referral' }
 
-/** El documento de una tarea o de un registro: el de la tarea (documentoTarea) con lo cargado en su ficha. */
-export function documentoRegistro(t: PendingTask): Documento {
-  const base = documentoTarea(t)
-  const r = registroDe(t.id)
-  if (!r) return base
+/** El HTML del documento de un registro (o de la tarea que todavía no se abrió); sin plantilla (Clinical note), nada. */
+export function hojaDeRegistro(t: PendingTask): string | undefined {
+  const pdf = PDFS.find((x) => x.id === PLANTILLA[t.kind as TipoRegistro])
+  if (!pdf) return undefined
+  /* La tarea llega con sus cambios (tareaViva): si ya se pidió, `updated` es la fecha de ese cambio. */
+  const r: Registro = registroDe(t.id) ?? { ...t, id: t.id ?? '', kind: t.kind as TipoRegistro, updated: (t as { updated?: string }).updated ?? t.register, ...contenidoDe(t) }
+  const p = paciente(r.person)
+  const provider = (r.provider ?? '').replace(/^Dr\.\s*/, '')
+  const edad = Math.floor((Date.now() - p.nacimiento.getTime()) / 31557600000)
+  /* La firma del provider queda puesta cuando el documento ya salió (la orden pedida, la receta activa…). */
+  const firmado = r.state === 'Pending' ? {} : { provider_signed_date: fechaLarga(r.updated), provider_signature_image: '' }
+  const comunes: Datos = {
+    ...COMUNES, patient_name: r.person, patient_birth_date: `${largo(p.nacimiento)} (${edad} yrs)`, patient_phone: p.telefono, patient_email: p.email,
+    patient_address: p.direccion, provider_name: provider, provider_email: mailProvider(provider),
+  }
+  let propios: Datos = {}
   if (r.lab) {
     const lab = laboratorios().find((l) => l.nombre === r.lab!.laboratorio)
-    const porDenticion = (d: Denticion) => r.lab!.dientes.filter((x) => /^\d+$/.test(x) === (d === 'Permanent'))
-    const dientes: Seccion[] = (['Permanent', 'Primary'] as const).filter((d) => porDenticion(d).length).map((d) => ({
-      titulo: 'Teeth & Surface Specifications', dientes: { denticion: d, piezas: porDenticion(d).map((x): [string, string[]] => [x, r.lab!.superficies[x] ?? []]) },
-    }))
-    const procedimientos = procedimientosDe(r.lab.procedimientos, PROCEDIMIENTOS_LAB)
-    return { ...base, secciones: [
-      ...base.secciones.slice(0, 2),
-      { titulo: 'Receiving Laboratory', campos: [['Name', r.lab.laboratorio], ['Phone', lab?.telefono ?? '-'], ['Email', lab?.email ?? '-'], ['Address', lab?.direccion ?? '-']] },
-      ...base.secciones.slice(3, 4),
-      ...(procedimientos.length ? [{ titulo: 'Procedures', parrafos: procedimientos.map(lineaProcedimiento) }] : []),
-      { titulo: 'Dental Work Request', parrafos: [r.lab.asap ? `ASAP. ${r.lab.trabajo}` : r.lab.trabajo] },
-      ...(r.lab.indicaciones.trim() ? [{ titulo: 'Special Instructions', parrafos: [r.lab.indicaciones] }] : []),
-      ...dientes,
-    ] }
-  }
-  if (r.receta) {
-    return { ...base, secciones: [
-      ...base.secciones,
-      { titulo: 'Medications', listas: r.receta.medicaciones.map((m): [string, string[]] => [
-        `${nombreMedicacion(m)} · ${m.forma}`,
-        [fraseDeUso(m), `Quantity to dispense: ${m.cantidad} · Refills: ${m.refills || '0'}`, m.generico ? 'Generic substitution allowed' : 'No generic substitution', ...(m.controlada ? ['Controlled substance'] : [])].filter(Boolean),
-      ]) },
-      ...(r.receta.indicaciones.trim() ? [{ titulo: 'Additional Instructions', parrafos: [r.receta.indicaciones] }] : []),
-    ] }
-  }
-  if (r.derivacion) {
+    const permanentes = r.lab.dientes.filter((d) => /^\d+$/.test(d))
+    propios = {
+      expiration_date: fechaLarga(r.expiration), lab_name: r.lab.laboratorio, lab_phone: lab?.telefono ?? '-', lab_email: lab?.email ?? '-', lab_address: lab?.direccion ?? '-',
+      work_request: [r.lab.asap ? 'ASAP.' : '', r.lab.trabajo, r.lab.indicaciones.trim() && `Special instructions: ${r.lab.indicaciones.trim()}`].filter(Boolean).join(' '),
+      /* La plantilla dibuja una dentición: la que tiene dientes marcados (la permanente si hay de las dos). */
+      dentition: permanentes.length || !r.lab.dientes.length ? 'Permanent' : 'Primary',
+      teeth: r.lab.dientes.map((d) => ({ tooth: d, surfaces: (r.lab!.superficies[d] ?? []).join(', ') })),
+    }
+  } else if (r.receta) {
+    propios = {
+      issued_date: fechaLarga(r.register), expiration_date: fechaLarga(r.expiration), additional_indications: r.receta.indicaciones,
+      medications: r.receta.medicaciones.map((m) => ({
+        drug_name: m.nombre, strength: nombreMedicacion({ ...m, nombre: '' }), dosage_form: m.forma,
+        dose: [m.dosis, unidadDeDosis(m.dosis, m.unidadDosis)].filter(Boolean).join(' '), route: m.via.toLowerCase(), frequency: m.frecuencia.toLowerCase(),
+        duration: `${m.duracion} ${(Number(m.duracion) === 1 ? m.unidadDuracion.replace(/s$/, '') : m.unidadDuracion).toLowerCase()}`, quantity: m.cantidad, refills: m.refills || '0',
+        generic_substitution: m.generico ? 'Allowed' : 'Not allowed', controlled_substance: siNo(m.controlada),
+      })),
+      ...firmado,
+    }
+  } else if (r.derivacion) {
     const d = r.derivacion
-    const destino = proveedoresDerivacion().find((p) => p.nombre === d.proveedor)
-    const procedimientos = procedimientosDe(d.procedimientos, PROCEDIMIENTOS_REFERRAL)
-    const marcas = [d.asap && 'ASAP', d.obligatoria && 'Mandatory to continue treatment'].filter((x): x is string => !!x)
-    return { ...base, secciones: [
-      ...base.secciones,
-      { titulo: 'Referral Provider', campos: [['Name', d.proveedor], ['Specialty', destino?.especialidad || '-']] },
-      { titulo: 'Case Procedure(s)', parrafos: procedimientos.length ? procedimientos.map(lineaProcedimiento) : ['No procedures attached to this referral.'] },
-      { titulo: 'Referral Notes', parrafos: [d.nota, ...marcas] },
-    ] }
+    const destino = proveedoresDerivacion().find((x) => x.nombre === d.proveedor)
+    propios = {
+      created_date: fechaLarga(r.register), asap: siNo(d.asap), mandatory: siNo(d.obligatoria),
+      contact_name: d.proveedor, contact_type: 'Dentist', contact_specialty: destino?.especialidad || '-', contact_phone: '-', contact_email: '-', contact_address: '-',
+      procedures: procedimientosDe(d.procedimientos, PROCEDIMIENTOS_REFERRAL).map((x) => ({ code: x.codigo, description: x.nombre, anatomic_area: zona(x), findings: [], diagnoses: [] })),
+      referral_note: d.nota,
+      attachments: d.adjuntos.map((a, i) => ({ annex_label: String.fromCharCode(65 + i), name: a.nombre, file_type: /\.pdf$/i.test(a.nombre) ? 'PDF' : 'Image', is_image: false, file_url: '' })),
+      ...firmado,
+    }
   }
-  return base
+  return completar(htmlDe(pdf), { ...comunes, ...propios })
 }
 
 export { LAB_VACIO }

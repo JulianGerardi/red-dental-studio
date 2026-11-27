@@ -3969,3 +3969,103 @@ con lo que #214 había relevado de red.dev y esta no tenía; los tres archivos d
   dice *Edit / View / View PDF* (no *Edit prescription / Download PDF*); el vencimiento va en rojo si vence en una
   semana y sigue abierta (no sólo las Expired); los datos de ejemplo son los 7 de `registros` (no los 14 de #214).
 - `ui/date-picker` queda con la firma de #214 (`min`, `max`, `disabled`, `label`); `aplicarAccion` pierde `sinAviso`.
+
+## CON-2214 · CON-2212 · CON-2321 · Teeth & surface de red.dev, datos en el título, fichas apiladas y el PDF nuevo (2026-11-27, 4ª vuelta)
+
+**Jira:** CON-2215 (Lab order), CON-2230 / CON-2287 (Prescription y su PDF), CON-2322 / CON-2609 (Referral), CON-4115
+(PDFs). Pedido de Julián sobre lo publicado en #216, con dos links de red.dev (una Prescription Active y la lista de
+Referral), que se recorrieron otra vez sin cambiar nada.
+
+1. **Teeth & surface como está armado en red.dev** (`dental/ArcadaAnatomica`, reemplaza a `DentalArch`, que se borra): el
+   dibujo de las dos arcadas con la anatomía de cada diente, su número afuera y *Maxillary* / *Mandibular* adentro, para
+   Permanent y Primary. Sale del SVG de red.dev (`dental/arcadasRed.ts`, generado: un trazo por diente; los colores son
+   los tokens de la app). Cada diente es un botón (`aria-pressed`, teclado). La dentición va debajo del rótulo
+   (`ui/tabs`), el dibujo a la izquierda y, a la derecha, *Permanent* / *Primary* con los dientes marcados, la rueda y
+   *Toggle all* / *Apply to unset*. La **rueda** usa las cinco formas de red.dev (`RuedaSuperficies`).
+2. **Quién y cuándo, en el título** (`EncabezadoFicha` suma `datos` y `campo`): pares rótulo / valor separados por una
+   línea, a la derecha del título y junto al PDF y el ⋮; en celular bajan a su fila. Lab order: *Ordering provider* y
+   *Order date*. Prescription: *Prescribing provider*, *Prescription date* y **Expiration date\*** (el `DatePicker`,
+   como red.dev, con su error debajo). Referral: *Referring provider*, *Referral date* y *Expiration date*. Salen de
+   *General information*.
+3. **New siempre activo**: *New lab order / prescription / referral* no piden encuentro abierto (en red.dev se crean con
+   el paciente en *Pending Signature*) y la ficha nueva se carga y se guarda. Lo ya cargado sigue pidiendo encuentro para
+   editar y para las acciones del ⋮ (CON-2643). **A confirmar con Julián** si eso también se saca.
+4. **Prescription y Referral, una card debajo de la otra**, como los formularios de la app (Lab order sigue en dos
+   columnas). Prescription: *Medications* (*Add medication* en el título de la card, pestañas, y *Medication details* |
+   *Directions for use* lado a lado desde 1280 px con los campos de a dos, como red.dev) y *Details* con *Additional
+   instructions*. **Sale el *Summary***. Referral: *General information* (provider + *New provider* | ASAP y Mandatory,
+   Procedures) y *Details* (Referral note | Attachments).
+5. **Prescription Active como red.dev**: campos apagados, Save apagado, PDF en el título y ⋮ con *Expire* y *Cancel*.
+6. **El documento sale de las plantillas de PDF** (`src/pdfs/plantillas`, las que recibe el backend), completadas con lo
+   cargado en la ficha (`hojaDeRegistro` + `completar`) y abiertas en una pestaña (`abrirHoja`): Lab order, Prescription
+   y Referral. La Clinical note sigue con el PDF de la tarea. Se va `documentoRegistro`.
+7. **PDF en la fila** de las tres tablas (columna *PDF*, el ícono de red.dev): se abre cuando el documento existe y se ve
+   apagado cuando todavía no. Sale *View PDF* del ⋮.
+8. **Referral con Expiration date** en la tabla (y en el título), en rojo cuando vence en una semana o ya venció y sigue
+   abierta, como Lab order y Prescription (`urge`).
+
+Anomalías y supuestos:
+
+- La ficha de Referral de red.dev no tiene campo de vencimiento y su lista muestra la misma fecha que *Created*. Acá una
+  derivación nueva vence a los 30 días (supuesto, no hay regla en Jira): **a confirmar**.
+- La plantilla de Lab order no tiene *Special instructions*, *ASAP* ni procedimientos: van dentro de *Dental Work
+  Request*. Dibuja una sola dentición; con dientes de las dos, la permanente (los temporarios quedan en la lista).
+- El PDF de red.dev de Prescription trae *Prescription ID*, *Valid From* y una tabla de medicación; el nuestro es el de
+  `pdfs.md` (sin ID, una medicación por bloque).
+- El documento se abre como hoja HTML (la plantilla), no como archivo .pdf: el PDF lo arma el backend. Desde la pestaña
+  se imprime o se guarda como PDF.
+- El dibujo de las arcadas pesa unos 85 KB en el módulo de Clinical Mode.
+
+**A validar con usuarios:** si el vencimiento en el título se ve como un campo obligatorio (queda lejos del resto); y si
+el dibujo anatómico se toca bien en celular (los dientes anteriores son chicos).
+
+Código: `clinical/dental/{ArcadaAnatomica,arcadasRed,RuedaSuperficies}`, `clinical/{FichaClinica,LabOrderDetail,
+PrescriptionDetail,ReferralDetail,RegistrosPanel,registros}`, `dashboard/{tareas,documentoTarea}`, `data/recetas`;
+`tests/{registros-clinicos,pending-tasks}.e2e.ts`.
+
+### Fichas apiladas en las tres, fechas y "+N" con las piezas de la app (2026-11-27, 5ª vuelta)
+
+**CON-2214 · CON-2212 · CON-2321.** Pedido de Julián sobre el link de prueba; corrige la 4ª vuelta donde la contradice.
+
+- **Lab order con la misma diagramación que Prescription y Referral**: una card debajo de la otra (*General information*
+  con Teeth & surface, y *Details* con *Dental work requested* | *Special instructions* y los adjuntos). Ya no hay
+  ficha en dos columnas: salen `COLUMNAS_FICHA`, `DatoFicha`, `TextArea.crecer` y `Card.bodyClassName`.
+- **Prescription:** el rótulo *Expiration date\** va arriba del campo, en el título.
+- **Referral:** *Referral note* a todo el ancho y *Attachments* debajo.
+- **Fechas con los componentes de la app:** el `DatePicker` de las fichas no apaga días (igual que en el resto de los
+  formularios); que el vencimiento no quede en el pasado (*Date cannot be in the past*) ni a más de seis meses en una
+  receta se revisa al guardar, con el aviso arriba y debajo del campo. Una Lab order Pending ya vencida pide una fecha
+  nueva para guardarse. CON-2230 pide bloquear la selección en el calendario: se cambió por pedido de Julián. El filtro
+  de las tablas es el `DateFilter` de toda la app (*All dates*, Today, Last 7 / 30 / 90 days); en Lab order y
+  Prescription también deja elegir días que vienen, y abre en el mes actual. Sale `emptyLabel`.
+- **"+N" de Medication** (`ui/chip` › `ChipMas`, el mismo "+N" de Working hours, sin la ✕): despliega el resto de las
+  medicaciones en la fila, sin abrir la ficha.
+- **Corregido en la revisión:** *New* después de entrar por una tarea de Pending Task tomaba el id y el estado de esa
+  tarea y la pisaba al guardar; ahora crea un registro nuevo en Pending. El documento de una tarea pedida desde el
+  Dashboard firmaba con la fecha de creación. El foco de un diente se distingue del diente elegido (trazo negro).
+
+### Sin encuentro, la fecha del Dashboard y Lab order a lo ancho (2026-11-27, 6ª vuelta)
+
+**CON-2214 · CON-2212 · CON-2321.** Pedido de Julián sobre el link de prueba; reemplaza lo que la 4ª y la 5ª vuelta dicen
+del encuentro y del filtro de fecha.
+
+- **Nada pide un encuentro abierto en estas tres pestañas**: ni *New*, ni editar una Pending, ni las acciones del ⋮
+  ("no tengo que poner siempre Start encounter para iniciar algo"). La ficha sólo queda en *Read-only mode* cuando el
+  registro ya no está en Pending. `RegistrosPanel` y las fichas pierden `encuentroAbierto` / `abierto`; `AvisosFicha`,
+  el aviso de *no open encounter*. **Pending Task del Dashboard y del Patient Dashboard no cambia**: su ⋮ sigue apagado
+  sin encuentro (CON-2643), pero *Complete this task* abre la ficha y desde ahí sí se edita. A unificar si Julián lo
+  pide.
+- **El filtro de fecha de las tablas es el bloque del Dashboard** (`ui/date-nav`: ‹ Today › + calendario), por mes:
+  filtra por el mes del vencimiento (Lab order, Prescription) o de la derivación (Referral). Para servir de filtro,
+  `DateNav` admite `value: null` con `vacio` (*All dates*) y `onClear` (la ✕ al final del bloque). Sale `DateFilter` de
+  estas tablas.
+- **Lab order sin aire a los costados**: dentro de *General information*, desde 1280 px, los campos (laboratorio, fecha,
+  ASAP, procedimientos) van a la izquierda y *Teeth & surface* (dentición, arcadas, dientes marcados, rueda y sus botones)
+  a la derecha. Más angosto, uno debajo del otro. La lógica no cambia.
+- **Details de Lab order**: *Dental work requested* y, debajo, *Special instructions*, los dos a todo el ancho.
+- **Expiration date de Prescription en el título**: los tres datos comparten grilla (rótulo arriba a 8 px y el valor a la
+  altura del campo, 36 px), separados por una línea; antes el rótulo quedaba pegado al campo porque los otros dos eran
+  texto chico (`EncabezadoFicha`: con `campo`, `datos` toma la grilla de formulario).
+
+**A validar con usuarios:** si filtrar por mes alcanza o piden un rango libre; y si *Today* se entiende como "este mes"
+en una tabla.

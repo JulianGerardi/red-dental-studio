@@ -1,59 +1,66 @@
 import { useState, type ComponentType, type ReactNode } from 'react'
 import { ArrowRightLeft, Eye, FileText, FlaskConical, Pill as IconoPastilla, Plus, type LucideIcon } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { ICONO_SUELTO } from '@/lib/estilos'
 import { Button } from '@/components/ui/button'
-import { Chip } from '@/components/ui/chip'
+import { Chip, ChipMas } from '@/components/ui/chip'
 import { DataTable, TextCell, type DataTableColumn } from '@/components/ui/data-table'
-import { DateFilter, inRange, type DatePreset, type DateRange } from '@/components/ui/date-filter'
+import { DateNav } from '@/components/ui/date-nav'
 import { DropdownMenuItem } from '@/components/ui/dropdown-menu'
 import { FilterMenu, type FilterGroup } from '@/components/ui/filter-menu'
 import { Pill } from '@/components/ui/pill'
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 import { SettingsSearch } from '@/components/settings/SettingsSearch'
 import type { PendingTask } from '@/components/dashboard/PendingTaskCard'
-import { ItemsTarea, SIN_ENCUENTRO, TONO_ESTADO, accionesDe, esEditable, useAccionesTarea, type AccionUI } from '@/components/dashboard/tareas'
+import { ItemsTarea, TONO_ESTADO, accionesDe, esEditable, useAccionesTarea, type AccionUI } from '@/components/dashboard/tareas'
 import { nombreMedicacion } from '@/data/recetas'
 import { LabOrderDetail } from './LabOrderDetail'
 import { PrescriptionDetail } from './PrescriptionDetail'
 import { ReferralDetail } from './ReferralDetail'
-import { asegurarRegistro, nuevoRegistro, proveedoresDerivacion, useRegistros, type Registro, type TipoRegistro } from './registros'
+import { asegurarRegistro, nuevoRegistro, proveedoresDerivacion, urge, useRegistros, type Registro, type TipoRegistro } from './registros'
 
 /* Las pestañas Lab order, Prescription y Referral de Clinical Mode son el mismo panel: la tabla estándar (buscador con
-   Search, Filter y el rango de fechas de red.dev, y la acción New a la derecha), la fila que abre la ficha, el ⋮ con las acciones del estado
+   Search, Filter y la fecha con el bloque del Dashboard, y la acción New a la derecha), la fila que abre la ficha, el ⋮ con las acciones del estado
    (la máquina de `dashboard/tareas`) y la ficha, que es una sola para New, Edit y la vista de sólo lectura. red.dev lista
    Prescription y Referral en cards; acá las tres van en tabla, como el resto de la app. Ver
    design-reference/figma/modulos/clinical-mode.md (2026-11-27). */
 
-type PropsFicha = { registro: Registro; nuevo?: boolean; abierto: boolean; onVolver: () => void; onAccion: (t: PendingTask, a: AccionUI) => void }
+type PropsFicha = { registro: Registro; nuevo?: boolean; onVolver: () => void; onAccion: (t: PendingTask, a: AccionUI) => void }
 
 const fecha = (s: string) => s || '—'
-const FINALES = ['Delivered', 'Rejected', 'Canceled', 'Completed', 'Expired']
-/* Vence en una semana o ya venció y sigue abierto: en rojo, como red.dev. */
-const urge = (r: Registro) => {
-  const f = new Date(r.expiration)
-  return !FINALES.includes(r.state) && !Number.isNaN(f.getTime()) && f.getTime() - Date.now() < 7 * 86400000
-}
 const columnaEstado: DataTableColumn<Registro> = { key: 'estado', header: 'Status', width: 120, cell: (r) => <Pill tone={TONO_ESTADO[r.state] ?? 'info'}>{r.state}</Pill> }
-const columnasFecha = (conVencimiento = true): DataTableColumn<Registro>[] => [
+const columnasFecha = (): DataTableColumn<Registro>[] => [
   { key: 'actualizado', header: 'Last update', width: 120, cell: (r) => fecha(r.updated) },
   { key: 'creado', header: 'Created date', width: 120, cell: (r) => fecha(r.register) },
-  ...(conVencimiento ? [{ key: 'vence', header: 'Expiration date', width: 130, cell: (r: Registro) => <span className={cn(urge(r) && 'font-semibold text-dash-bad-fg')}>{fecha(r.expiration)}</span> }] : []),
+  { key: 'vence', header: 'Expiration date', width: 130, cell: (r: Registro) => <span className={cn(urge(r) && 'font-semibold text-dash-bad-fg')}>{fecha(r.expiration)}</span> },
 ]
 const proveedor = (header: string): DataTableColumn<Registro> => ({ key: 'proveedor', header, cell: (r) => <TextCell>{r.provider ?? '—'}</TextCell> })
 const especialidadDe = (nombre?: string) => proveedoresDerivacion().find((p) => p.nombre === nombre)?.especialidad
 
-const enDias = (n: number) => { const d = new Date(); return new Date(d.getFullYear(), d.getMonth(), d.getDate() + n) }
-/* Atajos de vencimiento: hacia adelante (lo que vence pronto) y hacia atrás (lo que ya venció). */
-const ATAJOS_VENCE: DatePreset[] = [
-  { label: 'Next 7 days', range: () => ({ from: enDias(0), to: enDias(6) }) },
-  { label: 'Next 30 days', range: () => ({ from: enDias(0), to: enDias(29) }) },
-  { label: 'Last 30 days', range: () => ({ from: enDias(-29), to: enDias(0) }) },
-  { label: 'Last 90 days', range: () => ({ from: enDias(-89), to: enDias(0) }) },
-]
+/* Las medicaciones de una receta en la fila: la primera en un chip y el resto detrás de "+N", que las despliega (como las
+   franjas de Working hours, sin la ✕). */
+function MedicacionesCelda({ r }: { r: Registro }) {
+  const [abierto, setAbierto] = useState(false)
+  const todas = r.receta?.medicaciones ?? []
+  if (!todas.length) return <>—</>
+  const visibles = abierto ? todas : todas.slice(0, 1)
+  return (
+    <span className="flex min-w-0 flex-wrap items-center gap-1.5">
+      {visibles.map((m) => <Chip key={m.id} title={nombreMedicacion(m)}>{nombreMedicacion(m)}</Chip>)}
+      {todas.length > visibles.length && (
+        <ChipMas
+          n={todas.length - visibles.length} label={`Show ${todas.length - visibles.length} more medications: ${todas.slice(1).map(nombreMedicacion).join(', ')}`}
+          onClick={(e) => { e.stopPropagation(); setAbierto(true) }}
+        />
+      )}
+    </span>
+  )
+}
 
 const CONFIG: Record<TipoRegistro, {
   /** El filtro de fecha de red.dev: el vencimiento (Lab order, Prescription) o la fecha de la derivación (CON-2609). */
-  fecha: { de: (r: Registro) => string; vacio: string; nombre: string; futura?: boolean }
+  fecha: (r: Registro) => string
+  /** Cómo se llama esa fecha, para el lector de pantalla. */
+  nombreFecha: string
   /** Además de Status y Provider, Lab order filtra por laboratorio (CON-2219). */
   grupoExtra?: { titulo: string; de: (r: Registro) => string }
   nombre: string
@@ -69,7 +76,7 @@ const CONFIG: Record<TipoRegistro, {
 }> = {
   'Lab orders': {
     nombre: 'lab order', plural: 'lab orders', icono: FlaskConical, Ficha: LabOrderDetail,
-    fecha: { de: (r) => r.expiration, vacio: 'Any expiration date', nombre: 'expiration date', futura: true },
+    fecha: (r) => r.expiration, nombreFecha: 'expiration date',
     grupoExtra: { titulo: 'Laboratory', de: (r) => r.lab?.laboratorio ?? '' },
     estados: ['Pending', 'Requested', 'Delayed', 'Delivered', 'Rejected', 'Canceled'],
     columnas: [proveedor('Provider'), { key: 'laboratorio', header: 'Laboratory', cell: (r) => <TextCell>{r.lab?.laboratorio || '—'}</TextCell> }, columnaEstado, ...columnasFecha()],
@@ -78,19 +85,11 @@ const CONFIG: Record<TipoRegistro, {
   },
   Prescriptions: {
     nombre: 'prescription', plural: 'prescriptions', icono: IconoPastilla, Ficha: PrescriptionDetail,
-    fecha: { de: (r) => r.expiration, vacio: 'Any expiration date', nombre: 'expiration date', futura: true },
+    fecha: (r) => r.expiration, nombreFecha: 'expiration date',
     estados: ['Pending', 'Active', 'Expired', 'Canceled'],
     columnas: [
       proveedor('Provider'),
-      { key: 'medicacion', header: 'Medication', cell: (r) => {
-        const [primera, ...resto] = r.receta?.medicaciones ?? []
-        return (
-          <span className="flex min-w-0 items-center gap-1.5">
-            {primera ? <Chip title={nombreMedicacion(primera)}>{nombreMedicacion(primera)}</Chip> : '—'}
-            {resto.length > 0 && <span className="shrink-0 text-xs text-ink-muted" title={resto.map(nombreMedicacion).join(', ')}>+{resto.length}</span>}
-          </span>
-        )
-      } },
+      { key: 'medicacion', header: 'Medication', cell: (r) => <MedicacionesCelda r={r} /> },
       columnaEstado, ...columnasFecha(),
     ],
     texto: (r) => `${r.provider} ${r.receta?.medicaciones.map(nombreMedicacion).join(' ')} ${r.state}`,
@@ -98,7 +97,7 @@ const CONFIG: Record<TipoRegistro, {
   },
   Referrals: {
     nombre: 'referral', plural: 'referrals', icono: ArrowRightLeft, Ficha: ReferralDetail,
-    fecha: { de: (r) => r.register, vacio: 'Any referral date', nombre: 'referral date' },
+    fecha: (r) => r.register, nombreFecha: 'referral date',
     estados: ['Pending', 'Requested', 'Completed', 'Rejected', 'Canceled'],
     columnas: [
       proveedor('Referring provider'),
@@ -108,8 +107,8 @@ const CONFIG: Record<TipoRegistro, {
           {especialidadDe(r.derivacion?.proveedor) && <span className="truncate text-[11px] text-ink-muted">{especialidadDe(r.derivacion?.proveedor)}</span>}
         </span>
       ) },
-      /* CON-2609: Referral date, provider referido, provider creador y Status; la derivación no tiene vencimiento propio. */
-      columnaEstado, ...columnasFecha(false),
+      /* CON-2609: Referral date, provider referido, provider creador y Status; el vencimiento, como la lista de red.dev. */
+      columnaEstado, ...columnasFecha(),
     ],
     texto: (r) => `${r.provider} ${r.derivacion?.proveedor} ${especialidadDe(r.derivacion?.proveedor) ?? ''} ${r.state}`,
     rotulo: (r) => `referral to ${r.derivacion?.proveedor || r.person}, ${r.state}, created ${r.register}`,
@@ -118,13 +117,12 @@ const CONFIG: Record<TipoRegistro, {
 
 type Vista = { modo: 'lista' } | { modo: 'ficha'; id: string } | { modo: 'nuevo'; borrador: Registro }
 
-export function RegistrosPanel({ kind, paciente, tarea, encuentroAbierto = false, maximo }: {
+export function RegistrosPanel({ kind, paciente, tarea, maximo }: {
   kind: TipoRegistro
   /** El paciente de Clinical Mode: a su nombre quedan los registros nuevos (y su PDF). */
   paciente?: string
   /** La tarea de Pending Task que abrió Complete this task: entra directo a su ficha (CON-2643). */
   tarea?: PendingTask
-  encuentroAbierto?: boolean
   /** Cuántos registros mostrar como mucho (Storybook). */
   maximo?: number
 }) {
@@ -137,7 +135,8 @@ export function RegistrosPanel({ kind, paciente, tarea, encuentroAbierto = false
   const [estados, setEstados] = useState<string[]>([])
   const [proveedores, setProveedores] = useState<string[]>([])
   const [extras, setExtras] = useState<string[]>([])
-  const [rango, setRango] = useState<DateRange | null>(null)
+  /* El mes que filtra la tabla; sin mes, todas las fechas. */
+  const [mesFiltro, setMesFiltro] = useState<Date | null>(null)
   const todos = useRegistros(kind)
   const registros = maximo === undefined ? todos : todos.slice(0, maximo)
   const acciones = useAccionesTarea({ paciente: tarea?.patientId })
@@ -145,7 +144,7 @@ export function RegistrosPanel({ kind, paciente, tarea, encuentroAbierto = false
   /* Edit abre la ficha acá mismo; el resto pasa por la pregunta de su acción. */
   const hacer = (t: PendingTask, a: AccionUI) => (a === 'Edit' && t.id ? setVista({ modo: 'ficha', id: t.id }) : acciones.hacer(t, a))
 
-  if (vista.modo === 'nuevo') return <c.Ficha registro={vista.borrador} nuevo abierto={encuentroAbierto} onVolver={aLista} onAccion={hacer} />
+  if (vista.modo === 'nuevo') return <c.Ficha registro={vista.borrador} nuevo onVolver={aLista} onAccion={hacer} />
 
   const abierto = vista.modo === 'ficha' ? registros.find((r) => r.id === vista.id) : undefined
   /* Borrado desde su ⋮: ya no hay ficha que mostrar, vuelve a la lista. */
@@ -153,26 +152,21 @@ export function RegistrosPanel({ kind, paciente, tarea, encuentroAbierto = false
   if (abierto) {
     return (
       <>
-        <c.Ficha key={abierto.id} registro={abierto} abierto={encuentroAbierto} onVolver={aLista} onAccion={hacer} />
+        <c.Ficha key={abierto.id} registro={abierto} onVolver={aLista} onAccion={hacer} />
         {acciones.dialogo}
       </>
     )
   }
 
-  const nuevo = (
-    <Button size="md" aria-disabled={!encuentroAbierto || undefined} className={cn(!encuentroAbierto && 'cursor-not-allowed opacity-50')}
-      onClick={() => { if (encuentroAbierto) setVista({ modo: 'nuevo', borrador: nuevoRegistro(kind, tarea ?? (paciente ? { person: paciente, initials: paciente.split(/\s+/).map((x) => x[0]).join('').slice(0, 2).toUpperCase() } : undefined)) }) }}
-    >
-      <Plus /> New {c.nombre}
-    </Button>
-  )
-  const fechaDe = (r: Registro) => new Date(c.fecha.de(r))
+  /* En Clinical Mode nada de esto pide un encuentro abierto: ni New, ni editar, ni las acciones (Julián, 2026-11-27). */
+  const nuevo = <Button size="md" onClick={() => setVista({ modo: 'nuevo', borrador: nuevoRegistro(kind, tarea ? { person: tarea.person, initials: tarea.initials, patientId: tarea.patientId } : paciente ? { person: paciente, initials: paciente.split(/\s+/).map((x) => x[0]).join('').slice(0, 2).toUpperCase() } : undefined) })}><Plus /> New {c.nombre}</Button>
+  const fechaDe = (r: Registro) => new Date(c.fecha(r))
   const visibles = registros.filter((r) =>
     c.texto(r).toLowerCase().includes(q.trim().toLowerCase())
     && (!estados.length || estados.includes(r.state))
     && (!proveedores.length || proveedores.includes(r.provider ?? ''))
     && (!extras.length || extras.includes(c.grupoExtra?.de(r) ?? ''))
-    && (!rango || (!Number.isNaN(fechaDe(r).getTime()) && inRange(fechaDe(r), rango))))
+    && (!mesFiltro || (fechaDe(r).getFullYear() === mesFiltro.getFullYear() && fechaDe(r).getMonth() === mesFiltro.getMonth())))
   const contar = (de: (r: Registro) => string) => (v: string) => ({ value: v, count: registros.filter((r) => de(r) === v).length })
   const unicos = (de: (r: Registro) => string) => [...new Set(registros.map(de).filter(Boolean))].sort()
   /* Los grupos del Filters de red.dev: Status y Provider en los tres, Laboratory en Lab order. Referral sólo Status. */
@@ -181,12 +175,24 @@ export function RegistrosPanel({ kind, paciente, tarea, encuentroAbierto = false
     ...(c.grupoExtra ? [{ title: c.grupoExtra.titulo, options: unicos(c.grupoExtra.de).map(contar(c.grupoExtra.de)), value: extras, onChange: setExtras }] : []),
     ...(kind !== 'Referrals' ? [{ title: 'Provider', options: unicos((r) => r.provider ?? '').map(contar((r) => r.provider ?? '')), value: proveedores, onChange: setProveedores }] : []),
   ]
+  /* El documento en la fila, como el ícono de red.dev: se abre cuando existe; si todavía no, se ve apagado. */
+  const columnaPdf: DataTableColumn<Registro> = {
+    key: 'pdf', header: 'PDF', width: 64, cell: (r) => (
+      <button
+        type="button" disabled={!r.pdf} aria-label={`View PDF of the ${c.rotulo(r)}`} title={r.pdf ? 'View PDF' : 'No document yet'}
+        onClick={(e) => { e.stopPropagation(); hacer(r, 'PDF') }}
+        className={cn(ICONO_SUELTO, 'disabled:cursor-not-allowed disabled:opacity-30')}
+      >
+        <FileText className="size-4" />
+      </button>
+    ),
+  }
   const item = (icono: ReactNode, texto: string, alElegir: () => void) => <DropdownMenuItem className="text-[13px]" onSelect={alElegir}>{icono} {texto}</DropdownMenuItem>
 
   return (
     <div>
       <DataTable
-        columns={c.columnas}
+        columns={[...c.columnas, columnaPdf]}
         rows={visibles}
         rowKey={(r) => r.id}
         rowLabel={c.rotulo}
@@ -195,25 +201,16 @@ export function RegistrosPanel({ kind, paciente, tarea, encuentroAbierto = false
           <>
             <SettingsSearch value={q} onChange={setQ} placeholder={`Search ${c.plural}`} />
             <FilterMenu label={`Filter ${c.plural}`} groups={grupos} />
-            <DateFilter
-              value={rango} onChange={setRango} label={`Filter ${c.plural} by ${c.fecha.nombre}`} emptyLabel={c.fecha.vacio}
-              {...(c.fecha.futura ? { presets: ATAJOS_VENCE, max: enDias(365) } : {})}
-            />
+            {/* La fecha, con el bloque del Dashboard (‹ Today › + calendario, ui/date-nav), por mes: el del vencimiento o
+                el de la derivación. Sin mes elegido, All dates. */}
+            <DateNav value={mesFiltro} onChange={setMesFiltro} onClear={() => setMesFiltro(null)} periodo="month" vacio="All dates" label={`Filter ${c.plural} by ${c.nombreFecha}`} />
           </>
         )}
-        actions={encuentroAbierto ? nuevo : (
-          <TooltipProvider delayDuration={100}>
-            <Tooltip>
-              <TooltipTrigger asChild>{nuevo}</TooltipTrigger>
-              <TooltipContent side="top" className="max-w-[240px] text-center">{SIN_ENCUENTRO}</TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
-        )}
+        actions={nuevo}
         rowActions={(r) => (
           <>
             {!esEditable(r) && item(<Eye className="size-3.5" />, 'View', () => setVista({ modo: 'ficha', id: r.id }))}
-            {r.pdf && item(<FileText className="size-3.5" />, 'View PDF', () => hacer(r, 'PDF'))}
-            {accionesDe(r).length > 0 && <ItemsTarea task={r} abierto={encuentroAbierto} onAccion={hacer} />}
+            {accionesDe(r).length > 0 && <ItemsTarea task={r} abierto onAccion={hacer} />}
           </>
         )}
         pageSize={10}

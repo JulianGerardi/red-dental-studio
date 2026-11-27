@@ -19,13 +19,13 @@ export type Seccion =
 export type Documento = { titulo: string; paciente: string; secciones: Seccion[]; provider: string; firmado?: string; sinFirma?: boolean }
 
 const MESES = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
-const largo = (d: Date) => `${MESES[d.getMonth()]} ${d.getDate()}, ${d.getFullYear()}`
+export const largo = (d: Date) => `${MESES[d.getMonth()]} ${d.getDate()}, ${d.getFullYear()}`
 
 const suma = (s: string) => [...s].reduce((a, c) => a + c.charCodeAt(0), 0)
 const DIRECCIONES = ['Av Siempreviva 1237, 222, New York, 1232, NY, US', '742 Evergreen Ter, 5, Brooklyn, 11215, NY, US', '19 Hudson St, 12, Jersey City, 07302, NJ, US']
 
 /* Datos del paciente que no trae la tarea: los de la ficha de John Smith y, para el resto, unos fijos por nombre. */
-function paciente(nombre: string) {
+export function paciente(nombre: string) {
   const n = suma(nombre)
   const email = `${nombre.toLowerCase().replace(/\s+/g, '.')}@email.com`
   const direccion = DIRECCIONES[n % DIRECCIONES.length]!
@@ -52,7 +52,7 @@ export function ordenLab(t: PendingTask) {
 }
 
 /* El mail del provider como en red.dev: inicial y apellido. */
-const mailProvider = (nombre: string) => {
+export const mailProvider = (nombre: string) => {
   const [primero = '', ...resto] = nombre.toLowerCase().split(/\s+/)
   return `${resto.length ? `${primero[0]}${resto.at(-1)}` : primero}@confidentally.com`
 }
@@ -318,4 +318,10 @@ export function abrirDocumento(doc: Documento, alFallar: () => void) {
   ventana.document.body.textContent = 'Preparing document, please wait...'
   const url = URL.createObjectURL(pdfDeDocumento(doc))
   setTimeout(() => { ventana.location.href = url }, 700)
+}
+
+/** Una hoja HTML (las plantillas de PDF de `src/pdfs`) en una pestaña nueva, como el documento que arma el backend. */
+export function abrirHoja(html: string, alFallar: () => void) {
+  const ventana = window.open(URL.createObjectURL(new Blob([html], { type: 'text/html' })), '_blank')
+  if (!ventana) alFallar()
 }

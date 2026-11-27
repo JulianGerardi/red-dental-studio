@@ -2,10 +2,8 @@ import { cn } from '@/lib/utils'
 
 /* Compartidos entre la ficha de empleado y la de locación: la misma card con
    título opcional, y el mismo switch Yes/No. */
-export function Card({ title, action, children, className, bodyClassName }: {
+export function Card({ title, action, children, className }: {
   title?: string
-  /** Clases del cuerpo (por ejemplo `flex-1 flex flex-col` para que un campo ocupe el alto que sobra). */
-  bodyClassName?: string
   /** Un control a la derecha del título (la dentición de Teeth & surface). */
   action?: React.ReactNode
   children: React.ReactNode
@@ -19,7 +17,7 @@ export function Card({ title, action, children, className, bodyClassName }: {
           {action && <span className="ml-auto">{action}</span>}
         </div>
       )}
-      <div className={cn(title && 'mt-4', bodyClassName)}>{children}</div>
+      <div className={title ? 'mt-4' : ''}>{children}</div>
     </section>
   )
 }
