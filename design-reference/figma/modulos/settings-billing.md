@@ -2,47 +2,70 @@
 
 
 
-## Versiones de un Fee Schedule como la guía funcional (2026-11-27) · CON-1151, CON-1369, CON-1375, CON-495, CON-496, CON-497, CON-1276, CON-1108
+## Versiones de un Fee Schedule: guía funcional y prototipo (2026-11-27) · CON-1151, CON-1369, CON-1375, CON-495, CON-496, CON-497, CON-1276, CON-1108
 
-Julián pasó la *Guía funcional: ¿Cómo funciona un Fee Schedule?* (texto y video). Dos capas: el **fee schedule** (nombre,
-tipo y si está disponible) y sus **versiones** (las hojas de precios en el tiempo). Lo que no cerraba antes: el switch
-*Save in draft state* ponía inactivo todo el fee schedule, la versión activa y las expiradas se editaban, guardar una futura
-creaba otra versión y Archive / Inactive no miraban las asociaciones.
+Julián pasó la *Guía funcional: ¿Cómo funciona un Fee Schedule?* y después un **prototipo en HTML** (*Fee schedules ·
+version flow*) con cada botón, pop up y validación. Manda el prototipo; los textos son los suyos (que salen de Jira). Dos
+capas: el **fee schedule** (nombre, tipo, estado) y sus **versiones** (las hojas de precios en el tiempo). Se mantiene el
+diseño de la app (Billing con pestañas, lista y editor en dos cards): del prototipo se toma el funcionamiento.
 
-1. **Estados de una versión** (`estadoVersion`): *Active* (la que rige hoy), *Scheduled* (publicada con fecha futura) y
-   *Expired* (reemplazada). El selector *Fee schedule version* las muestra de la más nueva a la más vieja y suma *Draft*
-   arriba si hay uno. Debajo de los campos, un aviso dice qué es la versión que se ve y qué se puede hacer (la tabla de
-   estados de la guía, en una línea).
-2. **Active no se edita** (CON-495, CON-1369): la tabla queda en texto (*Fee*) y *Available from* deshabilitado. **Update
-   fees** abre el Draft con sus precios (*Open draft* si ya había uno).
-3. **Draft** (`Arancel.borrador`, uno por fee schedule): *Current fee* (lo que rige hoy) y *New fee*, Copy form y Bulk
-   edit. Pie: *Discard draft* a la izquierda, *Cancel · Save draft · Publish*. **Publish** confirma con el texto de
-   CON-1151 y crea la versión desde *Available from* (hoy o después: *The available date must be today or a future date.*);
-   si ya hay una versión ese día, la reemplaza. Toast de CON-1151.
-4. **Scheduled se edita en el lugar** (CON-1375): precios y fecha, *Save changes*, sin versión nueva. Con asociaciones
-   confirma con el texto de CON-495. *Current fee* es lo que la versión ya tiene guardado.
-5. **Expired**: sólo lectura, con el día en que la reemplazaron (CON-1369).
-6. **⋮ de la lista** (`useAccionesArancel`): con asociaciones (patients, providers, locations o carriers por sus planes),
-   *Inactive* y *Archive* muestran el error de CON-496 / CON-1276 y sólo dejan *Close*. Archive confirma (*Are you sure you
-   want to archive this fee schedule? This action cannot be undone.*) y no deja Undo. **Restore** confirma (CON-1108) y lo
-   deja **Active** (antes quedaba Inactive). Un fee schedule archivado se ve en sólo lectura (CON-1276).
-7. **New fee schedule**: Name, Type, Available from y los fees; *Publish* crea la versión 1. El nombre repetido usa el texto
-   de Jira (*There is already a fee schedule with this name. Please choose a different name.*).
-8. Se va el switch *Save in draft state*: el borrador es de la versión, no del fee schedule. Inactivar sigue en el ⋮.
-9. Datos de ejemplo: *Delta Dental PPO 2026* suma el aumento ya publicado para el 01/01/2027, así se ven las tres etapas
-   (expirada, activa y programada) como en el ejemplo de la guía.
+### Lista
 
-### Anomalías y pendientes
+1. **Filter › Fee schedule status** (una opción): *Active and inactive* (al entrar), *Active*, *Inactive*, *Archived*,
+   *All*. Los archivados sólo se ven con el filtro (CON-497). Corrige el "sin filtro se ve todo" del 2026-11-25. El Default
+   va primero y el resto por nombre.
+2. **⋮**: *Deactivate* o *Activate*, *Archive*; archivado, *Restore*. Con asociaciones, Deactivate y Archive muestran el
+   error de CON-496 / CON-1276 en un toast rojo y no hacen nada. Archive confirma (*It will become read-only and stop being
+   available in the system.*); Restore confirma (CON-1108) y lo deja **Active**. Toasts de Jira (*Fee Schedule deactivate
+   successfully.*, tal cual). Sin Undo.
 
-- **Draft y Publish no tienen historia en Jira**: salen de la guía. Las historias (Done) hablan de *Save* que crea la
-  versión directo. Conviene que exista la historia del Draft.
-- La guía junta *Archived / Inactive*; Jira los separa (CON-496 Deactivate, CON-1276 Archive). Se mantienen los dos.
-- New fee schedule publica directo (la guía arranca en Draft): un fee schedule sin ninguna versión rompe Compare fees y
-  las asignaciones. Queda para cuando exista la historia.
-- El paso de Scheduled a Active es por fecha (se calcula con el día de hoy): no hay un job que lo haga.
+### Editor
 
-**A validar con usuarios:** si *Update fees* se encuentra (la tabla de la activa ya no se edita) y si el aviso de cada
-versión alcanza para entender por qué una se edita y otra no.
+3. **Encabezado**: el nombre del fee schedule con sus pills y, a la derecha, **Version** (`MenuVersion`): fecha y estado
+   de cada una, de la más nueva a la más vieja, con el Draft (*No date yet*) arriba. Con una sola, no abre.
+4. **Pestañas** *General information* y *Assignments (n)*.
+5. **Aviso de arriba** (`ui/alert`, ahora con `action` y tono `neutral`), según lo que se ve:
+   - *Active*: *Current version, active since …* y el botón **Create new version**. Si ya hay una Scheduled o un Draft, el
+     botón queda deshabilitado con su tooltip y el aviso dice cuál editar.
+   - *Creando versión*: *You’re creating a new version.* · *Draft*: *This is a draft.* · *Scheduled*: *Scheduled. Replaces
+     the current version on …* · *Expired*: *Expired on …. View only.* · *Archived*: *Archived. View only.*
+6. **Active, Expired y Archived son sólo lectura** (CON-495, CON-1369, CON-1276): campos deshabilitados, la tabla en
+   texto (*Fee*) y sin pie.
+7. **Create new version / Draft**: se editan nombre, tipo, *Available from* y los fees, con *Current fee* (lo que rige hoy)
+   al lado de *New fee*. Debajo de la fecha, qué va a pasar: *Starts today. It becomes Active as soon as you publish…* o
+   *Starts on …. It stays Scheduled until then…*. Pie: *Cancel · Save draft · Publish…*.
+   - **Save draft** no pide fecha (el borrador no la guarda): uno por fee schedule (`Arancel.borrador`).
+   - **Publish…** pide la fecha (hoy o después) y abre el resumen (*Name, Available from, Result*) con *Back* y *Publish*.
+     Crea la versión: Active si empieza hoy, Scheduled si empieza después. Toast de CON-1151.
+   - **Cancel** descarta lo cambiado y queda en la pantalla (*Changes discarded*).
+8. **Scheduled** se edita en el lugar, sin versión nueva (CON-1375): *Cancel · Save changes* → *Changes saved.*
+9. **Validación**: toast *Please review the highlighted fields.* y cada campo en rojo (*This field is required.*, nombre
+   repetido, *The available date must be today or a future date.*). Se va el banner *Uncompleted fields* de esta pantalla.
+   Buscar sin resultados: *No results found for the selected filter.* (CON-495; antes el vacío de red.dev).
+10. **Assignments** (`finance/AssignmentsTab`): *Locations, Insurance plans, Providers, Patients* con su cantidad, buscador y
+    **Remove** por fila (confirma: *… will stop using <fee schedule>.*). Un plan por fila, con su carrier. Sin publicar:
+    *Assignments become available once this fee schedule is published.* Reemplaza a *View assignments* del ⋮.
+11. **New fee schedule**: *Cancel · Save as draft · Create and publish…*. Save as draft lo deja **Inactive** con su
+    borrador y sin versiones; publicar lo deja Active (o con su versión Scheduled). Publicar hoy un fee schedule que sólo era
+    borrador lo pasa a Active.
+12. Se van el switch *Save in draft state*, el lápiz *Rename* (el nombre se edita al crear una versión) y *Update fees*.
+13. Datos: *Delta Dental PPO 2026* suma el aumento publicado para el 01/01/2027 (expirada, activa y programada).
+
+### Fuera del prototipo (a confirmar con Julián)
+
+- **Type** no está en el prototipo; se mantiene (lo pidió el 2026-10-09) y se edita junto con el nombre.
+- **Compare fees** tampoco; sigue en el ⋮ (pedido del 2026-10-09), salvo en un fee schedule sin publicar.
+- **Discard draft** (pie, a la izquierda, sólo si hay otra versión): la guía dice que el borrador se descarta; sin eso, un
+  borrador guardado bloquea *Create new version* hasta publicarlo.
+- Cambiar de versión con cambios sin guardar pregunta antes (el prototipo los pierde).
+- *Copy form* y *Bulk edit* funcionan (en el prototipo son de muestra).
+- Pendientes del propio prototipo: qué tarifa usa un origen después de quitarle la asignación y si el nombre es del fee
+  schedule o de cada versión. Draft y Publish no tienen historia en Jira.
+- El paso de Scheduled a Active es por fecha (se calcula con el día de hoy). `AssignmentsDrawer` y `AssignmentsCount` quedan
+  sin uso en la app.
+
+**A validar con usuarios:** si *Create new version* se entiende como "cambiar precios", y si quitar asignaciones desde acá
+alcanza o esperan reasignar a otro fee schedule en el mismo paso.
 
 ## Atajos de Billing en un ⋮ y Settings › Overview (2026-11-26)
 

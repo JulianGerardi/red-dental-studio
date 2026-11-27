@@ -51,8 +51,8 @@ export const TONO_ARANCEL: Record<EstadoArancel, PillTone> = { Active: 'success'
    por fee schedule) y se publican como versión nueva. Ver settings-billing.md, 2026-11-27. */
 export type VersionArancel = { id: string; desde: string; precios: Record<string, number> }
 export type EstadoVersion = 'Active' | 'Scheduled' | 'Expired'
-/** El Draft: no afecta a la clínica hasta que se publica. */
-export type BorradorArancel = { precios: Record<string, number>; desde: string }
+/** El Draft: no afecta a la clínica hasta que se publica, y no guarda fecha (se pide al publicar). */
+export type BorradorArancel = { precios: Record<string, number> }
 
 /* Type y Assignments no están en red.dev: los pidió Julián para la tabla de Fee Schedules (settings-billing.md). */
 export const TIPOS_ARANCEL = ['UCR', 'PPO', 'Medicaid', 'Discount plan'] as const
@@ -67,8 +67,9 @@ export type Arancel = {
   tipo: TipoArancel
   porDefecto: boolean
   estado: EstadoArancel
+  /** Las publicadas. Vacío en un fee schedule que sólo se guardó como borrador. */
   versiones: VersionArancel[]
-  /** El único Draft del fee schedule, si hay uno abierto. */
+  /** El único Draft del fee schedule, si hay uno guardado. */
   borrador?: BorradorArancel
   /** Last updated, ISO. */
   actualizado: string
@@ -108,10 +109,21 @@ export const ARANCELES: Arancel[] = [
 
 export const hoyIso = () => new Date().toISOString().slice(0, 10)
 
-/* La versión vigente: la última que ya empezó (o la primera, si todas son futuras). */
+const porFecha = (a: Arancel) => [...a.versiones].sort((x, y) => x.desde.localeCompare(y.desde))
+
+/* La versión Active: la última que ya empezó. Sin ninguna (sólo futuras o sólo un borrador), undefined. */
+export function versionActiva(a: Arancel, hoy = hoyIso()): VersionArancel | undefined {
+  return porFecha(a).reverse().find((v) => v.desde <= hoy)
+}
+/* La versión Scheduled: publicada con fecha futura. Hay una sola a la vez. */
+export function versionProgramada(a: Arancel, hoy = hoyIso()): VersionArancel | undefined {
+  return porFecha(a).find((v) => v.desde > hoy)
+}
+
+/* Los precios que se usan para calcular: la activa o, si todavía no empezó ninguna, la primera futura. Un fee schedule
+   sin publicar no tiene precios. */
 export function versionVigente(a: Arancel, hoy = hoyIso()): VersionArancel {
-  const ordenadas = [...a.versiones].sort((x, y) => x.desde.localeCompare(y.desde))
-  return [...ordenadas].reverse().find((v) => v.desde <= hoy) ?? ordenadas[0]
+  return versionActiva(a, hoy) ?? porFecha(a)[0] ?? { id: '', desde: '', precios: {} }
 }
 
 /* Non-zero fees: cuántos códigos del catálogo tienen un importe mayor que cero. */
@@ -119,7 +131,7 @@ export const conImporte = (precios: Record<string, number | null>) => PROCEDIMIE
 
 /* Una versión que todavía no empezó es Scheduled aunque sea la única (Cigna DPPO 2027 decía Active). */
 export function estadoVersion(a: Arancel, v: VersionArancel, hoy = hoyIso()): EstadoVersion {
-  return v.desde > hoy ? 'Scheduled' : v.id === versionVigente(a, hoy).id ? 'Active' : 'Expired'
+  return v.desde > hoy ? 'Scheduled' : v.id === versionActiva(a, hoy)?.id ? 'Active' : 'Expired'
 }
 
 /* "03/06/2026 - Active", como el select de red.dev (que además muestra una hora). */
@@ -129,7 +141,7 @@ export function etiquetaVersion(a: Arancel, v: VersionArancel, hoy = hoyIso()) {
 
 /* La versión que reemplazó a una expirada: su Available From es el día en que la otra dejó de regir. */
 export function siguienteVersion(a: Arancel, v: VersionArancel) {
-  return [...a.versiones].sort((x, y) => x.desde.localeCompare(y.desde)).find((x) => x.desde > v.desde)
+  return porFecha(a).find((x) => x.desde > v.desde)
 }
 
 /* ── Coverage tables (plantillas) ──────────────────────────────────── */
