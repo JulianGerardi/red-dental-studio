@@ -5,7 +5,7 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-11-27
 
-### Un solo formato para el tacho: `ICONO_TACHO` y `BOTON_BORRAR` ([#PR](https://github.com/JulianGerardi/red-dental-studio/pull/PR))
+### Un solo formato para el tacho: `ICONO_TACHO` y `BOTON_BORRAR` ([#218](https://github.com/JulianGerardi/red-dental-studio/pull/218))
 - **`lib/estilos.ts`** suma las dos constantes y todo tacho usa una (regla en `design-reference/figma/README.md`):
   - `ICONO_TACHO`: sólo ícono, para una fila o un ítem. Botón de 28 px, `Trash2` de 16, rojo en reposo y fondo rojo claro
     (`dash-bad-bg`) al pasar el mouse. Reemplaza a `cn(ICONO_SUELTO, 'text-dash-bad-fg')` y a los armados a mano.
