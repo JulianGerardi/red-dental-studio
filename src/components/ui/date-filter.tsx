@@ -114,7 +114,7 @@ export function DateFilterPanel({
 
 /* El campo: "All dates" mientras no filtra; con fechas, azul como Filter con algo aplicado y una ✕ para sacarlas. */
 export function DateFilter({
-  value, onChange, marked, max, presets = DATE_PRESETS, label = 'Filter by date', disabled, className,
+  value, onChange, marked, max, presets = DATE_PRESETS, label = 'Filter by date', emptyLabel, disabled, className,
 }: {
   value: DateRange | null
   onChange: (r: DateRange | null) => void
@@ -123,11 +123,13 @@ export function DateFilter({
   presets?: DatePreset[]
   /** Nombre para lectores de pantalla ("Filter notifications by date"). */
   label?: string
+  /** Lo que dice sin rango elegido, si "All dates" no alcanza ("Any expiration date"). */
+  emptyLabel?: string
   disabled?: boolean
   className?: string
 }) {
   const [abierto, setAbierto] = useState(false)
-  const texto = rangeLabel(value, presets)
+  const texto = !value && emptyLabel ? emptyLabel : rangeLabel(value, presets)
   return (
     <div className={cn('relative inline-flex shrink-0', className)}>
       <Popover open={abierto} onOpenChange={setAbierto}>

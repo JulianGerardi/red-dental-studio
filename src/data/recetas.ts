@@ -7,6 +7,9 @@ export const MEDICAMENTOS = [
   'Clonazepam', 'Dexamethasone', 'Diazepam', 'Fluconazole', 'Hydrocodone / Acetaminophen', 'Ibuprofen', 'Lidocaine', 'Metronidazole',
   'Naproxen', 'Nystatin', 'Penicillin V potassium', 'Sodium fluoride', 'Triamcinolone',
 ]
+/* La medicación activa del paciente (Medical History). Guardar una receta que la vuelve a cargar con Update patient
+   medications pregunta si se reutiliza (CON-2846, que reemplaza el error de CON-2337; en red.dev, al guardar). */
+export const MEDICACION_ACTIVA = ['Ibuprofen']
 export const UNIDADES_FUERZA = ['g', 'mcg', 'mEq', 'mg', 'mL', 'mmol', '%', 'IU', 'Unknown']
 export const FORMAS = [
   'Buccal tablet', 'Chewable tablet', 'Dental gel', 'Dental paste', 'Ear drop', 'Eye drop', 'Inhalation powder', 'Injectable solution', 'Injection',
@@ -71,6 +74,16 @@ export function fraseDeUso(m: Medicacion) {
   return [VERBO[m.via] ?? 'Take', m.dosis, unidad(m.dosis, m.unidadDosis), COMO[m.via], frecuencia, duracion].filter(Boolean).join(' ')
 }
 
-/* Lo obligatorio de cada medicación (los asteriscos de red.dev; la unidad acompaña a su número). */
-export const OBLIGATORIOS: (keyof Medicacion)[] = ['nombre', 'fuerza', 'unidadFuerza', 'forma', 'cantidad', 'dosis', 'unidadDosis', 'via', 'frecuencia', 'duracion', 'unidadDuracion']
-export const faltantes = (m: Medicacion) => OBLIGATORIOS.filter((k) => !String(m[k]).trim())
+/* Lo obligatorio de cada medicación (los asteriscos de red.dev; la unidad acompaña a su número) y sus reglas (CON-2230):
+   la medicación sale de la lista y los números son mayores a 0. */
+const OBLIGATORIOS: (keyof Medicacion)[] = ['nombre', 'fuerza', 'unidadFuerza', 'forma', 'cantidad', 'dosis', 'unidadDosis', 'via', 'frecuencia', 'duracion', 'unidadDuracion']
+const NUMEROS: (keyof Medicacion)[] = ['fuerza', 'cantidad', 'dosis', 'duracion']
+export type ErroresMedicacion = Partial<Record<keyof Medicacion, string>>
+export function erroresDe(m: Medicacion): { errores: ErroresMedicacion; faltan: boolean } {
+  const errores: ErroresMedicacion = {}
+  for (const k of OBLIGATORIOS) if (!String(m[k]).trim()) errores[k] = 'This field is required.'
+  const faltan = Object.keys(errores).length > 0
+  if (m.nombre.trim() && !MEDICAMENTOS.includes(m.nombre)) errores.nombre = 'Select a medication from the list.'
+  for (const k of NUMEROS) if (String(m[k]).trim() && !(Number(m[k]) > 0)) errores[k] = 'Enter a number greater than 0.'
+  return { errores, faltan }
+}

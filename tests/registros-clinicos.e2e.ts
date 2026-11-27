@@ -51,7 +51,10 @@ test('Prescription: New valida, crea en Pending, se edita, se activa y se cancel
   await screen.getByRole('button', 'Save').tap()
   await expect(screen.getByText('Uncompleted fields')).toBeVisible()
   await screen.getByRole('button', /Remove medication/).tap()
+  /* CON-2846: el paciente ya tiene Ibuprofen activo; con Update patient medications, Save pregunta si se reutiliza. */
+  await screen.getByRole('checkbox', 'Update patient medications').tap()
   await screen.getByRole('button', 'Save').tap()
+  await screen.getByRole('dialog', 'Medication already active').getByRole('button', 'Reuse existing medication').tap()
   await expect(screen.getByText('The prescription has been successfully created.')).toBeVisible()
   await expect(screen.getByText(/Showing 1 to 8 of 8 results/)).toBeVisible()
 
@@ -61,6 +64,7 @@ test('Prescription: New valida, crea en Pending, se edita, se activa y se cancel
   await expect(screen.getByRole('textbox', /^Strength/)).toHaveValue('400')
   await screen.getByRole('textbox', /^Strength/).fill('600')
   await screen.getByRole('button', 'Save').tap()
+  await screen.getByRole('dialog', 'Medication already active').getByRole('button', 'Reuse existing medication').tap()
   await expect(screen.getByText('The prescription has been successfully updated.')).toBeVisible()
 
   /* Activate pregunta; ya Active no se edita, tiene PDF y sólo se cancela. */
@@ -71,13 +75,27 @@ test('Prescription: New valida, crea en Pending, se edita, se activa y se cancel
   await screen.getByRole('button', /^Actions for prescription of Ibuprofen 600 mg, Active, created (?!10\/30)/).tap()
   await expect(screen.getByRole('menuitem', 'Edit')).toHaveCount(0)
   await expect(screen.getByRole('menuitem', 'View PDF')).toBeVisible()
+  await expect(screen.getByRole('menuitem', 'Expire')).toBeVisible()
   await screen.getByRole('menuitem', 'Cancel').tap()
   await screen.getByRole('dialog', 'Cancel prescription').getByRole('button', 'Cancel prescription').tap()
-  await expect(screen.getByText('The prescription has been successfully canceled.')).toBeVisible()
+  await expect(screen.getByText('The prescription has been successfully marked as Canceled.')).toBeVisible()
 })
 
-test('Prescription: Delete sólo en Pending y saca la fila (CON-2356)', async ({ app, screen }) => {
+test('Prescription: Filter por estado y provider, Expire en una Active y Delete sólo en Pending (CON-2286, CON-2356)', async ({ app, screen }) => {
   await abrir(app, screen, 'Prescription')
+  /* Los filtros de red.dev: Status y Provider (y el rango de vencimiento). */
+  await screen.getByRole('button', 'Filter prescriptions').tap()
+  await screen.getByRole('menuitemcheckbox', /^Active/).tap()
+  await screen.getByRole('menuitemcheckbox', /Dr\. Daniel Anderson/).tap()
+  await screen.getByRole('menuitemcheckbox', /^Active/).press('Escape')
+  await expect(screen.getByText(/Showing 1 to 1 of 1 results/)).toBeVisible()
+  await screen.getByRole('button', /^Actions for prescription of Ibuprofen 600 mg, Active/).tap()
+  await screen.getByRole('menuitem', 'Expire').tap()
+  await screen.getByRole('dialog', 'Expire prescription').getByRole('button', 'Mark as expired').tap()
+  await expect(screen.getByText('The prescription has been successfully marked as Expired.')).toBeVisible()
+  await screen.getByRole('button', /^Filter prescriptions(?! by)/).tap()
+  await screen.getByRole('button', 'Clear all').tap()
+  await screen.getByRole('menuitemcheckbox', /^Active/).press('Escape')
   await screen.getByRole('button', /^Actions for prescription of Clonazepam 1 mg, Pending/).tap()
   await screen.getByRole('menuitem', 'Delete').tap()
   await screen.getByRole('dialog', 'Delete prescription').getByRole('button', 'Delete').tap()

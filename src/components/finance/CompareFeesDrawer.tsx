@@ -1,4 +1,6 @@
 import { useState } from 'react'
+import { CircleSlash, Equal, TrendingDown, TrendingUp } from 'lucide-react'
+import { StatCard } from '@/components/ui/stat-card'
 import { ModalShell, SelectField } from '@/components/patients/form'
 import { Button } from '@/components/ui/button'
 import { DrawerSection } from '@/components/ui/drawer'
@@ -23,19 +25,21 @@ export function CompareFeesDrawer({ arancel, aranceles, onClose, onEditar }: {
   onClose: () => void
   onEditar: () => void
 }) {
-  const opciones = aranceles.filter((a) => a.id !== arancel.id && a.estado !== 'Archived')
+  const opciones = aranceles.filter((a) => a.id !== arancel.id && a.estado !== 'Archived' && a.versiones.length > 0)
   const [refId, setRefId] = useState((opciones.find((a) => a.porDefecto) ?? opciones[0])?.id ?? '')
   const ref = opciones.find((a) => a.id === refId)
   const propios = versionVigente(arancel).precios
   const ajenos = ref ? versionVigente(ref).precios : {}
   const filas = PROCEDIMIENTOS.map((p) => ({ ...p, d: diferencia(propios[p.code], ajenos[p.code]) }))
   const comparables = filas.filter((f) => f.d)
+  const otro = ref?.nombre ?? 'the reference'
+  /* Las métricas con la card de la app (`ui/stat-card`), como Billing: lo que cuenta cada número va en el ⓘ. */
   const resumen = [
-    ['Higher', comparables.filter((f) => f.d!.monto > 0).length],
-    ['Lower', comparables.filter((f) => f.d!.monto < 0).length],
-    ['Same', comparables.filter((f) => f.d!.monto === 0).length],
-    ['Missing a fee', filas.length - comparables.length],
-  ] as const
+    { label: 'Higher', icon: TrendingUp, value: comparables.filter((f) => f.d!.monto > 0).length, info: `Procedures where ${arancel.nombre} charges more than ${otro}.` },
+    { label: 'Lower', icon: TrendingDown, value: comparables.filter((f) => f.d!.monto < 0).length, info: `Procedures where ${arancel.nombre} charges less than ${otro}.` },
+    { label: 'Same', icon: Equal, value: comparables.filter((f) => f.d!.monto === 0).length, info: 'Procedures with the same fee in both fee schedules.' },
+    { label: 'Missing a fee', icon: CircleSlash, value: filas.length - comparables.length, info: 'Procedures without a fee in one of the two fee schedules, so they can’t be compared.' },
+  ]
 
   return (
     <ModalShell
@@ -51,14 +55,9 @@ export function CompareFeesDrawer({ arancel, aranceles, onClose, onEditar }: {
             onChange={(n) => setRefId(opciones.find((a) => a.nombre === n)?.id ?? '')}
             hint={ref ? `Current version from ${fechaMDA(versionVigente(ref).desde)}. ${arancel.nombre}: from ${fechaMDA(versionVigente(arancel).desde)}.` : undefined}
           />
-          <dl className="grid grid-cols-2 gap-2 sm:grid-cols-4">
-            {resumen.map(([k, v]) => (
-              <div key={k} className="rounded-lg bg-surface-muted px-3 py-2">
-                <dt className="text-xs text-ink-muted">{k}</dt>
-                <dd className="text-[15px] font-semibold text-ink tabular-nums">{v}</dd>
-              </div>
-            ))}
-          </dl>
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+            {resumen.map((m) => <StatCard key={m.label} interna enFila icon={m.icon} label={m.label} value={String(m.value)} info={m.info} />)}
+          </div>
         </DrawerSection>
 
         <DrawerSection title="Fees">

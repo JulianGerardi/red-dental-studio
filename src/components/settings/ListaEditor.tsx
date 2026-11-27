@@ -111,7 +111,7 @@ export function ItemLista({ nombre, activo, estado, elegido, to, onElegir, extra
   )
 }
 
-/* El título del editor con el estado al lado: Edit coverage table / Edit template + Active o Inactive (o `estado`). */
+/* El título del editor: el nombre del ítem elegido (o "New …") con su estado al lado (README, "Breadcrumb y título"). */
 export function EncabezadoEditor({ titulo, activo, estado, extra }: { titulo: string; activo?: boolean; estado?: EstadoLista; extra?: ReactNode }) {
   const pill = activo !== undefined || estado ? pillEstado(activo ?? false, estado) : undefined
   return (
@@ -124,18 +124,23 @@ export function EncabezadoEditor({ titulo, activo, estado, extra }: { titulo: st
 }
 
 /* El pie del editor, fijo abajo mientras se baja: a la izquierda lo que no cierra (Preview), a la derecha Cancel y Save. */
-export function PieEditor({ izquierda, onCancelar, onGuardar, guardarDeshabilitado }: {
+export function PieEditor({ izquierda, onCancelar, onGuardar, guardarDeshabilitado, etiquetaGuardar = 'Save', secundario }: {
   izquierda?: ReactNode
   onCancelar: () => void
   onGuardar: () => void
   guardarDeshabilitado?: boolean
+  /** Otra acción principal: Publish en el Draft de un fee schedule. */
+  etiquetaGuardar?: string
+  /** Entre Cancel y la principal: Save draft. */
+  secundario?: ReactNode
 }) {
   return (
     <div className="sticky bottom-0 z-10 -mx-4 -mb-4 flex flex-wrap items-center justify-end gap-3 rounded-b-lg border-t border-line bg-surface px-4 py-3 sm:-mx-5 sm:-mb-5 sm:px-5">
       {izquierda && <div className="mr-auto">{izquierda}</div>}
       <div className="flex gap-3">
         <Button variant="secondary" className="px-6" onClick={onCancelar}>Cancel</Button>
-        <Button className="px-6" disabled={guardarDeshabilitado} onClick={onGuardar}>Save</Button>
+        {secundario}
+        <Button className="px-6" disabled={guardarDeshabilitado} onClick={onGuardar}>{etiquetaGuardar}</Button>
       </div>
     </div>
   )

@@ -1,10 +1,9 @@
 import { useEffect, useState } from 'react'
 import type { PendingTask } from '@/components/dashboard/PendingTaskCard'
 import { documentoTarea, hash, ordenLab, type Documento, type Seccion } from '@/components/dashboard/documentoTarea'
-/* Ciclo a propósito (tareas usa documentoRegistro y frenoDeAccion): los dos se llaman sólo dentro de funciones. */
+/* Ciclo a propósito (tareas usa documentoRegistro): se llaman sólo dentro de funciones. */
 import { avisarTareas, suscribirTareas, tareaViva } from '@/components/dashboard/tareas'
 import { PROCEDIMIENTOS, PROCEDIMIENTOS_ORDEN, PROVEEDORES_DERIVACION, VINCULOS_PROCEDIMIENTO, type DatosDerivacion, type ProveedorDerivacion } from '@/data/clinical-mode'
-import { ITEMS_INICIALES } from '@/data/clinicalItems'
 import { LABORATORIOS, type Denticion, type Laboratorio } from '@/data/laboratorios'
 import { fraseDeUso, medicacion, nombreMedicacion, type DatosReceta } from '@/data/recetas'
 import { CASOS, NO_ASIGNADOS } from '@/data/treatment-plan'
@@ -172,7 +171,7 @@ export function asegurarRegistro(t: PendingTask | undefined) {
 
 let serie = 1
 /** Un registro nuevo, en Pending, a nombre del provider del encuentro (CON-2215: se registra el proveedor y la fecha). */
-export const nuevoRegistro = (kind: TipoRegistro, paciente?: Pick<PendingTask, 'person' | 'initials' | 'patientId'>): Registro => ({
+export const nuevoRegistro = (kind: TipoRegistro, paciente?: Partial<Pick<PendingTask, 'person' | 'initials' | 'patientId'>>): Registro => ({
   id: `nuevo-${kind.toLowerCase().replace(/\s+/g, '-')}-${serie++}`, kind, state: 'Pending', ...PACIENTE, ...paciente, provider: MARTINEZ,
   register: hoy(), updated: hoy(), expiration: '', pdf: false,
 })
@@ -191,18 +190,6 @@ export const agregarLaboratorio = (l: Laboratorio) => { laboratoriosCreados = [.
 let proveedoresCreados: ProveedorDerivacion[] = []
 export const proveedoresDerivacion = () => [...PROVEEDORES_DERIVACION, ...proveedoresCreados]
 export const agregarProveedor = (p: ProveedorDerivacion) => { proveedoresCreados = [...proveedoresCreados, p] }
-
-/* ── Reglas que dependen del contenido ── */
-
-/* CON-2337: no se activa una receta si una de sus medicaciones marcadas *Update patient medications* ya está Active en
-   la historia del paciente. Las medicaciones de ejemplo del paciente no tienen ninguna Active (sus estados son los del
-   Figma de Medical History), así que hoy la regla no frena nada. */
-const ACTIVAS = () => ITEMS_INICIALES.Medication.filter((m) => String(m.status) === 'Active').map((m) => m.name.toLowerCase())
-export function frenoDeAccion(t: PendingTask, accion: string): string | undefined {
-  if (accion !== 'Activate') return undefined
-  const repetida = registroDe(t.id)?.receta?.medicaciones.find((m) => m.actualizar && ACTIVAS().includes(m.nombre.toLowerCase()))
-  return repetida && `The medication ${repetida.nombre} is already active in the patient’s history.`
-}
 
 /* ── El documento (PDF) con el contenido del registro ── */
 

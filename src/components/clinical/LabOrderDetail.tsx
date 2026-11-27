@@ -142,7 +142,7 @@ export function LabOrderDetail({ registro, nuevo, abierto, onVolver, onAccion }:
               <div className="flex flex-col gap-2">
                 <FieldLabel required>Delivery expiration date</FieldLabel>
                 {/* CON-2215: no puede quedar en el pasado; los días anteriores no se eligen. */}
-                <DatePicker value={vence} onChange={setVence} error={!!errores.vence} min={new Date()} ariaLabel="Delivery expiration date" />
+                <DatePicker value={vence} onChange={setVence} error={!!errores.vence} min={new Date()} label="Delivery expiration date" disabled={!editable} />
                 {errores.vence && <FieldError>{errores.vence}</FieldError>}
               </div>
               <label className={cn('flex w-fit items-center gap-2 text-[13px] font-medium text-ink sm:mt-[26px] sm:h-9', editable ? 'cursor-pointer' : 'opacity-60')}>

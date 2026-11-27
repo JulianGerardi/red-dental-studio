@@ -5,6 +5,78 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-11-27
 
+### Fee schedules: tachos de fila y métricas de Compare fees como el resto de la app ([#215](https://github.com/JulianGerardi/red-dental-studio/pull/215))
+- **Tacho de una fila:** sólo ícono, en rojo (`ICONO_SUELTO` + `text-dash-bad-fg`, `Trash2` de 16 px), con el nombre en el
+  `aria-label`. Así queda *Remove* en `finance/AssignmentsTab`, como los rangos, las excepciones y la Payment table. No usar
+  un botón con texto para quitar una fila. *Discard draft* (acción del pie) sigue con texto, en rojo.
+- **Compare fees:** el resumen (*Higher, Lower, Same, Missing a fee*) usa `ui/stat-card` con `interna`, la card de métricas
+  de Billing, el Ledger y Edit Account; cada una con su ⓘ. Se van las cajas grises propias.
+
+### Prescription en Clinical Mode: la lista y New / Edit prescription (CON-2230, CON-2354, CON-2355, CON-2356, CON-2846) ([#214](https://github.com/JulianGerardi/red-dental-studio/pull/214))
+- **Pestaña Prescription** (antes *Planned*): `clinical/PrescriptionPanel.tsx`. Tabla estándar como Lab order, con
+  *Search prescriptions*, Filter (Status y Provider) y filtro por fecha de vencimiento. La fila abre la ficha.
+- **⋮ según el estado:** Pending → Edit, Activate, Cancel, Delete; Active → View, Download PDF, Expire, Cancel; Expired y
+  Canceled → View. Activate, Cancel, Expire y Delete preguntan antes, con los textos de red.dev.
+- **Ficha** (`clinical/PrescriptionForm.tsx`), en dos columnas como Lab order y Referral (`COLUMNAS_FICHA`): *Medications*
+  (una pestaña por medicación con el nombre de la droga, *New medication*, *Remove …*) y *Details* (Expiration date,
+  Additional instructions). Sólo se edita en Pending.
+- **Reglas:** obligatorios por campo y el aviso *Uncompleted fields…*; Expiration date de mañana a 6 meses; al guardar,
+  si una medicación con *Update patient medications* ya está activa en el paciente, pregunta *Reuse existing medication*
+  (CON-2846). La indicación (*Take 1 capsule orally three times daily for 7 days*) se arma sola (`indicacionesDeUso`).
+- **Para el dev:** los catálogos (`data/prescripciones.ts`) son los de red.dev, no los de CON-2230. `ui/date-picker`
+  suma `min`, `max`, `disabled` y `label`; `ui/date-filter`, `emptyLabel`; `aplicarAccion` (Pending Task) acepta
+  `{ sinAviso }`. *Complete this task* de una Prescription abre su ficha (`?tab=Prescription&task=`). Diferencias con
+  red.dev y supuestos, en `clinical-mode.md` (2026-11-27). Storybook sin tocar.
+
+### Fee schedules: versiones Draft, Scheduled, Active y Expired, y pestaña Assignments (CON-1151, CON-1369, CON-1375, CON-495, CON-496, CON-497, CON-1276, CON-1108) ([#213](https://github.com/JulianGerardi/red-dental-studio/pull/213))
+- **Flujo de versiones** (guía funcional y prototipo de Julián): la versión Active, las Expired y un fee schedule archivado
+  son de sólo lectura. *Create new version* pasa a editar; *Save draft* guarda el borrador sin fecha (`Arancel.borrador`,
+  uno por fee schedule); *Publish…* pide *Available from* (hoy o después), muestra el resumen y crea la versión: Active si
+  empieza hoy, Scheduled si no. Una Scheduled se edita en el lugar (*Save changes*), sin versión nueva.
+- **Datos (`data/finanzas.ts`):** `versionActiva`, `versionProgramada` y `estadoVersion`; `versionVigente` ya no asume que
+  hay versiones (un fee schedule guardado sólo como borrador tiene `versiones: []` y queda `Inactive`). Backend: el estado
+  de una versión sale de su fecha; el borrador es aparte y no tiene fecha.
+- **Lista:** el filtro es de una opción (*Active and inactive* al entrar; los archivados sólo con el filtro, CON-497). El ⋮:
+  *Deactivate / Activate*, *Archive*, *Restore* (`useAccionesArancel`). Con asociaciones, Deactivate y Archive muestran el
+  error de CON-496 en un toast y no hacen nada; Restore deja Active (CON-1108).
+- **Pestaña Assignments** (`finance/AssignmentsTab`): Locations, Insurance plans, Providers y Patients con *Remove*.
+  Reemplaza a *View assignments*; `AssignmentsDrawer` y `AssignmentsCount` quedan sin uso.
+- **`ui/alert`** suma `action` (un botón a la derecha) y el tono `neutral`. **`PieEditor`** suma `etiquetaGuardar` y
+  `secundario`.
+- Se van de esta pantalla el switch *Save in draft state*, el lápiz *Rename* y el banner *Uncompleted fields* (la validación
+  es un toast más cada campo en rojo). Detalle y lo que quedó fuera del prototipo: `settings-billing.md` (2026-11-27).
+
+### Mails: Employee, Rescheduled (booked) y Subscription canceled como en el Figma ([#212](https://github.com/JulianGerardi/red-dental-studio/pull/212))
+- **Employee account ready:** "…access {{practice_name}}’s Confidentally workspace and use the features included in your role."
+- **Rescheduled (booked):** título "Appointment scheduled" y primera línea "…has been canceled.", como el Figma.
+- **Subscription canceled:** suma el aviso de solo lectura debajo de *Subscription details*.
+- Los tres pasan de *Proposal* a *From the Figma*. Sin variables nuevas; `public/emails/` regenerado.
+
+### Breadcrumb y título van de la mano ([#211](https://github.com/JulianGerardi/red-dental-studio/pull/211))
+- **Regla:** en toda pantalla con breadcrumb, el H1 dice lo mismo que el último tramo. Sección = nombre del menú; ítem =
+  su nombre, sin verbo (*Edit …* sólo en Edit patient); lo que no existe todavía, *New …*. Las pestañas no cambian el
+  título. Detalle en `design-reference/figma/README.md` (*Regla: breadcrumb y título van de la mano*).
+- **Títulos que cambian:** Consents, Ledger, Preferences, Account; en la ficha, el nombre de la locación, del empleado
+  (con su pill de estado al lado; la card ya no repite nombre y estado), del carrier y del plan; en el paciente,
+  Treatments, Documents, Insurance.
+- **Lista y editor** (Consents, Fee schedules, Coverage tables): `EncabezadoEditor` recibe el nombre del ítem elegido en
+  vez de *Edit template / Edit fee schedule / Edit coverage table*.
+- **Para el dev:** `tests/breadcrumb-titulo.e2e.ts` falla si una pantalla con rastro no tiene el último tramo como H1. Al
+  sumar una pantalla, sumala ahí. Sin historia de Jira.
+
+### PDFs: nota clínica como red.dev, findings y diagnósticos, importes iguales y anexos (CON-2975, CON-3081, CON-2204, CON-2730) ([#210](https://github.com/JulianGerardi/red-dental-studio/pull/210))
+- **Clinical note completa** (especificación de reconstrucción + las notas de red.dev): Vital Signs, Medical History,
+  Exams, Treatment Plan con el Consent Summary, Operative Report, Workflows, órdenes, firma del provider con hash y
+  adendas después de la firma. Lo que no pasó en la visita no sale.
+- **Treatment plan, aceptación, rechazo y Referral:** findings y diagnósticos debajo de cada procedimiento. Importes
+  iguales en treatment plan y aceptación (Fee / Insurance / Adjustment / Patient y el bloque Estimate).
+- **Lab order** sin el UUID interno; **Prescription** sin ID. **Adjuntos del Referral** como anexos, uno por hoja.
+- **Todos los PDF:** títulos en azul sin número y sin cajas.
+- **Para el dev/backend:** en `src/pdfs/marco.ts`, bloques `importes`, `narrativas`, `subtitulo` y `libre`;
+  `tabla.subtotal` reemplaza a `totales`; `Seccion.si`, `Hoja.aviso`, `Hoja.posdata`, `Hoja.anexos` y `Firma.hash`. Las
+  secciones condicionales usan booleanos (`has_vitals`…); un PDF adjunto se agrega detrás de su hoja y *Page N of M* se
+  cuenta después de unir. Detalle en `modulos/pdfs.md` (2026-11-27).
+
 ### Lab order y Referral: dos columnas, mismo procedimiento y lo de los videos de red.dev (CON-2214, CON-2321, CON-2584) ([#209](https://github.com/JulianGerardi/red-dental-studio/pull/209))
 - **Layout:** *General information* a la izquierda (Lab order con *Teeth & surface* adentro) y *Details* a la derecha, con
   el texto libre a todo el alto (`COLUMNAS_FICHA`, `TextArea.crecer`, `Card.bodyClassName`). En celular, una columna.

@@ -443,7 +443,7 @@ export function EditorTemplate({ actual, borrador, onBorrador, intentado, onCanc
   const faltaProcedimiento = intentado && borrador.procedimientos.length === 0
   return (
     <section aria-label="Template editor" className={TARJETA_EDITOR}>
-      <EncabezadoEditor titulo={actual ? 'Edit template' : 'New template'} activo={actual?.activo} />
+      <EncabezadoEditor titulo={actual?.titulo ?? 'New template'} activo={actual?.activo} />
 
       {(faltaTitulo || faltaProcedimiento) && (
         <div role="alert" className="rounded-md border border-dash-bad-fg/30 bg-dash-bad-bg px-3 py-2.5 text-[12px] font-medium text-dash-bad-fg">
@@ -605,7 +605,7 @@ export function SettingsConsents() {
   return (
     <div className={cn('@container', PADDING_PAGINA)}>
       <SettingsPageHeader
-        titulo="Consent templates"
+        titulo="Consents"
         accion={<Button size="md" onClick={nuevoTemplate}><Plus /> New template</Button>}
       />
 

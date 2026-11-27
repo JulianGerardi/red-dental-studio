@@ -116,7 +116,7 @@ export default function ClinicalMode() {
     : pestana === 'Vitals'
       ? <ExamLayout findings={false}><VitalsPanel /></ExamLayout>
       : registroDePestana
-        ? <RegistrosPanel key={registroDePestana} kind={registroDePestana} tarea={tareaPedida?.kind === registroDePestana ? tareaPedida : undefined} encuentroAbierto={encuentro !== 'sinEmpezar'} />
+        ? <RegistrosPanel key={registroDePestana} kind={registroDePestana} paciente={`${patient.first} ${patient.last}`} tarea={tareaPedida?.kind === registroDePestana ? tareaPedida : undefined} encuentroAbierto={encuentro !== 'sinEmpezar'} />
         : pestana === 'Radiographic'
           ? <RadiographyPanel />
           : pestana === 'Treatment plan'

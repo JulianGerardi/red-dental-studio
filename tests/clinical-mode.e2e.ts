@@ -169,7 +169,7 @@ test('Lab order filtra por estado', async ({ app, screen }) => {
   await screen.getByRole('menuitem', 'Lab order').tap()
   await expect(screen.getByText(/Showing 1 to 9 of 9 results/)).toBeVisible()
 
-  await screen.getByRole('button', /Filter lab orders by status/).tap()
+  await screen.getByRole('button', 'Filter lab orders').tap()
   await screen.getByRole('menuitemcheckbox', /Requested/).tap()
   await screen.getByRole('menuitemcheckbox', /Requested/).press('Escape')
   await expect(screen.getByText(/Showing 1 to 2 of 2 results/)).toBeVisible()

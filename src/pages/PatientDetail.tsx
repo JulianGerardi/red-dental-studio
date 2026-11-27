@@ -91,7 +91,7 @@ export default function PatientDetail({ turnos = APPTS.length }: { turnos?: numb
     <div className={CONTENEDOR_PAGINA}>
 
       <PatientBreadcrumb name="John Smith" />
-      <h1 className="sr-only">John Smith · Overview</h1>
+      <h1 className="sr-only">John Smith</h1>
       {/* Desde lg el alto lo da el menú del paciente -la pantalla termina donde termina Address-, con un piso para que
           colapsado no se achique: el contenido de al lado no lo estira, se acomoda adentro (patient-dashboard.md,
           2026-10-29). */}

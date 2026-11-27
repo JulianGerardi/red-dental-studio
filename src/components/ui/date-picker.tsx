@@ -49,10 +49,8 @@ export const POPOVER_FECHA = 'w-auto max-w-[calc(100vw-24px)] p-3'
 
 /* Un mes, con su navegación: lo usan DatePicker (un día) y DateFilter (un día o un rango). */
 export function MonthCalendar({
-  month, onMonthChange, from, to, onPick, onHover, marked = [], max, min, yearNav,
+  month, onMonthChange, from, to, onPick, onHover, marked = [], min, max, yearNav,
 }: {
-  /** Primer día que se puede elegir: los de antes, deshabilitados (un vencimiento no puede quedar en el pasado). */
-  min?: Date
   month: Date
   onMonthChange: (m: Date) => void
   /** Lo elegido: un día (from = to) o un rango, los dos extremos incluidos. */
@@ -63,23 +61,26 @@ export function MonthCalendar({
   onHover?: (d: Date | null) => void
   /** Días con contenido: se marcan con un punto. */
   marked?: Date[]
+  /** Primer día que se puede elegir: los de antes, deshabilitados, y sin flecha a los meses que pasaron. */
+  min?: Date
   /** Último día que se puede elegir: los de después, deshabilitados, y sin flecha a los meses que vienen. */
   max?: Date
   /** Saltos de año (‹‹ ››): sin ellos una fecha de nacimiento queda a cientos de clics. */
   yearNav?: boolean
 }) {
   const tope = max && dia(max)
-  const piso = min && dia(min)
   const mover = (n: number) => onMonthChange(new Date(month.getFullYear(), month.getMonth() + n, 1))
   const celdas = Array.from({ length: 42 }, (_, i) => new Date(month.getFullYear(), month.getMonth(), 1 + i - month.getDay()))
   const hayDespues = (n: number) => !tope || new Date(month.getFullYear(), month.getMonth() + n, 1) <= tope
+  const piso = min && dia(min)
+  const hayAntes = (n: number) => !piso || new Date(month.getFullYear(), month.getMonth() - n + 1, 0) >= piso
 
   return (
     <div className="flex flex-col">
       <div className="relative flex h-7 items-center justify-center">
         <div className="absolute left-0 flex gap-1">
-          {yearNav && <NavBtn onClick={() => mover(-12)} label="Previous year"><ChevronsLeft className="size-4" /></NavBtn>}
-          <NavBtn onClick={() => mover(-1)} label="Previous month"><ChevronLeft className="size-4" /></NavBtn>
+          {yearNav && <NavBtn onClick={() => mover(-12)} label="Previous year" hidden={!hayAntes(12)}><ChevronsLeft className="size-4" /></NavBtn>}
+          <NavBtn onClick={() => mover(-1)} label="Previous month" hidden={!hayAntes(1)}><ChevronLeft className="size-4" /></NavBtn>
         </div>
         <span className="flex items-center gap-1 text-sm font-medium">
           <span aria-live="polite">{MONTHS[month.getMonth()]}</span>
@@ -175,16 +176,18 @@ export function DatePicker({
   variant = 'field',
   min,
   max,
-  ariaLabel,
+  disabled,
+  label,
 }: {
   value: Date | null
   onChange: (d: Date) => void
-  /** Rango elegible: fuera de él los días quedan deshabilitados. */
+  marked?: Date[]
+  /** Días fuera de [min, max] deshabilitados: Expiration date de una prescripción, de mañana a seis meses (CON-2230). */
   min?: Date
   max?: Date
-  /** Nombre del campo para el lector de pantalla (el rótulo visible va afuera). */
-  ariaLabel?: string
-  marked?: Date[]
+  disabled?: boolean
+  /** Nombre para lectores de pantalla cuando el rótulo no es un <label> del campo. */
+  label?: string
   placeholder?: string
   /** Para usarlo como campo de formulario: h-9, ancho completo. */
   className?: string
@@ -206,7 +209,8 @@ export function DatePicker({
         <button
           type="button"
           aria-invalid={error || undefined}
-          aria-label={ariaLabel && `${ariaLabel}: ${value ? formatMDY(value) : placeholder}`}
+          aria-label={label ? `${label}: ${value ? formatMDY(value) : placeholder}` : undefined}
+          disabled={disabled}
           className={cn(
             fechaTriggerClasses(variant),
             !value && 'text-ink-faint',
