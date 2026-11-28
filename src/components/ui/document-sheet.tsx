@@ -16,7 +16,7 @@ export type DocumentSignature = {
   signed?: { date: string; image?: string; text?: string }
 }
 
-export function DocumentSheet({ clinic, meta, type, title, summary, sections, signatures, appendix, footer, className }: {
+export function DocumentSheet({ clinic, meta, type, title, summary, sections, signatures, footer, className }: {
   clinic: DocumentClinic
   /** A la derecha del membrete: el rótulo y la fecha ("Consent sent", "09/23/2026 — 10:30 AM"). */
   meta?: [label: string, value: string]
@@ -28,9 +28,6 @@ export function DocumentSheet({ clinic, meta, type, title, summary, sections, si
   /** Numeradas: en un documento legal se citan ("punto 3"). */
   sections: { title: string; content: ReactNode }[]
   signatures?: DocumentSignature[]
-  /** Después de las firmas y sin número: lo que se suma al documento ya firmado sin cambiarlo (los addenda de una
-      clinical note). */
-  appendix?: { title: string; note?: string; content: ReactNode }
   /** El pie de cada página: clínica, documento y paciente. */
   footer: string
   className?: string
@@ -96,14 +93,6 @@ export function DocumentSheet({ clinic, meta, type, title, summary, sections, si
               <span className="text-[11px] text-ink-muted">{f.signed ? `Signed electronically · ${f.signed.date}` : 'Not signed yet'}</span>
             </div>
           ))}
-        </section>
-      )}
-
-      {appendix && (
-        <section aria-label={appendix.title} className="mt-10 border-t border-line-row pt-5">
-          <h4 className="text-[14px] font-bold text-ink">{appendix.title}</h4>
-          {appendix.note && <p className="mt-0.5 text-[12px] text-ink-muted italic">{appendix.note}</p>}
-          <div className="mt-3">{appendix.content}</div>
         </section>
       )}
 

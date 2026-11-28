@@ -7,16 +7,19 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ### Patient Summary: la lista de encuentros, la nota que abre el ojo, firma, addendum y PDF (CON-2731, CON-2727, CON-2728, CON-2730) ([#223](https://github.com/JulianGerardi/red-dental-studio/pull/223))
 - **Pestaña Patient summary de Clinical Mode** (antes *Planned*): `clinical/PatientSummaryPanel`, la tabla de encuentros de
-  red.dev con `ui/data-table`: pills del encuentro (`TONO_ENCUENTRO`) y de la nota, *Filter* (Status, Provider), la fecha
-  por mes (`ui/date-nav`), casillas y *Download*. Datos de ejemplo en `data/historial`; el estado, en `lib/historial`.
+  red.dev con `ui/data-table`: pills del encuentro (`TONO_ENCUENTRO`) y de la nota, tilde verde o cruz roja en Exams, Ref,
+  Lab y Prescription, *Filter* (Status, Provider), la fecha por mes (`ui/date-nav`), casillas y *Download*.
 - **El ojo** abre `clinical/PatientSummaryNote` sobre `ui/document-viewer`, sin salir de la pestaña (`?note=<id>`): al
   volver siguen la página, los filtros y lo elegido. Qué aviso y qué acción muestra según el encuentro y la nota está en
   la tabla de `modulos/clinical-mode.md` (*El ojo*).
+- **La nota es la plantilla *Clinical note* de `src/pdfs`** completada con los eventos del encuentro (`lib/historial` ›
+  `datosNota`, `hojaNota`): la misma hoja en el visor y en *View PDF* (`abrirHoja`). Los datos de ejemplo
+  (`data/historial`) usan los nombres de variable de la plantilla.
+- **Nuevo en `ui/`:** `document-html` (`DocumentHtml`), la hoja HTML de una plantilla dentro del visor.
 - **Reglas:** la nota se firma con el encuentro Completed o Fulfilled y sólo la firma su provider; firmar pasa Completed a
-  Fulfilled; *Add addendum* sólo sobre una nota firmada; un encuentro cancelado o una nota sin permiso no se abren ni se
-  eligen.
-- **PDF:** `pdfDeDocumento` pasa de página (*Page N of M*) y dibuja los addenda; `descargarDocumento` lo baja como
-  archivo. `Documento` suma `aviso` y `adendas`; `ui/document-sheet`, `appendix`.
+  Fulfilled; *Add addendum* en toda nota firmada; un encuentro cancelado o una nota sin permiso no se abren ni se eligen.
+- **Download:** el archivo lo genera el backend con la plantilla; el prototipo abre las notas elegidas juntas en una
+  pestaña, una por página (`hojasJuntas`).
 - **Reuso:** `pages/ClinicalNote` exporta `FirmarDialog`. El encuentro de hoy entra a la lista con *Start encounter*
   (`cerrarEncuentroHoy` desde `ClinicalTopBar`).
 - **Dejar de usar:** `PatientSummaryPanel` de `clinical/panels.tsx` y `TREATMENT_HISTORY` de `data/mock` (borrados).

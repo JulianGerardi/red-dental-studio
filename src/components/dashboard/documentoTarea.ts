@@ -15,23 +15,8 @@ export type Seccion =
   | { titulo: string; parrafos: string[] }
   | { titulo: string; dientes: { denticion: Denticion; piezas: [string, string[]][] } }
 
-/** Un addendum de la nota firmada (CON-2730): va después de la firma y no la cambia. */
-export type AdendaDocumento = { autor: string; fecha: string; texto: string }
-
-/** `sinFirma`: la Lab Order no lleva firma (red.dev no la tiene). `aviso`: una línea bajo el título (nota generada sola). */
-export type Documento = { titulo: string; paciente: string; secciones: Seccion[]; provider: string; firmado?: string; sinFirma?: boolean; aviso?: string; adendas?: AdendaDocumento[] }
-
-/* Lo que toda Clinical Note de red.dev trae aunque no se haya cargado nada: la historia médica y el cierre. */
-export const HISTORIA_MEDICA: Seccion = { titulo: 'Medical History', listas: [
-  ['Past medical conditions:', ['Patient reports no known medical conditions.']],
-  ['Current medications:', ['Patient reports no current medications.']],
-  ['Known allergies:', ['No known allergies reported.']],
-  ['Past surgeries and/or hospitalizations:', ['No past surgeries or hospitalizations reported.']],
-] }
-export const NOTAS_ADICIONALES: Seccion = { titulo: 'Additional Notes', parrafos: [
-  'Patient responsibilities were discussed including but not limited to daily care, use/misuse, regular maintenance appointments, and routine examination of underlying oral tissues.',
-  'The patient was discharged to return home in satisfactory condition.',
-] }
+/** `sinFirma`: la Lab Order no lleva firma (red.dev no la tiene). */
+export type Documento = { titulo: string; paciente: string; secciones: Seccion[]; provider: string; firmado?: string; sinFirma?: boolean }
 
 const MESES = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
 export const largo = (d: Date) => `${MESES[d.getMonth()]} ${d.getDate()}, ${d.getFullYear()}`
@@ -90,8 +75,16 @@ export function documentoTarea(t: PendingTask, firmado?: Date): Documento {
           ['Date of visit', `${Number.isNaN(visita.getTime()) ? t.register : largo(visita)} — 09:00 AM to 09:45 AM`],
           ['Attending dentist', provider], ['Contact', p.telefono],
         ] },
-        HISTORIA_MEDICA,
-        NOTAS_ADICIONALES,
+        { titulo: 'Medical History', listas: [
+          ['Past medical conditions:', ['Patient reports no known medical conditions.']],
+          ['Current medications:', ['Patient reports no current medications.']],
+          ['Known allergies:', ['No known allergies reported.']],
+          ['Past surgeries and/or hospitalizations:', ['No past surgeries or hospitalizations reported.']],
+        ] },
+        { titulo: 'Additional Notes', parrafos: [
+          'Patient responsibilities were discussed including but not limited to daily care, use/misuse, regular maintenance appointments, and routine examination of underlying oral tissues.',
+          'The patient was discharged to return home in satisfactory condition.',
+        ] },
       ],
     }
   }
@@ -134,8 +127,7 @@ export function documentoTarea(t: PendingTask, firmado?: Date): Documento {
 /* El diagrama de la boca de la Lab Order vive en lib/diagramaBoca (lo usan también las plantillas de PDF). */
 export { diagramaBoca, type ArcadaDiagrama, type DienteDiagrama } from '@/lib/diagramaBoca'
 
-/* ── PDF armado a mano con Helvetica (sin dependencias), con el diseño de la hoja de la pantalla. Lo que no entra pasa
-   a otra página (una nota con exámenes, órdenes y addenda no entra en una). ── */
+/* ── PDF de una página, armado a mano con Helvetica (sin dependencias), con el diseño de la hoja de la pantalla. ── */
 
 /* Anchos de Helvetica (AFM), de " " a "~", en milésimas de em. */
 const ANCHOS = [278, 278, 355, 556, 556, 889, 667, 191, 333, 333, 389, 584, 278, 333, 278, 278, 556, 556, 556, 556, 556, 556, 556, 556, 556, 556, 278, 278, 584, 584, 584, 556, 1015, 667, 667, 722, 722, 667, 611, 778, 722, 278, 500, 667, 556, 833, 722, 778, 667, 778, 722, 667, 611, 722, 667, 944, 667, 667, 611, 278, 278, 278, 469, 556, 333, 556, 556, 500, 556, 556, 278, 556, 556, 222, 222, 500, 222, 833, 556, 556, 556, 556, 333, 500, 278, 556, 500, 722, 500, 500, 500, 334, 260, 334, 584]
@@ -165,13 +157,10 @@ function partir(s: string, tam: number, max: number) {
 }
 
 /* Mismo diseño que la hoja de la pantalla (ui/document-sheet): membrete, tipo y título, resumen en tres columnas,
-   secciones numeradas, la firma del provider, los addenda y el pie. */
+   secciones numeradas, la firma del provider y el pie. */
 const ALTO = 842
 const X = 56
 const ANCHO = 483
-/* Hasta dónde llega el contenido de una página (el pie va en 796) y dónde arranca la siguiente. */
-const LIMITE = 772
-const TOPE = 64
 const AZUL: [number, number, number] = [0.114, 0.337, 0.737]
 const TINTA: [number, number, number] = [0.035, 0.035, 0.043]
 const SUAVE: [number, number, number] = [0.25, 0.25, 0.27]
@@ -182,8 +171,7 @@ const ENCIA: [number, number, number] = [0.973, 0.835, 0.82] // --color-encia
 const AZUL_DIENTE: [number, number, number] = [0.39, 0.56, 0.94]
 
 export function pdfDeDocumento(doc: Documento) {
-  const paginas: string[][] = [[]]
-  let ops = paginas[0]!
+  const ops: string[] = []
   const col = ([r, g, b]: number[]) => `${r} ${g} ${b}`
   const escribir = (s: string, x: number, y: number, tam: number, fuente: 'F1' | 'F2' | 'F3' = 'F1', color = SUAVE, espacio = 0) =>
     ops.push(`BT /${fuente} ${tam} Tf ${espacio} Tc ${col(color)} rg ${x.toFixed(1)} ${(ALTO - y).toFixed(1)} Td (${texto(s)}) Tj ET`)
@@ -207,20 +195,8 @@ export function pdfDeDocumento(doc: Documento) {
   escribir(doc.titulo.toUpperCase(), X, 122, 7.5, 'F2', AZUL, 1)
   escribir(doc.paciente, X, 142, 15, 'F2', TINTA)
 
-  let y = 158
-  /** Si lo que sigue no entra en la página, pasa a la siguiente. */
-  const cabe = (alto: number) => { if (y + alto > LIMITE) { ops = []; paginas.push(ops); y = TOPE } }
-  /** Un texto en las líneas que haga falta, desde `x`. */
-  const parrafo = (s: string, x: number, tam = 9, fuente: 'F1' | 'F2' | 'F3' = 'F1', color = SUAVE) => {
-    for (const l of partir(s, tam, X + ANCHO - x)) { cabe(14); escribir(l, x, y, tam, fuente, color); y += 14 }
-  }
-
-  if (doc.aviso) {
-    for (const l of partir(doc.aviso, 8.5, ANCHO)) { escribir(l, X, y + 4, 8.5, 'F3', GRIS); y += 12 }
-    y += 10
-  }
-
   /* Resumen: la primera sección de datos, en tres columnas. */
+  let y = 158
   const datos = doc.secciones.find((s) => 'campos' in s)
   if (datos && 'campos' in datos) {
     const w = ANCHO / 3
@@ -242,35 +218,23 @@ export function pdfDeDocumento(doc: Documento) {
     linea(X, y, X + ANCHO, y, LINEA, 0.8)
   }
 
-  /* Cuánto ocupa una sección, para que la firma no quede sola en la página siguiente. */
-  const altoDe = (s: Seccion) => 33 + (
-    'campos' in s ? s.campos.reduce((a, [k, v]) => a + Math.max(1, partir(v, 9, ANCHO - ancho(`${k}:`, 9, true) - 5).length) * 14, 0)
-      : 'listas' in s ? s.listas.reduce((a, [, items]) => a + 18 + items.reduce((b, it) => b + partir(it, 9, ANCHO - 14).length * 14, 0), 0)
-        : 'dientes' in s ? diagramaBoca(s.dientes.denticion).alto + 8
-          : s.parrafos.reduce((a, p) => a + partir(p, 9, ANCHO).length * 14 + 4, 0))
-
-  /* Secciones numeradas. El título no queda solo al pie de una página, y la última sección pasa de página junto con la
-     firma si las dos no entran. */
+  /* Secciones numeradas. */
   y += 30
-  const numeradas = doc.secciones.filter((s) => s !== datos)
-  numeradas.forEach((s, i) => {
-    cabe(i === numeradas.length - 1 && !doc.sinFirma && altoDe(s) + 54 < LIMITE - TOPE ? altoDe(s) + 54 : 17 + 28)
+  doc.secciones.filter((s) => s !== datos).forEach((s, i) => {
     escribir(String(i + 1), X, y, 10.5, 'F2', AZUL)
     escribir(s.titulo, X + 14, y, 10.5, 'F2', TINTA)
     y += 17
     if ('campos' in s) {
       for (const [k, v] of s.campos) {
-        cabe(14)
         escribir(`${k}:`, X, y, 9, 'F2', TINTA)
-        if (v) parrafo(v, X + ancho(`${k}:`, 9, true) + 5)
-        else y += 14
+        escribir(v, X + ancho(`${k}:`, 9, true) + 5, y, 9)
+        y += 14
       }
     } else if ('listas' in s) {
       for (const [k, items] of s.listas) {
-        cabe(28)
         escribir(k, X, y, 9, 'F2', TINTA)
         y += 14
-        for (const it of items) { cabe(14); escribir('•', X + 2, y, 9); parrafo(it, X + 14) }
+        for (const it of items) { escribir('•', X + 2, y, 9); escribir(it, X + 14, y, 9); y += 14 }
         y += 4
       }
     } else if ('dientes' in s) {
@@ -278,7 +242,6 @@ export function pdfDeDocumento(doc: Documento) {
       const { denticion, piezas } = s.dientes
       const elegidos = new Map(piezas)
       const g = diagramaBoca(denticion)
-      cabe(g.alto + 8)
       const [ox, oy] = [X, y - 6]
       rectRedondo(ox, oy, g.ancho, g.alto, 10, [0.953, 0.957, 0.965])
       for (const a of g.arcadas) {
@@ -301,14 +264,16 @@ export function pdfDeDocumento(doc: Documento) {
       }
       y = Math.max(oy + g.alto + 8, yl)
     } else {
-      for (const p of s.parrafos) { parrafo(p, X); y += 4 }
+      for (const p of s.parrafos) {
+        for (const l of partir(p, 9, ANCHO)) { escribir(l, X, y, 9); y += 14 }
+        y += 4
+      }
     }
     y += 16
   })
 
   /* La firma del provider (la Lab Order no lleva). */
   if (!doc.sinFirma) {
-    cabe(24 + 30)
     y += 24
     const finFirma = X + (ANCHO - 24) / 2
     if (doc.firmado) escribir(doc.provider, X, y - 6, 16, 'F3', AZUL)
@@ -316,60 +281,30 @@ export function pdfDeDocumento(doc: Documento) {
     linea(X, y, finFirma, y, TINTA, 0.8)
     escribir(`${doc.provider} · Provider`, X, y + 13, 8, 'F2', TINTA)
     escribir(doc.firmado ? `Signed electronically · ${doc.firmado}` : 'Not signed yet', X, y + 24, 7.5, 'F1', GRIS)
-    y += 24
   }
 
-  /* Addenda: después de la firma, cada uno con su autor, su fecha y su firma (CON-2730). */
-  if (doc.adendas?.length) {
-    y += 30
-    cabe(15 + 18 + 42)
-    escribir('Addenda', X, y, 10.5, 'F2', TINTA)
-    y += 15
-    escribir('Added after the note was signed. They do not change the signed note.', X, y, 8.5, 'F3', GRIS)
-    y += 20
-    for (const a of doc.adendas) {
-      cabe(42)
-      escribir(`Addendum by ${a.autor}`, X, y, 9, 'F2', TINTA)
-      escribir(a.fecha, X + ANCHO - ancho(a.fecha, 8), y, 8, 'F1', GRIS)
-      y += 14
-      parrafo(a.texto, X)
-      cabe(14)
-      escribir(`Signed electronically by ${a.autor} · ${a.fecha}`, X, y, 7.5, 'F1', GRIS)
-      y += 22
-    }
-  }
+  /* Pie. */
+  linea(X, 796, X + ANCHO, 796, LINEA, 0.8)
+  escribir(`${CLINICA.nombre} · ${doc.titulo} · ${doc.paciente}`, X, 808, 7, 'F1', TENUE)
+  escribir('Page 1 of 1', X + ANCHO - ancho('Page 1 of 1', 7), 808, 7, 'F1', TENUE)
 
-  /* Pie de cada página. */
-  paginas.forEach((p, i) => {
-    ops = p
-    const numero = `Page ${i + 1} of ${paginas.length}`
-    linea(X, 796, X + ANCHO, 796, LINEA, 0.8)
-    escribir(`${CLINICA.nombre} · ${doc.titulo} · ${doc.paciente}`, X, 808, 7, 'F1', TENUE)
-    escribir(numero, X + ANCHO - ancho(numero, 7), 808, 7, 'F1', TENUE)
-  })
-
-  /* 1 catálogo, 2 páginas, 3 a 5 fuentes, 6 info y, por cada página, la página y su contenido. */
+  const contenido = ops.join('\n')
   const objetos = [
     '<< /Type /Catalog /Pages 2 0 R /ViewerPreferences << /DisplayDocTitle true >> >>',
-    `<< /Type /Pages /Kids [${paginas.map((_, i) => `${7 + 2 * i} 0 R`).join(' ')}] /Count ${paginas.length} >>`,
+    '<< /Type /Pages /Kids [3 0 R] /Count 1 >>',
+    `<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 ${ALTO}] /Resources << /Font << /F1 5 0 R /F2 6 0 R /F3 8 0 R >> >> /Contents 4 0 R >>`,
+    `<< /Length ${contenido.length} >>\nstream\n${contenido}\nendstream`,
     '<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>',
     '<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold /Encoding /WinAnsiEncoding >>',
-    '<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Oblique /Encoding /WinAnsiEncoding >>',
     `<< /Title <FEFF${[...`${doc.titulo} — ${doc.paciente}`].map((c) => c.charCodeAt(0).toString(16).padStart(4, '0')).join('')}> /Producer (Confidentally) >>`,
-    ...paginas.flatMap((p, i) => {
-      const contenido = p.join('\n')
-      return [
-        `<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 ${ALTO}] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> /Contents ${8 + 2 * i} 0 R >>`,
-        `<< /Length ${contenido.length} >>\nstream\n${contenido}\nendstream`,
-      ]
-    }),
+    '<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Oblique /Encoding /WinAnsiEncoding >>',
   ]
   let pdf = '%PDF-1.4\n'
   const posiciones: number[] = []
   objetos.forEach((o, i) => { posiciones.push(pdf.length); pdf += `${i + 1} 0 obj\n${o}\nendobj\n` })
   const xref = pdf.length
   pdf += `xref\n0 ${objetos.length + 1}\n0000000000 65535 f \n${posiciones.map((p) => `${String(p).padStart(10, '0')} 00000 n \n`).join('')}`
-  pdf += `trailer\n<< /Size ${objetos.length + 1} /Root 1 0 R /Info 6 0 R >>\nstartxref\n${xref}\n%%EOF`
+  pdf += `trailer\n<< /Size ${objetos.length + 1} /Root 1 0 R /Info 7 0 R >>\nstartxref\n${xref}\n%%EOF`
   return new Blob([Uint8Array.from(pdf, (c) => c.charCodeAt(0))], { type: 'application/pdf' })
 }
 
@@ -383,16 +318,6 @@ export function abrirDocumento(doc: Documento, alFallar: () => void) {
   ventana.document.body.textContent = 'Preparing document, please wait...'
   const url = URL.createObjectURL(pdfDeDocumento(doc))
   setTimeout(() => { ventana.location.href = url }, 700)
-}
-
-/** Baja el PDF del documento como archivo (Download de Patient Summary). */
-export function descargarDocumento(doc: Documento, archivo: string) {
-  const url = URL.createObjectURL(pdfDeDocumento(doc))
-  const a = Object.assign(document.createElement('a'), { href: url, download: archivo })
-  document.body.append(a)
-  a.click()
-  a.remove()
-  setTimeout(() => URL.revokeObjectURL(url), 1000)
 }
 
 /** Una hoja HTML (las plantillas de PDF de `src/pdfs`) en una pestaña nueva, como el documento que arma el backend. */

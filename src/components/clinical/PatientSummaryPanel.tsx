@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
-import { CircleCheck, ClipboardList, Download, Eye, Lock } from 'lucide-react'
+import { CircleCheck, CircleX, ClipboardList, Download, Eye, Lock } from 'lucide-react'
 import { ICONO_SUELTO } from '@/lib/estilos'
 import { aviso } from '@/components/ui/toaster'
 import { Button } from '@/components/ui/button'
@@ -9,10 +9,10 @@ import { DataTable, TextCell, type DataTableColumn } from '@/components/ui/data-
 import { DateNav } from '@/components/ui/date-nav'
 import { FilterMenu, type FilterGroup } from '@/components/ui/filter-menu'
 import { Pill, type PillTone } from '@/components/ui/pill'
-import { descargarDocumento } from '@/components/dashboard/documentoTarea'
+import { abrirHoja } from '@/components/dashboard/documentoTarea'
 import { PACIENTE } from '@/data/treatment-plan'
 import type { EncuentroHistorial, EstadoHistorial } from '@/data/historial'
-import { archivoNota, documentoEncuentro, tieneNota, useHistorial } from '@/lib/historial'
+import { hojaNota, hojasJuntas, huboExamenes, tieneNota, useHistorial } from '@/lib/historial'
 import { PatientSummaryNote } from './PatientSummaryNote'
 
 /* Patient Summary de Clinical Mode (red.dev: /clinical-mode/treatment-history): los encuentros del paciente y su nota
@@ -40,13 +40,13 @@ function NotaCelda({ nota }: Pick<EncuentroHistorial, 'nota'>) {
    medicaciones de una receta. El nombre y el estado, al pasar el mouse. Chip gris: el celeste se pierde en la fila elegida. */
 function ProcedimientosCelda({ e }: { e: EncuentroHistorial }) {
   const [abierto, setAbierto] = useState(false)
-  const todos = e.procedimientos
+  const todos = e.eventos.procedures
   if (!todos.length) return <span className="text-ink-muted">No procedures</span>
-  const texto = (p: EncuentroHistorial['procedimientos'][number]) => `${p.codigo} · ${p.nombre}${p.zona ? ` · ${p.zona}` : ''} [${p.estado}]`
+  const texto = (p: (typeof todos)[number]) => `${p.code} · ${p.description}${p.location ? ` · ${p.location}` : ''} [${p.status}]`
   const visibles = abierto ? todos : todos.slice(0, 1)
   return (
     <span className="flex min-w-0 flex-wrap items-center gap-1.5">
-      {visibles.map((p) => <Chip key={`${p.codigo}-${p.zona}`} tone="neutral" title={texto(p)}>{p.codigo}</Chip>)}
+      {visibles.map((p) => <Chip key={`${p.code}-${p.location}`} tone="neutral" title={texto(p)}>{p.code}</Chip>)}
       {todos.length > visibles.length && (
         <ChipMas
           n={todos.length - visibles.length} label={`Show ${todos.length - visibles.length} more procedures: ${todos.slice(1).map(texto).join(', ')}`}
@@ -57,15 +57,15 @@ function ProcedimientosCelda({ e }: { e: EncuentroHistorial }) {
   )
 }
 
-/* Si en el encuentro hubo exámenes, derivaciones, órdenes o recetas: el tilde verde de red.dev (CON-3012, CON-3539); lo
-   que no hubo, una raya, como cualquier celda sin dato. */
+/* Si en el encuentro hubo exámenes, derivaciones, órdenes o recetas, como red.dev: tilde verde si hubo (CON-3012,
+   CON-3539) y cruz roja si no. */
 function Hecho({ si }: { si: boolean }) {
   return si
     ? <><CircleCheck aria-hidden className="size-4 text-dash-ok-fg" /><span className="sr-only">Yes</span></>
-    : <><span aria-hidden className="text-ink-faint">—</span><span className="sr-only">No</span></>
+    : <><CircleX aria-hidden className="size-4 text-dash-bad-fg" /><span className="sr-only">No</span></>
 }
-const hecho = (key: string, header: string, width: number, de: (e: EncuentroHistorial) => unknown[]): DataTableColumn<EncuentroHistorial> =>
-  ({ key, header, width, cell: (e) => <Hecho si={de(e).length > 0} /> })
+const hecho = (key: string, header: string, width: number, si: (e: EncuentroHistorial) => boolean): DataTableColumn<EncuentroHistorial> =>
+  ({ key, header, width, cell: (e) => <Hecho si={si(e)} /> })
 
 export function PatientSummaryPanel({ paciente = PACIENTE }: { /** A nombre de quién salen las notas. */ paciente?: string }) {
   const encuentros = useHistorial()
@@ -90,12 +90,14 @@ export function PatientSummaryPanel({ paciente = PACIENTE }: { /** A nombre de q
     { title: 'Provider', options: [...new Set(encuentros.map((e) => e.provider))].sort().map(contar((e) => e.provider)), value: proveedores, onChange: setProveedores },
   ]
 
-  /* Download baja la nota de cada encuentro elegido, con sus addenda (CON-2731); avisa sólo si hay algo que bajar (CON-3023). */
+  /* Download junta las notas elegidas, con sus addenda (CON-2731), y avisa sólo si hay algo que bajar (CON-3023). El
+     archivo lo arma el backend con la plantilla; acá se abren en una pestaña con ese diseño, una por página. */
   const bajar = () => {
     const notas = encuentros.filter((e) => elegidos.includes(e.id) && tieneNota(e))
     if (!notas.length) { aviso.warn('Select at least one clinical note to download.'); return }
-    notas.forEach((e, i) => setTimeout(() => descargarDocumento(documentoEncuentro(e, paciente), archivoNota(e, paciente)), i * 300))
-    aviso.ok('Download started')
+    let abrio = true
+    abrirHoja(hojasJuntas(notas.map((e) => hojaNota(e, paciente))), () => { abrio = false; aviso.error("We couldn't open the clinical notes. Allow pop-ups for this site and try again.") })
+    if (abrio) aviso.ok('Download started')
   }
 
   const columnas: DataTableColumn<EncuentroHistorial>[] = [
@@ -110,10 +112,10 @@ export function PatientSummaryPanel({ paciente = PACIENTE }: { /** A nombre de q
     { key: 'motivo', header: 'Reason for appt', cell: (e) => <TextCell>{e.motivo}</TextCell> },
     { key: 'provider', header: 'Provider', width: 144, cell: (e) => <TextCell>{e.provider}</TextCell> },
     { key: 'procedimientos', header: 'Procedures', width: 132, cell: (e) => <ProcedimientosCelda e={e} /> },
-    hecho('examenes', 'Exams', 52, (e) => e.examenes),
-    hecho('derivaciones', 'Ref', 40, (e) => e.derivaciones),
-    hecho('laboratorios', 'Lab', 40, (e) => e.laboratorios),
-    hecho('recetas', 'Prescription', 84, (e) => e.recetas),
+    hecho('examenes', 'Exams', 52, huboExamenes),
+    hecho('derivaciones', 'Ref', 40, (e) => e.eventos.referrals.length > 0),
+    hecho('laboratorios', 'Lab', 40, (e) => e.eventos.lab_orders.length > 0),
+    hecho('recetas', 'Prescription', 84, (e) => e.eventos.prescriptions.length > 0),
     { key: 'ver', header: 'Actions', width: 60, align: 'right', locked: true, cell: (e) => tieneNota(e) && (
       <button type="button" aria-label={`View clinical note of the ${rotulo(e)}`} title="View clinical note" onClick={(ev) => { ev.stopPropagation(); abrir(e.id) }} className={ICONO_SUELTO}>
         <Eye className="size-4" />

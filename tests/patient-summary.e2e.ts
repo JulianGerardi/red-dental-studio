@@ -40,9 +40,9 @@ test('El ojo abre la nota; al volver, la página y lo elegido siguen como estaba
   await expect(screen.getByText(/Showing 11 to 20 of 22 results/)).toBeVisible()
   await screen.getByRole('button', ojo('08/05/2026')).tap()
   await expect(screen.getByRole('heading', 'Clinical note - Julio Perez')).toBeVisible()
-  await expect(screen.getByText('Dental Clinical Note').first()).toBeVisible()
-  /* Firmada por quien atendió: sin Sign, con Add addendum. */
-  await expect(screen.getByText(/^Signed by Sarah Stone on August 5, 2026/)).toBeVisible()
+  /* Firmada: sin Sign, con View PDF y Add addendum. */
+  await expect(screen.getByRole('button', 'View PDF')).toBeVisible()
+  await expect(screen.getByRole('button', 'Add addendum')).toBeVisible()
   await expect(screen.getByRole('button', 'Sign clinical note')).toHaveCount(0)
   await screen.getByRole('button', 'Back to history').tap()
   await expect(screen.getByText(/1 selected · Showing 11 to 20 of 22 results/)).toBeVisible()
@@ -51,7 +51,6 @@ test('El ojo abre la nota; al volver, la página y lo elegido siguen como estaba
 test('Una nota sin firmar de un encuentro Completed se firma con el login y el encuentro pasa a Fulfilled', async ({ app, screen }) => {
   await app.open(LISTA)
   await screen.getByRole('button', ojo('11/20/2026')).tap()
-  await expect(screen.getByText(/Signing this clinical note closes the encounter/)).toBeVisible()
   await screen.getByRole('button', 'Sign clinical note').tap()
   await firmar(screen)
   await expect(screen.getByText('Clinical note signed.')).toBeVisible()
@@ -65,7 +64,6 @@ test('Una nota sin firmar de un encuentro Completed se firma con el login y el e
   await drawer.getByRole('button', 'Sign and save').tap()
   await firmar(screen)
   await expect(screen.getByText('Addendum added.')).toBeVisible()
-  await expect(screen.getByText('Addendum by Sarah Stone')).toBeVisible()
 
   /* La lista lo muestra sin recargar (CON-3166). */
   await screen.getByRole('button', 'Back to history').tap()
@@ -87,7 +85,6 @@ test('Con el encuentro en curso la nota se ve pero todavía no se firma; la de o
 
   /* Cerrado solo a las 48 h: la nota quedó generada y se puede firmar. */
   await screen.getByRole('button', ojo('11/03/2026')).tap()
-  await expect(screen.getByText(/Generated automatically when the encounter closed after 48 hours/)).toBeVisible()
   await expect(screen.getByRole('button', 'Sign clinical note')).toBeVisible()
   await screen.getByRole('button', 'Back to history').tap()
 
@@ -96,7 +93,7 @@ test('Con el encuentro en curso la nota se ve pero todavía no se firma; la de o
   await expect(screen.getByRole('button', 'Sign clinical note')).toHaveCount(0)
 })
 
-test('Download pide elegir una nota y avisa cuando la descarga empieza', async ({ app, screen }) => {
+test('Download pide elegir una nota y avisa cuando empieza', async ({ app, screen }) => {
   await app.open(LISTA)
   await screen.getByRole('button', 'Download').tap()
   await expect(screen.getByText('Select at least one clinical note to download.')).toBeVisible()
