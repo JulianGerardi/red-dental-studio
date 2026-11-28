@@ -3,6 +3,25 @@
 Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber el dev. El porqué de cada decisión está en
 `design-reference/figma/modulos/<módulo>.md`; lo anterior al 2026-10-06, en `git log` y en esos mismos archivos.
 
+## 2026-11-28
+
+### Patient Summary: la lista de encuentros, la nota que abre el ojo, firma, addendum y PDF (CON-2731, CON-2727, CON-2728, CON-2730) ([#223](https://github.com/JulianGerardi/red-dental-studio/pull/223))
+- **Pestaña Patient summary de Clinical Mode** (antes *Planned*): `clinical/PatientSummaryPanel`, la tabla de encuentros de
+  red.dev con `ui/data-table`: pills del encuentro (`TONO_ENCUENTRO`) y de la nota, *Filter* (Status, Provider), la fecha
+  por mes (`ui/date-nav`), casillas y *Download*. Datos de ejemplo en `data/historial`; el estado, en `lib/historial`.
+- **El ojo** abre `clinical/PatientSummaryNote` sobre `ui/document-viewer`, sin salir de la pestaña (`?note=<id>`): al
+  volver siguen la página, los filtros y lo elegido. Qué aviso y qué acción muestra según el encuentro y la nota está en
+  la tabla de `modulos/clinical-mode.md` (*El ojo*).
+- **Reglas:** la nota se firma con el encuentro Completed o Fulfilled y sólo la firma su provider; firmar pasa Completed a
+  Fulfilled; *Add addendum* sólo sobre una nota firmada; un encuentro cancelado o una nota sin permiso no se abren ni se
+  eligen.
+- **PDF:** `pdfDeDocumento` pasa de página (*Page N of M*) y dibuja los addenda; `descargarDocumento` lo baja como
+  archivo. `Documento` suma `aviso` y `adendas`; `ui/document-sheet`, `appendix`.
+- **Reuso:** `pages/ClinicalNote` exporta `FirmarDialog`. El encuentro de hoy entra a la lista con *Start encounter*
+  (`cerrarEncuentroHoy` desde `ClinicalTopBar`).
+- **Dejar de usar:** `PatientSummaryPanel` de `clinical/panels.tsx` y `TREATMENT_HISTORY` de `data/mock` (borrados).
+- No se pudo entrar a red.dev (pide login): lo que falta confirmar está en *A validar* del `.md`.
+
 ## 2026-11-27
 
 ### Lab order, Prescription y Referral: Teeth & surface de red.dev, datos en el título, sin encuentro y PDF nuevo (CON-2214, CON-2212, CON-2321) ([#219](https://github.com/JulianGerardi/red-dental-studio/pull/219))
