@@ -19,6 +19,8 @@ p { margin: 0 0 4pt; }
 .datos b { display: block; font-size: 11pt; color: #09090b; }
 .datos span, .meta { display: block; font-size: 8pt; line-height: 1.45; color: #71717a; }
 .meta { text-align: right; white-space: nowrap; }
+/* El texto libre conserva sus saltos de línea (notas, trabajo pedido). */
+.texto { white-space: pre-line; }
 .meta b { display: block; color: #09090b; font-weight: 600; }
 .tipo { margin: 18pt 0 2pt; font-size: 7.5pt; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: #1d56bc; }
 h1 { margin: 0; font-size: 15pt; line-height: 1.25; font-weight: 700; color: #09090b; }
@@ -126,15 +128,15 @@ h2 + h3 { margin-top: 2pt; }
 <dl class="resumen"><div><dt>Patient</dt><dd>{{patient_name}}</dd></div><div><dt>Date of birth</dt><dd>{{patient_birth_date}}</dd></div><div><dt>Patient ID</dt><dd>{{patient_id}}</dd></div><div><dt>Provider</dt><dd>{{provider_name}}</dd></div><div><dt>Appointment</dt><dd>{{appointment}}</dd></div><div><dt>Procedure</dt><dd>{{procedure_name}}</dd></div></dl>
 <section>
 <h2>Diagnosis</h2>
-<p>{{diagnosis}}</p>
+<p class="texto">{{diagnosis}}</p>
 </section>
 <section>
 <h2>Clinical findings</h2>
-<p>{{clinical_findings}}</p>
+<p class="texto">{{clinical_findings}}</p>
 </section>
 <section>
 <h2>Nature of procedure</h2>
-<p>{{nature_of_procedure}}</p>
+<p class="texto">{{nature_of_procedure}}</p>
 </section>
 <section>
 <h2>Risk and complications</h2>
