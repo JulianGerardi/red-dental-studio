@@ -1200,7 +1200,7 @@ Dashboard no le pasaba su día de la demo y comparaba con la fecha real: nunca e
    período: activo si la semana o el mes que se ve incluye hoy. Fuera de hoy, el bloque blanco de siempre.
 3. Sin historia de Jira: es un ajuste visual del componente.
 
-## Contadores: el globo es para lo que hay que atender (2026-11-28)
+## Contadores: un solo globo, el de la campana (2026-11-28)
 
 Julián: el globo azul de *Appointments*, *Waiting room* y *Rooms* (y el de las cards clínicas de la ficha) es el de la
 campana, pero "que tengo 6 rooms no lo veo como una notificación". Pidió primero ver cómo lo resuelven otras apps. Una
@@ -1213,14 +1213,14 @@ relleno fuerte "for unread notification counts", y "use bold badges sparingly"; 
 folder)". Primer: el número siempre al lado de un texto que diga qué se cuenta. Ant y Anvil: se esconde en cero, tope 99+,
 y `aria-label` con el contexto ("Cases with 6 items to review"). Slack: número cuando la cantidad decide la acción.
 
-1. **Globo (azul relleno, el de la campana)** sólo en lo que hay que atender: *Appointments* (turnos por hacer check in),
-   *Waiting room* (Dashboard), *Today appointments* (Patients) y las cuatro cards clínicas de la ficha (Allergies, Medical
-   conditions, Medication, Past surgery). Es `Globo` (`dashboard/primitives`), una sola pieza.
-2. **Número suelto en gris** (`CuentaSuelta`, `ink-muted`) en lo que sólo cuenta cuánto hay: *Rooms* y *Recent patients*.
-   En cada sala, el número de turnos va con el ícono de calendario y en `dash-muted`, como su línea *Now / Next*: sin
-   ícono se leía "Operatory 1 6". Mantiene su tooltip (CON-4180).
+1. **Primera vuelta (descartada el mismo día):** globo sólo en lo que hay que atender y número gris para los totales
+   (Rooms, Recent patients, cada sala). Julián: "confunde; dejemos todo círculos azules con número en blanco".
+2. **Queda un solo contador, el globo de la campana** (`Globo`, `dashboard/primitives`): *Appointments*, *Waiting room* y
+   *Rooms* (Dashboard), cada sala de *Rooms*, *Today appointments* y *Recent patients* (Patients) y las cuatro cards
+   clínicas de la ficha. Se aparta de lo que recomiendan Atlassian y Anvil (ver arriba) a favor de una sola forma.
 3. **Reglas del globo:** en cero no se muestra; arriba de 99, "99+"; tooltip y texto para el lector que dicen qué se cuenta
-   ("9 appointments to check in", "8 patients in the waiting room", "11 appointments today"). En las cards clínicas (son
+   ("9 appointments to check in", "8 patients in the waiting room", "6 rooms", "6 appointments today" en cada sala). En
+   la sala vacía (Emergency) no hay globo: ya dice *No bookings*. En las cards clínicas (son
    botones) va sólo el texto para el lector ("4 items on record"), sin tooltip. Sobre la card clínica abierta, azul el
    número sobre `info-bg`.
 4. Quedan con `ui/count` (celeste) las cuentas de `FilaDetalle` y `PermissionsPicker`: no se tocaron en esta tanda.
@@ -1229,4 +1229,4 @@ y `aria-label` con el contexto ("Cases with 6 items to review"). Slack: número 
 6. Sin historia de Jira: es una regla visual del design system.
 
 **A validar con usuarios:** si recepción entiende el globo de *Appointments* como "turnos que faltan llegar" (cuenta los
-que no hicieron check in, no los del día); y si el número gris de *Rooms* se extraña como dato o pasa desapercibido.
+que no hicieron check in, no los del día); y si con tantos globos azules juntos la campana sigue llamando la atención.

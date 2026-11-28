@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
 import { CalendarDays, Clock, Activity, ShieldQuestionMark, Pencil, UserX, CalendarX } from 'lucide-react'
-import { CuentaSuelta, Globo, Panel } from '@/components/dashboard/primitives'
+import { Globo, Panel } from '@/components/dashboard/primitives'
 import { EmptyState } from '@/components/ui/empty-state'
 import { FilterMenu } from '@/components/ui/filter-menu'
 import { PageTitle } from '@/components/ui/page-title'
@@ -422,7 +422,7 @@ export default function Dashboard() {
           )}
         </Panel>
 
-        <Panel title={<>Rooms <CuentaSuelta n={dia.rooms.length} /></>}>
+        <Panel title={<>Rooms <Globo n={dia.rooms.length} texto={['room', 'rooms']} /></>}>
           <OperatoryList rooms={dia.rooms} turnos={dia.appointments} dia={dia} onSelect={(a, el) => pick(a, el)} />
         </Panel>
       </div>

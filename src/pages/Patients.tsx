@@ -11,7 +11,7 @@ import { Button } from '@/components/ui/button'
 import { EmptyState } from '@/components/ui/empty-state'
 import { ShowMore } from '@/components/ui/show-more'
 import { NewPatientModal } from '@/pages/patients/NewPatientModal'
-import { CuentaSuelta, Globo, Panel } from '@/components/dashboard/primitives'
+import { Globo, Panel } from '@/components/dashboard/primitives'
 import { AppointmentCard, type Appointment } from '@/components/dashboard/AppointmentCard'
 import { NewAppointmentModal, type DatosTurno } from '@/components/scheduling/NewAppointmentModal'
 import { HORAS, hora24 } from '@/components/scheduling/AppointmentSlotPicker'
@@ -32,8 +32,8 @@ const LIMITE_TURNOS = 4
 const LIMITE_RECIENTES = 3
 const CANTIDAD_RECIENTES = 10
 
-/* El total -no el filtrado ni el visible- al lado del título del panel: Globo en Today appointments (hay que
-   atenderlos), CuentaSuelta en Recent patients. Viven en dashboard/primitives (dashboard.md, 2026-11-28). */
+/* El total -no el filtrado ni el visible- al lado del título del panel: el Globo de la campana. Vive en
+   dashboard/primitives (dashboard.md, 2026-11-28). */
 export { Globo }
 
 /* Figma 3638:59529 "Patients — List".
@@ -153,7 +153,7 @@ export default function Patients() {
               que no se niegue a achicarse por debajo de su contenido. min-h-[220px]: una tabla muy corta (la última
               página, con un solo paciente) deja a Today Appointments -shrink-0- de igual pidiendo más alto que toda la
               barra; sin este piso, Recent Patients quedaba en 0 y desaparecía entera. */}
-          <Panel title={<>Recent patients <CuentaSuelta n={recientes.length} /></>} bodyClassName="gap-2 pt-0" className="min-h-[220px] flex-1 [&>header]:min-h-10">
+          <Panel title={<>Recent patients <Globo n={recientes.length} texto={['recent patient', 'recent patients']} /></>} bodyClassName="gap-2 pt-0" className="min-h-[220px] flex-1 [&>header]:min-h-10">
             {buscador(buscarReciente, setBuscarReciente, 'Search recent patients')}
             {recientesFiltrados.length === 0 ? (
               <EmptyState

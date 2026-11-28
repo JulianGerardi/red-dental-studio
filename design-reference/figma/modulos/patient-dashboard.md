@@ -233,7 +233,7 @@ El globo es ahora la pieza `Count` (`src/components/ui/count.tsx`, página *Elem
 `<span>` suelto en `PatientDetail`: el design system es la fuente y la pantalla sólo la usa.
 
 **2026-11-28:** las cuatro cards pasan al globo azul relleno de la campana (`Globo`), que no se muestra en cero; ver
-dashboard.md (*Contadores: el globo es para lo que hay que atender*).
+dashboard.md (*Contadores: un solo globo, el de la campana*).
 
 ## Appointments: la misma card que las solicitudes de Scheduling (2026-10-12)
 

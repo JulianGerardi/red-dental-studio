@@ -126,9 +126,8 @@ export function StatusPill({
   )
 }
 
-/* El globo de lo que hay que atender, con el estilo de la campana: Appointments y Waiting room (Dashboard), Today
-   appointments (Patients) y las cards clínicas de la ficha. Lo que sólo cuenta cuánto hay (Rooms, Recent patients) va
-   con CuentaSuelta. Cero no se muestra; tope 99+ (dashboard.md, 2026-11-28). */
+/* El único contador de la app, con el estilo de la campana: paneles del Dashboard y de Patients, salas y cards
+   clínicas de la ficha. Cero no se muestra; tope 99+ (dashboard.md, 2026-11-28). */
 export function Globo({ n, texto, invertido, sinTooltip }: {
   n: number
   /** Qué se cuenta, en singular y plural ("appointment to check in"): lo dicen el tooltip y el lector de pantalla. */
@@ -160,9 +159,4 @@ export function Globo({ n, texto, invertido, sinTooltip }: {
       </Tooltip>
     </TooltipProvider>
   )
-}
-
-/* Cuántos hay en una lista que no pide nada (Rooms, Recent patients): el número en gris junto al título, sin globo. */
-export function CuentaSuelta({ n }: { n: number }) {
-  return <span className="text-ink-muted font-medium tabular-nums">{n}</span>
 }
