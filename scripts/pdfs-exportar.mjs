@@ -32,7 +32,8 @@ archivos['pdfs.json'] = JSON.stringify(
       variables,
       lists: listas,
       raw_html: variables.filter((v) => v.endsWith('_html')),
-      sample_data: ejemplo,
+      /* Sólo lo que usa la plantilla: COMUNES trae datos que no todos los documentos imprimen. */
+      sample_data: Object.fromEntries(Object.entries(ejemplo).filter(([k]) => variables.includes(k) || k in listas)),
       jira: p.jira,
     }
   }),

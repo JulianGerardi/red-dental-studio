@@ -1,17 +1,15 @@
 import { useState } from 'react'
 import { FileText, Plus, Trash2 } from 'lucide-react'
-import { cn } from '@/lib/utils'
 import { aviso } from '@/components/ui/toaster'
 import { Button } from '@/components/ui/button'
-import { Checkbox } from '@/components/ui/checkbox'
 import { ConfirmDialog } from '@/components/ui/confirm-dialog'
 import { DatePicker } from '@/components/ui/date-picker'
 import { Tabs } from '@/components/ui/tabs'
 import { FieldError, FieldLabel, FormFooter, SearchField, SelectField, TextArea, TextField } from '@/components/patients/form'
-import { Card } from '@/components/settings/primitives'
+import { Card, Toggle } from '@/components/settings/primitives'
 import { OBLIGATORIO } from '@/lib/validacion'
 import { formatMDY } from '@/lib/fecha'
-import { BOTON_BORRAR } from '@/lib/estilos'
+import { ICONO_TACHO } from '@/lib/estilos'
 import {
   FORMAS, FRECUENCIAS, MEDICACION_ACTIVA, MEDICAMENTOS, UNIDADES_DOSIS, UNIDADES_DURACION, UNIDADES_FUERZA, VIAS, erroresDe, fraseDeUso, medicacionVacia, nombreMedicacion,
   type Medicacion,
@@ -119,19 +117,17 @@ export function PrescriptionDetail({ registro, nuevo, onVolver, onAccion }: {
   }
 
   const rotulo = (x: Medicacion, i: number) => nombreMedicacion(x) || `Medication ${i + 1}`
-  const casilla = (k: 'actualizar' | 'generico' | 'controlada', label: string) => (
-    <label className={cn('flex w-fit items-center gap-2 text-[13px] font-medium text-ink', editable ? 'cursor-pointer' : 'opacity-60')}>
-      <Checkbox on={m[k]} onChange={cambiar(k)} label={label} disabled={!editable} /> {label}
-    </label>
-  )
+  /* Switch con Yes / No, como red.dev (Julián, 2026-11-28): el rótulo arriba, como un campo más. */
+  const interruptor = (k: 'actualizar' | 'generico' | 'controlada', label: string) => <Toggle label={label} on={m[k]} onChange={cambiar(k)} disabled={!editable} />
   const frase = fraseDeUso(m)
 
   return (
     <div className="flex flex-col gap-4">
       <EncabezadoFicha
         titulo={nuevo ? 'New prescription' : 'Prescription'} estado={registro.state} tono={TONO_ESTADO[registro.state]} onVolver={onVolver} volverA="prescriptions"
-        /* CON-2230: se guarda quién la hizo y cuándo; van en el título, como en Lab order y Referral. */
-        datos={[['Prescribing provider', registro.provider ?? '—'], ['Prescription date', registro.register]]}
+        /* CON-2230: se guarda quién la hizo y cuándo; van en el título, como en Lab order y Referral. En New no van: todavía
+           no existe y red.dev sólo muestra el vencimiento (Julián, 2026-11-28). */
+        datos={nuevo ? undefined : [['Prescribing provider', registro.provider ?? '—'], ['Prescription date', registro.register]]}
         /* El vencimiento también va en el título, como red.dev. El calendario es el de toda la app, sin días apagados:
            que no quede en el pasado ni más allá del límite (CON-2230) se revisa al guardar. */
         campo={(
@@ -151,17 +147,23 @@ export function PrescriptionDetail({ registro, nuevo, onVolver, onAccion }: {
       <AvisosFicha editable={editable} nombre="prescription" incompleto={incompleto} error={errorVence && errorVence !== OBLIGATORIO ? errorVence : undefined} />
 
       {/* Una card debajo de la otra, como los formularios de la app: las medicaciones y, al final, las indicaciones. */}
-      <Card title="Medications" action={editable && <Button size="sm" variant="secondary" onClick={agregar}><Plus /> Add medication</Button>}>
+      <Card title="Medications" action={editable && <Button size="md" onClick={agregar}><Plus /> New medication</Button>}>
         <div className="flex min-w-0 flex-col gap-4">
           {/* Una pestaña por medicación, con su nombre apenas se elige; el punto rojo marca la que tiene faltantes. Fuera
-              del fieldset: en sólo lectura también se recorren. */}
+              del fieldset: en sólo lectura también se recorren. Al lado, el tacho de la app (sólo ícono) quita la que
+              se está viendo. */}
           {medicaciones.length > 1 && (
-            <div className="flex flex-wrap items-center gap-2">
+            <div className="flex min-w-0 items-center gap-2">
               <Tabs
+                className="min-w-0"
                 size="sm" aria-label="Medications" value={String(m.id)} onChange={setActual}
                 tabs={medicaciones.map((x, i) => ({ value: String(x.id), label: rotulo(x, i), alerta: intento && Object.keys(erroresDe(x).errores).length > 0 }))}
               />
-              {editable && <Button size="sm" variant="ghost" className={cn('ml-auto', BOTON_BORRAR)} onClick={quitar}><Trash2 /> Remove medication</Button>}
+              {editable && (
+                <button type="button" className={ICONO_TACHO} aria-label={`Remove medication: ${rotulo(m, medicaciones.indexOf(m))}`} title="Remove medication" onClick={quitar}>
+                  <Trash2 className="size-4" />
+                </button>
+              )}
             </div>
           )}
           {/* Medication details | Directions for use, lado a lado en pantallas anchas como red.dev; los campos, de a dos. */}
@@ -179,10 +181,10 @@ export function PrescriptionDetail({ registro, nuevo, onVolver, onAccion }: {
                 <TextField label="Quantity to dispense" required placeholder="e.g. 30" value={m.cantidad} onChange={(v) => cambiar('cantidad')(entero(v))} error={falta('cantidad')} disabled={!editable} />
                 <TextField label="Refills" placeholder="0" value={m.refills} onChange={(v) => cambiar('refills')(entero(v))} disabled={!editable} />
               </div>
-              <div className="flex flex-wrap gap-x-6 gap-y-3">
-                {casilla('actualizar', 'Update patient medications')}
-                {casilla('generico', 'Allow generic substitution')}
-                {casilla('controlada', 'Controlled substance')}
+              <div className="grid gap-4 sm:grid-cols-3">
+                {interruptor('actualizar', 'Update patient medications')}
+                {interruptor('generico', 'Allow generic substitution')}
+                {interruptor('controlada', 'Controlled substance')}
               </div>
             </div>
             <div className="flex min-w-0 flex-col gap-4">
@@ -218,7 +220,7 @@ export function PrescriptionDetail({ registro, nuevo, onVolver, onAccion }: {
 
       {reusar && (
         <ConfirmDialog
-          title="Medication already active" confirmLabel="Reuse existing medication" cancelLabel="Cancel" icon="warning"
+          title="Medication already active" confirmLabel="Confirm" cancelLabel="Cancel" icon="warning"
           onCancel={() => setReusar(null)} onConfirm={reusarExistente}
         >
           <p>This medication is already active for the patient. Do you want to reuse the existing medication?</p>

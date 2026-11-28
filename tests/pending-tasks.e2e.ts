@@ -11,7 +11,7 @@ test('Sin encuentro abierto las opciones del ⋮ funcionan: Cancel pregunta y sa
   await screen.getByRole('button', 'Actions for Lab order for James Foster').tap()
   await expect(screen.getByRole('menuitem', 'Cancel')).not.toHaveAttribute('aria-disabled', 'true')
   await screen.getByRole('menuitem', 'Cancel').tap()
-  await screen.getByRole('dialog', 'Cancel lab order').getByRole('button', 'Cancel lab order').tap()
+  await screen.getByRole('dialog', 'Cancel lab order').getByRole('button', 'Confirm').tap()
   await expect(screen.getByRole('button', 'Actions for Lab order for James Foster')).toHaveCount(0)
 })
 
@@ -20,13 +20,13 @@ test('Request pasa la orden a Requested y Cancel la saca de la lista', async ({ 
   await screen.getByRole('tab', /^Lab orders/).tap()
   await screen.getByRole('button', 'Actions for Lab order for Olivia Brooks').tap()
   await screen.getByRole('menuitem', 'Request').tap()
-  await screen.getByRole('dialog', 'Request lab order').getByRole('button', 'Mark as requested').tap()
+  await screen.getByRole('dialog', 'Request lab order').getByRole('button', 'Confirm').tap()
   await expect(screen.getByText('The lab order has been successfully marked as Requested.')).toBeVisible()
   await expect(screen.getByRole('button', 'Open PDF of the lab order for Olivia Brooks')).toBeVisible()
 
   await screen.getByRole('button', 'Actions for Lab order for Olivia Brooks').tap()
   await screen.getByRole('menuitem', 'Cancel').tap()
-  await screen.getByRole('dialog', 'Cancel lab order').getByRole('button', 'Cancel lab order').tap()
+  await screen.getByRole('dialog', 'Cancel lab order').getByRole('button', 'Confirm').tap()
   await expect(screen.getByRole('tab', 'Lab orders (1)')).toBeVisible()
 })
 
@@ -136,7 +136,7 @@ test('Una Referral Pending se edita, valida y se pide desde su ⋮', async ({ ap
 
   await screen.getByRole('button', 'Actions for Referral for Olivia Brooks').tap()
   await screen.getByRole('menuitem', 'Request').tap()
-  await screen.getByRole('dialog', 'Request referral').getByRole('button', 'Mark as requested').tap()
+  await screen.getByRole('dialog', 'Request referral').getByRole('button', 'Confirm').tap()
   await expect(screen.getByText('The referral has been successfully marked as Requested.')).toBeVisible()
   await expect(screen.getByText('This referral cannot be edited because it is not in an editable state.')).toBeVisible()
 })
@@ -164,6 +164,6 @@ test('Referral Requested: Complete pregunta y la saca de Pending Task', async ({
   await screen.getByRole('button', /^Actions for Referral/).tap()
   await expect(screen.getByRole('menuitem', 'Reject')).toBeVisible()
   await screen.getByRole('menuitem', 'Complete').tap()
-  await screen.getByRole('dialog', 'Complete referral').getByRole('button', 'Complete').tap()
+  await screen.getByRole('dialog', 'Complete referral').getByRole('button', 'Confirm').tap()
   await expect(screen.getByText('The referral has been successfully completed.')).toBeVisible()
 })

@@ -130,8 +130,18 @@ export function LabOrderDetail({ registro, nuevo, onVolver, onAccion }: {
     <div className="flex flex-col gap-4">
       <EncabezadoFicha
         titulo={nuevo ? 'New lab order' : 'Lab order'} estado={registro.state} tono={TONO_ESTADO[registro.state]} onVolver={onVolver} volverA="lab orders"
-        /* CON-2215 (comentario de Abril): quién la pide y cuándo, de sólo lectura, en el título junto al PDF. */
-        datos={[['Ordering provider', registro.provider ?? '—'], ['Order date', registro.register]]}
+        /* CON-2215 (comentario de Abril): quién la pide y cuándo, de sólo lectura, en el título junto al PDF. En New no
+           van, como en Prescription y Referral (Julián, 2026-11-28). */
+        datos={nuevo ? undefined : [['Ordering provider', registro.provider ?? '—'], ['Order date', registro.register]]}
+        /* El vencimiento de la entrega va arriba, en el título, como en red.dev y en Prescription (Julián, 2026-11-28). Que
+           no quede en el pasado (CON-2215) se revisa al guardar. */
+        campo={(
+          <div className="flex w-[190px] flex-col gap-2">
+            <FieldLabel required>Delivery expiration date</FieldLabel>
+            <DatePicker value={vence} onChange={setVence} error={!!errores.vence} label="Delivery expiration date" disabled={!editable} className="h-9 w-full" />
+            {errores.vence && <FieldError>{errores.vence}</FieldError>}
+          </div>
+        )}
         acciones={!nuevo && <>
           {registro.pdf && <Button variant="secondary" onClick={() => onAccion(registro, 'PDF')}><FileText /> PDF</Button>}
           <MenuTarea task={registro} onAccion={accion} sin={['Edit']} />
@@ -155,13 +165,8 @@ export function LabOrderDetail({ registro, nuevo, onVolver, onAccion }: {
                 />
                 <Button variant="secondary" size="lg" disabled={!editable} className="sm:mt-6" onClick={() => setNuevoLab(true)}><Plus /> New laboratory</Button>
               </div>
-              <div className="flex flex-col gap-2">
-                <FieldLabel required>Delivery expiration date</FieldLabel>
-                {/* El calendario de toda la app; que no quede en el pasado (CON-2215) se revisa al guardar. */}
-                <DatePicker value={vence} onChange={setVence} error={!!errores.vence} label="Delivery expiration date" disabled={!editable} className="h-9 w-full" />
-                {errores.vence && <FieldError>{errores.vence}</FieldError>}
-              </div>
-              <label className={cn('flex w-fit items-center gap-2 text-[13px] font-medium text-ink sm:mt-[26px] sm:h-9', editable ? 'cursor-pointer' : 'opacity-60')}>
+              {/* ASAP debajo del laboratorio, como red.dev. */}
+              <label className={cn('flex w-fit items-center gap-2 text-[13px] font-medium text-ink sm:col-span-2', editable ? 'cursor-pointer' : 'opacity-60')}>
                 <Checkbox on={asap} onChange={setAsap} label="ASAP" disabled={!editable} />
                 ASAP
               </label>

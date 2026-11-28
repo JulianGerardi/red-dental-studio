@@ -5,6 +5,21 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-11-28
 
+### Lab order, Prescription y Referral como red.dev: ⋮, Confirm en azul, sólo Filter, fichas y PDFs (CON-2214, CON-2212, CON-2321) ([#225](https://github.com/JulianGerardi/red-dental-studio/pull/225))
+- **⋮ de las tablas:** *Options* con el orden y los íconos de red.dev; fuera de Pending, *Edit* apagado con su tooltip y,
+  en un estado final, sólo ese Edit. Sale *View*: la fila abre la ficha (`ItemsTarea` / `MenuTarea` › `editarApagado`).
+- **Preguntas:** todas con *Cancel* / *Confirm*, Confirm en azul (también Reject, Cancel, Delete). `PREGUNTAS` pierde
+  `confirm` y `keep`; no usar `tone="danger"` en estas.
+- **Tabla:** sólo *Filter* y *New*; salen buscador y filtro de fecha. Delete de Prescription y Referral es el tacho de la
+  fila (`ICONO_TACHO`, sólo en Pending); en Lab order sigue en el ⋮.
+- **Fichas:** New sin quién ni cuándo; Lab order con el vencimiento en el título; Prescription con switches
+  (`primitives` › `Toggle`, suma `disabled`) y *New medication*; Referral con ASAP y Mandatory debajo de Procedures.
+- **PDFs:** `Hoja.encabezado` reemplaza a `meta` y `resumen` (datos a la derecha como red.dev) en los 10; Lab order con
+  Lab Order ID, arcadas de red.dev (`dentition` acepta `Mixed`), Special Instructions y Documents Uploaded; Prescription
+  ID; Referral con sus secciones y el contacto del derivado (`ProveedorDerivacion` suma `email`, `telefono`,
+  `direccion`). Anexos sólo con archivo (`has_file`); la firma va con la última sección. Regenerado `public/pdfs/`.
+- Detalle y anomalías en `modulos/clinical-mode.md` y `modulos/pdfs.md` (2026-11-28).
+
 ### Patient Summary: la lista de encuentros, la nota que abre el ojo, firma, addendum y PDF (CON-2731, CON-2727, CON-2728, CON-2730) ([#223](https://github.com/JulianGerardi/red-dental-studio/pull/223))
 - **Pestaña Patient summary de Clinical Mode** (antes *Planned*): `clinical/PatientSummaryPanel`, la tabla de encuentros de
   red.dev con `ui/data-table`: pills del encuentro (`TONO_ENCUENTRO`) y de la nota, tilde verde o cruz roja en Exams, Ref,

@@ -94,7 +94,8 @@ export function AvisosFicha({ editable, nombre, incompleto, error }: {
   )
 }
 
-export type Adjunto = { nombre: string; bytes?: number }
+/** `url`: el archivo subido en esta sesión (object URL); con él, una imagen sale en su hoja de anexo del documento. */
+export type Adjunto = { nombre: string; bytes?: number; url?: string }
 const TIPOS = ['application/pdf', 'image/jpeg', 'image/png']
 const MAX_BYTES = 10 * 1024 * 1024
 const tamano = (b: number) => (b < 1024 * 1024 ? `${(b / 1024).toFixed(1)} KB` : `${(b / 1024 / 1024).toFixed(1)} MB`)
@@ -113,7 +114,7 @@ export function Adjuntos({ value, onChange, disabled, error = 'Invalid file form
     const lista = [...(archivos ?? [])]
     const buenos = lista.filter((f) => TIPOS.includes(f.type) && f.size <= MAX_BYTES)
     setMalo(buenos.length < lista.length)
-    onChange([...value, ...buenos.filter((f) => !value.some((a) => a.nombre === f.name)).map((f) => ({ nombre: f.name, bytes: f.size }))])
+    onChange([...value, ...buenos.filter((f) => !value.some((a) => a.nombre === f.name)).map((f) => ({ nombre: f.name, bytes: f.size, url: URL.createObjectURL(f) }))])
   }
   return (
     <div className="flex flex-col gap-2">
@@ -192,9 +193,10 @@ export function ProcedimientoResumen({ p }: { p: ProcedimientoFicha }) {
   )
 }
 
-/** Los procedimientos vinculados, uno debajo del otro, cada uno con su tacho (si se puede editar). */
+/** Los procedimientos vinculados, uno debajo del otro, cada uno con su tacho (si se puede editar). Sin ninguno no se
+ *  muestra nada, como red.dev (Julián, 2026-11-28). */
 export function ProcedimientosVinculados({ items, onRemove, disabled }: { items: ProcedimientoFicha[]; onRemove: (p: ProcedimientoFicha) => void; disabled?: boolean }) {
-  if (!items.length) return <p className="text-[12px] text-ink-muted">No procedures linked.</p>
+  if (!items.length) return null
   return (
     <ul className="flex flex-col gap-2" aria-label="Linked procedures">
       {items.map((p) => (

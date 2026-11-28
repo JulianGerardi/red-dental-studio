@@ -5,7 +5,7 @@ import { aviso } from '@/components/ui/toaster'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
 import { SearchPicker } from '@/components/ui/search-picker'
-import { FieldHint, FieldLabel, FormFooter, SearchField, TextArea } from '@/components/patients/form'
+import { FieldLabel, FormFooter, SearchField, TextArea } from '@/components/patients/form'
 import { Card } from '@/components/settings/primitives'
 import { OBLIGATORIO } from '@/lib/validacion'
 import type { DatosDerivacion, ProveedorDerivacion } from '@/data/clinical-mode'
@@ -57,7 +57,7 @@ export function ReferralDetail({ registro, nuevo, onVolver, onAccion }: {
     setIntento(true)
     const e = revisar()
     if (e.proveedor || e.nota) return false
-    guardarRegistro({ ...registro, updated: hoy(), derivacion: { proveedor: elegido!.nombre, nota: nota.trim(), procedimientos, asap, obligatoria, adjuntos: adjuntos.map((a) => ({ nombre: a.nombre, bytes: a.bytes ?? 0 })) } })
+    guardarRegistro({ ...registro, updated: hoy(), derivacion: { proveedor: elegido!.nombre, nota: nota.trim(), procedimientos, asap, obligatoria, adjuntos: adjuntos.map((a) => ({ nombre: a.nombre, bytes: a.bytes ?? 0, url: a.url })) } })
     return true
   }
   const guardar = () => {
@@ -77,8 +77,9 @@ export function ReferralDetail({ registro, nuevo, onVolver, onAccion }: {
     <div className="flex flex-col gap-4">
       <EncabezadoFicha
         titulo={nuevo ? 'New referral' : 'Referral'} estado={registro.state} tono={TONO_ESTADO[registro.state]} onVolver={onVolver} volverA="referrals"
-        /* Quién deriva, cuándo (CON-2609) y hasta cuándo vale, de sólo lectura, en el título como en Lab order. */
-        datos={[['Referring provider', registro.provider ?? '—'], ['Referral date', registro.register], ...(registro.expiration ? [['Expiration date', <span key="vence" className={cn(urge(registro) && 'text-dash-bad-fg')}>{registro.expiration}</span>] as [string, ReactNode]] : [])]}
+        /* Quién deriva, cuándo (CON-2609) y hasta cuándo vale, de sólo lectura, en el título como en Lab order. En New no
+           van: red.dev no los muestra (Julián, 2026-11-28). */
+        datos={nuevo ? undefined : [['Referring provider', registro.provider ?? '—'], ['Referral date', registro.register], ...(registro.expiration ? [['Expiration date', <span key="vence" className={cn(urge(registro) && 'text-dash-bad-fg')}>{registro.expiration}</span>] as [string, ReactNode]] : [])]}
         acciones={!nuevo && <>
           {registro.pdf && <Button variant="secondary" onClick={() => onAccion(registro, 'PDF')}><FileText /> PDF</Button>}
           <MenuTarea task={registro} onAccion={accion} sin={['Edit']} />
@@ -91,23 +92,13 @@ export function ReferralDetail({ registro, nuevo, onVolver, onAccion }: {
       <Card title="General information">
         <fieldset disabled={!editable} className="flex min-w-0 flex-col gap-4">
           <legend className="sr-only">General information</legend>
-          <div className="grid gap-4 sm:grid-cols-2">
-            <div className="flex flex-col gap-2 sm:flex-row sm:items-start">
-              <SearchField
-                label="Referral provider" required clearable className="min-w-0 flex-1" placeholder="Search by name or surname"
-                options={proveedores.map((p) => p.nombre)} subtext={especialidad} emptyText="No results found."
-                value={proveedor} onChange={setProveedor} error={errores.proveedor} disabled={!editable}
-              />
-              <Button variant="secondary" size="lg" className="sm:mt-6" disabled={!editable} onClick={() => setNuevoProveedor(true)}><Plus /> New provider</Button>
-            </div>
-            <div className={cn('flex flex-wrap items-center gap-x-6 gap-y-3 sm:mt-[26px] sm:h-9', !editable && 'opacity-60')}>
-              <label className="flex w-fit items-center gap-2 text-[13px] font-medium text-ink">
-                <Checkbox on={asap} onChange={setAsap} label="ASAP" disabled={!editable} /> ASAP
-              </label>
-              <label className="flex w-fit items-center gap-2 text-[13px] font-medium text-ink">
-                <Checkbox on={obligatoria} onChange={setObligatoria} label="Mandatory to continue treatment" disabled={!editable} /> Mandatory to continue treatment
-              </label>
-            </div>
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-start">
+            <SearchField
+              label="Referral provider" required clearable className="min-w-0 flex-1" placeholder="Search by name or surname"
+              options={proveedores.map((p) => p.nombre)} subtext={especialidad} emptyText="No results found."
+              value={proveedor} onChange={setProveedor} error={errores.proveedor} disabled={!editable}
+            />
+            <Button variant="secondary" size="lg" className="sm:mt-6" disabled={!editable} onClick={() => setNuevoProveedor(true)}><Plus /> New provider</Button>
           </div>
           <div className="flex flex-col gap-2">
             <FieldLabel>Procedures</FieldLabel>
@@ -119,8 +110,16 @@ export function ReferralDetail({ registro, nuevo, onVolver, onAccion }: {
               placeholder="Search by code or description" ariaLabel="Search procedures" emptyText="No planned procedure matches that search."
               accion="vincular" disabled={!editable}
             />
-            {editable && <FieldHint>Only planned procedures can be referred.</FieldHint>}
             <ProcedimientosVinculados items={elegidos} disabled={!editable} onRemove={(p) => setProcedimientos((a) => a.filter((id) => id !== p.id))} />
+          </div>
+          {/* ASAP y Mandatory debajo de Procedures (y de los elegidos), como red.dev (Julián, 2026-11-28). */}
+          <div className={cn('flex flex-wrap items-center gap-x-6 gap-y-3', !editable && 'opacity-60')}>
+            <label className={cn('flex w-fit items-center gap-2 text-[13px] font-medium text-ink', editable && 'cursor-pointer')}>
+              <Checkbox on={asap} onChange={setAsap} label="ASAP" disabled={!editable} /> ASAP
+            </label>
+            <label className={cn('flex w-fit items-center gap-2 text-[13px] font-medium text-ink', editable && 'cursor-pointer')}>
+              <Checkbox on={obligatoria} onChange={setObligatoria} label="Mandatory to continue treatment" disabled={!editable} /> Mandatory to continue treatment
+            </label>
           </div>
         </fieldset>
       </Card>
