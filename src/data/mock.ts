@@ -131,13 +131,3 @@ export const PLAN_CASES = [
   { date: '05/08/2026', status: 'WAITING FOR CONSENT', items: [] },
   { date: '05/07/2026', status: 'WAITING FOR CONSENT', items: [] },
 ]
-
-export const TREATMENT_HISTORY = [
-  { date: '08/24/2026', latest: true, tz: 'America/Argentina/Buenos_Aires', status: 'Cancelled', note: 'Unsigned', reason: 'Crown prep', provider: 'Rene Favaloro', procedures: null, flags: [false, false, false, false] },
-  { date: '08/21/2026', latest: false, tz: 'Europe/Berlin', status: 'Fulfilled', note: 'Unsigned', reason: 'Filling', provider: 'Tomy Gi', procedures: null, flags: [false, false, false, false] },
-  { date: '08/20/2026', latest: false, tz: 'America/Argentina/Buenos_Aires', status: 'Fulfilled', note: 'Unsigned', reason: 'Crown prep', provider: 'Luis Leloir', procedures: 'D2140', flags: [true, true, true, true] },
-  { date: '08/17/2026', latest: false, tz: 'America/Argentina/Buenos_Aires', status: 'Fulfilled', note: 'Unsigned', reason: 'Crown prep', provider: 'Luis Leloir', procedures: null, flags: [false, false, false, false] },
-  { date: '08/14/2026', latest: false, tz: 'America/Argentina/Buenos_Aires', status: 'Fulfilled', note: 'Unsigned', reason: 'Crown prep', provider: 'Luis Leloir', procedures: null, flags: [false, false, false, false] },
-  { date: '08/12/2026', latest: false, tz: 'America/Argentina/Buenos_Aires', status: 'Fulfilled', note: 'Unsigned', reason: 'Extraction', provider: 'Andy Davis', procedures: null, flags: [false, false, false, false] },
-  { date: '08/11/2026', latest: false, tz: 'America/Argentina/Buenos_Aires', status: 'Fulfilled', note: 'Unsigned', reason: 'Crown prep', provider: 'Luis Leloir', procedures: null, flags: [false, false, false, true] },
-]

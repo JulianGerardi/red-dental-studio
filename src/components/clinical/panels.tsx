@@ -1,13 +1,13 @@
 import { useState } from 'react'
 import {
   Search, User, Calendar, LayoutGrid, ChevronDown, ChevronRight,
-  MoreVertical, CircleAlert, Check, X, Eye, Inbox, MapPin, Square,
+  MoreVertical, CircleAlert, Inbox, Square,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { RecordRow, RecordToolbar, RecordPagination } from './RecordRow'
 import {
   LAB_ORDERS, PRESCRIPTIONS, REFERRALS,
-  PLAN_CASES, PLAN_PROCEDURES, TREATMENT_HISTORY,
+  PLAN_CASES, PLAN_PROCEDURES,
 } from '@/data/mock'
 
 /* ── Treatment Plan ──────────────────────────────────────────────── */
@@ -158,86 +158,6 @@ export function TreatmentPanel() {
             You cannot proceed without an active encounter. Please ensure the patient has an
             open encounter and try again.
           </p>
-        </div>
-      </div>
-    </div>
-  )
-}
-
-/* ── Patient Summary (ruta: /treatment-history) ──────────────────── */
-
-export function PatientSummaryPanel() {
-  const flagCols = ['Exams', 'Ref', 'Lab', 'Prescription']
-  return (
-    <div>
-      <div className="mb-4 flex justify-end gap-3">
-        <button className="flex h-9 items-center gap-2 rounded-md border bg-background px-4 text-sm font-medium shadow-sm">
-          <Calendar className="size-4" /> Filter by date range
-        </button>
-        <button disabled className="bg-primary-disabled text-primary-disabled-foreground h-9 cursor-not-allowed rounded-md px-4 text-sm font-medium">
-          Download
-        </button>
-      </div>
-
-      <div className="overflow-x-auto rounded-xl border bg-background shadow-sm">
-        <table className="w-full min-w-[820px] text-sm">
-          <thead>
-            <tr className="text-muted-foreground border-b">
-              <th className="px-4 py-3"><input type="checkbox" aria-label="Select all" /></th>
-              {['Date', 'Status', 'Clinic note', 'Reason for appt', 'Provider', 'Procedures', ...flagCols, 'Actions'].map((h, i) => (
-                <th key={i} className="px-4 py-3 text-left font-medium whitespace-nowrap">{h}</th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {TREATMENT_HISTORY.map((r, i) => (
-              <tr key={i} className="border-b last:border-0">
-                <td className="px-4 py-4"><input type="checkbox" aria-label={`Select ${r.date}`} /></td>
-                <td className="px-4 py-4">
-                  <span className="flex items-center gap-2 font-semibold whitespace-nowrap">
-                    <Calendar className="text-muted-foreground size-4" /> {r.date}
-                    {r.latest && <span className="bg-accent text-primary rounded px-1.5 py-0.5 text-[11px] font-medium">Latest</span>}
-                  </span>
-                  <span className="text-muted-foreground mt-1 flex items-center gap-1 text-xs">
-                    <MapPin className="size-3" /> {r.tz}
-                  </span>
-                </td>
-                <td className="px-4 py-4">
-                  <span className={cn('rounded-full px-3 py-1 text-xs font-medium',
-                    r.status === 'Cancelled' ? 'bg-destructive text-white' : 'bg-blue-100 text-blue-700')}>
-                    {r.status}
-                  </span>
-                </td>
-                <td className="px-4 py-4">
-                  <span className="rounded-full bg-red-50 px-3 py-1 text-xs font-medium text-red-500">{r.note}</span>
-                </td>
-                <td className="px-4 py-4 whitespace-nowrap">{r.reason}</td>
-                <td className="px-4 py-4 whitespace-nowrap">{r.provider}</td>
-                <td className="text-muted-foreground px-4 py-4 whitespace-nowrap">
-                  {r.procedures ? (
-                    <span className="text-foreground inline-flex items-center gap-1">{r.procedures} <ChevronDown className="size-3" /></span>
-                  ) : 'No procedures'}
-                </td>
-                {r.flags.map((ok, j) => (
-                  <td key={j} className="px-4 py-4">
-                    <span className={cn('flex size-5 items-center justify-center rounded-full text-white',
-                      ok ? 'bg-green-500' : 'bg-red-500')}>
-                      {ok ? <Check className="size-3" /> : <X className="size-3" />}
-                    </span>
-                  </td>
-                ))}
-                <td className="px-4 py-4"><Eye className="text-muted-foreground size-4" /></td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-
-        <div className="text-muted-foreground flex items-center gap-3 px-5 py-4 text-sm">
-          Showing 1 to 7 of 64 results
-          {/* "Rows per page:", como la tabla del sistema y red.dev (clinical-mode.md, 2026-11-13). */}
-          <label className="flex items-center gap-2">Rows per page:
-            <select className="border-input h-9 rounded-md border px-2"><option>10</option><option>20</option></select>
-          </label>
         </div>
       </div>
     </div>

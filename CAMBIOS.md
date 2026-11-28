@@ -5,6 +5,33 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-11-28
 
+### Patient Summary: la lista de encuentros, la nota que abre el ojo, firma, addendum y PDF (CON-2731, CON-2727, CON-2728, CON-2730) ([#223](https://github.com/JulianGerardi/red-dental-studio/pull/223))
+- **Pestaña Patient summary de Clinical Mode** (antes *Planned*): `clinical/PatientSummaryPanel`, la tabla de encuentros de
+  red.dev con `ui/data-table`: pills del encuentro (`TONO_ENCUENTRO`) y de la nota, tilde verde o cruz roja en Exams, Ref,
+  Lab y Prescription, *Filter* (Status, Provider), la fecha por mes (`ui/date-nav`), casillas y *Download*.
+- **El ojo** abre `clinical/PatientSummaryNote` sobre `ui/document-viewer`, sin salir de la pestaña (`?note=<id>`): al
+  volver siguen la página, los filtros y lo elegido. Qué aviso y qué acción muestra según el encuentro y la nota está en
+  la tabla de `modulos/clinical-mode.md` (*El ojo*).
+- **La nota es la plantilla *Clinical note* de `src/pdfs`** completada con los eventos del encuentro (`lib/historial` ›
+  `datosNota`, `hojaNota`): la misma hoja en el visor y en *View PDF* (`abrirHoja`). Los datos de ejemplo
+  (`data/historial`) usan los nombres de variable de la plantilla.
+- **La plantilla *Clinical note* (backend, `/pdfs/`) cambia al contenido de las notas de red.dev:** Exams con ROS, Vital
+  Signs (tablas), Physical, Extraoral e Intraoral; Prescription y Lab Order en singular con su texto; sin hash. Variables
+  nuevas y las que se van, en `modulos/pdfs.md` (2026-11-28). `public/pdfs/` regenerado (también las otras nueve plantillas, con el `.texto` de #220).
+- **Como red.dev (recorrido del 2026-11-28):** *Add addendum* es un pop up con el texto y el login (`FirmarDialog` con
+  `addendum`, *Save addendum*); la nota no lleva avisos arriba; un encuentro cancelado se abre con el error de red.dev
+  y *Return*; *Sign clinical note* también en notas de otro provider; los signos vitales cuentan en *Exams*; *Download*
+  apagado hasta elegir.
+- **Nuevo en `ui/`:** `document-html` (`DocumentHtml`), la hoja HTML de una plantilla dentro del visor.
+- **Reglas:** la nota se firma con el encuentro Completed o Fulfilled; firmar pasa Completed a Fulfilled; *Add addendum*
+  en toda nota firmada; una nota ajena sin permiso no se abre ni se elige.
+- **Download:** el archivo lo genera el backend con la plantilla; el prototipo abre las notas elegidas juntas en una
+  pestaña, una por página (`hojasJuntas`).
+- **Reuso:** `pages/ClinicalNote` exporta `FirmarDialog`, que suma la variante `addendum`. El encuentro de hoy entra a la lista con *Start encounter*
+  (`cerrarEncuentroHoy` desde `ClinicalTopBar`).
+- **Dejar de usar:** `PatientSummaryPanel` de `clinical/panels.tsx` y `TREATMENT_HISTORY` de `data/mock` (borrados).
+- No se pudo entrar a red.dev (pide login): lo que falta confirmar está en *A validar* del `.md`.
+
 ### Pending Task sin encuentro, Waiting room alineada y arreglos del recorrido de Lab order, Prescription y Referral (CON-2641, CON-2643, CON-2214, CON-2212, CON-2321) ([#220](https://github.com/JulianGerardi/red-dental-studio/pull/220))
 - **El ⋮ de cada tarea funciona siempre**, en el Dashboard y en el Patient Dashboard, igual que en Clinical Mode desde
   #219. Se van el estado apagado y el tooltip *…there is no open encounter for the selected patient*.

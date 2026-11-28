@@ -11,6 +11,8 @@ import type { EstadoEncuentro } from '@/lib/encuentro'
 import { BOTON_EXPANDIBLE, ETIQUETA_EXPANDIBLE } from '@/lib/estilos'
 import { aviso } from '@/components/ui/toaster'
 import { setNotaPendiente } from '@/lib/notaClinica'
+import { ENCUENTRO_HOY } from '@/data/historial'
+import { cerrarEncuentroHoy, firmarNota } from '@/lib/historial'
 import { cerrarEncuentroEjecucion, firmarNotaUltimoEncuentro, useProcedimientosCita } from '@/lib/ejecucion'
 import { EndEncounterDrawer } from '@/components/clinical/EndEncounterDrawer'
 import { CONSTANTES, CONTADORES, type Contador } from '@/data/clinical-mode'
@@ -185,7 +187,7 @@ export function OpcionesEncuentro({ estado, onCambiar, onCompletar }: {
           <CircleCheck /> Complete encounter
         </DropdownMenuItem>
       )}
-      <DropdownMenuItem onSelect={() => onCambiar('sinEmpezar', 'Patient discharged.')}>
+      <DropdownMenuItem onSelect={() => { cerrarEncuentroHoy('Discharged'); onCambiar('sinEmpezar', 'Patient discharged.') }}>
         <LogOut /> Discharge patient
       </DropdownMenuItem>
     </>
@@ -209,7 +211,8 @@ export function ClinicalTopBar({
      procedimientos previstos, antes pasa por el drawer End Encounter (CON-4157, clinical-mode.md 2026-11-25). */
   const [revisar, setRevisar] = useState(false)
   const procedimientosCita = useProcedimientosCita()
-  const cerrar = () => { onEncuentro('sinEmpezar', 'Encounter completed.'); setNota(true) }
+  /* El encuentro queda en Patient Summary como Completed, con la nota sin firmar hasta que se firme (CON-2726). */
+  const cerrar = () => { cerrarEncuentroHoy('Completed'); onEncuentro('sinEmpezar', 'Encounter completed.'); setNota(true) }
   const completar = () => (procedimientosCita.length ? setRevisar(true) : cerrar())
 
   const cuenta = (c: Contador) =>
@@ -480,7 +483,7 @@ export function ClinicalTopBar({
         onClose={() => setRevisar(false)}
         onEnd={() => { setRevisar(false); cerrarEncuentroEjecucion(); cerrar() }}
       />
-      <ClinicalNoteDialog open={nota} onClose={() => setNota(false)} paciente={volverA.split('/').pop() ?? ''} onFirmar={firmarNotaUltimoEncuentro} />
+      <ClinicalNoteDialog open={nota} onClose={() => setNota(false)} paciente={volverA.split('/').pop() ?? ''} onFirmar={() => { firmarNotaUltimoEncuentro(); firmarNota(ENCUENTRO_HOY) }} />
     </div>
   )
 }
