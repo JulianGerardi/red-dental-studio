@@ -128,13 +128,12 @@ function MenuVersion({ opciones, actual, onElegir }: { opciones: OpcionVersion[]
   )
 }
 
-/* Debajo de Available from: qué va a pasar con esa fecha al publicar, con el aviso de la app (`ui/alert`) en el tono del
-   estado que va a tener la versión (settings-billing.md, 2026-11-27). */
-function ResultadoFecha({ desde, hoy, hayActiva }: { desde: string; hoy: string; hayActiva: boolean }) {
-  if (desde < hoy) return <FieldError>{FECHA_PASADA}</FieldError>
+/* Al lado de Available from: qué va a pasar con esa fecha, con el aviso de la app (`ui/alert`) en el tono del estado que
+   va a tener la versión. En una Scheduled se guarda, no se publica (settings-billing.md, 2026-11-27). */
+function ResultadoFecha({ desde, hoy, hayActiva, alGuardar }: { desde: string; hoy: string; hayActiva: boolean; alGuardar?: boolean }) {
   return desde === hoy ? (
     <Alert tone="success" title="Starts today">
-      It becomes <b>Active</b> as soon as you publish.{hayActiva && ' The current version expires at that moment.'}
+      It becomes <b>Active</b> as soon as you {alGuardar ? 'save' : 'publish'}.{hayActiva && ' The current version expires at that moment.'}
     </Alert>
   ) : (
     <Alert tone="info" title={`Starts on ${fechaMDA(desde)}`}>
@@ -309,13 +308,13 @@ export function FeeScheduleEditor({ arancel }: { arancel?: Arancel }) {
       <Tooltip>
         <TooltipTrigger asChild>
           <span tabIndex={0} className="inline-flex rounded-md focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-dash-blue">
-            <Button variant="secondary" disabled className="pointer-events-none">Create new version</Button>
+            <Button disabled className="pointer-events-none"><Plus /> Create new version</Button>
           </span>
         </TooltipTrigger>
         <TooltipContent className="max-w-[270px] bg-tooltip leading-snug text-white">{bloqueoNueva.tip}</TooltipContent>
       </Tooltip>
     </TooltipProvider>
-  ) : <Button onClick={() => cargar(activa.id, activa.precios, hoy, true)}>Create new version</Button>
+  ) : <Button onClick={() => cargar(activa.id, activa.precios, hoy, true)}><Plus /> Create new version</Button>
 
   /* Current fee: lo que rige hoy, al lado de lo que se está cargando. */
   const referencia = (modo === 'newver' || modo === 'draft' || modo === 'scheduled') && activa ? activa.precios : undefined
@@ -366,11 +365,18 @@ export function FeeScheduleEditor({ arancel }: { arancel?: Arancel }) {
                 <>
                   <DatePicker value={desde} onChange={setDesde} className="h-9 w-full" error={faltaFecha || (!!dia && dia < hoy)} />
                   {faltaFecha ? <FieldError>{OBLIGATORIO}</FieldError>
+                    : dia && dia < hoy ? <FieldError>{FECHA_PASADA}</FieldError>
                     : modo !== 'scheduled' && <FieldHint>Used when you publish. Saving as a draft doesn’t keep a date.</FieldHint>}
-                  {dia && <ResultadoFecha desde={dia} hoy={hoy} hayActiva={!!activa} />}
                 </>
               ) : <span className={cn(control(), 'flex h-9 items-center bg-surface-muted px-3 text-ink-muted tabular-nums')}>{version ? fechaMDA(version.desde) : 'No date'}</span>}
             </div>
+            {/* Al lado de la fecha, a la altura del campo. En una Scheduled sólo si se cambió la fecha: sin cambios, el aviso de
+                arriba ya dice cuándo empieza. */}
+            {edita && dia >= hoy && !(modo === 'scheduled' && dia === base.desde) && (
+              <div className="sm:mt-[26px]">
+                <ResultadoFecha desde={dia} hoy={hoy} hayActiva={!!activa} alGuardar={modo === 'scheduled'} />
+              </div>
+            )}
           </div>
 
           {/* Buscador y Non-zero fees a la izquierda; las acciones de la tabla justo encima, a la derecha, como Coverage. */}

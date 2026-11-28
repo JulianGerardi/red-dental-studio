@@ -407,13 +407,15 @@ test('el encuentro empieza, se pausa, se retoma y se da el alta desde su menú',
 })
 
 /* CON-4153: Complete encounter abre End Encounter con los procedimientos del turno. Las fases van en orden en el mismo
-   encuentro, completar antes de tiempo pide confirmación y el historial muestra lo registrado (clinical-mode.md, 2026-11-25). */
+   encuentro, completar antes de tiempo pide confirmación y el historial muestra lo registrado; Edit y el historial se
+   abren en el mismo drawer (clinical-mode.md, 2026-11-25 y 2026-11-27). */
 test('End Encounter registra fases en orden, completa antes de tiempo y cierra el encuentro', async ({ app, screen }) => {
   await app.open('/patients/patient-0001/clinical-mode')
   await screen.getByRole('button', /Start encounter/).first().tap()
   await screen.getByRole('button', /Complete encounter/).first().tap()
   const drawer = screen.getByRole('dialog', 'End Encounter')
-  await expect(drawer.getByText('Appointment procedures · 5')).toBeVisible()
+  await expect(drawer.getByRole('listitem')).toHaveCount(5)
+  await expect(drawer.getByText(/Appointment procedures/)).toHaveCount(0)
 
   // El implante, de tres fases: Start procedure, y en el mismo encuentro la fase 2 y el cierre.
   await drawer.getByRole('button', 'Start procedure').tap()
@@ -438,7 +440,24 @@ test('End Encounter registra fases en orden, completa antes de tiempo y cierra e
   const historial = screen.getByRole('dialog', 'Execution history')
   await expect(historial.getByRole('row')).toHaveCount(3)
   await expect(historial.getByText('Finished')).toBeVisible()
-  await historial.getByRole('button', 'Close').last().tap()
+  // Se abre en el mismo drawer: no hay otro encima, y Back vuelve a la lista.
+  await expect(screen.getByRole('dialog')).toHaveCount(1)
+  await historial.getByRole('button', 'Back').tap()
+  await expect(drawer.getByRole('listitem')).toHaveCount(5)
+
+  // Edit es el Edit procedure de las tablas, también en el mismo drawer; Save vuelve a la lista con lo guardado.
+  await drawer.getByRole('button', 'Actions for Endodontic therapy, molar tooth').tap()
+  await screen.getByRole('menuitem', /^Edit$/).tap()
+  const editar = screen.getByRole('dialog', 'Edit procedure')
+  await expect(screen.getByRole('dialog')).toHaveCount(1)
+  await expect(editar.getByRole('tab', 'Estimate')).toBeVisible()
+  await editar.getByLabel('Notes').fill('Canals irrigated and dried.')
+  await editar.getByRole('button', 'Save').tap()
+  await expect(screen.getByText('D3330 updated.')).toBeVisible()
+  await drawer.getByRole('button', 'Actions for Endodontic therapy, molar tooth').tap()
+  await screen.getByRole('menuitem', /^Edit$/).tap()
+  await expect(editar.getByLabel('Notes')).toHaveValue('Canals irrigated and dried.')
+  await editar.getByRole('button', 'Cancel').tap()
 
   await drawer.getByRole('button', 'End Encounter').tap()
   await expect(screen.getByText('Encounter completed.')).toBeVisible()

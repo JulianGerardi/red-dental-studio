@@ -19,16 +19,15 @@ import type { EstimadoProcedimiento } from '@/data/estimaciones'
    Fee sólo aparece si el procedimiento lo trae. Arriba: el procedimiento, la fecha, el precio y el área de
    tratamiento con el ícono de su tipo (CON-3700; mockup de Julián, 2026-10-27). La cuarta pestaña, Estimate, es el
    estimado del seguro del procedimiento (CON-4211). Se abre igual desde el examen, la tabla de Procedures y el ⋮ de
-   Treatment Plan. Ver design-reference/figma/modulos/clinical-mode.md (2026-10-24 y 2026-11-25). */
+   Treatment Plan. End Encounter lo muestra dentro de su propio drawer, sin apilar otro (`useEdicionProcedimiento`).
+   Ver design-reference/figma/modulos/clinical-mode.md (2026-10-24, 2026-11-25 y 2026-11-27). */
 type Pestana = 'General information' | 'Findings' | 'Diagnostic' | 'Estimate'
 const PESTANAS = ['General information', 'Findings', 'Diagnostic', 'Estimate'] as const
 
 /** El código CDT del procedimiento: lo que va antes del guion ("D2740 - Crown…"). */
 export const codigoDe = (f: Finding) => f.condition.split(' - ')[0].trim()
 
-export function EditProcedureDrawer({
-  finding, findings, onClose, onSave, estado, bloqueoEstimado,
-}: {
+type Props = {
   finding: Finding | null
   findings: Finding[]
   onClose: () => void
@@ -37,7 +36,14 @@ export function EditProcedureDrawer({
   estado?: { texto: string; tono: PillTone }
   /** Por qué el estimado no se puede editar (el caso ya salió de Planning). */
   bloqueoEstimado?: string
-}) {
+}
+
+export function EditProcedureDrawer(props: Props) {
+  return <Drawer open={!!props.finding} onClose={props.onClose} {...useEdicionProcedimiento(props)} />
+}
+
+/** Edit procedure como partes de un Drawer (título, pestañas, pie y contenido), para mostrarlo en uno que ya está abierto. */
+export function useEdicionProcedimiento({ finding, findings, onClose, onSave, estado, bloqueoEstimado }: Props) {
   const [pestana, setPestana] = useState<Pestana>('General information')
   const [provider, setProvider] = useState('')
   const [notes, setNotes] = useState('')
@@ -71,11 +77,12 @@ export function EditProcedureDrawer({
     onClose()
   }
 
-  return (
-    <Drawer
-      open={!!finding} onClose={onClose} title="Edit procedure" footer={<DrawerActions onCancel={onClose} onSave={guardar} />}
-      tabs={<Tabs tabs={PESTANAS} value={pestana} onChange={setPestana} fullWidth size="sm" aria-label="Edit procedure sections" />}
-    >
+  return {
+    title: 'Edit procedure',
+    footer: <DrawerActions onCancel={onClose} onSave={guardar} />,
+    tabs: <Tabs tabs={PESTANAS} value={pestana} onChange={setPestana} fullWidth size="sm" aria-label="Edit procedure sections" />,
+    children: (
+    <>
       {finding && pestana === 'General information' && (
         <div className="flex flex-col gap-5">
           <div className="flex flex-col gap-4">
@@ -131,6 +138,7 @@ export function EditProcedureDrawer({
       {finding && estimado && pestana === 'Estimate' && (
         <ProcedureEstimate codigo={codigoDe(finding)} cobrado={finding.fee} value={estimado} onChange={setEstimado} bloqueo={bloqueoEstimado} />
       )}
-    </Drawer>
-  )
+    </>
+    ),
+  }
 }
