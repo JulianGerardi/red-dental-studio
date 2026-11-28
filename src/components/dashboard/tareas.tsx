@@ -5,8 +5,6 @@ import { aviso } from '@/components/ui/toaster'
 import { ConfirmDialog } from '@/components/ui/confirm-dialog'
 import { DropdownMenuItem, DropdownMenuLabel } from '@/components/ui/dropdown-menu'
 import { RowActionsMenu } from '@/components/ui/row-actions-menu'
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
-import { cn } from '@/lib/utils'
 import type { PillTone } from '@/components/ui/pill'
 import type { PendingTask } from './PendingTaskCard'
 import { abrirDocumento, abrirHoja, documentoTarea } from './documentoTarea'
@@ -20,8 +18,6 @@ import { hojaDeRegistro } from '@/components/clinical/registros'
 /* `Finish` es el *Complete* de una Referral pedida (CON-2398): no confundir con `Complete`, que abre la tarea. */
 export type AccionTarea = 'Edit' | 'Request' | 'Activate' | 'Deliver' | 'Delay' | 'Finish' | 'Expire' | 'Reject' | 'Cancel' | 'Delete'
 export type AccionUI = AccionTarea | 'Complete' | 'PDF'
-
-export const SIN_ENCUENTRO = 'You do not have permission to perform this action because there is no open encounter for the selected patient.'
 
 const SINGULAR: Record<string, string> = { 'Clinical note': 'Clinical note', 'Lab orders': 'Lab order', Prescriptions: 'Prescription', Referrals: 'Referral' }
 export const nombreTarea = (t: PendingTask) => SINGULAR[t.kind] ?? t.kind
@@ -204,39 +200,25 @@ export function useAccionesTarea({ paciente, alAbrir }: { paciente?: string; alA
 }
 
 /* Las acciones de un registro según su estado, como ítems de menú: las usan el ⋮ de Pending Task, el de la ficha y el
-   de las tablas de Clinical Mode. En Pending Task, sin un encuentro abierto con el paciente se ven apagadas y cada una
-   explica por qué en un tooltip, que también abre con el foco del teclado (por eso no van `disabled`: Radix les quita el
-   puntero y el foco); la ficha y las tablas de Clinical Mode las pasan siempre activas (clinical-mode.md, 2026-11-27). */
-export function ItemsTarea({ task, abierto, onAccion, sin = [] }: { task: PendingTask; abierto: boolean; onAccion: (t: PendingTask, a: AccionUI) => void; sin?: AccionTarea[] }) {
-  const item = (a: AccionTarea) => {
+   de las tablas de Clinical Mode. Ninguna pide un encuentro abierto (dashboard.md, 2026-11-27). */
+export function ItemsTarea({ task, onAccion, sin = [] }: { task: PendingTask; onAccion: (t: PendingTask, a: AccionUI) => void; sin?: AccionTarea[] }) {
+  return accionesDe(task).filter((a) => !sin.includes(a)).map((a) => {
     const Icono = ICONO[a]
-    const opcion = (
-      <DropdownMenuItem
-        key={a} aria-disabled={!abierto || undefined} variant={DESTRUCTIVA.includes(a) ? 'destructive' : 'default'}
-        onSelect={(e) => { if (!abierto) { e.preventDefault(); return } onAccion(task, a) }}
-        className={cn('text-[13px]', !abierto && 'cursor-not-allowed opacity-50')}
-      >
+    return (
+      <DropdownMenuItem key={a} variant={DESTRUCTIVA.includes(a) ? 'destructive' : 'default'} onSelect={() => onAccion(task, a)} className="text-[13px]">
         <Icono className="size-3.5" /> {ETIQUETA[a] ?? a}
       </DropdownMenuItem>
     )
-    if (abierto) return opcion
-    return (
-      <Tooltip key={a}>
-        <TooltipTrigger asChild>{opcion}</TooltipTrigger>
-        <TooltipContent side="top" className="max-w-[240px] text-center">{SIN_ENCUENTRO}</TooltipContent>
-      </Tooltip>
-    )
-  }
-  return <TooltipProvider delayDuration={100}>{accionesDe(task).filter((a) => !sin.includes(a)).map(item)}</TooltipProvider>
+  })
 }
 
 /** El ⋮ de la tarea, como red.dev: *Options* y las acciones de su estado. Un estado final no tiene menú. */
-export function MenuTarea({ task, abierto, onAccion, sin = [] }: { task: PendingTask; abierto: boolean; onAccion: (t: PendingTask, a: AccionUI) => void; sin?: AccionTarea[] }) {
+export function MenuTarea({ task, onAccion, sin = [] }: { task: PendingTask; onAccion: (t: PendingTask, a: AccionUI) => void; sin?: AccionTarea[] }) {
   if (!accionesDe(task).some((a) => !sin.includes(a))) return null
   return (
     <RowActionsMenu label={`${nombreTarea(task)} for ${task.person}`}>
       <DropdownMenuLabel className="text-[12px] font-semibold text-ink">Options</DropdownMenuLabel>
-      <ItemsTarea task={task} abierto={abierto} onAccion={onAccion} sin={sin} />
+      <ItemsTarea task={task} onAccion={onAccion} sin={sin} />
     </RowActionsMenu>
   )
 }

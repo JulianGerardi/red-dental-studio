@@ -37,24 +37,39 @@ export function ReferralDetail({ registro, nuevo, onVolver, onAccion }: {
   const [obligatoria, setObligatoria] = useState(inicio.obligatoria)
   const [nota, setNota] = useState(inicio.nota)
   const [adjuntos, setAdjuntos] = useState<Adjunto[]>(inicio.adjuntos)
-  const [errores, setErrores] = useState<{ proveedor?: string; nota?: string }>({})
+  const [intento, setIntento] = useState(false)
   const [nuevoProveedor, setNuevoProveedor] = useState(false)
 
   /* Sólo se edita en Pending (CON-2323); no pide un encuentro abierto (Julián, 2026-11-27). */
   const editable = nuevo || esEditable(registro)
   const elegidos = PROCEDIMIENTOS_REFERRAL.filter((p) => procedimientos.includes(p.id))
 
+  /* El provider se elige de la lista; escrito a mano vale si coincide con uno. Los errores se muestran después del
+     primer intento y se van al corregir el campo. */
+  const elegido = proveedores.find((p) => p.nombre.toLowerCase() === proveedor.trim().toLowerCase())
+  const revisar = () => ({
+    proveedor: elegido ? undefined : proveedor.trim() ? 'Select a provider from the list.' : OBLIGATORIO,
+    nota: nota.trim() ? undefined : OBLIGATORIO,
+  })
+  const errores: ReturnType<typeof revisar> = intento ? revisar() : { proveedor: undefined, nota: undefined }
+
+  const guardarSiVale = () => {
+    setIntento(true)
+    const e = revisar()
+    if (e.proveedor || e.nota) return false
+    guardarRegistro({ ...registro, updated: hoy(), derivacion: { proveedor: elegido!.nombre, nota: nota.trim(), procedimientos, asap, obligatoria, adjuntos: adjuntos.map((a) => ({ nombre: a.nombre, bytes: a.bytes ?? 0 })) } })
+    return true
+  }
   const guardar = () => {
-    const e = {
-      proveedor: proveedores.some((p) => p.nombre === proveedor) ? undefined : OBLIGATORIO,
-      nota: nota.trim() ? undefined : OBLIGATORIO,
-    }
-    setErrores(e)
-    if (e.proveedor || e.nota) return
-    guardarRegistro({ ...registro, updated: hoy(), derivacion: { proveedor, nota: nota.trim(), procedimientos, asap, obligatoria, adjuntos: adjuntos.map((a) => ({ nombre: a.nombre, bytes: a.bytes ?? 0 })) } })
+    if (!guardarSiVale()) return
     aviso.ok(`The referral has been successfully ${nuevo ? 'created' : 'updated'}.`)
     onVolver()
   }
+  /* Request deja la derivación sin edición: si hay cambios sin guardar, antes se validan y se guardan, así sale con lo
+     que se ve en pantalla. Sin cambios, pasa como desde la tabla. */
+  const foto = JSON.stringify([proveedor, asap, obligatoria, nota, procedimientos, adjuntos.map((a) => a.nombre)])
+  const [original] = useState(foto)
+  const accion = (t: PendingTask, a: AccionUI) => { if (a === 'Request' && editable && foto !== original && !guardarSiVale()) return; onAccion(t, a) }
 
   const especialidad = (nombre: string) => proveedores.find((p) => p.nombre === nombre)?.especialidad || undefined
 
@@ -66,24 +81,24 @@ export function ReferralDetail({ registro, nuevo, onVolver, onAccion }: {
         datos={[['Referring provider', registro.provider ?? '—'], ['Referral date', registro.register], ...(registro.expiration ? [['Expiration date', <span key="vence" className={cn(urge(registro) && 'text-dash-bad-fg')}>{registro.expiration}</span>] as [string, ReactNode]] : [])]}
         acciones={!nuevo && <>
           {registro.pdf && <Button variant="secondary" onClick={() => onAccion(registro, 'PDF')}><FileText /> PDF</Button>}
-          <MenuTarea task={registro} abierto onAccion={onAccion} sin={['Edit']} />
+          <MenuTarea task={registro} onAccion={accion} sin={['Edit']} />
         </>}
       />
 
-      <AvisosFicha editable={editable} nombre="referral" incompleto={Object.values(errores).some(Boolean)} />
+      <AvisosFicha editable={editable} nombre="referral" incompleto={Object.values(errores).includes(OBLIGATORIO)} error={errores.proveedor !== OBLIGATORIO ? errores.proveedor : undefined} />
 
       {/* Una card debajo de la otra, como los formularios de la app. */}
       <Card title="General information">
         <fieldset disabled={!editable} className="flex min-w-0 flex-col gap-4">
           <legend className="sr-only">General information</legend>
           <div className="grid gap-4 sm:grid-cols-2">
-            <div className="flex flex-col gap-2 sm:flex-row sm:items-end">
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-start">
               <SearchField
                 label="Referral provider" required clearable className="min-w-0 flex-1" placeholder="Search by name or surname"
                 options={proveedores.map((p) => p.nombre)} subtext={especialidad} emptyText="No results found."
                 value={proveedor} onChange={setProveedor} error={errores.proveedor} disabled={!editable}
               />
-              <Button variant="secondary" size="lg" className={cn(errores.proveedor && 'sm:mb-6')} disabled={!editable} onClick={() => setNuevoProveedor(true)}><Plus /> New provider</Button>
+              <Button variant="secondary" size="lg" className="sm:mt-6" disabled={!editable} onClick={() => setNuevoProveedor(true)}><Plus /> New provider</Button>
             </div>
             <div className={cn('flex flex-wrap items-center gap-x-6 gap-y-3 sm:mt-[26px] sm:h-9', !editable && 'opacity-60')}>
               <label className="flex w-fit items-center gap-2 text-[13px] font-medium text-ink">
@@ -130,7 +145,7 @@ export function ReferralDetail({ registro, nuevo, onVolver, onAccion }: {
       {nuevoProveedor && (
         <NewProviderDrawer
           onClose={() => setNuevoProveedor(false)}
-          onGuardar={(p) => { agregarProveedor(p); setProveedores((x) => [...x, p]); setProveedor(p.nombre); setErrores((e) => ({ ...e, proveedor: undefined })); aviso.ok(`${p.nombre} added and selected.`) }}
+          onGuardar={(p) => { agregarProveedor(p); setProveedores((x) => [...x, p]); setProveedor(p.nombre); aviso.ok(`${p.nombre} added and selected.`) }}
         />
       )}
     </div>

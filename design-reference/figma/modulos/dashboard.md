@@ -1200,6 +1200,52 @@ Dashboard no le pasaba su día de la demo y comparaba con la fecha real: nunca e
    período: activo si la semana o el mes que se ve incluye hoy. Fuera de hoy, el bloque blanco de siempre.
 3. Sin historia de Jira: es un ajuste visual del componente.
 
+## CON-2641 · CON-2643 · Pending Task ya no pide un encuentro abierto (2026-11-27)
+
+Pedido de Julián ("unificalo, que pending task tampoco pida encuentro"), después de sacar la misma regla de Lab order,
+Prescription y Referral en Clinical Mode (clinical-mode.md, 2026-11-27). **Reemplaza** los dos primeros puntos de la
+sección del 2026-11-20.
+
+1. **El ⋮ de cada tarea funciona siempre**, en el Dashboard y en el Patient Dashboard: Edit, Request, Activate, Cancel,
+   Delete… según el estado del registro (`MAQUINA`), con sus preguntas de siempre. Se van el estado apagado, el tooltip
+   *You do not have permission to perform this action because there is no open encounter for the selected patient.* y la
+   constante `SIN_ENCUENTRO`.
+2. **Para el dev:** `ItemsTarea` y `MenuTarea` pierden `abierto`; `TaskRow` y `PendingTaskList` pierden
+   `encuentroAbierto`. El Dashboard sigue pasándole a Clinical Mode el encuentro del paciente (`alAbrir`): sólo decide
+   qué muestra el botón de encuentro de la barra, no habilita nada.
+3. **Diferencia con red.dev, a propósito:** red.dev apaga esas opciones sin encuentro (videos del 2026-11-20). Ni
+   CON-2641 ni CON-2643 piden un encuentro para las acciones; la regla salía sólo de los videos. **A confirmar con el
+   equipo** si el backend la mantiene: si la API rechaza la acción sin encuentro, la app tiene que mostrar ese error.
+4. **Sin cambios:** lo que no está en Pending sigue en sólo lectura (CON-2218, CON-2354, CON-2323), y el botón de
+   encuentro de la ficha y de Clinical Mode (Start, Complete, Pause) funciona igual que antes.
+
+## Waiting room alineada con Appointments (2026-11-27)
+
+Sin historia de Jira; pedido de Julián: quedaba un hueco entre la última card de Waiting room y "Show N more", y las cards
+no coincidían con las de Appointments. Resuelve lo que quedó "para validar" el 2026-11-20.
+
+1. **Causa:** los rótulos de etapa (*Checked in · 1*, *On hold · 2*, *Ready to check out · 5*) ocupaban una línea cada uno
+   y las filas con pill (*Waiting · 12 min*) medían 7 px menos que las que llevan botón. Con eso entraban cinco cards y
+   sobraba alto.
+2. **El rótulo sigue aparte, arriba de la primera card de su grupo**, como en el resto de la app, pero más chico (10 px,
+   en versalitas) y del alto exacto de la separación entre cards: no suma alto. El del primer grupo usa el aire que ya
+   había debajo del título del panel. **Descartado** (Julián, mismo día): montarlo sobre el borde de la card como la
+   leyenda de un fieldset; se confundía con la card y no es como se rotulan los grupos en la app.
+3. **16 px entre cards en las dos columnas** (antes 12): es lo mínimo para que el rótulo entre con aire. Appointments
+   lo toma con `ListGroup amplio`; el resto de las listas de la app sigue en 12.
+4. **Todas las filas miden lo mismo:** el final de la fila (`AppointmentRow`) reserva el alto del botón aunque lleve una
+   pill. **Seis cards en cada columna** (`TOPE.espera` pasa de 5 a 6): Appointments y Waiting room coinciden card por
+   card y los dos "Show N more" quedan a la misma altura, sin hueco.
+5. **Sin cambios:** el orden, la cuenta de cada grupo, que cada etapa muestre al menos una (`repartir`), el filtro por
+   *Visit stage*, y celular y tablet (los paneles van uno debajo del otro).
+
+**Celular (2026-11-28, recorrido de QA):** a 390 px las pestañas de Pending task (514 px) se cortaban dentro de la card y
+*Referrals* quedaba fuera de alcance: el contenedor no tenía tope de ancho y la card recorta. Ahora scrollean dentro de la
+card (`max-w-full min-w-0`), como en el Patient Dashboard.
+
+**A validar:** si el rótulo de 10 px se lee bien en la pantalla de recepción, que suele estar lejos, y si los 16 px
+entre cards no hacen que entren menos turnos de los que recepción necesita ver de un vistazo.
+
 ## Contadores: un solo globo, el de la campana (2026-11-28)
 
 Julián: el globo azul de *Appointments*, *Waiting room* y *Rooms* (y el de las cards clínicas de la ficha) es el de la

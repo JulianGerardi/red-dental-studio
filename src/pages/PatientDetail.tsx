@@ -12,8 +12,8 @@ import { ITEMS_INICIALES, type Categoria, type ClinicalItem } from '@/data/clini
 import { aviso } from '@/components/ui/toaster'
 import { PendingTaskList } from '@/components/dashboard/PendingTaskList'
 import { TASK_KINDS, TAREAS_PACIENTE } from '@/components/dashboard/dashboard-data'
+import { creadosDe } from '@/components/clinical/registros'
 import { useAccionesTarea, useTareasVivas } from '@/components/dashboard/tareas'
-import { useEstadoEncuentro } from '@/lib/encuentro'
 import { ShowMore } from '@/components/ui/show-more'
 import { EditContactModal } from '@/pages/patients/EditContactModal'
 import { CONTENEDOR_PAGINA, TARJETA_PANEL } from '@/lib/estilos'
@@ -77,10 +77,10 @@ export default function PatientDetail({ turnos = APPTS.length }: { turnos?: numb
   const [modal, setModal] = useState<'contact' | null>(null)
   /* Igual que el Dashboard (dashboard.md, 2026-10-29): tabs por tipo, en vez del filtro. */
   const [tipoTarea, setTipoTarea] = useState('All')
-  /* Las nueve del paciente, repartidas entre los cuatro tipos (patient-dashboard.md, 2026-10-28), con sus cambios. El
-     encuentro abierto es el de la ficha: Start Encounter habilita el ⋮ de cada tarea (dashboard.md, 2026-11-20). */
-  const TASKS = useTareasVivas(TAREAS_PACIENTE)
-  const [encuentro] = useEstadoEncuentro()
+  /* Las nueve del paciente, repartidas entre los cuatro tipos (patient-dashboard.md, 2026-10-28), con sus cambios. El ⋮
+     de cada tarea no pide un encuentro abierto (dashboard.md, 2026-11-27). */
+  /* Más lo que se creó en Clinical Mode con New para este paciente, mientras siga pendiente (clinical-mode.md, 2026-11-28). */
+  const TASKS = useTareasVivas([...creadosDe(id), ...TAREAS_PACIENTE])
   const accionesTarea = useAccionesTarea({ paciente: id })
   const tareas = tipoTarea === 'All' ? TASKS : TASKS.filter((t) => t.kind === tipoTarea)
   const [apptTab, setApptTab] = useState<'Next' | 'Next appointments'>('Next')
@@ -172,7 +172,7 @@ export default function PatientDetail({ turnos = APPTS.length }: { turnos?: numb
                   {tareas.length === 0 ? (
                     <EmptyState icon={Activity} title="Nothing pending" detail="No pending tasks of this type." className="py-8" />
                   ) : (
-                    <PendingTaskList tasks={tareas} limit={TOPE.tareas} enCaja llenarAlto cargarAlScroll encuentroAbierto={() => encuentro !== 'sinEmpezar'} onAccion={accionesTarea.hacer} />
+                    <PendingTaskList tasks={tareas} limit={TOPE.tareas} enCaja llenarAlto cargarAlScroll onAccion={accionesTarea.hacer} />
                   )}
                   {accionesTarea.dialogo}
                 </div>

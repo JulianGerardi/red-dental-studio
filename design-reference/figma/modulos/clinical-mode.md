@@ -4129,3 +4129,56 @@ lista mientras edita (ahí pesaría la opción del costado).
 Código: `clinical/EndEncounterDrawer.tsx` (`HistorialEjecucion` reemplaza a `ExecutionHistoryDrawer`),
 `clinical/dental/EditProcedureDrawer.tsx`, `ui/list-group.tsx`, `lib/ejecucion.ts`, `data/ejecucion.ts`,
 `tests/clinical-mode.e2e.ts`. Storybook sin tocar.
+
+## CON-2214 · CON-2212 · CON-2321 · Recorrido de QA de Lab order y sus arreglos (2026-11-28)
+
+Julián pidió recorrer la app para ver si lo nuevo está bien. Un agente recorrió Lab order de punta a punta sobre el link
+de prueba (tabla, filtros, New, Teeth & surface, acciones por estado, documento) y lo que sigue se confirmó en el código y
+en pantalla antes de corregirlo. Los arreglos de formulario se aplican igual a Prescription y Referral.
+
+1. **Request / Activate desde la ficha con cambios sin guardar perdía esos cambios.** El ⋮ de la ficha cambiaba el estado
+   sin guardar el formulario: la orden quedaba Requested (ya no se edita) con el contenido viejo, y la ficha seguía
+   mostrando lo nuevo como si se hubiera guardado. Ahora, si hay cambios, *Request* (Lab order, Referral) y *Activate*
+   (Prescription) validan y guardan antes de preguntar; con errores, los muestra y no pregunta. Sin cambios, pasa como
+   desde la tabla. Además la ficha se vuelve a armar cuando cambia el estado (`key` con el estado): después de *Cancel* no
+   queda a la vista lo que no se guardó.
+2. **El documento de una orden nueva salía a nombre de otra paciente.** `ClinicalMode` buscaba al paciente en `PATIENTS`
+   y, si no estaba (la ficha de prueba `john-smith`), tomaba el primero de la lista. Ahora sólo pasa el nombre si el
+   paciente existe; si no, queda el de la ficha de prueba, igual que los registros de ejemplo.
+3. **Los procedimientos vinculados no salían en el documento** aunque la 4ª vuelta decía que van dentro de *Dental Work
+   Request*. Salen debajo del trabajo y las indicaciones, uno por renglón con su código y su diente. El texto libre de los
+   PDF conserva los saltos de línea (`.texto { white-space: pre-line }` en `pdfs/marco`).
+4. **Lo creado con New no aparecía en Pending task del paciente.** Ahora entra al Patient Dashboard mientras siga
+   pendiente (`creadosDe`), y *Complete this task* abre su ficha (`ClinicalMode` busca la tarea también entre los
+   registros). El Dashboard de la clínica no cambia: sus tareas son las del día de ejemplo.
+5. **Formulario:** el error de un campo se va al corregirlo, sin esperar al próximo *Save*; un laboratorio o un provider
+   escrito a mano vale si coincide con uno de la lista (sin distinguir mayúsculas) y, si no coincide, el mensaje dice
+   *Select a laboratory from the list.* / *Select a provider from the list.* en vez de *This field is required.*; *New
+   laboratory* y *New provider* quedan alineados con su campo también cuando hay error.
+6. **Rueda de superficies:** la letra de arriba y la de abajo caían sobre la línea que separa las dos franjas de su
+   zona; van en la franja de adentro.
+
+**Segunda pasada: Prescription y Referral** (mismo día, recorrido acotado de dos agentes, confirmado acá antes de tocar):
+
+7. **Activate con la medicación ya activa no activaba.** Desde el ⋮ de la ficha con cambios, la pregunta de CON-2846
+   (*Medication already active*) guardaba y volvía a la tabla sin seguir con *Activate*. Ahora *Reuse existing medication*
+   guarda y sigue con la pregunta de *Activate*.
+8. **La pregunta de CON-2846 se repetía en cada Save.** *Reuse existing medication* deja *Update patient medications* sin
+   tildar en esas medicaciones: el paciente ya la tiene, no hay que volver a sumarla. Si se vuelve a tildar, pregunta otra vez.
+9. **Vencimiento de la receta en el día de hoy:** decía *Date cannot be in the past*. CON-2230 pide de mañana a seis
+   meses; ahora dice *The expiration date must be after today.* y lo pasado sigue con *Date cannot be in the past*.
+10. **New provider no validaba el formato** (sí lo hacía New laboratory): mail (*Enter a valid email.*), ZIP sólo números,
+    *Area code* de 3 y *Number* de 7 dígitos, con los mismos mensajes. Y **sus datos no llegaban al documento**: *Referred
+    to* decía *Phone: - · Email: - · Address: -*; ahora lleva teléfono, mail y dirección del provider creado (los de
+    ejemplo no tienen esos datos y siguen con *-*).
+11. **El documento de la receta decía *Additional indications*** y la ficha *Additional instructions*: queda el de la ficha.
+12. **El título para lector de pantalla de Clinical Mode** decía *Mara Otero* en la ficha de prueba (mismo origen que el
+    punto 2); dice *John Smith*.
+13. **Tablet (768 px):** el buscador de las tres tablas se achicaba hasta mostrar *Sea*; con un ancho mínimo, la barra
+    baja de renglón.
+
+**Anotado y sin tocar** (detalles, no rompen el flujo): al pasar a Expired o Canceled, el PDF de la fila se apaga (es la
+regla de `conPdf`, a confirmar si el documento de una receta vencida tiene que seguir a mano); la tabla no se reordena cuando cambia *Last update*; volver de
+una ficha abierta desde la página 2 deja la tabla en la 1; cambiar de pestaña con una ficha nueva cargada la descarta sin
+avisar; el contador 0/500 se oculta mientras el campo muestra un error (es así en toda la app).
+
