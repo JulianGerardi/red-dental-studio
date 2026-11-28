@@ -116,7 +116,7 @@ export default function ClinicalMode() {
     : pestana === 'Vitals'
       ? <ExamLayout findings={false}><VitalsPanel /></ExamLayout>
       : registroDePestana
-        ? <RegistrosPanel key={registroDePestana} kind={registroDePestana} paciente={`${patient.first} ${patient.last}`} tarea={tareaPedida?.kind === registroDePestana ? tareaPedida : undefined} />
+        ? <RegistrosPanel key={registroDePestana} kind={registroDePestana} paciente={PATIENTS.some((p) => p.id === id) ? `${patient.first} ${patient.last}` : undefined} tarea={tareaPedida?.kind === registroDePestana ? tareaPedida : undefined} />
         : pestana === 'Radiographic'
           ? <RadiographyPanel />
           : pestana === 'Treatment plan'

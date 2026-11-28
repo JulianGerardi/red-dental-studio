@@ -31,7 +31,11 @@ export function NewProviderDrawer({ onClose, onGuardar }: { onClose: () => void;
   const guardar = () => {
     if (!listo()) return
     if (credencialesIncompletas(credenciales)) { setIntentoCred(true); return }
-    onGuardar({ nombre: `${d.first.trim()} ${d.last.trim()}`, especialidad: d.especialidad })
+    onGuardar({
+      nombre: `${d.first.trim()} ${d.last.trim()}`, especialidad: d.especialidad, email: d.email.trim(),
+      telefono: `${d.codigo.match(/\(([^)]+)\)/)?.[1] ?? ''} ${d.area}${d.numero.replace(/\D/g, '')}`.trim(),
+      direccion: [d.linea1, d.linea2, d.ciudad, d.zip, d.estado, d.pais].map((x) => x.trim()).filter(Boolean).join(', '),
+    })
     onClose()
   }
 

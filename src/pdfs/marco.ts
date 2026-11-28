@@ -69,7 +69,7 @@ export type Hoja = {
   titulo: string
   /** Los datos del documento, a la derecha del membrete y alineados a la derecha, con la organización del PDF de
       red.dev: primero quién lo emite (`nombre`, en negrita y sin rótulo) y debajo un renglón "Rótulo: valor" por dato
-      (el ID del documento, el contacto, las fechas). Un dato cuyo valor llega vacío no deja el rótulo suelto. */
+      (el ID del documento, el contacto, las fechas). Un renglón sale sólo si su primera variable llega con valor. */
   encabezado: { nombre: string; datos: Campo[] }
   secciones: Seccion[]
   firmas?: Firma[]
@@ -77,8 +77,9 @@ export type Hoja = {
   aviso?: string
   /** Secciones que van después de las firmas (las adendas de la nota: se suman una vez firmada). */
   posdata?: Seccion[]
-  /** Lista de adjuntos que van como anexo, cada uno en su hoja: `annex_label`, `name`, `file_type`, `is_image`,
-      `file_url`. Las imágenes se ven en la hoja; un PDF adjunto lo agrega el backend después de su hoja. */
+  /** Lista de adjuntos que van como anexo, cada uno en su hoja: `annex_label`, `name`, `file_type`, `has_file`,
+      `is_image`, `file_url`. Sólo los que traen el archivo (`has_file`) tienen hoja; una imagen se ve en ella y un PDF
+      lo agrega el backend detrás. */
   anexos?: string
   /** Lo que dice el pie de cada página después del nombre de la clínica. */
   pie: string
@@ -97,7 +98,8 @@ function tabla({ lista, columnas, vacio, subtotal }: Omit<Extract<Bloque, { tipo
 </table>`
 }
 
-/* Las arcadas de red.dev en SVG, las dos denticiones; la plantilla muestra la que diga {{dentition}} y pinta los dientes
+/* Las arcadas de red.dev en SVG, las dos denticiones; la plantilla muestra la que diga {{dentition}} (Mixed: las dos, una
+   al lado de la otra) y pinta los dientes
    de la lista con CSS (Mustache no tiene condicionales por diente). `fondo` trae la encía, los números y los dientes;
    encima va el contorno de cada diente, que es lo que se pinta. */
 function svgBoca(denticion: Denticion) {
@@ -147,11 +149,11 @@ html { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
 body { margin: 0; font-family: ${FUENTE}; font-size: 9pt; line-height: 1.55; color: ${COLOR.texto}; }
 p { margin: 0 0 4pt; }
 .membrete { display: flex; justify-content: space-between; align-items: flex-start; gap: 16pt; padding-bottom: 11pt; border-bottom: 1.5pt solid ${COLOR.tinta}; }
-.clinica { display: flex; align-items: center; gap: 9pt; }
+.clinica { display: flex; flex: 1; min-width: 0; align-items: center; gap: 9pt; }
 .iniciales { display: grid; place-items: center; overflow: hidden; width: 30pt; height: 30pt; border-radius: 6pt; background: ${COLOR.marca}; color: #fff; font-weight: 700; font-size: 10.5pt; flex: none; }
 .datos b { display: block; font-size: 11pt; color: ${COLOR.tinta}; }
 .datos span { display: block; font-size: 8pt; line-height: 1.45; color: ${COLOR.apagado}; }
-.ficha { margin: 0; max-width: 58%; text-align: right; font-size: 8pt; line-height: 1.55; color: ${COLOR.texto}; }
+.ficha { flex: none; margin: 0; max-width: 62%; text-align: right; font-size: 8pt; line-height: 1.55; color: ${COLOR.texto}; }
 .ficha .quien { font-size: 9pt; font-weight: 600; color: ${COLOR.tinta}; }
 .ficha dt { display: inline; font-weight: 600; color: ${COLOR.tinta}; }
 .ficha dd { display: inline; margin: 0; overflow-wrap: anywhere; }
@@ -215,12 +217,14 @@ h2 + h3 { margin-top: 2pt; }
 .imagenes figcaption { display: flex; flex-direction: column; margin-top: 3pt; font-size: 8pt; }
 .imagenes figcaption b { color: ${COLOR.tinta}; font-weight: 600; }
 .imagenes figcaption span { color: ${COLOR.apagado}; }
-.casillas { list-style: none; margin: 0 0 4pt; padding: 0; }
+.casillas { list-style: none; margin: 0 0 4pt; padding: 0; break-inside: avoid; }
+/* La firma no viaja sola a otra página: va con la última sección (pdfs.md, 2026-11-28). */
+.cierre { break-inside: avoid; }
 .casillas li { display: flex; gap: 6pt; margin-bottom: 3pt; }
 .casilla { display: grid; place-items: center; flex: none; width: 9pt; height: 9pt; margin-top: 2pt; border: .75pt solid ${COLOR.apagado}; border-radius: 2pt; }
 .casilla.marcada { background: ${COLOR.marca}; border-color: ${COLOR.marca}; }
 .boca { display: flex; gap: 16pt; align-items: flex-start; break-inside: avoid; }
-.dibujo { flex: none; }
+.dibujo { flex: none; display: flex; gap: 10pt; }
 .dibujo svg { display: block; width: 150pt; height: auto; overflow: visible; }
 .boca[data-dentition="Permanent"] svg[data-d="Primary"], .boca[data-dentition="Primary"] svg[data-d="Permanent"] { display: none; }
 /* El dibujo usa los tokens de la app; acá van en hex porque la plantilla vive fuera de ella. */
@@ -249,6 +253,8 @@ const seccion = (s: Seccion) => {
   const html = `<section>\n<h2>${esc(s.titulo)}</h2>\n${s.bloques.map(bloque).join('\n')}\n</section>`
   return s.si ? `{{#${s.si}}}${html}{{/${s.si}}}` : html
 }
+/* Un renglón del encabezado sale sólo si su primera variable llega con valor: no deja "Lab Order ID:" vacío. */
+const siTiene = (valor: string, html: string) => { const v = valor.match(/\{\{\s*(\w+)\s*\}\}/)?.[1]; return v ? `{{#${v}}}${html}{{/${v}}}` : html }
 const pie = (h: Hoja) => `<footer class="pie-pantalla"><span>{{practice_name}} · ${esc(h.pie)} · {{patient_name}}</span></footer>`
 
 export function armarHoja(h: Hoja): string {
@@ -265,21 +271,22 @@ export function armarHoja(h: Hoja): string {
 <main class="hoja">
 <header class="membrete">
 <div class="clinica"><span class="iniciales">{{practice_initials}}</span><div class="datos"><b>{{practice_name}}</b><span>{{location_name}} · {{location_address}}</span><span>{{practice_phone}} · {{practice_email}}</span></div></div>
-<dl class="ficha"><div class="quien">${h.encabezado.nombre}</div>${h.encabezado.datos.map(([r, v]) => `<div><dt>${esc(r)}:</dt> <dd>${v}</dd></div>`).join('')}</dl>
+<dl class="ficha"><div class="quien">${h.encabezado.nombre}</div>${h.encabezado.datos.map(([r, v]) => siTiene(v, `<div><dt>${esc(r)}:</dt> <dd>${v}</dd></div>`)).join('')}</dl>
 </header>
 <p class="tipo">${esc(h.tipo)}</p>
 <h1>${h.titulo}</h1>${h.aviso ? `\n${h.aviso}` : ''}
-${h.secciones.map(seccion).join('\n')}
-${h.firmas?.length ? `<div class="firmas">${h.firmas.map(firma).join('')}</div>` : ''}
+${h.firmas?.length && h.secciones.length
+    ? `${h.secciones.slice(0, -1).map(seccion).join('\n')}\n<div class="cierre">\n${seccion(h.secciones.at(-1)!)}\n<div class="firmas">${h.firmas.map(firma).join('')}</div>\n</div>`
+    : `${h.secciones.map(seccion).join('\n')}\n${h.firmas?.length ? `<div class="firmas">${h.firmas.map(firma).join('')}</div>` : ''}`}
 ${(h.posdata ?? []).map(seccion).join('\n')}
 ${pie(h)}
 </main>${h.anexos ? `
-{{#${h.anexos}}}<main class="hoja anexo">
+{{#${h.anexos}}}{{#has_file}}<main class="hoja anexo">
 <header class="anexo-cabeza"><p class="tipo">Annex {{annex_label}} · ${esc(h.pie)}</p><h1>{{name}}</h1><span>{{file_type}} · {{patient_name}}</span></header>
 {{#is_image}}<figure class="anexo-imagen"><img src="{{file_url}}" alt="{{name}}"></figure>{{/is_image}}
 {{^is_image}}<p class="anexo-pdf">The attached document starts on the next page.</p>{{/is_image}}
 ${pie(h)}
-</main>{{/${h.anexos}}}` : ''}
+</main>{{/has_file}}{{/${h.anexos}}}` : ''}
 </body>
 </html>
 `

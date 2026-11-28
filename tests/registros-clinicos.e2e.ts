@@ -87,7 +87,7 @@ test('Prescription: New valida, crea en Pending, se edita, se activa y se cancel
   /* CON-2846: el paciente ya tiene Ibuprofen activo; con Update patient medications, Save pregunta si se reutiliza. */
   await screen.getByRole('switch', 'Update patient medications').tap()
   await screen.getByRole('button', 'Save').tap()
-  await screen.getByRole('dialog', 'Medication already active').getByRole('button', 'Reuse existing medication').tap()
+  await screen.getByRole('dialog', 'Medication already active').getByRole('button', 'Confirm').tap()
   await expect(screen.getByText('The prescription has been successfully created.')).toBeVisible()
   await expect(screen.getByText(/Showing 1 to 8 of 8 results/)).toBeVisible()
 
@@ -97,7 +97,7 @@ test('Prescription: New valida, crea en Pending, se edita, se activa y se cancel
   await expect(screen.getByRole('textbox', /^Strength/)).toHaveValue('400')
   await screen.getByRole('textbox', /^Strength/).fill('600')
   await screen.getByRole('button', 'Save').tap()
-  await screen.getByRole('dialog', 'Medication already active').getByRole('button', 'Reuse existing medication').tap()
+  await screen.getByRole('dialog', 'Medication already active').getByRole('button', 'Confirm').tap()
   await expect(screen.getByText('The prescription has been successfully updated.')).toBeVisible()
 
   /* Activate pregunta; ya Active no se edita, tiene PDF y sólo se cancela. */

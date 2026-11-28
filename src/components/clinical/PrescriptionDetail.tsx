@@ -123,8 +123,9 @@ export function PrescriptionDetail({ registro, nuevo, onVolver, onAccion }: {
               del fieldset: en sólo lectura también se recorren. Al lado, el tacho de la app (sólo ícono) quita la que
               se está viendo. */}
           {medicaciones.length > 1 && (
-            <div className="flex flex-wrap items-center gap-2">
+            <div className="flex min-w-0 items-center gap-2">
               <Tabs
+                className="min-w-0"
                 size="sm" aria-label="Medications" value={String(m.id)} onChange={setActual}
                 tabs={medicaciones.map((x, i) => ({ value: String(x.id), label: rotulo(x, i), alerta: intento && Object.keys(erroresDe(x).errores).length > 0 }))}
               />
@@ -189,7 +190,7 @@ export function PrescriptionDetail({ registro, nuevo, onVolver, onAccion }: {
 
       {reusar && (
         <ConfirmDialog
-          title="Medication already active" confirmLabel="Reuse existing medication" cancelLabel="Cancel" icon="warning"
+          title="Medication already active" confirmLabel="Confirm" cancelLabel="Cancel" icon="warning"
           onCancel={() => setReusar(false)} onConfirm={() => { setReusar(false); confirmar() }}
         >
           <p>This medication is already active for the patient. Do you want to reuse the existing medication?</p>

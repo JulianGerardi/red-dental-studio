@@ -83,7 +83,7 @@ const DOCUMENTOS_ENVIADOS = '{{#document_sent}}<p><b>Documents sent:</b> Yes</p>
 /* Documents Uploaded, como el PDF de red.dev (archivo y peso) más el anexo donde va cada uno: los adjuntos siguen al
    documento, cada uno en su hoja (`Hoja.anexos`; Julián, 2026-11-27). */
 const DOCUMENTOS: Bloque = { tipo: 'tabla', lista: 'attachments', vacio: 'No documents uploaded.', columnas: [
-  { titulo: 'Annex', valor: '{{annex_label}}', ancho: '12%' }, { titulo: 'File', valor: '{{name}}' }, { titulo: 'Type', valor: '{{file_type}}', ancho: '14%' }, { titulo: 'Size', valor: '{{file_size}}', derecha: true, ancho: '14%' },
+  { titulo: 'Annex', valor: '{{#has_file}}{{annex_label}}{{/has_file}}{{^has_file}}—{{/has_file}}', ancho: '12%' }, { titulo: 'File', valor: '{{name}}' }, { titulo: 'Type', valor: '{{file_type}}', ancho: '14%' }, { titulo: 'Size', valor: '{{file_size}}', derecha: true, ancho: '14%' },
 ] }
 
 /* El caso del ejemplo (Restorative plan), con los importes que calcula Estimate details (data/estimaciones): cobertura
@@ -407,7 +407,7 @@ export const PDFS: Pdf[] = [
       special_instructions: 'Send the try-in before final glazing.',
       has_documents: true,
       attachments: [
-        { annex_label: 'A', name: 'Shade_photo_19.jpg', file_type: 'Image', file_size: '185 KB', is_image: true, file_url: '{{assets_url}}/sample-periapical.jpg' },
+        { annex_label: 'A', name: 'Shade_photo_19.jpg', file_type: 'Image', file_size: '185 KB', has_file: true, is_image: true, file_url: '{{assets_url}}/sample-periapical.jpg' },
       ],
     },
   },
@@ -452,7 +452,7 @@ export const PDFS: Pdf[] = [
     id: 'referral',
     categoria: 'Orders',
     nombre: 'Referral',
-    cuando: 'PDF of a referral (Pending tasks, Clinical Mode, patient documents).',
+    cuando: 'While the referral is Requested; the document icon in the referrals table, in the referral and in Pending tasks.',
     firma: 'The referring provider. It goes to the referred contact.',
     origen: 'propuesta',
     completado: ['Layout: the app PDF only lists the task data', 'Fields from New Referral (CON-2322) and the provider type and specialty (CON-3128)', 'Findings and diagnoses of each procedure (CON-2616)', 'Attachments as annexes, one page each'],
@@ -471,7 +471,7 @@ export const PDFS: Pdf[] = [
         ] }] },
         { titulo: 'Provider Information', bloques: [{ tipo: 'campos', campos: [['Name', '{{provider_name}}'], ['Email', '{{provider_email}}']] }] },
         { titulo: 'Procedures to refer', bloques: [{ tipo: 'tabla', lista: 'procedures', vacio: 'No procedures selected.', columnas: COLS_PROCEDIMIENTO }] },
-        { titulo: 'Referral note', bloques: [{ tipo: 'texto', texto: '{{referral_note}}' }] },
+        { titulo: 'Referral note', si: 'referral_note', bloques: [{ tipo: 'texto', texto: '{{referral_note}}' }] },
         { titulo: 'Documents Uploaded', si: 'has_documents', bloques: [DOCUMENTOS] },
       ],
       firmas: [{ rol: 'Referring provider', prefijo: 'provider' }],
@@ -486,8 +486,8 @@ export const PDFS: Pdf[] = [
       referral_note: 'Periapical radiolucency on #19. Please evaluate for root canal treatment before we place the crown.',
       has_documents: true,
       attachments: [
-        { annex_label: 'A', name: 'Periapical_19.jpg', file_type: 'Image', file_size: '185 KB', is_image: true, file_url: '{{assets_url}}/sample-periapical.jpg' },
-        { annex_label: 'B', name: 'Radiographic report.pdf', file_type: 'PDF', file_size: '412 KB', is_image: false, file_url: '' },
+        { annex_label: 'A', name: 'Periapical_19.jpg', file_type: 'Image', file_size: '185 KB', has_file: true, is_image: true, file_url: '{{assets_url}}/sample-periapical.jpg' },
+        { annex_label: 'B', name: 'Radiographic report.pdf', file_type: 'PDF', file_size: '412 KB', has_file: true, is_image: false, file_url: '' },
       ],
       ...FIRMADO_PROVIDER,
     },

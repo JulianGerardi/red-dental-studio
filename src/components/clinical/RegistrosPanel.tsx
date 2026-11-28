@@ -204,7 +204,7 @@ export function RegistrosPanel({ kind, paciente, tarea, maximo }: {
         pageSize={10}
         empty={registros.length === 0
           ? { icon: c.icono, title: `No ${c.plural} yet`, detail: `New ${c.plural} for this patient will show up here.` }
-          : { icon: c.icono, title: `No ${c.plural} match the current filters`, detail: 'Try a different status or provider.' }}
+          : { icon: c.icono, title: `No ${c.plural} match the current filters`, detail: 'Try different filters.' }}
       />
       {acciones.dialogo}
     </div>

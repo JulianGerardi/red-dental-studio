@@ -51,7 +51,7 @@ export function ReferralDetail({ registro, nuevo, onVolver, onAccion }: {
     }
     setErrores(e)
     if (e.proveedor || e.nota) return
-    guardarRegistro({ ...registro, updated: hoy(), derivacion: { proveedor, nota: nota.trim(), procedimientos, asap, obligatoria, adjuntos: adjuntos.map((a) => ({ nombre: a.nombre, bytes: a.bytes ?? 0 })) } })
+    guardarRegistro({ ...registro, updated: hoy(), derivacion: { proveedor, nota: nota.trim(), procedimientos, asap, obligatoria, adjuntos: adjuntos.map((a) => ({ nombre: a.nombre, bytes: a.bytes ?? 0, url: a.url })) } })
     aviso.ok(`The referral has been successfully ${nuevo ? 'created' : 'updated'}.`)
     onVolver()
   }

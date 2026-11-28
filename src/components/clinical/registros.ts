@@ -212,14 +212,26 @@ const fechaLarga = (s: string) => { const f = new Date(s); return s && !Number.i
 const siNo = (v: boolean) => (v ? 'Yes' : 'No')
 /* Los IDs del documento, como los imprime red.dev: el de la Lab order es un UUID y el de la Prescription, ocho
    caracteres. Acá salen del id del registro, siempre los mismos. */
-const hex = (semilla: string, n: number) => { let h = ''; for (let i = 0; h.length < n; i++) h += (hash(`${semilla}:${i}`) >>> 0).toString(16).padStart(8, '0'); return h.slice(0, n) }
-const uuidDe = (id: string) => hex(id, 32).replace(/^(.{8})(.{4})(.{4})(.{4})(.{12})$/, '$1-$2-$3-$4-$5')
+const hex = (semilla: string, n: number) => {
+  let x = hash(semilla) || 1
+  return Array.from({ length: n }, () => { x ^= x << 13; x ^= x >>> 17; x ^= x << 5; return ((x >>> 0) & 15).toString(16) }).join('')
+}
+/* Con la versión (7) y la variante de los UUID de red.dev. */
+const uuidDe = (id: string) => { const h = hex(id, 32); return `${h.slice(0, 8)}-${h.slice(8, 12)}-7${h.slice(13, 16)}-9${h.slice(17, 20)}-${h.slice(20)}` }
 const peso = (b?: number) => (b === undefined ? '-' : b < 1024 * 1024 ? `${Math.max(1, Math.round(b / 1024))} KB` : `${(b / 1024 / 1024).toFixed(1)} MB`)
-/* Documents Uploaded y sus anexos: una imagen sin archivo a mano (mock) sale como hoja de anexo con su nombre. */
-const adjuntosDe = (lista: { nombre: string; bytes?: number }[]) => ({
-  has_documents: lista.length > 0,
-  attachments: lista.map((a, i) => ({ annex_label: String.fromCharCode(65 + i), name: a.nombre, file_type: /\.pdf$/i.test(a.nombre) ? 'PDF' : 'Image', file_size: peso(a.bytes), is_image: false, file_url: '' })),
-})
+/* Documents Uploaded y sus anexos: tiene hoja de anexo la imagen que se subió en esta sesión (hay archivo para mostrar);
+   los adjuntos de ejemplo y los PDF sólo se listan (el backend agrega los PDF detrás). */
+const esImagen = (nombre: string) => /\.(jpe?g|png)$/i.test(nombre)
+const adjuntosDe = (lista: Adjunto[]) => {
+  let letra = 0
+  return {
+    has_documents: lista.length > 0,
+    attachments: lista.map((a) => {
+      const conHoja = !!a.url && esImagen(a.nombre)
+      return { annex_label: conHoja ? String.fromCharCode(65 + letra++) : '', name: a.nombre, file_type: /\.pdf$/i.test(a.nombre) ? 'PDF' : 'Image', file_size: peso(a.bytes), has_file: conHoja, is_image: conHoja, file_url: a.url ?? '' }
+    }),
+  }
+}
 const PLANTILLA: Record<TipoRegistro, string> = { 'Lab orders': 'lab-order', Prescriptions: 'prescription', Referrals: 'referral' }
 
 /** El HTML del documento de un registro (o de la tarea que todavía no se abrió); sin plantilla (Clinical note), nada. */
@@ -244,8 +256,8 @@ export function hojaDeRegistro(t: PendingTask): string | undefined {
     propios = {
       lab_order_id: uuidDe(r.id), expiration_date: fechaLarga(r.expiration), lab_name: r.lab.laboratorio, lab_phone: lab?.telefono ?? '-', lab_email: lab?.email ?? '-', lab_address: lab?.direccion ?? '-',
       work_request: [r.lab.asap ? 'ASAP.' : '', r.lab.trabajo].filter(Boolean).join(' '), special_instructions: r.lab.indicaciones.trim(),
-      /* La plantilla dibuja una dentición: la que tiene dientes marcados (la permanente si hay de las dos). */
-      dentition: permanentes.length || !r.lab.dientes.length ? 'Permanent' : 'Primary',
+      /* La dentición que tiene dientes marcados; con dientes de las dos, Mixed dibuja las dos arcadas. */
+      dentition: permanentes.length && permanentes.length < r.lab.dientes.length ? 'Mixed' : permanentes.length || !r.lab.dientes.length ? 'Permanent' : 'Primary',
       has_teeth: r.lab.dientes.length > 0,
       teeth: r.lab.dientes.map((d) => ({ tooth: d, surfaces: (r.lab!.superficies[d] ?? []).join(', ') })),
       ...adjuntosDe(r.lab.adjuntos),
@@ -266,7 +278,8 @@ export function hojaDeRegistro(t: PendingTask): string | undefined {
     const destino = proveedoresDerivacion().find((x) => x.nombre === d.proveedor)
     propios = {
       created_date: fechaLarga(r.register), asap: siNo(d.asap), mandatory: siNo(d.obligatoria),
-      contact_name: d.proveedor, contact_type: 'Dentist', contact_specialty: destino?.especialidad || '-', contact_phone: '-', contact_email: '-', contact_address: '-',
+      contact_name: d.proveedor, contact_type: 'Dentist', contact_specialty: destino?.especialidad || '-',
+      contact_phone: destino?.telefono || '-', contact_email: destino?.email || '-', contact_address: destino?.direccion || '-',
       procedures: procedimientosDe(d.procedimientos, PROCEDIMIENTOS_REFERRAL).map((x) => ({ code: x.codigo, description: x.nombre, anatomic_area: zona(x), findings: [], diagnoses: [] })),
       referral_note: d.nota,
       ...adjuntosDe(d.adjuntos),

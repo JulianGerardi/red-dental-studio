@@ -240,3 +240,17 @@ Lab order (8) y Prescription (1) de red.dev, en sólo lectura.
 3. red.dev imprime el vencimiento como `2026-05-05` (Lab order) y `03-06-2026` (Prescription); la plantilla recibe la
    fecha ya escrita.
 4. En red.dev el documento no tiene tipo ni título, pie, número de página ni firma; el diseño nuevo los mantiene.
+
+### Revisión (2026-11-28, misma tanda)
+
+- **Encabezado:** la clínica cede ancho y los datos del documento no (`.clinica` flex, `.ficha` sin achicarse): el Lab
+  Order ID ya no se parte con una dirección larga. Cada renglón sale sólo si su primera variable llega con valor.
+- **Dentición mixta:** con dientes permanentes y primarios, `dentition: 'Mixed'` dibuja las dos arcadas, una al lado de
+  la otra. Valores: `Permanent`, `Primary`, `Mixed`.
+- **Anexos:** tienen hoja sólo los adjuntos con archivo (`has_file`); en la tabla de Documents Uploaded, los demás llevan
+  "—" en *Annex*. En la app, una imagen subida en la sesión sale en su hoja (object URL); los de ejemplo sólo se listan.
+- **La firma no viaja sola:** la última sección y las firmas van juntas (`.cierre`); las casillas del paciente no se
+  cortan entre páginas. *Referral note* sale sólo con texto.
+- **Referred Provider** imprime teléfono, mail y dirección: `ProveedorDerivacion` los guarda y New provider los carga.
+- `pdfs.json › sample_data` trae sólo lo que usa cada plantilla.
+- Pendiente (baja): con dentición Primary queda un hueco entre el título y el dibujo (las dos arcadas comparten viewBox).

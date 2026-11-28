@@ -234,10 +234,10 @@ export function ItemsTarea({ task, abierto, onAccion, sin = [], editarApagado }:
     )
   }
   const acciones = accionesDe(task).filter((a) => !sin.includes(a))
-  const soloPending = editarApagado && !acciones.includes('Edit') && !sin.includes('Edit')
+  const editApagado = editarApagado && !acciones.includes('Edit') && !sin.includes('Edit')
   return (
     <TooltipProvider delayDuration={100}>
-      {soloPending && item('Edit', `This ${nombreTarea(task).toLowerCase()} can only be edited while Pending.`)}
+      {editApagado && item('Edit', `This ${nombreTarea(task).toLowerCase()} can only be edited while Pending.`)}
       {acciones.map((a) => item(a, abierto ? undefined : SIN_ENCUENTRO))}
     </TooltipProvider>
   )
@@ -246,7 +246,7 @@ export function ItemsTarea({ task, abierto, onAccion, sin = [], editarApagado }:
 /** El ⋮ de la tarea, como red.dev: *Options* y las acciones de su estado. Un estado final no tiene menú, salvo con
  *  `editarApagado`. */
 export function MenuTarea({ task, abierto, onAccion, sin = [], editarApagado }: PropsMenu) {
-  if (!editarApagado && !accionesDe(task).some((a) => !sin.includes(a))) return null
+  if (!accionesDe(task).some((a) => !sin.includes(a)) && !(editarApagado && !sin.includes('Edit'))) return null
   return (
     <RowActionsMenu label={`${nombreTarea(task)} for ${task.person}`}>
       <DropdownMenuLabel className="text-[12px] font-semibold text-ink">Options</DropdownMenuLabel>

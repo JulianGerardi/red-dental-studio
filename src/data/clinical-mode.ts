@@ -370,13 +370,14 @@ export const RADIOGRAFIAS: Radiografia[] = Array.from({ length: 20 }, (_, i) => 
 
 /* Referral (CON-2321): los contactos que se pueden elegir como Referral Provider, con su especialidad (CON-3128), y lo
    que trae cargado la derivación que abre Complete this task desde Pending Task (clinical-mode.md, 2026-11-25). */
-export type ProveedorDerivacion = { nombre: string; especialidad: string }
+/* Con el contacto que pide New provider: lo imprime el documento de la Referral (pdfs.md, 2026-11-28). */
+export type ProveedorDerivacion = { nombre: string; especialidad: string; email?: string; telefono?: string; direccion?: string }
 export const PROVEEDORES_DERIVACION: ProveedorDerivacion[] = [
-  { nombre: 'Dr. Laura Chen', especialidad: 'Endodontics' },
-  { nombre: 'Dr. Omar Haddad', especialidad: 'Oral Surgery' },
-  { nombre: 'Dr. Priya Shah', especialidad: 'Periodontics' },
+  { nombre: 'Dr. Laura Chen', especialidad: 'Endodontics', email: 'lchen@rootcare.com', telefono: '+1 646 5550110', direccion: '120 W 57th St, 8, New York, 10019, NY, US' },
+  { nombre: 'Dr. Omar Haddad', especialidad: 'Oral Surgery', email: 'ohaddad@oralsurgerynyc.com', telefono: '+1 212 5550187', direccion: '30 E 60th St, 1402, New York, 10022, NY, US' },
+  { nombre: 'Dr. Priya Shah', especialidad: 'Periodontics', email: 'pshah@gumcare.com', telefono: '+1 718 5550133', direccion: '55 Court St, 3, Brooklyn, 11201, NY, US' },
 ]
-export type AdjuntoDerivacion = { nombre: string; bytes: number }
+export type AdjuntoDerivacion = { nombre: string; bytes: number; url?: string }
 export type DatosDerivacion = { proveedor: string; nota: string; procedimientos: string[]; asap: boolean; obligatoria: boolean; adjuntos: AdjuntoDerivacion[] }
 export const DERIVACION_TAREA: DatosDerivacion = {
   proveedor: 'Dr. Laura Chen',

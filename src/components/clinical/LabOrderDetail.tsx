@@ -122,7 +122,7 @@ export function LabOrderDetail({ registro, nuevo, onVolver, onAccion }: {
         campo={(
           <div className="flex w-[190px] flex-col gap-2">
             <FieldLabel required>Delivery expiration date</FieldLabel>
-            <DatePicker value={vence} onChange={setVence} error={!!errores.vence} label="Delivery expiration date" disabled={!editable} className="h-9 w-full" />
+            <DatePicker value={vence} onChange={(f) => { setVence(f); setErrores((e) => ({ ...e, vence: undefined })) }} error={!!errores.vence} label="Delivery expiration date" disabled={!editable} className="h-9 w-full" />
             {errores.vence && <FieldError>{errores.vence}</FieldError>}
           </div>
         )}

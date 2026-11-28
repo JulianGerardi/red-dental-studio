@@ -4126,3 +4126,14 @@ historia nueva: son correcciones sobre CON-2214, CON-2212 y CON-2321 (y CON-2584
 - Con odontólogos: si alcanza con Edit apagado + abrir la fila para ver una orden que ya no se edita, o hace falta un
   *View* explícito.
 - Con recepción: Confirm en azul para Cancel y Delete (acciones que no se deshacen): que no se confirme sin leer.
+
+### Revisión (2026-11-28, misma tanda)
+
+- *Medication already active* (CON-2846) también se contesta con *Confirm*, como el resto de las preguntas.
+- Lab order: el error de la fecha se borra al cambiarla (antes quedaba hasta el próximo Save).
+- La tira de medicaciones no baja de renglón en celular: el tacho queda al lado y las pestañas scrollean.
+- Vacío con filtros: "Try different filters." (Referral no filtra por provider).
+- Clinical Mode con un paciente que no está en la lista (`john-smith`): los registros nuevos quedan a nombre de John
+  Smith y no del primero de la lista.
+- Pendientes (baja): el foco se pierde después de borrar con el tacho de la fila; el tacho y el PDF apagados explican el
+  motivo sólo con `title` (no por teclado); `ui/date-nav` conserva `vacio` / `onClear` sin uso.
