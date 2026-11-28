@@ -12,7 +12,7 @@ test('El rastro del paciente vuelve al Overview y a la lista; Patients y Billing
   await expect(migas.getByRole('link', 'Ledger')).toHaveCount(0)
 
   await migas.getByRole('link', 'John Smith').tap()
-  await expect(screen.getByRole('button', 'Allergies 4')).toBeVisible()
+  await expect(screen.getByRole('button', 'Allergies 4 items on record')).toBeVisible()
   await expect(migas.getByRole('link', 'John Smith')).toHaveCount(0)
   await expect(migas.getByText('John Smith')).toBeVisible()
 
