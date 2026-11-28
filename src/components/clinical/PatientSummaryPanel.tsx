@@ -17,9 +17,9 @@ import { PatientSummaryNote } from './PatientSummaryNote'
 
 /* Patient Summary de Clinical Mode (red.dev: /clinical-mode/treatment-history): los encuentros del paciente y su nota
    clínica. Mismas columnas y acciones que red.dev (el ojo, Download de lo elegido y el filtro por fecha), con la tabla,
-   las pills, el pie y el bloque de fecha de la app (por mes, como Lab order); Filter suma Status y Provider (CON-2731). El ojo abre la nota en el visor de documentos
-   sin salir de la pestaña: al volver, la página, los filtros y lo elegido siguen como estaban (CON-3773). Ver
-   design-reference/figma/modulos/clinical-mode.md (2026-11-27, Patient Summary). */
+   las pills, el pie y el bloque de fecha de la app (por mes, como Lab order); Filter suma Status y Provider (CON-2731).
+   El ojo abre la nota en el visor de documentos sin salir de la pestaña: al volver, la página, los filtros y lo elegido
+   siguen como estaban (CON-3773). Ver design-reference/figma/modulos/clinical-mode.md (2026-11-27, Patient Summary). */
 
 /* Un tono por estado del encuentro, con los de los turnos de la app (Fulfilled verde, Cancelled rojo). */
 export const TONO_ENCUENTRO: Record<EstadoHistorial, PillTone> = {
