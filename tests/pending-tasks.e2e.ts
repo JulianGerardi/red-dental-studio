@@ -127,6 +127,13 @@ test('Una Referral Pending se edita, valida y se pide desde su ⋮', async ({ ap
   await screen.getByRole('button', 'Save').tap()
   await expect(screen.getByText('This field is required.')).toBeVisible()
 
+  /* Con cambios sin guardar, Request valida antes: con la nota vacía no pregunta (clinical-mode.md, 2026-11-28). */
+  await screen.getByRole('button', 'Actions for Referral for Olivia Brooks').tap()
+  await screen.getByRole('menuitem', 'Request').tap()
+  await expect(screen.getByRole('dialog', 'Request referral')).toHaveCount(0)
+  await screen.getByRole('textbox', /^Referral note/).fill('Evaluate tooth 14 before the crown.')
+  await expect(screen.getByText('This field is required.')).toHaveCount(0)
+
   await screen.getByRole('button', 'Actions for Referral for Olivia Brooks').tap()
   await screen.getByRole('menuitem', 'Request').tap()
   await screen.getByRole('dialog', 'Request referral').getByRole('button', 'Mark as requested').tap()

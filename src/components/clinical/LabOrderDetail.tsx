@@ -59,7 +59,7 @@ export function LabOrderDetail({ registro, nuevo, onVolver, onAccion }: {
   const [trabajo, setTrabajo] = useState(inicio.trabajo)
   const [indicaciones, setIndicaciones] = useState(inicio.indicaciones)
   const [adjuntos, setAdjuntos] = useState(inicio.adjuntos)
-  const [errores, setErrores] = useState<{ vence?: string; lab?: string; trabajo?: string }>({})
+  const [intento, setIntento] = useState(false)
 
     const tocarDiente = (d: string) => {
     const esta = dientes.includes(d)
@@ -94,21 +94,37 @@ export function LabOrderDetail({ registro, nuevo, onVolver, onAccion }: {
   const cuenta = (f: (p: ProcedimientoFicha) => boolean) => PROCEDIMIENTOS_LAB.filter(f).length
   const elegidos = PROCEDIMIENTOS_LAB.filter((p) => vinculados.includes(p.id))
 
-  const guardar = () => {
-    const e = {
-      lab: laboratorios.some((l) => l.nombre === lab) ? undefined : OBLIGATORIO,
-      vence: !vence ? OBLIGATORIO : vence < hoyDia() ? 'Date cannot be in the past' : undefined,
-      trabajo: trabajo.trim() ? undefined : OBLIGATORIO,
-    }
-    setErrores(e)
-    if (e.lab || e.vence || e.trabajo) return
+  /* El laboratorio se elige de la lista; escrito a mano vale si coincide con uno, sin distinguir mayúsculas. Los errores
+     se muestran después del primer intento y se van al corregir el campo. */
+  const elegido = laboratorios.find((l) => l.nombre.toLowerCase() === lab.trim().toLowerCase())
+  const revisar = () => ({
+    lab: elegido ? undefined : lab.trim() ? 'Select a laboratory from the list.' : OBLIGATORIO,
+    vence: !vence ? OBLIGATORIO : vence < hoyDia() ? 'Date cannot be in the past' : undefined,
+    trabajo: trabajo.trim() ? undefined : OBLIGATORIO,
+  })
+  const errores: ReturnType<typeof revisar> = intento ? revisar() : { lab: undefined, vence: undefined, trabajo: undefined }
+  const otroError = [errores.vence, errores.lab].find((e) => e && e !== OBLIGATORIO)
+
+  const guardarSiVale = () => {
+    setIntento(true)
+    const e = revisar()
+    if (e.lab || e.vence || e.trabajo) return false
     guardarRegistro({
       ...registro, expiration: formatMDY(vence!), updated: hoy(),
-      lab: { laboratorio: lab, asap, procedimientos: vinculados, denticion, dientes, superficies, trabajo: trabajo.trim(), indicaciones: indicaciones.trim(), adjuntos },
+      lab: { laboratorio: elegido!.nombre, asap, procedimientos: vinculados, denticion, dientes, superficies, trabajo: trabajo.trim(), indicaciones: indicaciones.trim(), adjuntos },
     })
+    return true
+  }
+  const guardar = () => {
+    if (!guardarSiVale()) return
     aviso.ok(`The lab order has been successfully ${nuevo ? 'created' : 'updated'}.`)
     onVolver()
   }
+  /* Request deja la orden sin edición: si hay cambios sin guardar, antes se validan y se guardan, así sale con lo que
+     se ve en pantalla. Sin cambios, pasa como desde la tabla. */
+  const foto = JSON.stringify([vence?.getTime(), lab, asap, vinculados, denticion, dientes, superficies, trabajo, indicaciones, adjuntos])
+  const [original] = useState(foto)
+  const accion = (t: PendingTask, a: AccionUI) => { if (a === 'Request' && editable && foto !== original && !guardarSiVale()) return; onAccion(t, a) }
 
   return (
     <div className="flex flex-col gap-4">
@@ -118,11 +134,11 @@ export function LabOrderDetail({ registro, nuevo, onVolver, onAccion }: {
         datos={[['Ordering provider', registro.provider ?? '—'], ['Order date', registro.register]]}
         acciones={!nuevo && <>
           {registro.pdf && <Button variant="secondary" onClick={() => onAccion(registro, 'PDF')}><FileText /> PDF</Button>}
-          <MenuTarea task={registro} onAccion={onAccion} sin={['Edit']} />
+          <MenuTarea task={registro} onAccion={accion} sin={['Edit']} />
         </>}
       />
 
-      <AvisosFicha editable={editable} nombre="lab order" incompleto={Object.values(errores).includes(OBLIGATORIO)} error={errores.vence && errores.vence !== OBLIGATORIO ? errores.vence : undefined} />
+      <AvisosFicha editable={editable} nombre="lab order" incompleto={Object.values(errores).includes(OBLIGATORIO)} error={otroError} />
 
       {/* Una card debajo de la otra, con la misma diagramación que Prescription y Referral (Julián, 2026-11-27). */}
       <Card title="General information">
@@ -132,12 +148,12 @@ export function LabOrderDetail({ registro, nuevo, onVolver, onAccion }: {
            <fieldset disabled={!editable} className="flex min-w-0 flex-col gap-6">
             <legend className="sr-only">General information</legend>
             <div className="grid gap-4 sm:grid-cols-2">
-              <div className="flex flex-col gap-2 sm:col-span-2 sm:flex-row sm:items-end">
+              <div className="flex flex-col gap-2 sm:col-span-2 sm:flex-row sm:items-start">
                 <SearchField
                   label="Receiving laboratory" required clearable className="min-w-0 flex-1" placeholder="Search laboratory"
                   options={laboratorios.map((l) => l.nombre)} value={lab} onChange={setLab} error={errores.lab} disabled={!editable} emptyText="No laboratories match your search."
                 />
-                <Button variant="secondary" size="lg" disabled={!editable} className={cn(errores.lab && 'sm:mb-6')} onClick={() => setNuevoLab(true)}><Plus /> New laboratory</Button>
+                <Button variant="secondary" size="lg" disabled={!editable} className="sm:mt-6" onClick={() => setNuevoLab(true)}><Plus /> New laboratory</Button>
               </div>
               <div className="flex flex-col gap-2">
                 <FieldLabel required>Delivery expiration date</FieldLabel>
@@ -256,7 +272,7 @@ export function LabOrderDetail({ registro, nuevo, onVolver, onAccion }: {
       {nuevoLab && (
         <NewLaboratoryDrawer
           existentes={laboratorios} onClose={() => setNuevoLab(false)}
-          onGuardar={(l) => { agregarLaboratorio(l); setLaboratorios((p) => [...p, l]); setLab(l.nombre); setErrores((e) => ({ ...e, lab: undefined })); aviso.ok('The laboratory has been successfully created.') }}
+          onGuardar={(l) => { agregarLaboratorio(l); setLaboratorios((p) => [...p, l]); setLab(l.nombre); aviso.ok('The laboratory has been successfully created.') }}
         />
       )}
     </div>

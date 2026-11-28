@@ -78,14 +78,29 @@ export function PrescriptionDetail({ registro, nuevo, onVolver, onAccion }: {
     aviso.ok(`The prescription has been successfully ${nuevo ? 'created' : 'updated'}.`)
     onVolver()
   }
-  const guardar = () => {
+  const vale = () => {
     setIntento(true)
     const conErrores = medicaciones.find((x) => Object.keys(erroresDe(x).errores).length)
     if (conErrores) setActual(String(conErrores.id))
-    if (!vence || vence < manana() || vence > limite() || conErrores) return
+    return !(!vence || vence < manana() || vence > limite() || conErrores)
+  }
+  const guardar = () => {
+    if (!vale()) return
     /* CON-2846: una medicación con Update patient medications que el paciente ya tiene activa pregunta antes. */
     if (yaActivas.length) { setReusar(true); return }
     confirmar()
+  }
+  /* Activate deja la receta sin edición: si hay cambios sin guardar, antes se validan y se guardan, así sale con lo que
+     se ve en pantalla. Sin cambios, pasa como desde la tabla. */
+  const foto = JSON.stringify([vence?.getTime(), medicaciones, indicaciones])
+  const [original] = useState(foto)
+  const accion = (t: PendingTask, a: AccionUI) => {
+    if (a === 'Activate' && editable && foto !== original) {
+      if (!vale()) return
+      if (yaActivas.length) { setReusar(true); return }
+      guardarRegistro({ ...registro, expiration: formatMDY(vence!), updated: hoy(), receta: { medicaciones, indicaciones: indicaciones.trim() } })
+    }
+    onAccion(t, a)
   }
 
   const rotulo = (x: Medicacion, i: number) => nombreMedicacion(x) || `Medication ${i + 1}`
@@ -114,7 +129,7 @@ export function PrescriptionDetail({ registro, nuevo, onVolver, onAccion }: {
         )}
         acciones={!nuevo && (registro.pdf || accionesDe(registro).some((x) => x !== 'Edit')) && <>
           {registro.pdf && <Button variant="secondary" onClick={() => onAccion(registro, 'PDF')}><FileText /> PDF</Button>}
-          <MenuTarea task={registro} onAccion={onAccion} sin={['Edit']} />
+          <MenuTarea task={registro} onAccion={accion} sin={['Edit']} />
         </>}
       />
 

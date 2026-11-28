@@ -138,6 +138,36 @@ test('Prescription: Filter por estado y provider, Expire en una Active y Delete 
   await expect(screen.getByRole('menuitem', 'View')).toBeVisible()
 })
 
+/* Request desde la ficha deja la orden sin edición: lo que se cambió y no se guardó sale igual en el pedido, y lo creado
+   aparece en Pending task del paciente (clinical-mode.md, 2026-11-28). */
+test('Lab order: Request desde la ficha guarda los cambios pendientes y la orden entra a Pending task del paciente', async ({ app, screen }) => {
+  await abrir(app, screen, 'Lab order')
+  await screen.getByRole('button', /New lab order/).tap()
+  /* El laboratorio escrito a mano vale si coincide con uno de la lista. */
+  await screen.getByPlaceholder('Search laboratory').fill('smile lab studio')
+  await screen.getByRole('button', /^Delivery expiration date/).tap()
+  await screen.getByRole('button', 'Next month').tap()
+  await screen.getByRole('button', / 15, \d{4}$/).tap()
+  await screen.getByLabel(/Dental work requested/).fill('First draft.')
+  await screen.getByRole('button', 'Save').tap()
+  await expect(screen.getByText('The lab order has been successfully created.')).toBeVisible()
+
+  await screen.getByRole('button', /^Actions for lab order for Smile Lab Studio, Pending/).first().tap()
+  await screen.getByRole('menuitem', 'Edit').tap()
+  await screen.getByLabel(/Dental work requested/).fill('Final: zirconia crown, shade B2.')
+  await screen.getByRole('button', /^Actions for Lab order/).tap()
+  await screen.getByRole('menuitem', 'Request').tap()
+  await screen.getByRole('dialog', 'Request lab order').getByRole('button', 'Mark as requested').tap()
+  await expect(screen.getByText('Read-only mode')).toBeVisible()
+  await screen.getByRole('button', 'Back to lab orders').tap()
+  await screen.getByRole('button', /^Actions for lab order for Smile Lab Studio, Requested/).first().tap()
+  await screen.getByRole('menuitem', 'View').tap()
+  await expect(screen.getByLabel(/Dental work requested/)).toHaveValue('Final: zirconia crown, shade B2.')
+
+  await screen.getByRole('link', 'Exit Clinical Mode').tap()
+  await expect(screen.getByRole('tab', 'Lab orders (4)')).toBeVisible()
+})
+
 test('Lab order: New crea en Pending; Request, Delay y Deliver siguen la máquina de estados (CON-2215, CON-2221, CON-2226)', async ({ app, screen }) => {
   await abrir(app, screen, 'Lab order')
   await screen.getByRole('button', /New lab order/).tap()

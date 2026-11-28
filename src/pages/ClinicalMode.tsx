@@ -15,7 +15,7 @@ import { ProblemListFlotante } from '@/components/clinical/ProblemListFlotante'
 import { NavegacionClinica, examenDePestana, type DestinoClinico } from '@/components/clinical/RecordDetail'
 import { VitalsPanel } from '@/components/clinical/VitalsPanel'
 import { RegistrosPanel } from '@/components/clinical/RegistrosPanel'
-import type { TipoRegistro } from '@/components/clinical/registros'
+import { registroDe, type TipoRegistro } from '@/components/clinical/registros'
 import { RadiographyPanel } from '@/components/clinical/RadiographyPanel'
 import { TreatmentPlanSection } from '@/components/clinical/TreatmentPlanSection'
 import { TreatmentPanel } from '@/components/clinical/TreatmentPanel'
@@ -49,7 +49,8 @@ export default function ClinicalMode() {
   /* ?tab= y ?task=: Complete this Task de Pending Task abre la pestaña de su tipo y, en Lab Order, el detalle de la orden
      (dashboard.md, 2026-11-20); en Referral, el de la derivación (clinical-mode.md, 2026-11-25). */
   const tabPedida = ([...EXAMENES, ...REGISTROS] as readonly string[]).includes(busqueda.get('tab') ?? '') ? (busqueda.get('tab') as Pestana) : undefined
-  const tareaPedida = buscarTarea(busqueda.get('task') ?? '')
+  /* La tarea puede ser un registro creado acá con New: no está entre las de ejemplo, pero sí en su tabla. */
+  const tareaPedida = buscarTarea(busqueda.get('task') ?? '') ?? registroDe(busqueda.get('task') ?? undefined)
   const patient = PATIENTS.find((p) => p.id === id) ?? PATIENTS[0]
   /* Overwiev no es una pestaña más: es el estado inicial y el botón de la
      barra vuelve acá desde cualquier examen o registro. */
@@ -116,7 +117,7 @@ export default function ClinicalMode() {
     : pestana === 'Vitals'
       ? <ExamLayout findings={false}><VitalsPanel /></ExamLayout>
       : registroDePestana
-        ? <RegistrosPanel key={registroDePestana} kind={registroDePestana} paciente={`${patient.first} ${patient.last}`} tarea={tareaPedida?.kind === registroDePestana ? tareaPedida : undefined} />
+        ? <RegistrosPanel key={registroDePestana} kind={registroDePestana} paciente={PATIENTS.some((p) => p.id === id) ? `${patient.first} ${patient.last}` : undefined} pacienteId={id} tarea={tareaPedida?.kind === registroDePestana ? tareaPedida : undefined} />
         : pestana === 'Radiographic'
           ? <RadiographyPanel />
           : pestana === 'Treatment plan'
