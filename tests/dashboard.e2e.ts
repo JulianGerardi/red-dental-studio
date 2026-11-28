@@ -108,7 +108,8 @@ test('Tocar una sala despliega su día sin filtrar la Waiting room', async ({ ap
   await salas.getByRole('button', /^Operatory 1/).tap()
   await expect(screen.getByRole('list', 'Operatory 1 today')).toBeVisible()
   await expect(screen.getByText('Complete')).toBeVisible()
-  await expect(screen.getByRole('button', /^Check out/)).toHaveCount(2)
+  /* Seis filas a la vista en la Waiting room (dashboard.md, 2026-11-27): tres llevan Check out. */
+  await expect(screen.getByRole('button', /^Check out/)).toHaveCount(3)
 
   await salas.getByRole('button', /^Operatory 1/).tap()
   await expect(screen.getByRole('list', 'Operatory 1 today')).toHaveCount(0)

@@ -30,6 +30,7 @@ const aFecha = (s: string) => { const f = new Date(s); return s && !Number.isNaN
 const decimal = (v: string) => v.replace(/[^\d.]/g, '').replace(/(\..*)\./g, '$1').slice(0, 8)
 const entero = (v: string) => v.replace(/\D/g, '').slice(0, 4)
 /* CON-2230: el vencimiento es posterior a hoy y no pasa el límite normativo (6 meses): de mañana a seis meses. */
+const hoyDia = () => { const d = new Date(); return new Date(d.getFullYear(), d.getMonth(), d.getDate()) }
 const manana = () => { const d = new Date(); return new Date(d.getFullYear(), d.getMonth(), d.getDate() + 1) }
 const limite = () => { const d = new Date(); return new Date(d.getFullYear(), d.getMonth() + 6, d.getDate()) }
 
@@ -58,9 +59,10 @@ export function PrescriptionDetail({ registro, nuevo, onVolver, onAccion }: {
   const errores = intento ? erroresDe(m).errores : {}
   const falta = (k: keyof Medicacion) => errores[k]
   /* Una Pending vieja puede abrir con la fecha ya vencida: avisa al guardar (CON-2230). */
-  const errorVence = !intento ? undefined : !vence ? OBLIGATORIO : vence < manana() ? 'Date cannot be in the past' : vence > limite() ? 'Date cannot be more than 6 months from today.' : undefined
+  const errorVence = !intento ? undefined : !vence ? OBLIGATORIO : vence < hoyDia() ? 'Date cannot be in the past' : vence < manana() ? 'The expiration date must be after today.' : vence > limite() ? 'Date cannot be more than 6 months from today.' : undefined
   const incompleto = intento && (!vence || medicaciones.some((x) => erroresDe(x).faltan))
-  const [reusar, setReusar] = useState(false)
+  /* La pregunta de CON-2846 y qué seguía después: guardar (Save) o activar (Activate desde el ⋮). */
+  const [reusar, setReusar] = useState<null | { t?: PendingTask; a?: AccionUI }>(null)
   const yaActivas = medicaciones.filter((x) => x.actualizar && MEDICACION_ACTIVA.includes(x.nombre))
 
   const agregar = () => { const nueva = medicacionVacia(); setMedicaciones((l) => [...l, nueva]); setActual(String(nueva.id)) }
@@ -76,14 +78,42 @@ export function PrescriptionDetail({ registro, nuevo, onVolver, onAccion }: {
     aviso.ok(`The prescription has been successfully ${nuevo ? 'created' : 'updated'}.`)
     onVolver()
   }
-  const guardar = () => {
+  /* Reuse existing medication: la receta usa la medicación que el paciente ya tiene activa, así que no vuelve a pedir
+     sumarla (Update patient medications queda sin tildar) y la pregunta no se repite. Después sigue lo que se estaba
+     haciendo: guardar o activar (clinical-mode.md, 2026-11-28). */
+  const reusarExistente = () => {
+    const sigue = reusar
+    const sinRepetir = medicaciones.map((x) => (yaActivas.includes(x) ? { ...x, actualizar: false } : x))
+    setMedicaciones(sinRepetir)
+    setReusar(null)
+    guardarRegistro({ ...registro, expiration: formatMDY(vence!), updated: hoy(), receta: { medicaciones: sinRepetir, indicaciones: indicaciones.trim() } })
+    if (sigue?.t && sigue.a) { onAccion(sigue.t, sigue.a); return }
+    aviso.ok(`The prescription has been successfully ${nuevo ? 'created' : 'updated'}.`)
+    onVolver()
+  }
+  const vale = () => {
     setIntento(true)
     const conErrores = medicaciones.find((x) => Object.keys(erroresDe(x).errores).length)
     if (conErrores) setActual(String(conErrores.id))
-    if (!vence || vence < manana() || vence > limite() || conErrores) return
+    return !(!vence || vence < manana() || vence > limite() || conErrores)
+  }
+  const guardar = () => {
+    if (!vale()) return
     /* CON-2846: una medicación con Update patient medications que el paciente ya tiene activa pregunta antes. */
-    if (yaActivas.length) { setReusar(true); return }
+    if (yaActivas.length) { setReusar({}); return }
     confirmar()
+  }
+  /* Activate deja la receta sin edición: si hay cambios sin guardar, antes se validan y se guardan, así sale con lo que
+     se ve en pantalla. Sin cambios, pasa como desde la tabla. */
+  const foto = JSON.stringify([vence?.getTime(), medicaciones, indicaciones])
+  const [original] = useState(foto)
+  const accion = (t: PendingTask, a: AccionUI) => {
+    if (a === 'Activate' && editable && foto !== original) {
+      if (!vale()) return
+      if (yaActivas.length) { setReusar({ t, a }); return }
+      guardarRegistro({ ...registro, expiration: formatMDY(vence!), updated: hoy(), receta: { medicaciones, indicaciones: indicaciones.trim() } })
+    }
+    onAccion(t, a)
   }
 
   const rotulo = (x: Medicacion, i: number) => nombreMedicacion(x) || `Medication ${i + 1}`
@@ -110,7 +140,7 @@ export function PrescriptionDetail({ registro, nuevo, onVolver, onAccion }: {
         )}
         acciones={!nuevo && (registro.pdf || accionesDe(registro).some((x) => x !== 'Edit')) && <>
           {registro.pdf && <Button variant="secondary" onClick={() => onAccion(registro, 'PDF')}><FileText /> PDF</Button>}
-          <MenuTarea task={registro} abierto onAccion={onAccion} sin={['Edit']} />
+          <MenuTarea task={registro} onAccion={accion} sin={['Edit']} />
         </>}
       />
 
@@ -191,7 +221,7 @@ export function PrescriptionDetail({ registro, nuevo, onVolver, onAccion }: {
       {reusar && (
         <ConfirmDialog
           title="Medication already active" confirmLabel="Confirm" cancelLabel="Cancel" icon="warning"
-          onCancel={() => setReusar(false)} onConfirm={() => { setReusar(false); confirmar() }}
+          onCancel={() => setReusar(null)} onConfirm={reusarExistente}
         >
           <p>This medication is already active for the patient. Do you want to reuse the existing medication?</p>
           <p className="mt-2 font-medium text-ink">{yaActivas.map(nombreMedicacion).join(', ')}</p>

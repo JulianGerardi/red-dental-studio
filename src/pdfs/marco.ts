@@ -111,7 +111,7 @@ function svgBoca(denticion: Denticion) {
 function bloque(b: Bloque): string {
   switch (b.tipo) {
     case 'campos': return campos(b.campos)
-    case 'texto': return `<p>${b.texto}</p>`
+    case 'texto': return `<p class="texto">${b.texto}</p>`
     case 'html': return `<div class="prosa">{{{${b.variable}}}}</div>`
     case 'nota': return `<p class="nota">${b.texto}</p>`
     case 'lista': return `${b.rotulo ? `<p class="rotulo">${esc(b.rotulo)}</p>` : ''}<ul class="lista">{{#${b.lista}}}<li>${b.valor}</li>{{/${b.lista}}}{{^${b.lista}}}<li>${esc(b.vacio)}</li>{{/${b.lista}}}</ul>`
@@ -157,6 +157,8 @@ p { margin: 0 0 4pt; }
 .ficha .quien { font-size: 9pt; font-weight: 600; color: ${COLOR.tinta}; }
 .ficha dt { display: inline; font-weight: 600; color: ${COLOR.tinta}; }
 .ficha dd { display: inline; margin: 0; overflow-wrap: anywhere; }
+/* El texto libre conserva sus saltos de línea (notas, trabajo pedido). */
+.texto { white-space: pre-line; }
 .tipo { margin: 18pt 0 2pt; font-size: 7.5pt; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: ${COLOR.marca}; }
 h1 { margin: 0; font-size: 15pt; line-height: 1.25; font-weight: 700; color: ${COLOR.tinta}; }
 section { margin-top: 18pt; }

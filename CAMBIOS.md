@@ -20,6 +20,25 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
   `direccion`). Anexos sólo con archivo (`has_file`); la firma va con la última sección. Regenerado `public/pdfs/`.
 - Detalle y anomalías en `modulos/clinical-mode.md` y `modulos/pdfs.md` (2026-11-28).
 
+### Pending Task sin encuentro, Waiting room alineada y arreglos del recorrido de Lab order, Prescription y Referral (CON-2641, CON-2643, CON-2214, CON-2212, CON-2321) ([#220](https://github.com/JulianGerardi/red-dental-studio/pull/220))
+- **El ⋮ de cada tarea funciona siempre**, en el Dashboard y en el Patient Dashboard, igual que en Clinical Mode desde
+  #219. Se van el estado apagado y el tooltip *…there is no open encounter for the selected patient*.
+- **Para el dev:** `ItemsTarea` y `MenuTarea` pierden `abierto`; `TaskRow` y `PendingTaskList`, `encuentroAbierto`; sale
+  `SIN_ENCUENTRO`. Es distinto de red.dev, que apaga esas opciones sin encuentro: si el backend mantiene la regla, hay
+  que mostrar su error. Detalle en `design-reference/figma/modulos/dashboard.md` (2026-11-27).
+- **Waiting room alineada con Appointments** (Dashboard): el rótulo de cada etapa sigue aparte pero más chico y del alto
+  de la separación entre cards (`WaitingRoomList`), que pasa a 16 px en las dos columnas (`ListGroup amplio`). Todas las
+  filas miden lo mismo (`AppointmentRow` reserva el alto del botón) y se ven seis cards en cada columna (`TOPE.espera`
+  5 → 6). Ya no queda hueco antes de "Show N more".
+- **Pending task en el celular** (Dashboard): las pestañas scrollean dentro de la card; antes *Referrals* quedaba cortada y sin alcance.
+- **Arreglos del recorrido de QA de Lab order, Prescription y Referral** (CON-2214, CON-2212, CON-2321): *Request* /
+  *Activate* desde la ficha guardan antes los cambios pendientes (y validan); el documento de un registro nuevo sale a
+  nombre del paciente correcto y con los procedimientos vinculados (`.texto` de `pdfs/marco` conserva saltos de línea);
+  lo creado con New entra a Pending task del paciente (`registros.creadosDe`); los errores se van al corregir el campo.
+  Activate con la medicación ya activa sigue después de *Reuse*; New provider valida mail, ZIP y teléfono y sus datos
+  llegan al PDF (`ProveedorDerivacion` suma `telefono`, `email`, `direccion`). Detalle en `modulos/clinical-mode.md`
+  (2026-11-28).
+
 ### Contadores: todos con el globo azul de la campana ([#224](https://github.com/JulianGerardi/red-dental-studio/pull/224))
 - **Un solo contador, `Globo`** (`components/dashboard/primitives`): círculo azul con número blanco, el de la campana.
   Lo usan *Appointments*, *Waiting room*, *Rooms* y cada sala (Dashboard), *Today appointments* y *Recent patients*
@@ -39,6 +58,7 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 - **Versión Scheduled:** ese aviso sólo aparece si se cambia la fecha (sin cambios repetía el de arriba), y dice *as soon as
   you save* en vez de *publish*.
 - *Create new version* sigue en el aviso de la versión activa (`action` de `ui/alert`) y suma el ícono `Plus`.
+
 ### End Encounter: sin rótulo y Edit / historial dentro del mismo drawer (CON-4157, CON-4156) ([#221](https://github.com/JulianGerardi/red-dental-studio/pull/221))
 - **`EndEncounterDrawer`** es un solo `Drawer` con tres vistas: la lista, *Edit procedure* y *Execution history*. Edit y
   el historial reemplazan el contenido (título, pestañas, contenido y pie) en vez de abrir otro drawer encima. *Cancel* /

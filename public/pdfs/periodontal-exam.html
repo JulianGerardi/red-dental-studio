@@ -22,6 +22,8 @@ p { margin: 0 0 4pt; }
 .ficha .quien { font-size: 9pt; font-weight: 600; color: #09090b; }
 .ficha dt { display: inline; font-weight: 600; color: #09090b; }
 .ficha dd { display: inline; margin: 0; overflow-wrap: anywhere; }
+/* El texto libre conserva sus saltos de línea (notas, trabajo pedido). */
+.texto { white-space: pre-line; }
 .tipo { margin: 18pt 0 2pt; font-size: 7.5pt; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: #1d56bc; }
 h1 { margin: 0; font-size: 15pt; line-height: 1.25; font-weight: 700; color: #09090b; }
 section { margin-top: 18pt; }
@@ -142,7 +144,7 @@ h2 + h3 { margin-top: 2pt; }
 <div class="cierre">
 <section>
 <h2>Notes</h2>
-<p>{{exam_notes}}{{^exam_notes}}No notes.{{/exam_notes}}</p>
+<p class="texto">{{exam_notes}}{{^exam_notes}}No notes.{{/exam_notes}}</p>
 </section>
 <div class="firmas"><div class="firma">
 <div class="trazo">{{#provider_signed_date}}{{#provider_signature_image}}<img src="{{provider_signature_image}}" alt="Signature of {{provider_name}}">{{/provider_signature_image}}{{^provider_signature_image}}<span class="escrita">{{provider_name}}</span>{{/provider_signature_image}}{{/provider_signed_date}}{{^provider_signed_date}}<span class="pendiente">Pending signature</span>{{/provider_signed_date}}</div>

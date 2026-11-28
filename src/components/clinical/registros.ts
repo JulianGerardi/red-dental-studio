@@ -166,6 +166,9 @@ export const registrosDe = (kind: TipoRegistro): Registro[] =>
 
 export const registroDe = (id: string | undefined) => TIPOS_REGISTRO.flatMap(registrosDe).find((r) => r.id === id)
 
+/** Los creados con New para un paciente: entran a su Pending Task (Patient Dashboard) mientras sigan pendientes. */
+export const creadosDe = (patientId: string): Registro[] => registros.filter((r) => r.id.startsWith('nuevo-') && r.patientId === patientId)
+
 /** Crea o reemplaza un registro (New y Save de la ficha). */
 export function guardarRegistro(r: Registro) {
   registros = registros.some((x) => x.id === r.id) ? registros.map((x) => (x.id === r.id ? r : x)) : [r, ...registros]
@@ -255,7 +258,13 @@ export function hojaDeRegistro(t: PendingTask): string | undefined {
     const permanentes = r.lab.dientes.filter((d) => /^\d+$/.test(d))
     propios = {
       lab_order_id: uuidDe(r.id), expiration_date: fechaLarga(r.expiration), lab_name: r.lab.laboratorio, lab_phone: lab?.telefono ?? '-', lab_email: lab?.email ?? '-', lab_address: lab?.direccion ?? '-',
-      work_request: [r.lab.asap ? 'ASAP.' : '', r.lab.trabajo].filter(Boolean).join(' '), special_instructions: r.lab.indicaciones.trim(),
+      /* Un renglón por dato: ASAP, el trabajo y los procedimientos vinculados (clinical-mode.md, 2026-11-27); las
+         indicaciones van en su sección, como red.dev (pdfs.md, 2026-11-28). */
+      work_request: [
+        r.lab.asap ? 'ASAP.' : '', r.lab.trabajo,
+        ...procedimientosDe(r.lab.procedimientos, PROCEDIMIENTOS_LAB).map((x, i) => `${i ? '' : 'Procedures:\n'}${x.codigo} · ${x.nombre}${zona(x) !== '-' ? ` (${zona(x)})` : ''}`),
+      ].filter(Boolean).join('\n'),
+      special_instructions: r.lab.indicaciones.trim(),
       /* La dentición que tiene dientes marcados; con dientes de las dos, Mixed dibuja las dos arcadas. */
       dentition: permanentes.length && permanentes.length < r.lab.dientes.length ? 'Mixed' : permanentes.length || !r.lab.dientes.length ? 'Permanent' : 'Primary',
       has_teeth: r.lab.dientes.length > 0,

@@ -106,10 +106,11 @@ const CONFIG: Record<TipoRegistro, {
 
 type Vista = { modo: 'lista' } | { modo: 'ficha'; id: string } | { modo: 'nuevo'; borrador: Registro }
 
-export function RegistrosPanel({ kind, paciente, tarea, maximo }: {
+export function RegistrosPanel({ kind, paciente, pacienteId, tarea, maximo }: {
   kind: TipoRegistro
   /** El paciente de Clinical Mode: a su nombre quedan los registros nuevos (y su PDF). */
   paciente?: string
+  pacienteId?: string
   /** La tarea de Pending Task que abrió Complete this task: entra directo a su ficha (CON-2643). */
   tarea?: PendingTask
   /** Cuántos registros mostrar como mucho (Storybook). */
@@ -138,14 +139,15 @@ export function RegistrosPanel({ kind, paciente, tarea, maximo }: {
   if (abierto) {
     return (
       <>
-        <c.Ficha key={abierto.id} registro={abierto} onVolver={aLista} onAccion={hacer} />
+        {/* Otro estado, otra ficha: lo que no se guardó antes de Cancel o Delete no queda a la vista como si estuviera. */}
+        <c.Ficha key={`${abierto.id}-${abierto.state}`} registro={abierto} onVolver={aLista} onAccion={hacer} />
         {acciones.dialogo}
       </>
     )
   }
 
   /* En Clinical Mode nada de esto pide un encuentro abierto: ni New, ni editar, ni las acciones (Julián, 2026-11-27). */
-  const nuevo = <Button size="md" onClick={() => setVista({ modo: 'nuevo', borrador: nuevoRegistro(kind, tarea ? { person: tarea.person, initials: tarea.initials, patientId: tarea.patientId } : paciente ? { person: paciente, initials: paciente.split(/\s+/).map((x) => x[0]).join('').slice(0, 2).toUpperCase() } : undefined) })}><Plus /> New {c.nombre}</Button>
+  const nuevo = <Button size="md" onClick={() => setVista({ modo: 'nuevo', borrador: nuevoRegistro(kind, tarea ? { person: tarea.person, initials: tarea.initials, patientId: tarea.patientId } : paciente ? { person: paciente, patientId: pacienteId, initials: paciente.split(/\s+/).map((x) => x[0]).join('').slice(0, 2).toUpperCase() } : undefined) })}><Plus /> New {c.nombre}</Button>
   const visibles = registros.filter((r) =>
     (!estados.length || estados.includes(r.state))
     && (!proveedores.length || proveedores.includes(r.provider ?? ''))
@@ -198,7 +200,7 @@ export function RegistrosPanel({ kind, paciente, tarea, maximo }: {
         rowActions={(r) => (
           <>
             <DropdownMenuLabel className="text-[12px] font-semibold text-ink">Options</DropdownMenuLabel>
-            <ItemsTarea task={r} abierto onAccion={hacer} editarApagado sin={c.tachoEnFila ? ['Delete'] : []} />
+            <ItemsTarea task={r} onAccion={hacer} editarApagado sin={c.tachoEnFila ? ['Delete'] : []} />
           </>
         )}
         pageSize={10}

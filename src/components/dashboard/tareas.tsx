@@ -21,8 +21,6 @@ import { hojaDeRegistro } from '@/components/clinical/registros'
 export type AccionTarea = 'Edit' | 'Request' | 'Activate' | 'Deliver' | 'Delay' | 'Finish' | 'Expire' | 'Reject' | 'Cancel' | 'Delete'
 export type AccionUI = AccionTarea | 'Complete' | 'PDF'
 
-export const SIN_ENCUENTRO = 'You do not have permission to perform this action because there is no open encounter for the selected patient.'
-
 const SINGULAR: Record<string, string> = { 'Clinical note': 'Clinical note', 'Lab orders': 'Lab order', Prescriptions: 'Prescription', Referrals: 'Referral' }
 export const nombreTarea = (t: PendingTask) => SINGULAR[t.kind] ?? t.kind
 
@@ -206,14 +204,11 @@ export function useAccionesTarea({ paciente, alAbrir }: { paciente?: string; alA
 }
 
 /* Las acciones de un registro según su estado, como ítems de menú: las usan el ⋮ de Pending Task, el de la ficha y el
-   de las tablas de Clinical Mode. En Pending Task, sin un encuentro abierto con el paciente se ven apagadas y cada una
-   explica por qué en un tooltip, que también abre con el foco del teclado (por eso no van `disabled`: Radix les quita el
-   puntero y el foco); la ficha y las tablas de Clinical Mode las pasan siempre activas (clinical-mode.md, 2026-11-27).
-   `editarApagado` (las tablas de Clinical Mode): fuera de Pending, *Edit* sigue primero pero apagado y dice por qué,
-   como red.dev; un estado final muestra sólo ese *Edit* (clinical-mode.md, 2026-11-28). */
-type PropsMenu = { task: PendingTask; abierto: boolean; onAccion: (t: PendingTask, a: AccionUI) => void; sin?: AccionTarea[]; editarApagado?: boolean }
+   de las tablas de Clinical Mode. Ninguna pide un encuentro abierto (dashboard.md, 2026-11-27). `editarApagado` (las
+   tablas de Clinical Mode): fuera de Pending, *Edit* sigue primero pero apagado y dice por qué (clinical-mode.md, 2026-11-28). */
+type PropsMenu = { task: PendingTask; onAccion: (t: PendingTask, a: AccionUI) => void; sin?: AccionTarea[]; editarApagado?: boolean }
 
-export function ItemsTarea({ task, abierto, onAccion, sin = [], editarApagado }: PropsMenu) {
+export function ItemsTarea({ task, onAccion, sin = [], editarApagado }: PropsMenu) {
   const item = (a: AccionTarea, motivo?: string) => {
     const Icono = ICONO[a]
     const opcion = (
@@ -238,19 +233,19 @@ export function ItemsTarea({ task, abierto, onAccion, sin = [], editarApagado }:
   return (
     <TooltipProvider delayDuration={100}>
       {editApagado && item('Edit', `This ${nombreTarea(task).toLowerCase()} can only be edited while Pending.`)}
-      {acciones.map((a) => item(a, abierto ? undefined : SIN_ENCUENTRO))}
+      {acciones.map((a) => item(a))}
     </TooltipProvider>
   )
 }
 
 /** El ⋮ de la tarea, como red.dev: *Options* y las acciones de su estado. Un estado final no tiene menú, salvo con
  *  `editarApagado`. */
-export function MenuTarea({ task, abierto, onAccion, sin = [], editarApagado }: PropsMenu) {
+export function MenuTarea({ task, onAccion, sin = [], editarApagado }: PropsMenu) {
   if (!accionesDe(task).some((a) => !sin.includes(a)) && !(editarApagado && !sin.includes('Edit'))) return null
   return (
     <RowActionsMenu label={`${nombreTarea(task)} for ${task.person}`}>
       <DropdownMenuLabel className="text-[12px] font-semibold text-ink">Options</DropdownMenuLabel>
-      <ItemsTarea task={task} abierto={abierto} onAccion={onAccion} sin={sin} editarApagado={editarApagado} />
+      <ItemsTarea task={task} onAccion={onAccion} sin={sin} editarApagado={editarApagado} />
     </RowActionsMenu>
   )
 }
