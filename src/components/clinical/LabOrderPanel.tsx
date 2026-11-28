@@ -6,7 +6,7 @@ import { RegistrosPanel } from './RegistrosPanel'
 /* El tono de cada estado de una orden vinculada (RecordDetail). */
 export const ORDEN_TONO: Record<EstadoOrden, PillTone> = {
   Requested: 'purple', Pending: 'warning', Delayed: 'warning',
-  Delivered: 'success', Canceled: 'danger', Rejected: 'danger',
+  Delivered: 'success', Cancelled: 'danger', Rejected: 'danger',
 }
 
 /** La pestaña Lab order: el panel compartido con Prescription y Referral (RegistrosPanel). `ordenes` sólo limita cuántas

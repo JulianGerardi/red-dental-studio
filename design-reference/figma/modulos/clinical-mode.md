@@ -4469,3 +4469,28 @@ historia nueva: son correcciones sobre CON-2214, CON-2212 y CON-2321 (y CON-2584
   Smith y no del primero de la lista.
 - Pendientes (baja): el foco se pierde después de borrar con el tacho de la fila; el tacho y el PDF apagados explican el
   motivo sólo con `title` (no por teclado); `ui/date-nav` conserva `vacio` / `onClear` sin uso.
+
+## CON-2214 · CON-2212 · CON-2321 · Lo que faltaba para coincidir con red.dev (2026-11-28, segunda pasada)
+
+Julián pidió navegar red.dev y que el flujo coincida "perfectamente". Se recorrió en sólo lectura (sin crear, cambiar ni
+borrar nada): las tres tablas con su *Filter* y el ⋮ por estado, *New* de cada una con *Save* vacío, la ficha de una
+Pending y de una cerrada, el tacho de Referral y Pending Task del Dashboard. Casi todo ya coincidía después de la sección
+anterior; esto es lo que quedaba:
+
+1. **Teeth & surface arranca con el dibujo a la vista**, en *Permanent*, sin los botones *Initialize permanent / primary
+   dentition*: red.dev ya no los tiene. Vincular un procedimiento con un diente temporario pasa a *Primary*.
+2. **La lista de dientes temporarios se llama *Pediatric***, como en red.dev (las pestañas siguen *Permanent* / *Primary*,
+   también como red.dev).
+3. **Prescription muestra la pestaña desde la primera medicación** (*Medication 1*), como red.dev; el tacho para quitar
+   una aparece desde la segunda.
+4. **El estado *Cancelled*** se escribe como en red.dev y en el resto de la app (Scheduling). Los textos de las preguntas y
+   los avisos no cambian ("…mark this lab order as Canceled?", "…marked as Canceled."): son los de red.dev.
+
+**Distinto de red.dev a propósito** (ya decidido, se deja igual):
+- *Pending Task* no pide encuentro abierto (red.dev apaga el ⋮ con el tooltip *…no open encounter…*; Julián, 2026-11-27).
+- *Delete* de una Prescription Pending: red.dev no lo ofrece, CON-2356 sí; queda el tacho de la fila.
+- *Save* vacío en Referral muestra el aviso *Uncompleted fields* (red.dev sólo pinta los campos), igual que Lab order y
+  Prescription; y debajo de cada campo, *This field is required.* (red.dev sólo lo pinta de rojo).
+- Pending Task de red.dev lista también Lab orders *Cancelled* y *Rejected*; acá sólo las pendientes (CON-2641, CON-2643).
+- El pie de la tabla dice *results* en las tres (red.dev dice *lab orders* en Lab order): es el pie de todas las tablas.
+

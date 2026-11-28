@@ -72,13 +72,13 @@ const CONFIG: Record<TipoRegistro, {
   'Lab orders': {
     nombre: 'lab order', plural: 'lab orders', icono: FlaskConical, Ficha: LabOrderDetail,
     grupoExtra: { titulo: 'Laboratory', de: (r) => r.lab?.laboratorio ?? '' },
-    estados: ['Pending', 'Requested', 'Delayed', 'Delivered', 'Rejected', 'Canceled'],
+    estados: ['Pending', 'Requested', 'Delayed', 'Delivered', 'Rejected', 'Cancelled'],
     columnas: [proveedor('Provider'), { key: 'laboratorio', header: 'Laboratory', cell: (r) => <TextCell>{r.lab?.laboratorio || '—'}</TextCell> }, columnaEstado, ...columnasFecha()],
     rotulo: (r) => `lab order for ${r.lab?.laboratorio || r.person}, ${r.state}, created ${r.register}`,
   },
   Prescriptions: {
     nombre: 'prescription', plural: 'prescriptions', icono: IconoPastilla, Ficha: PrescriptionDetail, tachoEnFila: true,
-    estados: ['Pending', 'Active', 'Expired', 'Canceled'],
+    estados: ['Pending', 'Active', 'Expired', 'Cancelled'],
     columnas: [
       proveedor('Provider'),
       { key: 'medicacion', header: 'Medication', cell: (r) => <MedicacionesCelda r={r} /> },
@@ -88,7 +88,7 @@ const CONFIG: Record<TipoRegistro, {
   },
   Referrals: {
     nombre: 'referral', plural: 'referrals', icono: ArrowRightLeft, Ficha: ReferralDetail, tachoEnFila: true,
-    estados: ['Pending', 'Requested', 'Completed', 'Rejected', 'Canceled'],
+    estados: ['Pending', 'Requested', 'Completed', 'Rejected', 'Cancelled'],
     columnas: [
       proveedor('Referring provider'),
       { key: 'derivado', header: 'Referred provider', cell: (r) => (

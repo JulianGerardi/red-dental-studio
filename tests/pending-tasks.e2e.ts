@@ -146,7 +146,7 @@ test('Una Referral Pending se edita, valida y se pide desde su ⋮', async ({ ap
 test('Lab order: dentición mixta y Toggle all por diente', async ({ app, screen }) => {
   await app.open('/patients/john-smith/clinical-mode?tab=Lab%20order')
   await screen.getByRole('button', /New lab order/).tap()
-  await screen.getByRole('button', 'Initialize permanent dentition').tap()
+  /* Arranca en Permanent con el dibujo a la vista, como red.dev (sin Initialize). */
   await screen.getByRole('button', 'Tooth 17').tap()
   await screen.getByRole('tab', 'Primary').tap()
   await screen.getByRole('button', 'Tooth I').tap()
