@@ -32,8 +32,8 @@ const LIMITE_TURNOS = 4
 const LIMITE_RECIENTES = 3
 const CANTIDAD_RECIENTES = 10
 
-/* Globo con el total -no el filtrado ni el visible- al lado del título del
-   panel, mismo color que el de notificaciones de la campana. Vive en dashboard/primitives: lo usa también el Dashboard. */
+/* El total -no el filtrado ni el visible- al lado del título del panel: el Globo de la campana. Vive en
+   dashboard/primitives (dashboard.md, 2026-11-28). */
 export { Globo }
 
 /* Figma 3638:59529 "Patients — List".
@@ -133,7 +133,7 @@ export default function Patients() {
             2026-10-10); el scroll va adentro de cada panel, en ShowMore. lg:h-[var(--alto-tabla)]: el alto de la
             tabla, medido arriba. */}
         <div className="flex w-full flex-col gap-4 lg:h-[var(--alto-tabla,auto)] lg:w-[336px] lg:shrink-0">
-          <Panel title={<>Today appointments <Globo n={TURNOS_PATIENTS.length} /></>} bodyClassName="gap-2 pt-0" className="shrink-0 [&>header]:min-h-10">
+          <Panel title={<>Today appointments <Globo n={TURNOS_PATIENTS.length} texto={['appointment today', 'appointments today']} /></>} bodyClassName="gap-2 pt-0" className="shrink-0 [&>header]:min-h-10">
             {buscador(buscarTurno, setBuscarTurno, "Search today's appointments")}
             {turnosFiltrados.length === 0 ? (
               <EmptyState
@@ -153,7 +153,7 @@ export default function Patients() {
               que no se niegue a achicarse por debajo de su contenido. min-h-[220px]: una tabla muy corta (la última
               página, con un solo paciente) deja a Today Appointments -shrink-0- de igual pidiendo más alto que toda la
               barra; sin este piso, Recent Patients quedaba en 0 y desaparecía entera. */}
-          <Panel title={<>Recent patients <Globo n={recientes.length} /></>} bodyClassName="gap-2 pt-0" className="min-h-[220px] flex-1 [&>header]:min-h-10">
+          <Panel title={<>Recent patients <Globo n={recientes.length} texto={['recent patient', 'recent patients']} /></>} bodyClassName="gap-2 pt-0" className="min-h-[220px] flex-1 [&>header]:min-h-10">
             {buscador(buscarReciente, setBuscarReciente, 'Search recent patients')}
             {recientesFiltrados.length === 0 ? (
               <EmptyState

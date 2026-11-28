@@ -635,3 +635,9 @@ las cards de la derecha (Today Appointments, Recent Patients) no cambian: van de
 
 Pie, alineación, fechas y avatar con las reglas comunes de todas las tablas: ver `design-reference/figma/README.md`
 (*Tablas estandarizadas v2*, 2026-11-24).
+
+## Contadores de los paneles (2026-11-28)
+
+*Today appointments* y *Recent patients* llevan el globo azul de la campana, con tooltip ("N appointments today", "N
+recent patients") y oculto en cero. Regla y fuentes en dashboard.md (*Contadores: un solo globo, el de la
+campana*).

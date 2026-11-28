@@ -25,6 +25,17 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 - **Dejar de usar:** `PatientSummaryPanel` de `clinical/panels.tsx` y `TREATMENT_HISTORY` de `data/mock` (borrados).
 - No se pudo entrar a red.dev (pide login): lo que falta confirmar está en *A validar* del `.md`.
 
+### Contadores: todos con el globo azul de la campana ([#224](https://github.com/JulianGerardi/red-dental-studio/pull/224))
+- **Un solo contador, `Globo`** (`components/dashboard/primitives`): círculo azul con número blanco, el de la campana.
+  Lo usan *Appointments*, *Waiting room*, *Rooms* y cada sala (Dashboard), *Today appointments* y *Recent patients*
+  (Patients) y las cuatro cards clínicas de la ficha.
+- **Props:** `n` y `texto: [singular, plural]` (tooltip y lector: "9 appointments to check in"); `invertido` sobre fondo
+  azul (card clínica abierta); `sinTooltip` dentro de un botón. En cero no se muestra; arriba de 99, "99+".
+- `OperatoryCard` deja su `<span>` propio y `PatientDetail` deja `ui/count`, que queda sólo en `FilaDetalle` y
+  `PermissionsPicker`.
+- Los títulos de los paneles cambian de nombre accesible (`Appointments 9 appointments to check in`): los e2e ya lo leen.
+- Decisión y fuentes en `modulos/dashboard.md` (2026-11-28).
+
 ## 2026-11-27
 
 ### Fee schedules: el aviso de la fecha va al lado del campo ([#222](https://github.com/JulianGerardi/red-dental-studio/pull/222))

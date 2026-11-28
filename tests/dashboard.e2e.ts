@@ -29,7 +29,7 @@ test('La fecha se lee "Feb 28, 2026"; elegir un día lo cambia y Today vuelve a 
    dashboard.md). Con ?day=busy quedan 12 turnos por llegar y 8 en la sala de espera. */
 test('Con muchos turnos cada columna lleva su total y Show more', async ({ app, screen }) => {
   await app.open('/?day=busy')
-  await expect(screen.getByRole('heading', 'Appointments 12')).toBeVisible()
+  await expect(screen.getByRole('heading', 'Appointments 12 appointments to check in')).toBeVisible()
   await expect(screen.getByRole('button', /^Check in/)).toHaveCount(6)
   await expect(screen.getByRole('button', /Show \d+ more/)).toHaveCount(3)
 
@@ -41,7 +41,7 @@ test('Con muchos turnos cada columna lleva su total y Show more', async ({ app, 
    (comparativa del 2026-11-19, CON-1670). */
 test('Check in pasa la cita a la Waiting room y Check out la saca', async ({ app, screen }) => {
   await app.open('/')
-  await expect(screen.getByRole('heading', 'Appointments 9')).toBeVisible()
+  await expect(screen.getByRole('heading', 'Appointments 9 appointments to check in')).toBeVisible()
   await expect(screen.getByText('Checked in · 1')).toBeVisible()
   await expect(screen.getByText('On hold · 2')).toBeVisible()
   await expect(screen.getByText('Ready to check out · 5')).toBeVisible()
@@ -49,12 +49,12 @@ test('Check in pasa la cita a la Waiting room y Check out la saca', async ({ app
   await expect(screen.getByText(/^Waiting · 12 min$/).first()).toBeVisible()
 
   await screen.getByRole('button', /^Check in/).first().tap()
-  await expect(screen.getByRole('heading', 'Appointments 8')).toBeVisible()
-  await expect(screen.getByRole('heading', 'Waiting room 9')).toBeVisible()
+  await expect(screen.getByRole('heading', 'Appointments 8 appointments to check in')).toBeVisible()
+  await expect(screen.getByRole('heading', 'Waiting room 9 patients in the waiting room')).toBeVisible()
   await expect(screen.getByText('Checked in · 2')).toBeVisible()
 
   await screen.getByRole('button', /^Check out/).first().tap()
-  await expect(screen.getByRole('heading', 'Waiting room 8')).toBeVisible()
+  await expect(screen.getByRole('heading', 'Waiting room 8 patients in the waiting room')).toBeVisible()
   await expect(screen.getByText('Ready to check out · 4')).toBeVisible()
 })
 
@@ -120,7 +120,7 @@ test('La Waiting room se filtra por Visit stage', async ({ app, screen }) => {
   await screen.getByRole('button', /Filter waiting room/).tap()
   await screen.getByRole('menuitemcheckbox', /Ready to check out/).tap()
   await screen.getByRole('menuitemcheckbox', /Ready to check out/).press('Escape')
-  await expect(screen.getByRole('heading', 'Waiting room 5')).toBeVisible()
+  await expect(screen.getByRole('heading', 'Waiting room 5 patients in the waiting room')).toBeVisible()
   await expect(screen.getByText('On hold · 2')).toHaveCount(0)
   await expect(screen.getByRole('button', /^Check out/)).toHaveCount(5)
 })
@@ -132,7 +132,7 @@ test('Appointments se filtra por Provider y Room combinados', async ({ app, scre
   await screen.getByRole('menuitemcheckbox', /Dr\. Elena Martinez/).tap()
   await screen.getByRole('menuitemcheckbox', /Operatory 2/).tap()
   await screen.getByRole('menuitemcheckbox', /Operatory 2/).press('Escape')
-  await expect(screen.getByRole('heading', 'Appointments 2')).toBeVisible()
+  await expect(screen.getByRole('heading', 'Appointments 2 appointments to check in')).toBeVisible()
   await expect(screen.getByRole('button', /^Check in/)).toHaveCount(2)
 })
 
@@ -147,13 +147,13 @@ test('Booked: No show sólo con la hora pasada y Cancel con motivo', async ({ ap
   await screen.getByText('Patient illness').tap()
   await screen.getByRole('button', 'Cancel appointment').tap()
   await expect(screen.getByText(/updated to Canceled/)).toBeVisible()
-  await expect(screen.getByRole('heading', 'Appointments 8')).toBeVisible()
+  await expect(screen.getByRole('heading', 'Appointments 8 appointments to check in')).toBeVisible()
 
   await screen.getByRole('button', 'Actions for Noah James').first().tap()
   await screen.getByRole('menuitem', /Mark as no-show/).tap()
   await screen.getByRole('button', 'Mark as no show').tap()
   await expect(screen.getByText('The appointment status has been updated to No show.')).toBeVisible()
-  await expect(screen.getByRole('heading', 'Appointments 7')).toBeVisible()
+  await expect(screen.getByRole('heading', 'Appointments 7 appointments to check in')).toBeVisible()
 })
 
 /* En la Waiting room el menú depende de la etapa: Cancel sólo en Checked in; On hold sólo deja cambiar la sala. */
@@ -206,5 +206,6 @@ test('Filtros sin resultados y menú de Booked sin Edit patient', async ({ app, 
   await screen.getByRole('menuitemcheckbox', /Operatory 1/).tap()
   await screen.getByRole('menuitemcheckbox', /Operatory 1/).press('Escape')
   await expect(screen.getByText('No results match your filters')).toBeVisible()
-  await expect(screen.getByRole('heading', 'Appointments 0')).toBeVisible()
+  // En cero el globo no se muestra (dashboard.md, 2026-11-28).
+  await expect(screen.getByRole('heading', 'Appointments', { exact: true })).toBeVisible()
 })

@@ -1,10 +1,9 @@
 import { Check, ChevronDown, User } from 'lucide-react'
-import { StatusPill } from './primitives'
+import { Globo, StatusPill } from './primitives'
 import type { Appointment } from './AppointmentCard'
 import { Avatar } from '@/components/ui/avatar'
 import { cn } from '@/lib/utils'
 import type { ResumenSala } from './dashboard-data'
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 
 /* No bookings: hoy no tiene turnos, no que esté fuera de servicio (eso es Unavailable). Ver dashboard.md, 2026-11-19. */
 export type OperatoryStatus = 'Available' | 'Busy' | 'No bookings' | 'Unavailable'
@@ -56,17 +55,8 @@ export function OperatoryCard({ room, turnos, resumen, abierta, onToggle, onSele
       <span className="flex items-center justify-between gap-2">
         <span className="flex min-w-0 items-center gap-2">
           <span className="text-dash-name truncate text-sm leading-none font-semibold">{room.name}</span>
-          {/* Cuenta turnos, no personas; el tooltip lo aclara (CON-4180). */}
-          <TooltipProvider delayDuration={150}>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <span className="bg-dash-count-bg text-dash-blue-hover shrink-0 rounded-full px-2 py-[3px] text-[11px] leading-none font-medium">
-                  {cuantos}<span className="sr-only"> {cuantos === 1 ? 'appointment' : 'appointments'} today</span>
-                </span>
-              </TooltipTrigger>
-              <TooltipContent className="bg-tooltip text-white">{cuantos} {cuantos === 1 ? 'appointment' : 'appointments'} today</TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
+          {/* Cuenta turnos, no personas; el tooltip lo aclara (CON-4180; dashboard.md, 2026-11-28). */}
+          <Globo n={cuantos} texto={['appointment today', 'appointments today']} />
         </span>
         <span className="flex shrink-0 items-center gap-1.5">
           <StatusPill tone={TONE[status]}>{status}</StatusPill>

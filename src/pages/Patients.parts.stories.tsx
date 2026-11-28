@@ -6,4 +6,4 @@ const meta = { title: 'Pages/Parts/Patients', parameters: { docs: { jira: ['CON-
 export default meta
 type Story = StoryObj<typeof meta>
 
-export const CountBubble: Story = { render: () => <div className="flex gap-2"><Globo n={3} /><Globo n={12} /></div> }
+export const CountBubble: Story = { render: () => <div className="flex gap-2"><Globo n={3} texto={['appointment today', 'appointments today']} /><Globo n={12} texto={['appointment today', 'appointments today']} /></div> }
