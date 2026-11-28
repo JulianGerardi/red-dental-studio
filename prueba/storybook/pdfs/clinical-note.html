@@ -14,18 +14,18 @@ html { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
 body { margin: 0; font-family: Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 9pt; line-height: 1.55; color: #3f3f46; }
 p { margin: 0 0 4pt; }
 .membrete { display: flex; justify-content: space-between; align-items: flex-start; gap: 16pt; padding-bottom: 11pt; border-bottom: 1.5pt solid #09090b; }
-.clinica { display: flex; flex: 1; min-width: 0; align-items: center; gap: 9pt; }
+.clinica { display: flex; align-items: center; gap: 9pt; }
 .iniciales { display: grid; place-items: center; overflow: hidden; width: 30pt; height: 30pt; border-radius: 6pt; background: #1d56bc; color: #fff; font-weight: 700; font-size: 10.5pt; flex: none; }
 .datos b { display: block; font-size: 11pt; color: #09090b; }
-.datos span { display: block; font-size: 8pt; line-height: 1.45; color: #71717a; }
-.ficha { flex: none; margin: 0; max-width: 62%; text-align: right; font-size: 8pt; line-height: 1.55; color: #3f3f46; }
-.ficha .quien { font-size: 9pt; font-weight: 600; color: #09090b; }
-.ficha dt { display: inline; font-weight: 600; color: #09090b; }
-.ficha dd { display: inline; margin: 0; overflow-wrap: anywhere; }
-/* El texto libre conserva sus saltos de línea (notas, trabajo pedido). */
-.texto { white-space: pre-line; }
+.datos span, .meta { display: block; font-size: 8pt; line-height: 1.45; color: #71717a; }
+.meta { text-align: right; white-space: nowrap; }
+.meta b { display: block; color: #09090b; font-weight: 600; }
 .tipo { margin: 18pt 0 2pt; font-size: 7.5pt; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: #1d56bc; }
 h1 { margin: 0; font-size: 15pt; line-height: 1.25; font-weight: 700; color: #09090b; }
+.resumen { display: grid; grid-template-columns: repeat(3, 1fr); margin-top: 13pt; border: .75pt solid #e7e7e7; border-radius: 4pt; overflow: hidden; }
+.resumen div { padding: 6pt 8pt; border-right: .75pt solid #e7e7e7; border-bottom: .75pt solid #e7e7e7; margin: 0 -.75pt -.75pt 0; min-width: 0; }
+.resumen dt { font-size: 6.5pt; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: #71717a; }
+.resumen dd { margin: 1pt 0 0; font-weight: 500; color: #09090b; overflow-wrap: anywhere; }
 section { margin-top: 18pt; }
 h2 { margin: 0 0 5pt; font-size: 10.5pt; font-weight: 700; color: #1d56bc; break-after: avoid; }
 .aviso { margin: 8pt 0 0; font-size: 8pt; color: #71717a; }
@@ -84,19 +84,18 @@ h2 + h3 { margin-top: 2pt; }
 .imagenes figcaption { display: flex; flex-direction: column; margin-top: 3pt; font-size: 8pt; }
 .imagenes figcaption b { color: #09090b; font-weight: 600; }
 .imagenes figcaption span { color: #71717a; }
-.casillas { list-style: none; margin: 0 0 4pt; padding: 0; break-inside: avoid; }
-/* La firma no viaja sola a otra página: va con la última sección (pdfs.md, 2026-11-28). */
-.cierre { break-inside: avoid; }
+.casillas { list-style: none; margin: 0 0 4pt; padding: 0; }
 .casillas li { display: flex; gap: 6pt; margin-bottom: 3pt; }
 .casilla { display: grid; place-items: center; flex: none; width: 9pt; height: 9pt; margin-top: 2pt; border: .75pt solid #71717a; border-radius: 2pt; }
 .casilla.marcada { background: #1d56bc; border-color: #1d56bc; }
 .boca { display: flex; gap: 16pt; align-items: flex-start; break-inside: avoid; }
-.dibujo { flex: none; display: flex; gap: 10pt; }
-.dibujo svg { display: block; width: 150pt; height: auto; overflow: visible; }
+.dibujo { flex: none; padding: 4pt; border-radius: 8pt; background: #f4f4f5; }
+.dibujo svg { display: block; width: 128pt; height: auto; }
 .boca[data-dentition="Permanent"] svg[data-d="Primary"], .boca[data-dentition="Primary"] svg[data-d="Permanent"] { display: none; }
-/* El dibujo usa los tokens de la app; acá van en hex porque la plantilla vive fuera de ella. */
-.dibujo svg { --color-encia: #f8d5d1; --color-ink-faint: #a1a1aa; --color-ink-muted: #71717a; --color-line-strong: #d4d4d8; --color-surface: #fff; --color-surface-muted: #f4f4f5; font-family: Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif; }
-.boca .pieza { fill: none; }
+.boca .pieza { fill: #fff; stroke: #a1a1aa; stroke-width: .8; }
+.boca .arcada { font-size: 8.5px; fill: #71717a; }
+.boca .num { font-size: 6.5px; fill: #71717a; }
+.boca svg[data-d="Primary"] .num { font-size: 8px; }
 .firmas { display: grid; grid-template-columns: 1fr 1fr; gap: 24pt; margin-top: 30pt; break-inside: avoid; }
 .firma { display: flex; flex-direction: column; gap: 1pt; font-size: 8pt; }
 .trazo { display: flex; align-items: flex-end; height: 40pt; padding-bottom: 3pt; margin-bottom: 3pt; border-bottom: .75pt solid #09090b; }
@@ -120,17 +119,12 @@ h2 + h3 { margin-top: 2pt; }
 <main class="hoja">
 <header class="membrete">
 <div class="clinica"><span class="iniciales">{{practice_initials}}</span><div class="datos"><b>{{practice_name}}</b><span>{{location_name}} · {{location_address}}</span><span>{{practice_phone}} · {{practice_email}}</span></div></div>
-<dl class="ficha"><div class="quien">{{provider_name}}</div>{{#patient_birth_date}}<div><dt>Date of birth:</dt> <dd>{{patient_birth_date}}</dd></div>{{/patient_birth_date}}{{#visit_date}}<div><dt>Date of visit:</dt> <dd>{{visit_date}} — {{visit_time}}</dd></div>{{/visit_date}}{{#patient_phone}}<div><dt>Contact:</dt> <dd>{{patient_phone}}</dd></div>{{/patient_phone}}</dl>
+<p class="meta"><b>Date of visit</b>{{visit_date}}</p>
 </header>
 <p class="tipo">Dental clinical note</p>
 <h1>{{patient_name}}</h1>
 {{#auto_generated}}<p class="aviso">Generated automatically when the encounter closed after 48 hours without activity. Workflow narratives are not included.</p>{{/auto_generated}}
-{{#has_vitals}}<section>
-<h2>Vital Signs</h2>
-<p>Patient vitals were taken:</p>
-<ul class="lista">{{#height_in}}<li>Height {{height_in}} in, Weight {{weight_lb}} pounds; BMI {{bmi}}.</li>{{/height_in}}{{#blood_pressure}}<li>Blood pressure: {{blood_pressure}} mmHg.</li>{{/blood_pressure}}{{#heart_rate}}<li>Heart rate: {{heart_rate}} bpm.</li>{{/heart_rate}}{{#respiratory_rate}}<li>Respiratory rate: {{respiratory_rate}} rpm.</li>{{/respiratory_rate}}{{#temperature}}<li>Temperature: {{temperature}} °F.</li>{{/temperature}}{{#oxygen_saturation}}<li>Oxygen saturation: {{oxygen_saturation}} %.</li>{{/oxygen_saturation}}</ul>
-{{#out_of_range_values}}<p><b>Out of range values:</b> {{out_of_range_values}}.</p>{{/out_of_range_values}}{{#vitals_notes}}<p><b>Notes:</b> {{vitals_notes}}</p>{{/vitals_notes}}
-</section>{{/has_vitals}}
+<dl class="resumen"><div><dt>Patient name</dt><dd>{{patient_name}}</dd></div><div><dt>Date of birth</dt><dd>{{patient_birth_date}}</dd></div><div><dt>Date of visit</dt><dd>{{visit_date}} — {{visit_time}}</dd></div><div><dt>Attending dentist</dt><dd>{{provider_name}}</dd></div><div><dt>Contact</dt><dd>{{patient_phone}}</dd></div></dl>
 <section>
 <h2>Medical History</h2>
 <p class="rotulo">Past medical conditions:{{^past_medical_conditions}} <span>Patient reports no known medical conditions.</span>{{/past_medical_conditions}}</p>
@@ -139,12 +133,28 @@ h2 + h3 { margin-top: 2pt; }
 <p class="rotulo">Known allergies:</p><ul class="lista">{{#known_allergies}}<li>Allergy to {{allergen}} ({{start_date}}).{{#notes}} {{notes}}{{/notes}}<ul class="lista">{{#reactions}}<li>{{category}} – {{symptom}}</li>{{/reactions}}{{#severity}}<li>Severity: {{severity}}</li>{{/severity}}</ul></li>{{/known_allergies}}{{^known_allergies}}<li>No known allergies reported.</li>{{/known_allergies}}</ul>
 <p class="rotulo">Past surgeries and/or hospitalizations:</p><ul class="lista">{{#past_surgeries}}<li>{{name}} ({{date}}).</li>{{/past_surgeries}}{{^past_surgeries}}<li>No past surgeries or hospitalizations reported.</li>{{/past_surgeries}}</ul>
 {{#encounter_questionnaires}}<div class="narrativa"><p class="narrativa-titulo">{{name}}</p><p>{{narrative}}</p></div>{{/encounter_questionnaires}}
-{{#has_history_questionnaires}}<h3>Patient History</h3>{{/has_history_questionnaires}}
-{{#history_questionnaires}}<div class="narrativa"><p class="narrativa-titulo">{{name}}<span>Completed on {{completed_at}}</span></p><p>{{narrative}}</p></div>{{/history_questionnaires}}
+{{#has_history_questionnaires}}<h3>Patient History</h3>{{#history_questionnaires}}<div class="narrativa"><p class="narrativa-titulo">{{name}}<span>Completed on {{completed_at}}</span></p><p>{{narrative}}</p></div>{{/history_questionnaires}}{{/has_history_questionnaires}}
 </section>
 {{#has_exams}}<section>
 <h2>Exams</h2>
-{{#exams}}<div class="bloque"><p class="bloque-titulo">{{exam_name}} ({{exam_date}}):</p><ul class="lista">{{#findings}}<li>{{finding}} on {{location}}{{#details}} [details: ({{details}})]{{/details}}.{{#note}} ({{note}}){{/note}}</li>{{/findings}}</ul></div>{{/exams}}
+{{#has_ros}}<h3>Review of Systems (ROS)</h3>
+<p>The review of systems was performed to evaluate the presence or absence of symptoms across major body systems.</p>
+<table class="tabla"><thead><tr><th style="width:30%">System</th><th style="width:35%">Negative</th><th>Positive</th></tr></thead><tbody>{{#ros}}<tr><td>{{system}}</td><td>{{negative}}</td><td>{{positive}}</td></tr>{{/ros}}</tbody></table>{{/has_ros}}
+{{#has_vitals}}<h3>Vital Signs</h3>
+<p>Patient vitals were taken:</p>
+<table class="tabla"><thead><tr><th style="width:50%">Measurement</th><th>Value</th></tr></thead><tbody>{{#vitals}}<tr><td>{{measurement}}</td><td>{{value}}</td></tr>{{/vitals}}</tbody></table>
+{{#out_of_range_values}}<p><b>Out of range values:</b> {{out_of_range_values}}.</p>{{/out_of_range_values}}{{#vitals_notes}}<p><b>Notes:</b> {{vitals_notes}}</p>{{/vitals_notes}}{{/has_vitals}}
+{{#has_physical}}<h3>Physical Examination</h3>
+<p>A physical examination was performed to assess the patient’s overall health status.</p>
+{{#physical}}<p class="rotulo">{{area}}:</p><p>{{#positive}}Positive for <b>{{term}}</b>{{/positive}}{{^positive}}Negative for {{term}}{{/positive}}{{#note}} ({{note}}){{/note}}.</p>{{/physical}}{{/has_physical}}
+{{#has_extraoral}}<h3>Extraoral Examination</h3>
+<p>The extraoral examination revealed:</p>
+<ul class="lista">{{#extraoral_findings}}<li>{{finding}} on <b>{{location}}</b>{{#details}} ({{details}}){{/details}}.</li>{{/extraoral_findings}}</ul>
+<p>All other extraoral structures appeared normal.</p>{{/has_extraoral}}
+{{#has_intraoral}}<h3>Intraoral Examination</h3>
+<p>The intraoral examination identified:</p>
+<ul class="lista">{{#intraoral_findings}}<li>{{finding}} on <b>{{location}}</b>{{#details}} ({{details}}){{/details}}.</li>{{/intraoral_findings}}</ul>
+<p>All other intraoral structures appeared normal.</p>{{/has_intraoral}}
 {{#dental_assessment}}<div class="bloque"><p class="bloque-titulo">Dental Assessment ({{dental_assessment_date}}):</p>{{#dental_assessment_no_findings}}<p>The dental assessment showed no significant findings; dentition appears healthy.</p>{{/dental_assessment_no_findings}}<ul class="lista">{{#dental_assessment_findings}}<li>{{finding}} on {{location}}{{#details}} [details: ({{details}})]{{/details}}.{{#note}} ({{note}}){{/note}}</li>{{/dental_assessment_findings}}</ul>{{#dental_assessment_reviewed}}<p>Dental assessment reviewed: stable with no changes from last exam; prior findings unchanged.{{#dental_assessment_review_note}} Note: {{dental_assessment_review_note}}{{/dental_assessment_review_note}}</p>{{/dental_assessment_reviewed}}</div>{{/dental_assessment}}
 {{#radiographic_exams}}<div class="bloque"><p class="bloque-titulo">Radiographic Examination ({{exam_date}}):</p>{{#no_findings}}<p>The radiographic examination indicated no abnormalities; all structures are within normal limits.</p>{{/no_findings}}{{#has_findings}}<p>The radiographic examination revealed:</p><ul class="lista">{{#findings}}<li>{{finding}} on {{location}}{{#details}} [details: ({{details}})]{{/details}}.{{#note}} ({{note}}){{/note}}</li>{{/findings}}</ul>{{/has_findings}}{{#reviewed}}<p>Radiographic findings reviewed: stable and unchanged from prior radiographs; no new issues.{{#review_note}} Note: {{review_note}}{{/review_note}}</p>{{/reviewed}}</div>{{/radiographic_exams}}
 {{#periodontal_exams}}<div class="bloque"><p class="bloque-titulo">Periodontal Examination ({{exam_date}}):</p>{{#reviewed}}<p>Periodontal chart reviewed: no changes since prior charting; status stable.</p>{{/reviewed}}{{#new_charting}}<p>A new periodontal charting was performed, with the following clinically significant findings documented individually for each tooth and respective surfaces.</p>
@@ -172,18 +182,18 @@ h2 + h3 { margin-top: 2pt; }
 {{#workflows}}<div class="narrativa"><p class="narrativa-titulo">{{workflow_name}}</p><p>{{narrative}}</p></div>{{/workflows}}
 </section>{{/has_workflows}}
 {{#has_prescriptions}}<section>
-<h2>Prescriptions</h2>
-{{#prescriptions}}<div class="tarjeta"><p class="tarjeta-titulo">Prescription · {{status}}</p><dl class="campos"><div><dt>Medications:</dt> <dd>{{#medications}}<span class="linea">{{drug_brand}} ({{drug}}) {{strength}} {{strength_unit}} {{dosage_form}}: {{dose}} {{dose_unit}}, {{frequency}}, for {{duration_number}} {{duration_unit}}</span>{{/medications}}</dd></div><div><dt>Indications:</dt> <dd>{{indications}}</dd></div></dl>{{#document_sent}}<p><b>Documents sent:</b> Yes</p>{{/document_sent}}</div>{{/prescriptions}}
+<h2>Prescription</h2>
+<p>The following medication(s) was prescribed to the patient:</p>
+{{#prescriptions}}<div class="tarjeta">{{#medications}}<div class="bloque"><p><b>{{drug}}</b> {{strength}}.</p><p>Take {{dose}} {{frequency}} for {{duration}}.</p><p>Dosage form: {{dosage_form}}.</p></div>{{/medications}}{{#indications}}<p>Indications: {{indications}}</p>{{/indications}}<p>Documents sent: {{documents_sent}}</p></div>{{/prescriptions}}
 </section>{{/has_prescriptions}}
 {{#has_lab_orders}}<section>
-<h2>Lab Orders</h2>
-{{#lab_orders}}<div class="tarjeta"><p class="tarjeta-titulo">{{laboratory}} · {{status}}</p><dl class="campos"><div><dt>Work requested:</dt> <dd>{{work_requested}}</dd></div><div><dt>Procedures:</dt> <dd>{{#lab_treatments}}<span class="linea">{{cdt_code}} {{description}} · {{anatomic_area}} · {{treatment_plan}}</span>{{/lab_treatments}}</dd></div><div><dt>Special instructions:</dt> <dd>{{special_instructions}}</dd></div><div><dt>ASAP:</dt> <dd>{{asap}}</dd></div><div><dt>Mandatory to continue treatment:</dt> <dd>{{mandatory_to_continue_treatment}}</dd></div><div><dt>Expiration date:</dt> <dd>{{expiration_date}}</dd></div></dl>{{#document_sent}}<p><b>Documents sent:</b> Yes</p>{{/document_sent}}</div>{{/lab_orders}}
+<h2>Lab Order</h2>
+{{#lab_orders}}<div class="tarjeta"><p>Lab order sent to {{laboratory}}.</p><p>Lab work requested: {{work_requested}}</p>{{#case}}<p><b>Case:</b> {{case}}</p>{{/case}}<ul class="lista">{{#lab_treatments}}<li>{{description}}{{#tooth}} — #{{tooth}}{{/tooth}}.</li>{{/lab_treatments}}</ul>{{#special_instructions}}<p>Special instructions: {{special_instructions}}</p>{{/special_instructions}}<p>Documents sent: {{documents_sent}}</p><p>Expected return: {{expected_return}}</p></div>{{/lab_orders}}
 </section>{{/has_lab_orders}}
 {{#has_referrals}}<section>
-<h2>Referrals</h2>
-{{#referrals}}<div class="tarjeta"><p class="tarjeta-titulo">{{referral}} · {{specialties}} · {{status}}</p><dl class="campos"><div><dt>Procedures:</dt> <dd>{{#referral_procedures}}<span class="linea">{{cdt_code}} {{description}} · {{anatomic_area}}</span>{{/referral_procedures}}</dd></div><div><dt>Notes:</dt> <dd>{{notes}}</dd></div></dl>{{#document_sent}}<p><b>Documents sent:</b> Yes</p>{{/document_sent}}</div>{{/referrals}}
+<h2>Referral</h2>
+{{#referrals}}<div class="tarjeta"><p>Referral sent to {{referral}}{{#specialties}} ({{specialties}}){{/specialties}}.</p><ul class="lista">{{#referral_procedures}}<li>{{description}}{{#tooth}} — #{{tooth}}{{/tooth}}.</li>{{/referral_procedures}}</ul>{{#notes}}<p>Notes: {{notes}}</p>{{/notes}}<p>Documents sent: {{documents_sent}}</p></div>{{/referrals}}
 </section>{{/has_referrals}}
-<div class="cierre">
 {{#clinical_notes_html}}<section>
 <h2>Additional Notes</h2>
 <div class="prosa">{{{clinical_notes_html}}}</div>
@@ -192,9 +202,7 @@ h2 + h3 { margin-top: 2pt; }
 <div class="trazo">{{#provider_signed_date}}{{#provider_signature_image}}<img src="{{provider_signature_image}}" alt="Signature of {{provider_name}}">{{/provider_signature_image}}{{^provider_signature_image}}<span class="escrita">{{provider_name}}</span>{{/provider_signature_image}}{{/provider_signed_date}}{{^provider_signed_date}}<span class="pendiente">Pending signature</span>{{/provider_signed_date}}</div>
 <b>{{provider_name}} · Provider</b>
 <span>{{#provider_signed_date}}Signed electronically · {{provider_signed_date}}{{/provider_signed_date}}{{^provider_signed_date}}Not signed yet{{/provider_signed_date}}</span>
-{{#provider_signature_hash}}<span class="hash">Content hash: {{provider_signature_hash}}</span>{{/provider_signature_hash}}
 </div></div>
-</div>
 {{#has_addenda}}<section>
 <h2>Addenda</h2>
 <p class="nota">Added after the note was signed. They do not change the signed note.</p>
