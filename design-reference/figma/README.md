@@ -779,6 +779,11 @@ mismo diseño. Se va `settings/HojaConsentimientoPdf` (el formato de cards de re
 **Para backend:** el PDF real lo genera el servidor; el formato de referencia es este (`pdfDeDocumento` lo muestra en
 una página A4 con Helvetica).
 
+**2026-11-28 (Patient Summary, clinical-mode.md):** `ui/document-html` (`DocumentHtml`) muestra dentro del visor la hoja
+HTML de una plantilla de `src/pdfs`, la misma que abre *View PDF*: lo que se lee es lo que se imprime. La usa la Clinical
+note de Patient Summary; un documento que ya tiene plantilla puede mostrarse así en lugar de rearmarse con
+`DocumentSheet`.
+
 
 ## Regla: el tacho va en rojo, con un solo formato (2026-11-27)
 

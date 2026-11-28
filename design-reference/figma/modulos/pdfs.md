@@ -46,7 +46,7 @@ página aparte con cada documento, su link, datos de ejemplo o variables y la pl
 
 | Documento | Diseño | Jira |
 | --- | --- | --- |
-| Clinical note | Como la app (`documentoTarea`) | CON-2641, CON-2643, CON-4115 |
+| Clinical note | Contenido de red.dev (2026-11-28) | CON-2641, CON-2643, CON-2731, CON-4115 |
 | Periodontal exam | Propuesta | CON-1122, CON-1418, CON-1428, CON-4115 |
 | Radiographic exam | Propuesta | CON-1649, CON-1657, CON-1658, CON-4115 |
 | Lab order | Como la app (PDF de red.dev) | CON-2215, CON-2220, CON-2643, CON-4115 |
@@ -204,6 +204,24 @@ siguen saliendo de la especificación.
   sobre todo exámenes, órdenes y workflows.
 - Con odontólogos: si el BRAINS fijo del Consent Summary alcanza o esperan el detalle de cada plan.
 - Con recepción: si el paciente entiende *Adjustment* o conviene "Insurance discount".
+
+## 2026-11-28 · Clinical note con el contenido de red.dev (CON-2731, CON-2975)
+
+De las dos notas de red.dev que pasó Julián para Patient Summary (detalle en `clinical-mode.md`, tercera vuelta). Mismo
+diseño de hoja; cambia el contenido:
+
+- **Exams** agrupa *Review of Systems (ROS)* (tabla), *Vital Signs* (tabla, antes lista y sección propia), *Physical
+  Examination*, *Extraoral* e *Intraoral Examination* con los textos de red.dev, más Dental Assessment, Radiographic y
+  Periodontal de CON-2975.
+- **Prescription**, **Lab Order** y **Referral** en singular y con el texto de red.dev (*Lab order sent to …*, *Expected
+  return*, *Documents sent: Yes/No*).
+- Sin hash en la firma; sin Treatment Plan, Operative Report ni Workflows en el ejemplo (siguen en la plantilla,
+  apagados, con sus campos). *Patient History* queda dentro de su condición.
+- Variables nuevas: `has_ros` y `ros` (system, negative, positive); `vitals` (measurement, value); `has_physical` y
+  `physical` (area, positive, term, note); `has_extraoral` / `extraoral_findings` y `has_intraoral` /
+  `intraoral_findings` (finding, location, details); en las órdenes, `documents_sent`, `case`, `expected_return` y
+  `tooth`. Se van `exams`, `height_in`, `weight_lb` y compañía.
+- `origen` pasa a *Same as the app*: el contenido es el de red.dev.
 
 ## 2026-11-28 · Encabezado como red.dev, Lab order completa y Referral (CON-2220, CON-2584, CON-2287, CON-2616)
 

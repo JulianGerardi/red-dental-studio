@@ -3,9 +3,9 @@
     "id": "clinical-note",
     "category": "Clinical records",
     "name": "Clinical note",
-    "generated": "Generate Clinical Note in Clinical Mode (as many times as needed until it is signed), or on its own when the encounter closes after 48 hours. View PDF in Pending tasks, Treatment history and patient documents.",
-    "signed_by": "Only the provider: name, date and time, and the content hash. Addenda are signed by their author.",
-    "layout": "proposal, pending approval",
+    "generated": "Generate Clinical Note in Clinical Mode (as many times as needed until it is signed), or on its own when the encounter closes after 48 hours. View PDF in Patient Summary (the eye of each encounter), Pending tasks and patient documents; Download in Patient Summary.",
+    "signed_by": "Only the provider: name and date. Addenda are signed by their author.",
+    "layout": "same as the app",
     "template": "clinical-note.html",
     "sample_pdf": "clinical-note.pdf",
     "variables": [
@@ -22,19 +22,15 @@
       "visit_time",
       "patient_phone",
       "auto_generated",
-      "has_vitals",
-      "height_in",
-      "weight_lb",
-      "bmi",
-      "blood_pressure",
-      "heart_rate",
-      "respiratory_rate",
-      "temperature",
-      "oxygen_saturation",
-      "out_of_range_values",
-      "vitals_notes",
       "has_history_questionnaires",
       "has_exams",
+      "has_ros",
+      "has_vitals",
+      "out_of_range_values",
+      "vitals_notes",
+      "has_physical",
+      "has_extraoral",
+      "has_intraoral",
       "dental_assessment",
       "dental_assessment_date",
       "dental_assessment_no_findings",
@@ -52,7 +48,6 @@
       "clinical_notes_html",
       "provider_signed_date",
       "provider_signature_image",
-      "provider_signature_hash",
       "has_addenda"
     ],
     "lists": {
@@ -94,15 +89,30 @@
         "completed_at",
         "narrative"
       ],
-      "exams": [
-        "exam_name",
-        "exam_date"
+      "ros": [
+        "system",
+        "negative",
+        "positive"
       ],
-      "exams.findings": [
+      "vitals": [
+        "measurement",
+        "value"
+      ],
+      "physical": [
+        "area",
+        "positive",
+        "term",
+        "note"
+      ],
+      "extraoral_findings": [
         "finding",
         "location",
-        "details",
-        "note"
+        "details"
+      ],
+      "intraoral_findings": [
+        "finding",
+        "location",
+        "details"
       ],
       "dental_assessment_findings": [
         "finding",
@@ -114,48 +124,32 @@
         "exam_date",
         "no_findings",
         "has_findings",
-        "reviewed",
-        "review_note"
-      ],
-      "radiographic_exams.findings": [
+        "findings",
         "finding",
         "location",
         "details",
-        "note"
+        "note",
+        "reviewed",
+        "review_note"
       ],
       "periodontal_exams": [
         "exam_date",
         "reviewed",
         "new_charting",
         "has_probing_depths",
+        "probing_depths",
+        "tooth",
+        "surface",
+        "value",
         "has_gingival_margin",
         "has_recession",
+        "recession",
         "has_overgrowth",
+        "overgrowth",
         "has_bleeding",
-        "has_suppuration"
-      ],
-      "periodontal_exams.probing_depths": [
-        "tooth",
-        "surface",
-        "value"
-      ],
-      "periodontal_exams.recession": [
-        "tooth",
-        "surface",
-        "value"
-      ],
-      "periodontal_exams.overgrowth": [
-        "tooth",
-        "surface",
-        "value"
-      ],
-      "periodontal_exams.bleeding": [
-        "tooth",
-        "surface"
-      ],
-      "periodontal_exams.suppuration": [
-        "tooth",
-        "surface"
+        "bleeding",
+        "has_suppuration",
+        "suppuration"
       ],
       "treatment_cases": [
         "name",
@@ -188,49 +182,38 @@
         "narrative"
       ],
       "prescriptions": [
-        "status",
         "indications",
-        "document_sent"
+        "documents_sent"
       ],
       "prescriptions.medications": [
-        "drug_brand",
         "drug",
         "strength",
-        "strength_unit",
-        "dosage_form",
         "dose",
-        "dose_unit",
         "frequency",
-        "duration_number",
-        "duration_unit"
+        "duration",
+        "dosage_form"
       ],
       "lab_orders": [
         "laboratory",
-        "status",
         "work_requested",
+        "case",
         "special_instructions",
-        "asap",
-        "mandatory_to_continue_treatment",
-        "expiration_date",
-        "document_sent"
+        "documents_sent",
+        "expected_return"
       ],
       "lab_orders.lab_treatments": [
-        "cdt_code",
         "description",
-        "anatomic_area",
-        "treatment_plan"
+        "tooth"
       ],
       "referrals": [
         "referral",
         "specialties",
-        "status",
         "notes",
-        "document_sent"
+        "documents_sent"
       ],
       "referrals.referral_procedures": [
-        "cdt_code",
         "description",
-        "anatomic_area"
+        "tooth"
       ],
       "addenda": [
         "author",
@@ -253,186 +236,161 @@
       "patient_birth_date": "January 28, 1999 (27 yrs)",
       "patient_phone": "(555) 234-5678",
       "provider_name": "Elena Martinez",
-      "visit_date": "November 25, 2026",
-      "visit_time": "09:00 AM to 09:45 AM",
+      "visit_date": "August 20, 2026",
+      "visit_time": "02:34 PM to 03:20 PM",
       "auto_generated": false,
-      "has_vitals": true,
-      "height_in": "68",
-      "weight_lb": "187",
-      "bmi": "28.4",
-      "blood_pressure": "145/92",
-      "heart_rate": "74",
-      "respiratory_rate": "16",
-      "temperature": "98.4",
-      "oxygen_saturation": "98",
-      "out_of_range_values": "Blood pressure",
-      "vitals_notes": "Taken seated, before local anesthesia.",
       "past_medical_conditions": [
         {
-          "name": "Hypertension",
-          "status": "Active",
-          "start_date": "03/15/2019",
-          "notes": "Controlled with medication."
+          "name": "Diabetes mellitus type 1",
+          "status": "Chronic",
+          "start_date": "06/02/2026",
+          "notes": "Controlled with insulin."
         }
       ],
       "current_medications": [
         {
-          "name": "Lisinopril",
-          "dose": "10",
+          "name": "Clonazepam",
+          "dose": "2",
           "unit": "mg",
-          "frequency": "once daily",
-          "status": "Active",
-          "start_date": "03/15/2019",
-          "notes": "The patient has to take it for life."
+          "frequency": "as needed",
+          "status": "Suspended",
+          "start_date": "06/02/2026",
+          "notes": ""
+        },
+        {
+          "name": "Ibuprofen",
+          "dose": "400",
+          "unit": "mg",
+          "frequency": "as needed",
+          "status": "Suspended",
+          "start_date": "07/02/2026",
+          "notes": ""
         }
       ],
       "known_allergies": [
         {
-          "allergen": "latex",
-          "start_date": "01/01/2015",
-          "notes": "Use nitrile gloves.",
+          "allergen": "sulfa drugs",
+          "start_date": "05/11/2026",
+          "notes": "",
           "reactions": [
             {
-              "category": "Dermatological",
-              "symptom": "Skin rash"
+              "category": "Anaphylactic",
+              "symptom": "Difficulty Breathing"
             }
           ],
-          "severity": "Mild"
+          "severity": "Moderate"
+        },
+        {
+          "allergen": "lidocaine",
+          "start_date": "06/02/2026",
+          "notes": "",
+          "reactions": [
+            {
+              "category": "Anaphylactic",
+              "symptom": "Difficulty Breathing"
+            },
+            {
+              "category": "Anaphylactic",
+              "symptom": "Dizziness or Fainting"
+            }
+          ],
+          "severity": "Moderate"
         }
       ],
       "past_surgeries": [
         {
-          "name": "Appendectomy",
-          "date": "06/10/2012"
+          "name": "Hip replacement",
+          "date": "12/01/2025"
         }
       ],
-      "encounter_questionnaires": [
-        {
-          "name": "Chief Complaint",
-          "narrative": "Patient reports throbbing pain in the lower left back tooth for five days, worse when chewing and with cold drinks."
-        },
-        {
-          "name": "Triage",
-          "narrative": "Pain severity: 7/10. No facial swelling reported. Patient denies fever or difficulty swallowing."
-        }
-      ],
-      "has_history_questionnaires": true,
+      "encounter_questionnaires": [],
+      "has_history_questionnaires": false,
       "history_questionnaires": [
         {
           "name": "Family History",
-          "completed_at": "November 20, 2026 at 10:15 AM",
-          "narrative": "Patient reports a family history of diabetes in mother and hypertension in father."
-        },
-        {
-          "name": "Oral History",
-          "completed_at": "November 20, 2026 at 10:12 AM",
-          "narrative": "Patient reports occasional gum bleeding during brushing and sensitivity to cold. Last dental visit two years ago."
-        },
-        {
-          "name": "Social History",
-          "completed_at": "November 20, 2026 at 10:16 AM",
-          "narrative": "Patient reports no tobacco use and occasional alcohol consumption."
+          "completed_at": "August 20, 2026 at 2:30 PM",
+          "narrative": "Patient reports a family history of diabetes."
         }
       ],
       "has_exams": true,
-      "exams": [
+      "has_ros": true,
+      "ros": [
         {
-          "exam_name": "Intraoral Examination",
-          "exam_date": "11/25/2026",
-          "findings": [
-            {
-              "finding": "Gingival inflammation",
-              "location": "Left Mandibular Gingiva",
-              "details": "Severity: Mild; Bleeding: Yes",
-              "note": ""
-            }
-          ]
+          "system": "General",
+          "negative": "-",
+          "positive": "Abnormal weight gain (since the last visit)"
         }
       ],
-      "dental_assessment": true,
-      "dental_assessment_date": "11/25/2026",
+      "has_vitals": true,
+      "vitals": [
+        {
+          "measurement": "Height",
+          "value": "68 in"
+        },
+        {
+          "measurement": "Weight",
+          "value": "187 lbs"
+        },
+        {
+          "measurement": "BMI",
+          "value": "28.4"
+        }
+      ],
+      "out_of_range_values": "",
+      "vitals_notes": "",
+      "has_physical": true,
+      "physical": [
+        {
+          "area": "General Appearance",
+          "positive": true,
+          "term": "generally unwell",
+          "note": "tired, poor sleep"
+        },
+        {
+          "area": "Neck",
+          "positive": false,
+          "term": "tenderness of neck",
+          "note": ""
+        }
+      ],
+      "has_extraoral": true,
+      "extraoral_findings": [
+        {
+          "finding": "Atrophy (morphologic abnormality)",
+          "location": "Left Eye",
+          "details": "quantity: solitary; symmetry: unilateral; size: small (e.g., 0.5 cm); shape: round; borders: well demarcated"
+        },
+        {
+          "finding": "Abscess (morphologic abnormality)",
+          "location": "Right Temple Area",
+          "details": "symmetry: bilateral"
+        }
+      ],
+      "has_intraoral": true,
+      "intraoral_findings": [
+        {
+          "finding": "Abscess (morphologic abnormality)",
+          "location": "Soft Palate",
+          "details": "size: large (e.g., >2 cm)"
+        }
+      ],
+      "dental_assessment": false,
+      "dental_assessment_date": "08/20/2026",
       "dental_assessment_no_findings": false,
+      "dental_assessment_reviewed": false,
+      "dental_assessment_review_note": "",
       "dental_assessment_findings": [
         {
           "finding": "Deep caries",
           "location": "#19/O, D",
           "details": "Extent: Deep",
-          "note": "Caries close to the pulp."
+          "note": ""
         }
       ],
-      "dental_assessment_reviewed": false,
-      "dental_assessment_review_note": "",
-      "radiographic_exams": [
-        {
-          "exam_date": "11/25/2026",
-          "no_findings": false,
-          "has_findings": true,
-          "reviewed": false,
-          "review_note": "",
-          "findings": [
-            {
-              "finding": "Periapical radiolucency",
-              "location": "#19",
-              "details": "Size: 3 mm; Root: Mesial",
-              "note": "Consistent with chronic apical periodontitis."
-            }
-          ]
-        },
-        {
-          "exam_date": "05/12/2026",
-          "no_findings": false,
-          "has_findings": false,
-          "reviewed": true,
-          "review_note": "Compared with today’s periapical image.",
-          "findings": []
-        }
-      ],
-      "periodontal_exams": [
-        {
-          "exam_date": "11/25/2026",
-          "reviewed": false,
-          "new_charting": true,
-          "has_probing_depths": true,
-          "probing_depths": [
-            {
-              "tooth": "18",
-              "surface": "DB",
-              "value": "5"
-            },
-            {
-              "tooth": "19",
-              "surface": "B",
-              "value": "6"
-            }
-          ],
-          "has_gingival_margin": true,
-          "has_recession": true,
-          "recession": [
-            {
-              "tooth": "19",
-              "surface": "L",
-              "value": "2"
-            }
-          ],
-          "has_overgrowth": false,
-          "overgrowth": [],
-          "has_bleeding": true,
-          "bleeding": [
-            {
-              "tooth": "19",
-              "surface": "B"
-            },
-            {
-              "tooth": "19",
-              "surface": "DB"
-            }
-          ],
-          "has_suppuration": false,
-          "suppuration": []
-        }
-      ],
-      "has_treatment_plan": true,
-      "has_treatment_cases": true,
+      "radiographic_exams": [],
+      "periodontal_exams": [],
+      "has_treatment_plan": false,
+      "has_treatment_cases": false,
       "treatment_cases": [
         {
           "name": "Restorative plan",
@@ -449,129 +407,49 @@
                   "code": "D3330",
                   "description": "Endodontic therapy, molar tooth",
                   "anatomic_area": "#19"
-                },
-                {
-                  "code": "D1110",
-                  "description": "Prophylaxis, adult",
-                  "anatomic_area": ""
-                }
-              ]
-            },
-            {
-              "visit_name": "Visit 2",
-              "visit_cost": "$1,250.00",
-              "procedures": [
-                {
-                  "code": "D2740",
-                  "description": "Crown, porcelain/ceramic",
-                  "anatomic_area": "#19"
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "name": "Extraction and implant",
-          "case_type": "Definitive / Rehabilitation",
-          "recommended": false,
-          "total": "$2,350.00",
-          "decision": "Declined",
-          "visits": [
-            {
-              "visit_name": "Visit 1",
-              "visit_cost": "$250.00",
-              "procedures": [
-                {
-                  "code": "D7140",
-                  "description": "Extraction, erupted tooth",
-                  "anatomic_area": "#19"
-                }
-              ]
-            },
-            {
-              "visit_name": "Visit 2",
-              "visit_cost": "$2,100.00",
-              "procedures": [
-                {
-                  "code": "D6010",
-                  "description": "Implant body, endosteal",
-                  "anatomic_area": "#19"
                 }
               ]
             }
           ]
         }
       ],
-      "consent_presented": true,
-      "has_accepted_consents": true,
+      "consent_presented": false,
+      "has_accepted_consents": false,
       "accepted_consents": [
         {
           "consent_name": "Informed Consent for Dental Treatment",
           "plan_name": "Restorative plan"
-        },
-        {
-          "consent_name": "Informed Refusal of Dental Treatment",
-          "plan_name": "Extraction and implant"
         }
       ],
-      "has_procedures": true,
+      "has_procedures": false,
       "procedures": [
         {
-          "code": "D0140",
-          "description": "Limited oral evaluation – problem focused",
-          "location": "",
-          "status": "completed"
-        },
-        {
-          "code": "D0220",
-          "description": "Intraoral – periapical first radiographic image",
-          "location": "#19",
-          "status": "completed"
-        },
-        {
-          "code": "D3221",
-          "description": "Pulpal debridement, primary and permanent teeth",
-          "location": "#19",
+          "code": "D2140",
+          "description": "Amalgam – one surface, primary or permanent",
+          "location": "#32",
           "status": "completed"
         }
       ],
-      "has_workflows": true,
+      "has_workflows": false,
       "workflows": [
         {
           "workflow_name": "Local anesthesia",
-          "narrative": "Inferior alveolar nerve block with 1.7 ml of 2% lidocaine with 1:100,000 epinephrine. Aspiration negative. Patient tolerated the procedure well."
+          "narrative": "Infiltration with 1.7 ml of 2% lidocaine."
         }
       ],
       "has_prescriptions": true,
       "prescriptions": [
         {
-          "status": "Active",
-          "indications": "Take after meals. Stop ibuprofen if stomach pain appears.",
-          "document_sent": false,
+          "documents_sent": "No",
+          "indications": "",
           "medications": [
             {
-              "drug_brand": "Amoxil",
-              "drug": "Amoxicillin",
-              "strength": "500",
-              "strength_unit": "mg",
-              "dosage_form": "capsule",
-              "dose": "1",
-              "dose_unit": "capsule",
-              "frequency": "every 8 hours",
-              "duration_number": "7",
-              "duration_unit": "days"
-            },
-            {
-              "drug_brand": "Advil",
-              "drug": "Ibuprofen",
-              "strength": "400",
-              "strength_unit": "mg",
-              "dosage_form": "tablet",
-              "dose": "1",
-              "dose_unit": "tablet",
-              "frequency": "every 6 hours",
-              "duration_number": "3",
-              "duration_unit": "days"
+              "drug": "Clonazepam",
+              "strength": "500 mg",
+              "dose": "1.0 applications",
+              "frequency": "as needed",
+              "duration": "7 days",
+              "dosage_form": "buccal tablet"
             }
           ]
         }
@@ -580,51 +458,44 @@
       "lab_orders": [
         {
           "laboratory": "Olivos Laboratory",
-          "status": "Requested",
-          "work_requested": "Zirconia crown, shade A2.",
-          "special_instructions": "Send the try-in before final glazing.",
-          "asap": "No",
-          "mandatory_to_continue_treatment": "Yes",
-          "expiration_date": "12/09/2026",
-          "document_sent": true,
+          "work_requested": "Amalgam restoration model.",
+          "case": "Restorative plan",
+          "special_instructions": "Send the try-in before final polishing.",
+          "documents_sent": "No",
+          "expected_return": "2026-09-30",
           "lab_treatments": [
             {
-              "cdt_code": "D2740",
-              "description": "Crown, porcelain/ceramic",
-              "anatomic_area": "19",
-              "treatment_plan": "Restorative plan"
+              "description": "Amalgam – one surface, primary or permanent",
+              "tooth": "32"
             }
           ]
         }
       ],
-      "has_referrals": true,
+      "has_referrals": false,
       "referrals": [
         {
           "referral": "Dr. Mark Bennett",
           "specialties": "Endodontics",
-          "status": "Sent",
-          "notes": "Please evaluate #19 for root canal treatment before we place the crown.",
-          "document_sent": true,
+          "notes": "Please evaluate #19.",
+          "documents_sent": "No",
           "referral_procedures": [
             {
-              "cdt_code": "D3330",
               "description": "Endodontic therapy, molar tooth",
-              "anatomic_area": "19"
+              "tooth": "19"
             }
           ]
         }
       ],
       "clinical_notes_html": "<p>Patient responsibilities were discussed including but not limited to daily care, use/misuse, regular maintenance appointments, and routine examination of underlying oral tissues.</p><p>The patient was discharged to return home in satisfactory condition.</p>",
-      "provider_signed_date": "November 25, 2026 at 10:02 AM",
+      "provider_signed_date": "August 20, 2026",
       "provider_signature_image": "",
-      "provider_signature_hash": "sha256:9f2c4e1a7b3d5e8f0a6c2b9d4e7f1a3c5b8d0e2f4a6c8b1d3e5f7a9c0b2d4e6f",
       "has_addenda": true,
       "addenda": [
         {
           "author": "Elena Martinez",
-          "created_at": "November 26, 2026 at 8:40 AM",
-          "text": "Patient called: pain went down to 2/10. Continue the antibiotic as prescribed.",
-          "signed_date": "November 26, 2026"
+          "created_at": "August 21, 2026 at 8:40 AM",
+          "text": "Patient called: the abscess drained and pain went down. Keep the follow-up visit.",
+          "signed_date": "August 21, 2026"
         }
       ]
     },
@@ -635,6 +506,8 @@
       "CON-3668",
       "CON-2727",
       "CON-2728",
+      "CON-2730",
+      "CON-2731",
       "CON-2816",
       "CON-2617",
       "CON-1619",
@@ -645,7 +518,6 @@
       "CON-2616",
       "CON-2620",
       "CON-2621",
-      "CON-2730",
       "CON-2937",
       "CON-2641",
       "CON-2643",

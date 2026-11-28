@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { Eye, EyeOff, FileText, PenLine } from 'lucide-react'
+import { CopyPlus, Eye, EyeOff, FileText, PenLine } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { aviso } from '@/components/ui/toaster'
 import { Button } from '@/components/ui/button'
@@ -85,25 +85,36 @@ export function VistaDocumento({ doc }: { doc: Documento }) {
   )
 }
 
-/* Login to Sign Document: el usuario y la contraseña otra vez, por seguridad. Sign se habilita con los dos. */
-function FirmarDialog({ onCancel, onFirmar }: { onCancel: () => void; onFirmar: () => void }) {
+/* Login to Sign Document: el usuario y la contraseña otra vez, por seguridad. Sign se habilita con los dos. Con
+   `addendum` es el Add Clinical Note Addendum de red.dev: el texto y el login en el mismo pop up, y Save addendum
+   (Patient Summary, clinical-mode.md 2026-11-28). */
+export function FirmarDialog({ onCancel, onFirmar, addendum }: { onCancel: () => void; onFirmar: (texto: string) => void; addendum?: boolean }) {
+  const [texto, setTexto] = useState('')
   const [email, setEmail] = useState('')
   const [clave, setClave] = useState('')
   const [ver, setVer] = useState(false)
+  const listo = !!email.trim() && !!clave && (!addendum || !!texto.trim())
   return (
     <Dialog open onOpenChange={(v) => !v && onCancel()}>
       <DialogContent className="gap-4 p-5 sm:max-w-[575px]">
         <DialogTitle className="flex items-center gap-2 text-base font-bold text-ink">
-          <span className="flex size-6 items-center justify-center rounded-md border border-line"><PenLine className="size-3.5" aria-hidden /></span>
-          Login to sign document
+          <span className="flex size-6 items-center justify-center rounded-md border border-line">{addendum ? <CopyPlus className="size-3.5" aria-hidden /> : <PenLine className="size-3.5" aria-hidden />}</span>
+          {addendum ? 'Add clinical note addendum' : 'Login to sign document'}
         </DialogTitle>
         <DialogDescription className="text-[13px] text-ink-soft">
-          For security and legal purposes, please re-enter your credentials to sign this document electronically.
+          {addendum ? 'Authentication required to sign this addendum' : 'For security and legal purposes, please re-enter your credentials to sign this document electronically.'}
         </DialogDescription>
         <form
           className="flex flex-col gap-4"
-          onSubmit={(e) => { e.preventDefault(); if (email.trim() && clave) onFirmar() }}
+          onSubmit={(e) => { e.preventDefault(); if (listo) onFirmar(texto.trim()) }}
         >
+          {addendum && (
+            <label className="flex flex-col gap-2 border-b border-line pb-4">
+              <FieldLabel>Addendum content</FieldLabel>
+              <textarea rows={5} placeholder="Type your addendum here..." value={texto} onChange={(e) => setTexto(e.target.value)} className={cn(control(), 'resize-none px-3 py-2')} />
+            </label>
+          )}
+          {addendum && <p className="-mb-1 text-[12px] text-ink-muted">Authentication required to sign this addendum</p>}
           <div className="grid gap-4 sm:grid-cols-2">
             <label className="flex flex-col gap-2">
               <FieldLabel>Email</FieldLabel>
@@ -120,8 +131,8 @@ function FirmarDialog({ onCancel, onFirmar }: { onCancel: () => void; onFirmar: 
             </label>
           </div>
           <div className="flex justify-end gap-2">
-            <Button type="button" variant="secondary" onClick={onCancel}>Cancel</Button>
-            <Button type="submit" disabled={!email.trim() || !clave}>Sign</Button>
+            {!addendum && <Button type="button" variant="secondary" onClick={onCancel}>Cancel</Button>}
+            <Button type="submit" disabled={!listo}>{addendum ? 'Save addendum' : 'Sign'}</Button>
           </div>
         </form>
       </DialogContent>

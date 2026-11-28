@@ -4182,6 +4182,225 @@ regla de `conPdf`, a confirmar si el documento de una receta vencida tiene que s
 una ficha abierta desde la página 2 deja la tabla en la 1; cambiar de pestaña con una ficha nueva cargada la descarta sin
 avisar; el contador 0/500 se oculta mientras el campo muestra un error (es así en toda la app).
 
+## CON-2731 · CON-2727 · CON-2728 · CON-2730 · Patient Summary: el flujo completo (2026-11-27)
+
+**Jira:** epic CON-2724 *Nota Clinica*. CON-2731 (la lista), CON-2728 y CON-2816 (la nota se genera al abrirla),
+CON-2937 (la que se genera sola a las 48 h), CON-2726 y CON-2727 (firma), CON-2730 (addendum), CON-3508 (quién ve y
+quién firma), CON-4158 (los textos *No clinical note* y *Access restricted*) y los bugs que fijan el comportamiento de la
+lista: CON-3016 (la pestaña se llama *Patient Summary*), CON-3773 (al volver se conserva la página), CON-3166 (el estado
+se actualiza sin recargar), CON-3023 (*Download started*), CON-3012 y CON-3539 (el tilde verde).
+
+Pedido de Julián: armar el flujo de `red.dev/…/clinical-mode/treatment-history` alineado a la app, sin piezas nuevas. La
+pestaña era el placeholder *Planned*. **red.dev pide login y no se pudo entrar desde la sesión**: la lista sale de la
+réplica que ya había en `clinical/panels.tsx` (hecha mirando red.dev), de sus rutas públicas
+(`/treatment-history` y `/treatment-history/:clinicalNoteId`) y de Jira; la nota y su PDF, de los videos del 2026-11-20
+(dashboard.md). Lo que no se pudo ver está en *A validar*.
+
+Código: `clinical/PatientSummaryPanel` (la tabla), `clinical/PatientSummaryNote` (lo que abre el ojo), `data/historial`
+(los encuentros de ejemplo, con las variables de la plantilla *Clinical note*), `lib/historial` (firmar, addendum y la
+hoja de cada encuentro) y `ui/document-html` (la hoja de una plantilla dentro del visor). Se borra la réplica de
+`panels.tsx` y `TREATMENT_HISTORY` de `data/mock`.
+
+### La lista
+
+- **Mismas columnas que red.dev**, con `ui/data-table`: *Date* (con *Latest* en el más nuevo y la zona horaria debajo),
+  *Status*, *Clinical note*, *Reason for appt*, *Provider*, *Procedures*, *Exams*, *Ref*, *Lab*, *Prescription* y
+  *Actions* (el ojo). Pie estándar: *Showing 1 to 10 of N results*, *Rows per page* y paginador; 10 por página.
+- **Pills con los tonos de la app:** el encuentro, con los de los turnos (Fulfilled verde, Cancelled rojo) más In
+  progress azul, On hold ámbar, Completed violeta y Discharged gris (`TONO_ENCUENTRO`); la nota, *Signed* verde y
+  *Unsigned* ámbar, como en el historial de un procedimiento (End Encounter). Sin nota, *No clinical note*; sin permiso,
+  el candado y *Access restricted* (CON-4158).
+- **Procedures:** el primer código en un chip y el resto detrás de "+N", que los despliega en la fila (`ChipMas`, como
+  las medicaciones de una receta). El nombre, el diente y el estado, al pasar el mouse. Chip gris: el celeste se pierde
+  sobre la fila elegida.
+- **Exams, Ref, Lab y Prescription:** tilde verde si en el encuentro hubo (CON-3012, CON-3539) y cruz roja si no, como
+  red.dev. Las reglas son las de los eventos del encuentro: un examen con hallazgos (CON-3668), una orden o derivación
+  que salió de Pending, una receta que pasó a Active (CON-2614 a CON-2616).
+- **Barra:** *Filter* (Status y Provider, CON-2731), la fecha y *Download*.
+- **Selección y Download:** casilla por fila y en el encabezado. *Download* junta las notas elegidas, con sus addenda, y
+  avisa *Download started* (CON-3023). El archivo lo arma el backend con la plantilla; en el prototipo se abren en una
+  pestaña con ese diseño, una nota por página (`hojasJuntas`). Sin nada elegido avisa *Select at least one clinical note
+  to download.*, como Documents.
+- **Sin nota o sin permiso** (encuentro cancelado; nota de otro provider sin *Read Clinical Note*): la fila se ve
+  atenuada, sin ojo ni casilla (`isRowDisabled`).
+- **El encuentro de hoy** entra a la lista cuando se toca *Start encounter* y toma su estado de la barra: In progress,
+  On hold y, al cerrarlo, Completed o Discharged (`cerrarEncuentroHoy`). *Review and sign* del diálogo de cierre lo deja
+  Fulfilled y Signed. Antes de empezar no aparece: Planned no se lista.
+
+### El ojo
+
+Abre la Clinical Note del encuentro en `ui/document-viewer`, a pantalla completa, **sin salir de la pestaña**: al volver,
+la página, los filtros y lo elegido siguen como estaban (CON-3773). La nota abierta va en la URL (`?note=<id>`), como la
+ruta de red.dev: se puede compartir y el Atrás del navegador la cierra. Tocar la fila hace lo mismo que el ojo.
+
+Siempre: *Back to history*, *Clinical note - <paciente>*, la pill de la nota, *View PDF* y *Preparing document...* un
+momento, como red.dev. Lo demás depende del encuentro y de la nota; el aviso aparece sólo cuando no se puede firmar:
+
+| Encuentro · nota | Aviso | Acción |
+|---|---|---|
+| In progress, On hold o Discharged · Unsigned | *The clinical note can only be signed when the encounter is completed.* (CON-2727) | Ninguna |
+| Completed o Fulfilled · Unsigned, propia | Ninguno | *Sign clinical note* |
+| Completed o Fulfilled · Unsigned, de otro provider | *Only <provider>, the provider of this encounter, can sign this clinical note.* (CON-3508) | Ninguna |
+| Signed | Ninguno | *Add addendum* |
+
+- **Firmar** pide el usuario y la contraseña otra vez (*Login to sign document*, el mismo diálogo de la nota de Pending
+  Task). Firmada, la nota no cambia más, el encuentro Completed pasa a Fulfilled y la lista lo muestra sin recargar
+  (CON-2727, CON-3166).
+- **Add addendum** (CON-2730, CON-3008): en toda nota firmada. Drawer de un solo campo y *Sign and save*, que también
+  pide el login. Queda en *Addenda*, después de la firma, a nombre de quien lo escribe; no se edita ni se borra. Se
+  pueden sumar varios.
+- "Propia" es la del provider de la sesión (`PROVIDER_SESION`, el de la barra de la app). No hay permiso de firma: firma
+  quien atendió (CON-3306, cancelada, lo decía así; CON-3508 lo mantiene).
+- La nota que se generó sola a las 48 h lo dice adentro del documento (el aviso de la plantilla) y no trae *Workflows*
+  (CON-2937).
+
+### La nota y el PDF
+
+- **El documento es la plantilla *Clinical note* de `src/pdfs`** (el diseño nuevo de los PDF, el que recibe el backend),
+  completada con los eventos del encuentro (`datosNota`, `hojaNota`). **La misma hoja se ve en el visor y abre *View
+  PDF***: lo que se lee es lo que se imprime. `ui/document-html` la muestra en un iframe que toma el alto del contenido;
+  en el celular la hoja se acomoda al ancho.
+- **Contenido, el de la plantilla y en su orden, sólo lo que se hizo** (CON-2975): *Vital Signs*; *Medical History*
+  (condiciones, medicación, alergias, cirugías, *Chief Complaint* y *Triage* del encuentro, y *Patient History* con
+  Family, Oral y Social, CON-3081 y CON-3605); *Exams* (CON-3668); *Treatment Plan* con el *Consent Summary*;
+  *Operative Report*; *Workflows*; *Prescriptions*; *Lab Orders*; *Referrals*; *Additional Notes*; la firma del
+  provider con fecha y hash (CON-2727) y, después, *Addenda*. Sin firma del paciente.
+- *View PDF* abre la hoja en una pestaña nueva, titulada *Dental Clinical Note — <paciente>*, como los documentos de Lab
+  order, Prescription y Referral (`abrirHoja`).
+- La historia médica es del paciente (`HISTORIA_PACIENTE`): va igual en todas sus notas.
+
+### Decisiones
+
+1. **La fecha se filtra con el bloque del Dashboard, por mes** (`ui/date-nav`), como Lab order, Prescription y Referral
+   desde la 6ª vuelta del mismo día. red.dev y CON-2731 piden un rango: queda en *A validar*, junto con el de las otras
+   tres tablas.
+2. **Filter con Status y Provider**: red.dev sólo tiene la fecha; CON-2731 pide los tres. Se usa el `FilterMenu` de las
+   tablas hermanas.
+3. **Tilde verde y cruz roja, como red.dev** (`CircleCheck` y `CircleX`). La primera versión ponía una raya en lugar de
+   la cruz; Julián pidió la cruz (2026-11-28).
+4. **El ojo queda a la vista**, no dentro de un ⋮: es la única acción de la fila y la que se usa siempre.
+5. **La columna se llama *Clinical note***, como en el resto de la app; red.dev dice *Clinic note* (anomalía).
+6. **Download habilitado siempre**: red.dev lo apaga sin selección, sin decir por qué. Acá avisa qué falta, como
+   Documents. El botón lleva la cantidad elegida.
+7. **El aviso del visor sólo cuando algo impide firmar.** La primera versión avisaba en todos los casos (firmada, a la
+   espera de firma, generada sola): era ruido que red.dev no tiene.
+
+### Anomalías y límites
+
+1. CON-2731 nombra la columna de recetas *Active*; red.dev, *Prescription*. Se deja la de red.dev.
+2. CON-3058 (bug): "al seleccionar *Date* deben marcarse todos los encounters de esa fecha". No queda claro qué control
+   es; la casilla del encabezado elige toda la página.
+3. *Review and sign* del cierre del encuentro firma sin mostrar la nota (Figma 4540:27072); CON-2726 dice que la muestra
+   y que firmar es otro paso. No se tocó: se propone aparte que abra esta misma nota con *Sign clinical note*.
+4. Cerrar el encuentro desde la ficha del paciente (no desde Clinical Mode) no deja la fila en la lista: sólo la barra de
+   Clinical Mode llama a `cerrarEncuentroHoy`.
+5. Los encuentros de la lista y los del historial de un procedimiento (`data/ejecucion`) son datos de ejemplo distintos.
+6. Las credenciales del login no se validan (CON-3648 pide que sean las del provider que firma).
+7. El paciente es el de la barra de Clinical Mode (Julio Perez), con cualquier id de la ruta.
+
+**A validar (con red.dev abierto y con usuarios):**
+
+- Qué hace el ojo de red.dev en un encuentro cancelado y en uno In progress, y si el detalle muestra algo más que *Back
+  to history*, *View PDF* y *Sign clinical note*.
+- Dónde está *Add addendum* en red.dev y cómo se ve el addendum en su PDF (acá sale de CON-2730).
+- Si *Download* de varias notas baja un archivo por nota, un ZIP o un PDF combinado.
+- Si el provider necesita ver el motivo de *Access restricted* o pedir el acceso desde la fila.
+- Si el filtro por mes alcanza para buscar una visita vieja o hace falta el rango (también en las otras tres tablas).
+- Que el texto de la nota coincida con el de red.dev sección por sección: sale de la plantilla de `src/pdfs`, no de
+  mirar la nota real.
+
+### Segunda vuelta (2026-11-28): devolución de Julián
+
+Sobre el link de prueba: *"faltan las cruces rojas"*, *"el pdf no está alineado al nuevo diseño de pdf y el documento no
+dice lo mismo… le falta información, le falta el add addendum… le sumaste cosas que no van"*. Lo de arriba ya está
+corregido con esto:
+
+1. Vuelve la cruz roja en Exams, Ref, Lab y Prescription.
+2. La nota deja de dibujarse con `VistaDocumento` y `pdfDeDocumento` (el formato de una página de la nota de Pending
+   Task, con secciones numeradas) y pasa a la plantilla *Clinical note* de `src/pdfs`, en pantalla y en el PDF. Con eso
+   entra lo que faltaba: Chief Complaint, Triage, Patient History, Treatment Plan y Consent Summary, el detalle de cada
+   orden y el hash de la firma.
+3. *Add addendum* aparece en toda nota firmada (antes sólo en las propias).
+4. Se van los avisos informativos del visor y el subtítulo con fecha y provider.
+5. Se vuelve atrás lo que la primera versión le había sumado a `documentoTarea` (páginas, `aviso`, `adendas`,
+   `descargarDocumento`) y a `ui/document-sheet` (`appendix`): ya no hace falta.
+
+**Queda distinto:** la Clinical note de Pending Task (`pages/ClinicalNote`) sigue con el formato anterior. Pasarla a la
+misma plantilla es un cambio chico; espera el ok.
+
+### Tercera vuelta (2026-11-28): el contenido de las notas de red.dev
+
+Julián pasó dos Clinical Notes de red.dev en PDF (la más completa, del 08/20/2026, y una con sólo el peso, del
+08/13/2026) y los links a esas notas (`/treatment-history/<encounter>?page=2`). Los links piden login y no se pudieron
+abrir; los PDF sí. Con eso:
+
+1. **La plantilla *Clinical note* de `src/pdfs` pasa al contenido de red.dev**, con el diseño nuevo de los PDF (ver
+   `pdfs.md`). Orden de red.dev: *Medical History*; *Exams* con *Review of Systems (ROS)* (tabla System / Negative /
+   Positive), *Vital Signs* (tabla Measurement / Value; antes era una lista y una sección aparte), *Physical
+   Examination* (*Positive for …* / *Negative for …* por zona), *Extraoral Examination* (*The extraoral examination
+   revealed:* … *All other extraoral structures appeared normal.*) e *Intraoral Examination* (igual, con *identified*);
+   *Prescription* (*The following medication(s) was prescribed to the patient:*, la droga, *Take … for …*, *Dosage
+   form*, *Documents sent*); *Lab Order* (*Lab order sent to …*, *Lab work requested*, *Case* con sus procedimientos,
+   *Special instructions*, *Documents sent*, *Expected return*); *Additional Notes*; *Provider* con nombre y fecha.
+   *Prescription* y *Lab Order* en singular, como red.dev.
+2. **Sale lo que red.dev no imprime:** Chief Complaint, Triage, Patient History, Treatment Plan y Consent Summary,
+   Operative Report, Workflows y el hash de la firma. Dental Assessment, Radiographic, Periodontal y Referral quedan en la
+   plantilla porque los pide Jira (CON-2975), y sólo salen si el encuentro los tiene.
+3. ~~La columna *Exams* no cuenta los signos vitales~~ — corregido en la cuarta vuelta: en red.dev sí cuentan. Se suma
+   un encuentro con sólo el peso (08/12/2026, Andy Davis).
+4. **La columna *Procedures* no sale de la nota:** en la de red.dev el D2140 de la fila aparece dentro de la orden de
+   laboratorio (*Case*), no como un *Operative Report*. Cada encuentro tiene sus procedimientos aparte (`procedimientos`).
+5. Los encuentros de ejemplo (`data/historial`) usan los campos nuevos (`ros`, `vitals`, `physical`,
+   `extraoral_findings`, `intraoral_findings`…).
+
+**Anomalías de red.dev** (se copian donde aplica, se anotan):
+
+- La fecha de la nota de Andy Davis dice 08/13 y la fila de la lista, 08/12: es el corrimiento de zona horaria de
+  CON-3038.
+- En la lista de red.dev la fila del 08/20 tiene tilde en *Ref*, pero la nota no trae ninguna derivación.
+- *Take 1.0 applications as needed* y *Expected return: 2026-09-30* (fecha ISO, no MM/DD/YYYY): se copia el formato.
+- La firma de red.dev dice *Date:* vacío aunque la nota esté firmada.
+
+**Todavía sin ver en red.dev:** qué hace el ojo en una fila cancelada (red.dev muestra *Unsigned* también ahí), cómo
+se ven *Add addendum* y los addenda, y el *Download* de varias.
+
+### Cuarta vuelta (2026-11-28): recorrido en red.dev
+
+Julián pasó un usuario de red.dev y se recorrió Patient Summary (página 2 del paciente *AAA test AAA*) sin guardar ni
+firmar nada. Pidió además: *"el add addendum no funciona así, fijalo bien como está en red"* y *"el mensaje 'the clinical
+note…' eso no va"*.
+
+**Cómo se comporta red.dev:**
+
+| Qué | red.dev |
+|---|---|
+| Barra | *Filter by date range* (dos meses, *Clear Filter*) y *Download*, apagado hasta elegir; con elegidas, *2 Selected · Clear*. Sin buscador ni Filter. |
+| Filas | Todas con casilla y ojo, también la cancelada (que dice *Unsigned*). *Procedures* abre un desplegable *Procedures (1)* con código y nombre. |
+| Exams, Ref, Lab, Prescription | Tilde verde o cruz roja. Los signos vitales solos marcan *Exams*. |
+| Ojo · firmada | *Back to History*, *Clinical Note - <paciente>*, *View PDF*, la nota y, abajo al centro, *Add Addendum*. Sin aviso. |
+| Ojo · sin firmar | Igual, con *Sign Clinical Note* abajo; también en la nota de otro provider. Sin aviso. |
+| Ojo · cancelada | *Clinical note can only be rendered for an active or finished encounter* y *Return*; *View PDF* apagado. |
+| Add Addendum | Pop up centrado *Add Clinical Note Addendum*: *Authentication required to sign this addendum*, *Addendum Content* (*Type your addendum here...*), una línea, otra vez *Authentication required…*, *Email* y *Password* lado a lado y *Save Addendum*, apagado hasta completar. |
+| Sign Clinical Note | *Login to Sign Document* (el mismo de Pending Task). |
+| Download | Un PDF por nota elegida (`document-<id>.pdf`). La firmada dice *Date: <fecha>*; los signos vitales fuera de rango, *(Out of range)*. |
+
+**Lo que cambia en la app:**
+
+1. **Add addendum como red.dev:** un solo pop up con el texto y el login, y *Save addendum*. Es el mismo diálogo de la
+   firma (`FirmarDialog` con `addendum`); se va el drawer. Botón primario, como *Sign clinical note*.
+2. **Sin avisos arriba de la nota:** se va *The clinical note can only be signed…* (y cualquier otro).
+3. **Cancelada:** se abre con el error de red.dev (`EmptyState` con *Return*) y *View PDF* apagado; en la lista dice
+   *Unsigned*, como red.dev. *Download* no baja nada de un encuentro cancelado.
+4. **Firmar una nota ajena:** *Sign clinical note* aparece en toda nota sin firmar de un encuentro cerrado; el login dice
+   quién firma (CON-3648). Con el encuentro abierto, sigue sin aparecer.
+5. **Exams cuenta los signos vitales.**
+6. **Download apagado** hasta elegir alguna fila.
+
+**Se mantiene distinto de red.dev, a propósito:** la fecha con el bloque de mes (`ui/date-nav`, como las otras tres
+pestañas, decisión de Julián del 2026-11-27) en lugar del rango; *Filter* (Status y Provider, CON-2731); los
+procedimientos con chip y "+N" (como Medication); la pill de la nota en la barra del visor; *Download* abre las notas
+juntas en una pestaña, una por página, porque el PDF de cada una lo genera el backend.
+
 
 ## CON-2214 · CON-2212 · CON-2321 · Lab order, Prescription y Referral como red.dev: ⋮, Confirm en azul, sólo Filter y fichas (2026-11-28)
 
