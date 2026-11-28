@@ -5,6 +5,25 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-11-27
 
+### Fee schedules: el aviso de la fecha va al lado del campo ([#222](https://github.com/JulianGerardi/red-dental-studio/pull/222))
+- **Available from:** el aviso de qué pasa con la fecha (*Starts today* / *Starts on …*, `ui/alert`) va en la columna de al
+  lado, a la altura del campo; en celular, debajo. El error de fecha pasada queda debajo del campo.
+- **Versión Scheduled:** ese aviso sólo aparece si se cambia la fecha (sin cambios repetía el de arriba), y dice *as soon as
+  you save* en vez de *publish*.
+- *Create new version* sigue en el aviso de la versión activa (`action` de `ui/alert`) y suma el ícono `Plus`.
+### End Encounter: sin rótulo y Edit / historial dentro del mismo drawer (CON-4157, CON-4156) ([#221](https://github.com/JulianGerardi/red-dental-studio/pull/221))
+- **`EndEncounterDrawer`** es un solo `Drawer` con tres vistas: la lista, *Edit procedure* y *Execution history*. Edit y
+  el historial reemplazan el contenido (título, pestañas, contenido y pie) en vez de abrir otro drawer encima. *Cancel* /
+  *Save* / *Back*, la X y Escape vuelven a la lista; el foco queda en el ⋮ de la fila.
+- Sale el rótulo *Appointment procedures · N*. `ui/list-group` sin `title` toma `label` como nombre accesible.
+- **Edit es el Edit procedure de las tablas**: `EditProcedureDrawer` expone `useEdicionProcedimiento(props)`, que
+  devuelve `title`, `tabs`, `footer` y `children` para mostrarlo dentro de un `Drawer` ya abierto. El estimado va
+  bloqueado: el procedimiento del turno está en un caso aceptado (CON-2529).
+- `HistorialEjecucion` (contenido) reemplaza a `ExecutionHistoryDrawer`. `lib/ejecucion`: `guardarEdicionCita` reemplaza a
+  `guardarNotaCita`; `ProcedimientoCita` suma `fecha`, `proveedor`, `vinculados`, `diagnosticos` y `estimado`.
+- **Dejar de usar** `DialogoEditar` (sólo la nota): ya no se usa en la app, queda en `accionesProcedimiento` y su story.
+- Decisiones, alternativas descartadas y pendientes en `modulos/clinical-mode.md` (2026-11-27).
+
 ### Lab order, Prescription y Referral: Teeth & surface de red.dev, datos en el título, sin encuentro y PDF nuevo (CON-2214, CON-2212, CON-2321) ([#219](https://github.com/JulianGerardi/red-dental-studio/pull/219))
 - **Teeth & surface (Lab order):** `clinical/dental/ArcadaAnatomica` dibuja las arcadas de red.dev (`arcadasRed.ts`, SVG
   generado; cada diente es un botón) y `RuedaSuperficies` usa sus cinco formas. Reemplaza a `DentalArch`, que se borra.
