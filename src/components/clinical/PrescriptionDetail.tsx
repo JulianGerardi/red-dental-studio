@@ -152,14 +152,15 @@ export function PrescriptionDetail({ registro, nuevo, onVolver, onAccion }: {
           {/* Una pestaña por medicación, con su nombre apenas se elige; el punto rojo marca la que tiene faltantes. Fuera
               del fieldset: en sólo lectura también se recorren. Al lado, el tacho de la app (sólo ícono) quita la que
               se está viendo. */}
-          {medicaciones.length > 1 && (
+          {/* Desde la primera (Medication 1), como red.dev; el tacho, sólo con más de una. */}
+          {(
             <div className="flex min-w-0 items-center gap-2">
               <Tabs
                 className="min-w-0"
                 size="sm" aria-label="Medications" value={String(m.id)} onChange={setActual}
                 tabs={medicaciones.map((x, i) => ({ value: String(x.id), label: rotulo(x, i), alerta: intento && Object.keys(erroresDe(x).errores).length > 0 }))}
               />
-              {editable && (
+              {editable && medicaciones.length > 1 && (
                 <button type="button" className={ICONO_TACHO} aria-label={`Remove medication: ${rotulo(m, medicaciones.indexOf(m))}`} title="Remove medication" onClick={quitar}>
                   <Trash2 className="size-4" />
                 </button>

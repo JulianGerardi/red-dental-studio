@@ -50,9 +50,9 @@ export function LabOrderDetail({ registro, nuevo, onVolver, onAccion }: {
   const [vinculados, setVinculados] = useState<string[]>(inicio.procedimientos)
   const [filtroEstado, setFiltroEstado] = useState<string[]>([])
   const [filtroCaso, setFiltroCaso] = useState<string[]>([])
-  /* Hasta elegir la dentición se ven los dos botones "Initialize…", como red.dev. Permanent / Primary sólo cambia la
+  /* Arranca en Permanent con el dibujo a la vista, como red.dev (recorrido del 2026-11-28, ya sin "Initialize…"). Permanent / Primary sólo cambia la
      arcada que se ve: lo marcado en una queda al pasar a la otra (dentición mixta, video del 2026-11-27). */
-  const [denticion, setDenticion] = useState<Denticion | null>(inicio.denticion)
+  const [denticion, setDenticion] = useState<Denticion>(inicio.denticion ?? 'Permanent')
   const [dientes, setDientes] = useState<string[]>(inicio.dientes)
   const [actual, setActual] = useState<string | null>(inicio.dientes[0] ?? null)
   const [superficies, setSuperficies] = useState<Record<string, SuperficieLab[]>>(inicio.superficies)
@@ -83,7 +83,7 @@ export function LabOrderDetail({ registro, nuevo, onVolver, onAccion }: {
     setVinculados((v) => [...v, p.id])
     const d = p.pieza && p.pieza !== '-' ? p.pieza : undefined
     if (!d || dientes.includes(d)) return
-    setDenticion((actualDenticion) => actualDenticion ?? (esPermanente(d) ? 'Permanent' : 'Primary'))
+    setDenticion(esPermanente(d) ? 'Permanent' : 'Primary')
     setDientes((v) => [...v, d])
     setActual(d)
     const delProcedimiento = (p.superficie ?? '').split(',').map((x) => x.trim()).filter((x): x is SuperficieLab => (superficiesDe(d) as string[]).includes(x))
@@ -198,22 +198,14 @@ export function LabOrderDetail({ registro, nuevo, onVolver, onAccion }: {
                 fieldset: en sólo lectura también se cambia de arcada y de diente para ver sus superficies. */}
             <div className="flex flex-col gap-3">
               <FieldLabel>Teeth & surface</FieldLabel>
-              {!denticion ? (
-                editable ? (
-                  <span className="flex flex-wrap gap-2">
-                    <Button variant="secondary" onClick={() => setDenticion('Permanent')}>Initialize permanent dentition</Button>
-                    <Button variant="secondary" onClick={() => setDenticion('Primary')}>Initialize primary dentition</Button>
-                  </span>
-                ) : <p className="text-[12px] text-ink-muted">No teeth selected.</p>
-              ) : (
-                <>
+              <>
                   <Tabs size="sm" aria-label="Dentition" value={denticion} onChange={setDenticion} tabs={['Permanent', 'Primary']} />
                   <div className="flex flex-col items-center gap-6 sm:flex-row sm:items-start sm:justify-center sm:gap-8">
                     <ArcadaAnatomica denticion={denticion} marcados={dientes} actual={actual} disabled={!editable} onToggle={tocarDiente} />
                     <div className="flex w-full shrink-0 flex-col gap-5 sm:w-[220px]">
                       {/* Los dientes marcados de las dos denticiones: tocar uno lo elige para marcarle (o ver) sus superficies. */}
                       <div className="flex flex-col gap-3">
-                        {([['Permanent', permanentes], ['Primary', temporarios]] as const).map(([titulo, lista]) => (
+                        {([['Permanent', permanentes], ['Pediatric', temporarios]] as const).map(([titulo, lista]) => (
                           <div key={titulo} className="flex flex-col gap-1.5">
                             <span className="text-[11px] font-semibold tracking-wide text-ink-muted uppercase">{titulo}</span>
                             {lista.length ? (
@@ -246,8 +238,7 @@ export function LabOrderDetail({ registro, nuevo, onVolver, onAccion }: {
                       </div>
                     </div>
                   </div>
-                </>
-              )}
+              </>
             </div>
           </div>
         </Card>

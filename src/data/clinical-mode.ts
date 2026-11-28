@@ -180,7 +180,7 @@ export const VINCULOS_PROCEDIMIENTO: Record<string, VinculoProcedimiento> = {
   },
   pr5: {
     problemas: ['p1'],
-    ordenes: [{ id: 'lo-p1', laboratorio: 'Oral pathology lab', trabajo: 'Biopsy analysis', pedida: '05/15/2026', estado: 'Canceled' }],
+    ordenes: [{ id: 'lo-p1', laboratorio: 'Oral pathology lab', trabajo: 'Biopsy analysis', pedida: '05/15/2026', estado: 'Cancelled' }],
     derivaciones: [{ id: 'rf-2', a: 'Dr. Omar Haddad', especialidad: 'Oral Surgery', pedida: '05/15/2026', estado: 'Declined' }],
   },
   pr6: { caso: { id: 'c3', procedimiento: 'c3v1p1' }, problemas: ['p5'] },
@@ -219,7 +219,7 @@ export const ULTIMA_CONDICION: UltimaCondicion = {
 /* ── Lab Order (Figma 4070:148911, listado) ────────────────────────── */
 
 export type EstadoOrden =
-  | 'Pending' | 'Canceled' | 'Rejected' | 'Delayed' | 'Requested' | 'Delivered'
+  | 'Pending' | 'Cancelled' | 'Rejected' | 'Delayed' | 'Requested' | 'Delivered'
 
 export type OrdenLab = {
   id: string
@@ -235,7 +235,7 @@ export type OrdenLab = {
 
 export const ORDENES: OrdenLab[] = [
   { id: 'lo1', proveedor: 'Dr. Julián Gerardi', paciente: 'James Cartes',  estado: 'Pending',   actualizado: '05/10/2026', creado: '05/11/2026', vence: '05/18/2028' },
-  { id: 'lo2', proveedor: 'Dr. Sarah Stone',    paciente: 'Maria Lopez',   estado: 'Canceled',  actualizado: '05/08/2026', creado: '05/08/2026', vence: '05/12/2026' },
+  { id: 'lo2', proveedor: 'Dr. Sarah Stone',    paciente: 'Maria Lopez',   estado: 'Cancelled',  actualizado: '05/08/2026', creado: '05/08/2026', vence: '05/12/2026' },
   { id: 'lo3', proveedor: 'Dr. Julián Gerardi', paciente: 'Carlos Ruiz',   estado: 'Rejected',  actualizado: '04/20/2026', creado: '04/21/2026', vence: '10/21/2026' },
   { id: 'lo4', proveedor: 'Dr. Julio Perez',    paciente: 'Ana Torres',    estado: 'Rejected',  actualizado: '05/14/2026', creado: '05/15/2026', vence: '11/15/2026' },
   { id: 'lo5', proveedor: 'Dr. Sarah Stone',    paciente: 'Sofia Sanchez', estado: 'Delayed',   actualizado: '03/15/2026', creado: '03/16/2026', vence: '09/16/2026' },

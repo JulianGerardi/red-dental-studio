@@ -30,7 +30,7 @@ export const PESTANA_TAREA: Record<string, string> = { 'Lab orders': 'Lab order'
 /* Un color por estado, el mismo en Pending Task, en las tres tablas de Clinical Mode y en sus fichas. */
 export const TONO_ESTADO: Record<string, PillTone> = {
   Pending: 'warning', Requested: 'info', Delayed: 'warning', Fulfilled: 'danger', Active: 'success', Delivered: 'success',
-  Completed: 'success', Rejected: 'danger', Canceled: 'danger', Expired: 'neutral',
+  Completed: 'success', Rejected: 'danger', Cancelled: 'danger', Expired: 'neutral',
 }
 
 /* La máquina de estados de cada registro, como red.dev (recorrido del 2026-11-27) y Jira: sólo se edita y se borra en
@@ -49,7 +49,7 @@ export const esEditable = (t: PendingTask) => accionesDe(t).includes('Edit')
 
 /* A qué estado lleva cada acción y si el registro sigue siendo una tarea pendiente (CON-2643). */
 const DESTINO: Partial<Record<AccionTarea, string>> = {
-  Request: 'Requested', Activate: 'Active', Deliver: 'Delivered', Delay: 'Delayed', Finish: 'Completed', Expire: 'Expired', Reject: 'Rejected', Cancel: 'Canceled',
+  Request: 'Requested', Activate: 'Active', Deliver: 'Delivered', Delay: 'Delayed', Finish: 'Completed', Expire: 'Expired', Reject: 'Rejected', Cancel: 'Cancelled',
 }
 const PENDIENTES: Record<string, string[]> = { 'Lab orders': ['Pending', 'Requested', 'Delayed'], Prescriptions: ['Pending'], Referrals: ['Pending', 'Requested'] }
 

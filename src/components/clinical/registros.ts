@@ -112,7 +112,7 @@ type Fila = [estado: string, provider: string, creado: string, actualizado: stri
 const semilla = (kind: TipoRegistro, clave: string, filas: Fila[]): Registro[] =>
   filas.map(([state, provider, register, updated, expiration], i) => {
     const base: PendingTask = { id: `${clave}-${i + 1}`, kind, state, ...PACIENTE, provider, register, expiration }
-    return { ...base, id: base.id!, kind, updated, pdf: kind === 'Lab orders' ? !['Pending', 'Canceled'].includes(state) : state === (kind === 'Prescriptions' ? 'Active' : 'Requested'), ...contenidoDe(base) }
+    return { ...base, id: base.id!, kind, updated, pdf: kind === 'Lab orders' ? !['Pending', 'Cancelled'].includes(state) : state === (kind === 'Prescriptions' ? 'Active' : 'Requested'), ...contenidoDe(base) }
   })
 
 const SEMILLA: Registro[] = [
@@ -124,7 +124,7 @@ const SEMILLA: Registro[] = [
     ['Pending', CHEN, '10/28/2026', '10/28/2026', '12/10/2026'],
     ['Delivered', MARTINEZ, '09/22/2026', '10/09/2026', '10/12/2026'],
     ['Rejected', ANDERSON, '09/03/2026', '09/08/2026', '09/30/2026'],
-    ['Canceled', MARTINEZ, '08/18/2026', '08/19/2026', '09/15/2026'],
+    ['Cancelled', MARTINEZ, '08/18/2026', '08/19/2026', '09/15/2026'],
     ['Delivered', CHEN, '07/06/2026', '07/24/2026', '07/27/2026'],
   ]),
   ...semilla('Prescriptions', 'rx', [
@@ -133,7 +133,7 @@ const SEMILLA: Registro[] = [
     ['Active', ANDERSON, '10/30/2026', '10/30/2026', '12/30/2026'],
     ['Pending', CHEN, '10/21/2026', '10/21/2026', '12/21/2026'],
     ['Expired', MARTINEZ, '08/31/2026', '08/31/2026', '09/30/2026'],
-    ['Canceled', MARTINEZ, '06/30/2026', '07/02/2026', '07/30/2026'],
+    ['Cancelled', MARTINEZ, '06/30/2026', '07/02/2026', '07/30/2026'],
     ['Expired', ANDERSON, '06/05/2026', '06/05/2026', '07/05/2026'],
   ]),
   ...semilla('Referrals', 'ref', [
@@ -143,12 +143,12 @@ const SEMILLA: Registro[] = [
     ['Requested', CHEN, '10/15/2026', '10/16/2026', '11/15/2026'],
     ['Completed', MARTINEZ, '09/08/2026', '10/01/2026', '10/08/2026'],
     ['Rejected', MARTINEZ, '08/11/2026', '08/20/2026', '09/11/2026'],
-    ['Canceled', ANDERSON, '07/02/2026', '07/03/2026', '08/02/2026'],
+    ['Cancelled', ANDERSON, '07/02/2026', '07/03/2026', '08/02/2026'],
   ]),
 ]
 
 /* Vence en una semana o ya venció y sigue abierto: la fecha va en rojo, como red.dev. */
-const FINALES = ['Delivered', 'Rejected', 'Canceled', 'Completed', 'Expired']
+const FINALES = ['Delivered', 'Rejected', 'Cancelled', 'Completed', 'Expired']
 export const urge = (r: Pick<Registro, 'expiration' | 'state'>) => {
   const f = new Date(r.expiration)
   return !FINALES.includes(r.state) && !Number.isNaN(f.getTime()) && f.getTime() - Date.now() < 7 * 86400000

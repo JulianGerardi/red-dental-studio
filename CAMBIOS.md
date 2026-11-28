@@ -5,6 +5,13 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-11-28
 
+### Lab order y Prescription: lo que faltaba para coincidir con red.dev (CON-2214, CON-2212) ([#226](https://github.com/JulianGerardi/red-dental-studio/pull/226))
+- **Teeth & surface** arranca en *Permanent* con el dibujo a la vista, sin *Initialize…*; la lista de temporarios se
+  llama *Pediatric*. **Prescription** muestra la pestaña *Medication 1* desde la primera medicación.
+- **El estado es *Cancelled*** (`DESTINO`, `TONO_ESTADO`, los estados de `RegistrosPanel` y los datos), como red.dev y
+  Scheduling; los textos de preguntas y avisos no cambian. Lo que queda distinto de red.dev a propósito, en
+  `modulos/clinical-mode.md` (2026-11-28, segunda pasada).
+
 ### Lab order, Prescription y Referral como red.dev: ⋮, Confirm en azul, sólo Filter, fichas y PDFs (CON-2214, CON-2212, CON-2321) ([#225](https://github.com/JulianGerardi/red-dental-studio/pull/225))
 - **⋮ de las tablas:** *Options* con el orden y los íconos de red.dev; fuera de Pending, *Edit* apagado con su tooltip y,
   en un estado final, sólo ese Edit. Sale *View*: la fila abre la ficha (`ItemsTarea` / `MenuTarea` › `editarApagado`).
