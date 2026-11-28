@@ -18,13 +18,16 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 - **La plantilla *Clinical note* (backend, `/pdfs/`) cambia al contenido de las notas de red.dev:** Exams con ROS, Vital
   Signs (tablas), Physical, Extraoral e Intraoral; Prescription y Lab Order en singular con su texto; sin hash. Variables
   nuevas y las que se van, en `modulos/pdfs.md` (2026-11-28). `public/pdfs/` regenerado.
-- **Columna Exams:** los signos vitales solos no cuentan (como red.dev).
+- **Como red.dev (recorrido del 2026-11-28):** *Add addendum* es un pop up con el texto y el login (`FirmarDialog` con
+  `addendum`, *Save addendum*); la nota no lleva avisos arriba; un encuentro cancelado se abre con el error de red.dev
+  y *Return*; *Sign clinical note* también en notas de otro provider; los signos vitales cuentan en *Exams*; *Download*
+  apagado hasta elegir.
 - **Nuevo en `ui/`:** `document-html` (`DocumentHtml`), la hoja HTML de una plantilla dentro del visor.
-- **Reglas:** la nota se firma con el encuentro Completed o Fulfilled y sólo la firma su provider; firmar pasa Completed a
-  Fulfilled; *Add addendum* en toda nota firmada; un encuentro cancelado o una nota sin permiso no se abren ni se eligen.
+- **Reglas:** la nota se firma con el encuentro Completed o Fulfilled; firmar pasa Completed a Fulfilled; *Add addendum*
+  en toda nota firmada; una nota ajena sin permiso no se abre ni se elige.
 - **Download:** el archivo lo genera el backend con la plantilla; el prototipo abre las notas elegidas juntas en una
   pestaña, una por página (`hojasJuntas`).
-- **Reuso:** `pages/ClinicalNote` exporta `FirmarDialog`. El encuentro de hoy entra a la lista con *Start encounter*
+- **Reuso:** `pages/ClinicalNote` exporta `FirmarDialog`, que suma la variante `addendum`. El encuentro de hoy entra a la lista con *Start encounter*
   (`cerrarEncuentroHoy` desde `ClinicalTopBar`).
 - **Dejar de usar:** `PatientSummaryPanel` de `clinical/panels.tsx` y `TREATMENT_HISTORY` de `data/mock` (borrados).
 - No se pudo entrar a red.dev (pide login): lo que falta confirmar está en *A validar* del `.md`.

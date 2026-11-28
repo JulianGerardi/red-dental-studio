@@ -15,14 +15,17 @@ const firmar = async (screen: { getByRole: (r: string, n?: string | RegExp) => a
   await login.getByRole('button', 'Sign').tap()
 }
 
-test('La lista pagina de a 10, filtra por estado y un encuentro sin nota no se abre ni se elige', async ({ app, screen }) => {
+test('La lista pagina de a 10 y filtra por estado; un encuentro cancelado abre el error de red.dev', async ({ app, screen }) => {
   await app.open(LISTA)
   await expect(screen.getByText(/Showing 1 to 10 of 23 results/)).toBeVisible()
-  /* Cancelado: sin nota, sin ojo y sin casilla. Una nota ajena sin permiso, igual. */
-  await expect(screen.getByText('No clinical note').first()).toBeVisible()
+  /* Una nota ajena sin permiso no se abre ni se elige. */
   await expect(screen.getByText('Access restricted')).toBeVisible()
-  await expect(screen.getByRole('checkbox', 'Select encounter of 10/20/2026, Cleaning')).toBeDisabled()
-  await expect(screen.getByRole('button', ojo('10/20/2026'))).toHaveCount(0)
+  await expect(screen.getByRole('button', ojo('09/22/2026'))).toHaveCount(0)
+  /* Cancelado: el ojo abre el error de red.dev, con View PDF apagado y Return. */
+  await screen.getByRole('button', ojo('10/20/2026')).tap()
+  await expect(screen.getByText('Clinical note can only be rendered for an active or finished encounter')).toBeVisible()
+  await expect(screen.getByRole('button', 'View PDF')).toBeDisabled()
+  await screen.getByRole('button', 'Return').tap()
   /* "+N" despliega el resto de los procedimientos en la fila, sin abrir la nota. */
   await screen.getByRole('button', /^Show 2 more procedures/).tap()
   await expect(screen.getByText('D0220').first()).toBeVisible()
@@ -56,13 +59,14 @@ test('Una nota sin firmar de un encuentro Completed se firma con el login y el e
   await expect(screen.getByText('Clinical note signed.')).toBeVisible()
   await expect(screen.getByRole('button', 'Sign clinical note')).toHaveCount(0)
 
-  /* Ya firmada, se le suma un addendum, que también se firma. */
+  /* Ya firmada, Add addendum: el texto y el login en el mismo pop up, como red.dev. */
   await screen.getByRole('button', 'Add addendum').tap()
-  const drawer = screen.getByRole('dialog', 'Add addendum')
-  await expect(drawer.getByRole('button', 'Sign and save')).toBeDisabled()
-  await drawer.getByRole('textbox', /Addendum/).fill('Patient called the next day: no pain.')
-  await drawer.getByRole('button', 'Sign and save').tap()
-  await firmar(screen)
+  const adenda = screen.getByRole('dialog', 'Add clinical note addendum')
+  await expect(adenda.getByRole('button', 'Save addendum')).toBeDisabled()
+  await adenda.getByPlaceholder('Type your addendum here...').fill('Patient called the next day: no pain.')
+  await adenda.getByPlaceholder('example@example.com').fill('sarah@example.com')
+  await adenda.getByPlaceholder('Enter password').fill('secret')
+  await adenda.getByRole('button', 'Save addendum').tap()
   await expect(screen.getByText('Addendum added.')).toBeVisible()
 
   /* La lista lo muestra sin recargar (CON-3166). */
@@ -72,14 +76,13 @@ test('Una nota sin firmar de un encuentro Completed se firma con el login y el e
   await expect(fila).toContainText('Signed')
 })
 
-test('Con el encuentro en curso la nota se ve pero todavía no se firma; la de otro provider, tampoco', async ({ app, screen }) => {
+test('Con el encuentro en curso la nota se ve pero todavía no se firma; cerrado, se firma aunque sea de otro provider', async ({ app, screen }) => {
   await app.open(LISTA)
   /* El encuentro de hoy entra a la lista cuando empieza. */
   await screen.getByRole('button', 'Start encounter').tap()
   await expect(screen.getByText(/Showing 1 to 10 of 24 results/)).toBeVisible()
   await expect(screen.getByRole('row', /11\/27\/2026/)).toContainText('In progress')
   await screen.getByRole('button', ojo('11/27/2026')).tap()
-  await expect(screen.getByText(/can only be signed when the encounter is completed/)).toBeVisible()
   await expect(screen.getByRole('button', 'Sign clinical note')).toHaveCount(0)
   await screen.getByRole('button', 'Back to history').tap()
 
@@ -88,15 +91,14 @@ test('Con el encuentro en curso la nota se ve pero todavía no se firma; la de o
   await expect(screen.getByRole('button', 'Sign clinical note')).toBeVisible()
   await screen.getByRole('button', 'Back to history').tap()
 
+  /* Como red.dev: la de otro provider también ofrece firmar; el login dice quién firma (CON-3648). */
   await screen.getByRole('button', ojo('10/27/2026')).tap()
-  await expect(screen.getByText('Only Dr. Emily Chen, the provider of this encounter, can sign this clinical note.')).toBeVisible()
-  await expect(screen.getByRole('button', 'Sign clinical note')).toHaveCount(0)
+  await expect(screen.getByRole('button', 'Sign clinical note')).toBeVisible()
 })
 
-test('Download pide elegir una nota y avisa cuando empieza', async ({ app, screen }) => {
+test('Download se habilita al elegir una nota y avisa cuando empieza', async ({ app, screen }) => {
   await app.open(LISTA)
-  await screen.getByRole('button', 'Download').tap()
-  await expect(screen.getByText('Select at least one clinical note to download.')).toBeVisible()
+  await expect(screen.getByRole('button', 'Download')).toBeDisabled()
   await screen.getByRole('checkbox', 'Select encounter of 10/06/2026, Crown prep').tap()
   await screen.getByRole('button', 'Download (1)').tap()
   await expect(screen.getByText('Download started')).toBeVisible()

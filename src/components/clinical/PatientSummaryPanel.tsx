@@ -28,6 +28,8 @@ export const TONO_ENCUENTRO: Record<EstadoHistorial, PillTone> = {
 const ESTADOS = Object.keys(TONO_ENCUENTRO) as EstadoHistorial[]
 
 const rotulo = (e: EncuentroHistorial) => `encounter of ${e.fecha}, ${e.motivo}`
+/* Todo encuentro se abre, también el cancelado (muestra el error de red.dev), salvo la nota ajena sin permiso. */
+const seAbre = (e: EncuentroHistorial) => e.nota === 'Signed' || e.nota === 'Unsigned'
 
 /* La nota del encuentro, con los textos del historial de un procedimiento (CON-4158). */
 function NotaCelda({ nota }: Pick<EncuentroHistorial, 'nota'>) {
@@ -76,7 +78,7 @@ export function PatientSummaryPanel({ paciente = PACIENTE }: { /** A nombre de q
   const [elegidos, setElegidos] = useState<string[]>([])
   /* La nota abierta va en la URL (?note=), como la de red.dev: se puede compartir y el Atrás del navegador la cierra. */
   const [busqueda, setBusqueda] = useSearchParams()
-  const abierta = encuentros.find((e) => e.id === busqueda.get('note') && tieneNota(e))
+  const abierta = encuentros.find((e) => e.id === busqueda.get('note') && seAbre(e))
   const abrir = (id: string) => setBusqueda((p) => { p.set('tab', 'Patient summary'); p.set('note', id); return p })
   const cerrar = () => setBusqueda((p) => { p.delete('note'); return p }, { replace: true })
 
@@ -94,7 +96,7 @@ export function PatientSummaryPanel({ paciente = PACIENTE }: { /** A nombre de q
      archivo lo arma el backend con la plantilla; acá se abren en una pestaña con ese diseño, una por página. */
   const bajar = () => {
     const notas = encuentros.filter((e) => elegidos.includes(e.id) && tieneNota(e))
-    if (!notas.length) { aviso.warn('Select at least one clinical note to download.'); return }
+    if (!notas.length) { aviso.warn('The selected encounters have no clinical note to download.'); return }
     let abrio = true
     abrirHoja(hojasJuntas(notas.map((e) => hojaNota(e, paciente))), () => { abrio = false; aviso.error("We couldn't open the clinical notes. Allow pop-ups for this site and try again.") })
     if (abrio) aviso.ok('Download started')
@@ -116,7 +118,7 @@ export function PatientSummaryPanel({ paciente = PACIENTE }: { /** A nombre de q
     hecho('derivaciones', 'Ref', 40, (e) => e.eventos.referrals.length > 0),
     hecho('laboratorios', 'Lab', 40, (e) => e.eventos.lab_orders.length > 0),
     hecho('recetas', 'Prescription', 84, (e) => e.eventos.prescriptions.length > 0),
-    { key: 'ver', header: 'Actions', width: 60, align: 'right', locked: true, cell: (e) => tieneNota(e) && (
+    { key: 'ver', header: 'Actions', width: 60, align: 'right', locked: true, cell: (e) => seAbre(e) && (
       <button type="button" aria-label={`View clinical note of the ${rotulo(e)}`} title="View clinical note" onClick={(ev) => { ev.stopPropagation(); abrir(e.id) }} className={ICONO_SUELTO}>
         <Eye className="size-4" />
       </button>
@@ -131,8 +133,8 @@ export function PatientSummaryPanel({ paciente = PACIENTE }: { /** A nombre de q
         rowKey={(e) => e.id}
         rowLabel={rotulo}
         onRowClick={(e) => abrir(e.id)}
-        /* Sin nota (cancelado) o sin permiso para leerla: no hay nada que abrir ni que bajar. */
-        isRowDisabled={(e) => !tieneNota(e)}
+        /* Sin permiso para leer la nota: no hay nada que abrir ni que bajar. */
+        isRowDisabled={(e) => !seAbre(e)}
         selectable
         selected={elegidos}
         onSelectedChange={setElegidos}
@@ -142,7 +144,8 @@ export function PatientSummaryPanel({ paciente = PACIENTE }: { /** A nombre de q
             <DateNav value={mes} onChange={setMes} onClear={() => setMes(null)} periodo="month" vacio="All dates" marked={encuentros.map((e) => new Date(e.fecha))} label="Filter encounters by date" />
           </>
         )}
-        actions={<Button variant="secondary" size="md" onClick={bajar}><Download /> Download{elegidos.length > 0 && ` (${elegidos.length})`}</Button>}
+        /* Como red.dev: apagado hasta elegir alguna nota; el pie dice cuántas van elegidas. */
+        actions={<Button variant="secondary" size="md" disabled={!elegidos.length} onClick={bajar}><Download /> Download{elegidos.length > 0 && ` (${elegidos.length})`}</Button>}
         pageSize={10}
         empty={encuentros.length === 0
           ? { icon: ClipboardList, title: 'No encounters yet', detail: "This patient's encounters and their clinical notes will show up here." }

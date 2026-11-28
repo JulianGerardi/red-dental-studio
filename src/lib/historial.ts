@@ -52,12 +52,12 @@ export function agregarAdenda(id: string, adenda: Pick<Adenda, 'author' | 'text'
 
 /** La nota se firma con el encuentro terminado (CON-2727): Completed o Fulfilled. */
 export const encuentroCerrado = (e: EncuentroHistorial) => e.estado === 'Completed' || e.estado === 'Fulfilled'
-/** Hay nota para abrir o bajar: firmada o sin firmar. Un encuentro cancelado no tiene; una ajena puede estar restringida. */
-export const tieneNota = (e: EncuentroHistorial) => e.nota === 'Signed' || e.nota === 'Unsigned'
-/** La columna Exams: el encuentro cargó una condición o un examen (CON-2731). Los signos vitales solos no cuentan, como en
- *  red.dev; la nota igual los muestra en Exams. */
+/** Hay nota para bajar: firmada o sin firmar, de un encuentro que no se canceló. Una ajena puede estar restringida. */
+export const tieneNota = (e: EncuentroHistorial) => (e.nota === 'Signed' || e.nota === 'Unsigned') && e.estado !== 'Cancelled'
+/** La columna Exams: el encuentro cargó un examen, también sólo los signos vitales (como red.dev, recorrido del
+ *  2026-11-28). */
 export const huboExamenes = ({ eventos: v }: EncuentroHistorial) =>
-  [v.ros, v.physical, v.extraoral_findings, v.intraoral_findings, v.dental_assessment_findings, v.radiographic_exams, v.periodontal_exams].some((x) => x.length > 0)
+  [v.ros, v.vitals, v.physical, v.extraoral_findings, v.intraoral_findings, v.dental_assessment_findings, v.radiographic_exams, v.periodontal_exams].some((x) => x.length > 0)
 
 const NOTAS_HTML = '<p>Patient responsibilities were discussed including but not limited to daily care, use/misuse, regular maintenance appointments, and routine examination of underlying oral tissues.</p><p>The patient was discharged to return home in satisfactory condition.</p>'
 const hay = (x: unknown[]) => x.length > 0
@@ -76,7 +76,7 @@ export function datosNota(e: EncuentroHistorial, paciente: string): Datos {
     auto_generated: !!e.automatica,
     ...HISTORIA_PACIENTE,
     encounter_questionnaires: [], has_history_questionnaires: false, history_questionnaires: [],
-    has_exams: huboExamenes(e) || hay(v.vitals),
+    has_exams: huboExamenes(e),
     has_ros: hay(v.ros), ros: v.ros,
     has_vitals: hay(v.vitals), vitals: v.vitals, out_of_range_values: '', vitals_notes: '',
     has_physical: hay(v.physical), physical: v.physical,

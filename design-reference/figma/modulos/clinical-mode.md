@@ -4294,9 +4294,8 @@ abrir; los PDF sí. Con eso:
 2. **Sale lo que red.dev no imprime:** Chief Complaint, Triage, Patient History, Treatment Plan y Consent Summary,
    Operative Report, Workflows y el hash de la firma. Dental Assessment, Radiographic, Periodontal y Referral quedan en la
    plantilla porque los pide Jira (CON-2975), y sólo salen si el encuentro los tiene.
-3. **La columna *Exams* no cuenta los signos vitales:** la visita de red.dev que sólo tiene el peso trae *Exams* en la
-   nota, pero en la lista va con cruz (CON-2731: "si se cargó alguna condition o review exam"). Se suma un encuentro así
-   (08/12/2026, Andy Davis).
+3. ~~La columna *Exams* no cuenta los signos vitales~~ — corregido en la cuarta vuelta: en red.dev sí cuentan. Se suma
+   un encuentro con sólo el peso (08/12/2026, Andy Davis).
 4. **La columna *Procedures* no sale de la nota:** en la de red.dev el D2140 de la fila aparece dentro de la orden de
    laboratorio (*Case*), no como un *Operative Report*. Cada encuentro tiene sus procedimientos aparte (`procedimientos`).
 5. Los encuentros de ejemplo (`data/historial`) usan los campos nuevos (`ros`, `vitals`, `physical`,
@@ -4312,4 +4311,41 @@ abrir; los PDF sí. Con eso:
 
 **Todavía sin ver en red.dev:** qué hace el ojo en una fila cancelada (red.dev muestra *Unsigned* también ahí), cómo
 se ven *Add addendum* y los addenda, y el *Download* de varias.
+
+### Cuarta vuelta (2026-11-28): recorrido en red.dev
+
+Julián pasó un usuario de red.dev y se recorrió Patient Summary (página 2 del paciente *AAA test AAA*) sin guardar ni
+firmar nada. Pidió además: *"el add addendum no funciona así, fijalo bien como está en red"* y *"el mensaje 'the clinical
+note…' eso no va"*.
+
+**Cómo se comporta red.dev:**
+
+| Qué | red.dev |
+|---|---|
+| Barra | *Filter by date range* (dos meses, *Clear Filter*) y *Download*, apagado hasta elegir; con elegidas, *2 Selected · Clear*. Sin buscador ni Filter. |
+| Filas | Todas con casilla y ojo, también la cancelada (que dice *Unsigned*). *Procedures* abre un desplegable *Procedures (1)* con código y nombre. |
+| Exams, Ref, Lab, Prescription | Tilde verde o cruz roja. Los signos vitales solos marcan *Exams*. |
+| Ojo · firmada | *Back to History*, *Clinical Note - <paciente>*, *View PDF*, la nota y, abajo al centro, *Add Addendum*. Sin aviso. |
+| Ojo · sin firmar | Igual, con *Sign Clinical Note* abajo; también en la nota de otro provider. Sin aviso. |
+| Ojo · cancelada | *Clinical note can only be rendered for an active or finished encounter* y *Return*; *View PDF* apagado. |
+| Add Addendum | Pop up centrado *Add Clinical Note Addendum*: *Authentication required to sign this addendum*, *Addendum Content* (*Type your addendum here...*), una línea, otra vez *Authentication required…*, *Email* y *Password* lado a lado y *Save Addendum*, apagado hasta completar. |
+| Sign Clinical Note | *Login to Sign Document* (el mismo de Pending Task). |
+| Download | Un PDF por nota elegida (`document-<id>.pdf`). La firmada dice *Date: <fecha>*; los signos vitales fuera de rango, *(Out of range)*. |
+
+**Lo que cambia en la app:**
+
+1. **Add addendum como red.dev:** un solo pop up con el texto y el login, y *Save addendum*. Es el mismo diálogo de la
+   firma (`FirmarDialog` con `addendum`); se va el drawer. Botón primario, como *Sign clinical note*.
+2. **Sin avisos arriba de la nota:** se va *The clinical note can only be signed…* (y cualquier otro).
+3. **Cancelada:** se abre con el error de red.dev (`EmptyState` con *Return*) y *View PDF* apagado; en la lista dice
+   *Unsigned*, como red.dev. *Download* no baja nada de un encuentro cancelado.
+4. **Firmar una nota ajena:** *Sign clinical note* aparece en toda nota sin firmar de un encuentro cerrado; el login dice
+   quién firma (CON-3648). Con el encuentro abierto, sigue sin aparecer.
+5. **Exams cuenta los signos vitales.**
+6. **Download apagado** hasta elegir alguna fila.
+
+**Se mantiene distinto de red.dev, a propósito:** la fecha con el bloque de mes (`ui/date-nav`, como las otras tres
+pestañas, decisión de Julián del 2026-11-27) en lugar del rango; *Filter* (Status y Provider, CON-2731); los
+procedimientos con chip y "+N" (como Medication); la pill de la nota en la barra del visor; *Download* abre las notas
+juntas en una pestaña, una por página, porque el PDF de cada una lo genera el backend.
 

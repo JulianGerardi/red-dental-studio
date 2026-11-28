@@ -143,8 +143,8 @@ export const ENCUENTROS_HISTORIAL: EncuentroHistorial[] = [
     id: 'enc-1027', fecha: '10/27/2026', estado: 'Fulfilled', nota: 'Unsigned', motivo: 'Treatment plan review', provider: 'Dr. Emily Chen',
     eventos: { dental_assessment_findings: [conNota('Deep caries', '#19/O, D', 'Extent: Deep', 'Caries close to the pulp.')] },
   }),
-  /* Cancelado: no hubo atención, no hay nota. */
-  encuentro({ id: 'enc-1020', fecha: '10/20/2026', estado: 'Cancelled', nota: 'None', motivo: 'Cleaning', provider: PROVIDER_SESION }),
+  /* Cancelado: la lista dice Unsigned, como red.dev; el ojo abre el error de red.dev. */
+  encuentro({ id: 'enc-1020', fecha: '10/20/2026', estado: 'Cancelled', nota: 'Unsigned', motivo: 'Cleaning', provider: PROVIDER_SESION }),
   /* Firmada, con un addendum posterior (CON-2730). */
   encuentro({
     id: 'enc-1006', fecha: '10/06/2026', estado: 'Fulfilled', nota: 'Signed', firmada: 'October 6, 2026', motivo: 'Crown prep', provider: PROVIDER_SESION,
@@ -175,7 +175,7 @@ export const ENCUENTROS_HISTORIAL: EncuentroHistorial[] = [
   control('enc-0825', '08/25/2026', 'August 25, 2026', PROVIDER_SESION, 'Filling', [proc('D2140', 'Amalgam – one surface, primary or permanent', '#30/O'), proc('D0220', 'Intraoral – periapical first radiographic image', '#30')], {
     dental_assessment_findings: [conNota('Caries', '#30/O', 'Extent: Moderate')],
   }),
-  /* Sólo los signos vitales: la nota trae Exams, pero la columna Exams va con cruz (como la de Andy Davis en red.dev). */
+  /* Sólo los signos vitales, como la de Andy Davis en red.dev: Exams en la nota y tilde en la columna. */
   control('enc-0812', '08/12/2026', 'August 12, 2026', 'Dr. Andy Davis', 'Extraction', [], { vitals: [{ measurement: 'Weight', value: '186 lbs' }] }),
   control('enc-0805', '08/05/2026', 'August 5, 2026', PROVIDER_SESION, 'Cleaning', [PROFILAXIS, EVALUACION], {
     vitals: vitales(),
@@ -190,7 +190,7 @@ export const ENCUENTROS_HISTORIAL: EncuentroHistorial[] = [
     ros: [ROS_GENERAL],
     dental_assessment_findings: [conNota('Gingival recession', '#6/B', 'Extent: 2 mm')],
   }, { zona: 'Europe/Berlin' }),
-  encuentro({ id: 'enc-0518', fecha: '05/18/2026', estado: 'Cancelled', nota: 'None', motivo: 'Cleaning', provider: 'Dr. Elena Martinez' }),
+  encuentro({ id: 'enc-0518', fecha: '05/18/2026', estado: 'Cancelled', nota: 'Unsigned', motivo: 'Cleaning', provider: 'Dr. Elena Martinez' }),
   control('enc-0407', '04/07/2026', 'April 7, 2026', PROVIDER_SESION, 'Night guard delivery', [proc('D9944', 'Occlusal guard – hard appliance, full arch', 'Upper arch')]),
   control('enc-0316', '03/16/2026', 'March 16, 2026', PROVIDER_SESION, 'Night guard impression', [proc('D9944', 'Occlusal guard – hard appliance, full arch', 'Upper arch', 'in progress')], {
     lab_orders: [orden('Olivos Laboratory', 'Hard occlusal guard, maxillary.', '2026-04-06', 'Night guard', 'Occlusal guard – hard appliance, full arch', '')],
