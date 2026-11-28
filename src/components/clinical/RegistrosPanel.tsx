@@ -117,10 +117,11 @@ const CONFIG: Record<TipoRegistro, {
 
 type Vista = { modo: 'lista' } | { modo: 'ficha'; id: string } | { modo: 'nuevo'; borrador: Registro }
 
-export function RegistrosPanel({ kind, paciente, tarea, maximo }: {
+export function RegistrosPanel({ kind, paciente, pacienteId, tarea, maximo }: {
   kind: TipoRegistro
   /** El paciente de Clinical Mode: a su nombre quedan los registros nuevos (y su PDF). */
   paciente?: string
+  pacienteId?: string
   /** La tarea de Pending Task que abrió Complete this task: entra directo a su ficha (CON-2643). */
   tarea?: PendingTask
   /** Cuántos registros mostrar como mucho (Storybook). */
@@ -152,14 +153,15 @@ export function RegistrosPanel({ kind, paciente, tarea, maximo }: {
   if (abierto) {
     return (
       <>
-        <c.Ficha key={abierto.id} registro={abierto} onVolver={aLista} onAccion={hacer} />
+        {/* Otro estado, otra ficha: lo que no se guardó antes de Cancel o Delete no queda a la vista como si estuviera. */}
+        <c.Ficha key={`${abierto.id}-${abierto.state}`} registro={abierto} onVolver={aLista} onAccion={hacer} />
         {acciones.dialogo}
       </>
     )
   }
 
   /* En Clinical Mode nada de esto pide un encuentro abierto: ni New, ni editar, ni las acciones (Julián, 2026-11-27). */
-  const nuevo = <Button size="md" onClick={() => setVista({ modo: 'nuevo', borrador: nuevoRegistro(kind, tarea ? { person: tarea.person, initials: tarea.initials, patientId: tarea.patientId } : paciente ? { person: paciente, initials: paciente.split(/\s+/).map((x) => x[0]).join('').slice(0, 2).toUpperCase() } : undefined) })}><Plus /> New {c.nombre}</Button>
+  const nuevo = <Button size="md" onClick={() => setVista({ modo: 'nuevo', borrador: nuevoRegistro(kind, tarea ? { person: tarea.person, initials: tarea.initials, patientId: tarea.patientId } : paciente ? { person: paciente, patientId: pacienteId, initials: paciente.split(/\s+/).map((x) => x[0]).join('').slice(0, 2).toUpperCase() } : undefined) })}><Plus /> New {c.nombre}</Button>
   const fechaDe = (r: Registro) => new Date(c.fecha(r))
   const visibles = registros.filter((r) =>
     c.texto(r).toLowerCase().includes(q.trim().toLowerCase())
@@ -199,7 +201,8 @@ export function RegistrosPanel({ kind, paciente, tarea, maximo }: {
         onRowClick={(r) => setVista({ modo: 'ficha', id: r.id })}
         toolbarStart={(
           <>
-            <SettingsSearch value={q} onChange={setQ} placeholder={`Search ${c.plural}`} />
+            {/* Con un mínimo: en tablet la barra baja de renglón en vez de achicar el buscador hasta cortar el texto. */}
+            <SettingsSearch value={q} onChange={setQ} placeholder={`Search ${c.plural}`} className="min-w-[200px]" />
             <FilterMenu label={`Filter ${c.plural}`} groups={grupos} />
             {/* La fecha, con el bloque del Dashboard (‹ Today › + calendario, ui/date-nav), por mes: el del vencimiento o
                 el de la derivación. Sin mes elegido, All dates. */}
@@ -210,7 +213,7 @@ export function RegistrosPanel({ kind, paciente, tarea, maximo }: {
         rowActions={(r) => (
           <>
             {!esEditable(r) && item(<Eye className="size-3.5" />, 'View', () => setVista({ modo: 'ficha', id: r.id }))}
-            {accionesDe(r).length > 0 && <ItemsTarea task={r} abierto onAccion={hacer} />}
+            {accionesDe(r).length > 0 && <ItemsTarea task={r} onAccion={hacer} />}
           </>
         )}
         pageSize={10}

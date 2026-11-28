@@ -373,7 +373,7 @@ export const PDFS: Pdf[] = [
           ['Quantity to dispense', '{{quantity}}'], ['Refills', '{{refills}}'],
           ['Generic substitution', '{{generic_substitution}}'], ['Controlled substance', '{{controlled_substance}}'],
         ] }] },
-        { titulo: 'Additional indications', bloques: [{ tipo: 'texto', texto: '{{additional_indications}}{{^additional_indications}}No additional indications.{{/additional_indications}}' }] },
+        { titulo: 'Additional instructions', bloques: [{ tipo: 'texto', texto: '{{additional_indications}}{{^additional_indications}}No additional instructions.{{/additional_indications}}' }] },
       ],
       firmas: [{ rol: 'Prescriber', prefijo: 'provider' }],
       pie: 'Prescription',

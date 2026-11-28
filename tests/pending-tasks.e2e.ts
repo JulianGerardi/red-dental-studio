@@ -4,22 +4,20 @@ import { expect } from 'e2e'
 /* Lo que hacen los botones de Pending Task (videos de red.dev de Julián, 2026-11-20; CON-2641 y CON-2643). Ver
    design-reference/figma/modulos/dashboard.md. */
 
-const SIN_ENCUENTRO = /no open encounter for the selected patient/
-
-test('Sin encuentro abierto las opciones del ⋮ quedan deshabilitadas y un tooltip dice por qué', async ({ app, screen }) => {
+/* James Foster todavía no llegó: su ⋮ funciona igual, sin encuentro abierto (dashboard.md, 2026-11-27). */
+test('Sin encuentro abierto las opciones del ⋮ funcionan: Cancel pregunta y saca la orden', async ({ app, screen }) => {
   await app.open('/')
   await screen.getByRole('tab', /^Lab orders/).tap()
   await screen.getByRole('button', 'Actions for Lab order for James Foster').tap()
-  await expect(screen.getByRole('menuitem', 'Cancel')).toHaveAttribute('aria-disabled', 'true')
-  /* El tooltip abre también con el foco del teclado. */
-  await screen.getByRole('menuitem', 'Cancel').focus()
-  await expect(screen.getByRole('tooltip')).toContainText(SIN_ENCUENTRO)
+  await expect(screen.getByRole('menuitem', 'Cancel')).not.toHaveAttribute('aria-disabled', 'true')
+  await screen.getByRole('menuitem', 'Cancel').tap()
+  await screen.getByRole('dialog', 'Cancel lab order').getByRole('button', 'Cancel lab order').tap()
+  await expect(screen.getByRole('button', 'Actions for Lab order for James Foster')).toHaveCount(0)
 })
 
 test('Request pasa la orden a Requested y Cancel la saca de la lista', async ({ app, screen }) => {
   await app.open('/')
   await screen.getByRole('tab', /^Lab orders/).tap()
-  /* Olivia Brooks está en el sillón: su encuentro está abierto. */
   await screen.getByRole('button', 'Actions for Lab order for Olivia Brooks').tap()
   await screen.getByRole('menuitem', 'Request').tap()
   await screen.getByRole('dialog', 'Request lab order').getByRole('button', 'Mark as requested').tap()
@@ -119,16 +117,22 @@ test('Complete this task abre el detalle de la Referral; una ya pedida, en sólo
   await expect(screen.getByRole('button', 'New provider')).toBeDisabled()
 })
 
-test('Una Referral Pending con encuentro abierto se edita, valida y se pide desde su ⋮', async ({ app, screen }) => {
+test('Una Referral Pending se edita, valida y se pide desde su ⋮', async ({ app, screen }) => {
   await app.open('/')
   await screen.getByRole('tab', /^Referrals/).tap()
-  /* Olivia Brooks está en el sillón: su encuentro está abierto. */
   await screen.getByRole('button', /Complete this task/).last().tap()
   await expect(screen.getByText('Read-only mode')).toHaveCount(0)
 
   await screen.getByRole('textbox', /^Referral note/).fill('')
   await screen.getByRole('button', 'Save').tap()
   await expect(screen.getByText('This field is required.')).toBeVisible()
+
+  /* Con cambios sin guardar, Request valida antes: con la nota vacía no pregunta (clinical-mode.md, 2026-11-28). */
+  await screen.getByRole('button', 'Actions for Referral for Olivia Brooks').tap()
+  await screen.getByRole('menuitem', 'Request').tap()
+  await expect(screen.getByRole('dialog', 'Request referral')).toHaveCount(0)
+  await screen.getByRole('textbox', /^Referral note/).fill('Evaluate tooth 14 before the crown.')
+  await expect(screen.getByText('This field is required.')).toHaveCount(0)
 
   await screen.getByRole('button', 'Actions for Referral for Olivia Brooks').tap()
   await screen.getByRole('menuitem', 'Request').tap()
@@ -141,7 +145,6 @@ test('Una Referral Pending con encuentro abierto se edita, valida y se pide desd
    superficies del diente elegido (Lingual arriba en la mandíbula). */
 test('Lab order: dentición mixta y Toggle all por diente', async ({ app, screen }) => {
   await app.open('/patients/john-smith/clinical-mode?tab=Lab%20order')
-  await screen.getByRole('button', /Start encounter/).tap()
   await screen.getByRole('button', /New lab order/).tap()
   await screen.getByRole('button', 'Initialize permanent dentition').tap()
   await screen.getByRole('button', 'Tooth 17').tap()
@@ -158,7 +161,6 @@ test('Lab order: dentición mixta y Toggle all por diente', async ({ app, screen
 /* Una Referral Requested se completa o se rechaza desde su ⋮, con la pregunta de red.dev (video del 2026-11-27). */
 test('Referral Requested: Complete pregunta y la saca de Pending Task', async ({ app, screen }) => {
   await app.open('/patients/john-smith/clinical-mode?tab=Referral&task=paciente-referrals-1')
-  await screen.getByRole('button', /Start encounter/).tap()
   await screen.getByRole('button', /^Actions for Referral/).tap()
   await expect(screen.getByRole('menuitem', 'Reject')).toBeVisible()
   await screen.getByRole('menuitem', 'Complete').tap()

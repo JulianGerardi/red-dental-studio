@@ -166,6 +166,9 @@ export const registrosDe = (kind: TipoRegistro): Registro[] =>
 
 export const registroDe = (id: string | undefined) => TIPOS_REGISTRO.flatMap(registrosDe).find((r) => r.id === id)
 
+/** Los creados con New para un paciente: entran a su Pending Task (Patient Dashboard) mientras sigan pendientes. */
+export const creadosDe = (patientId: string): Registro[] => registros.filter((r) => r.id.startsWith('nuevo-') && r.patientId === patientId)
+
 /** Crea o reemplaza un registro (New y Save de la ficha). */
 export function guardarRegistro(r: Registro) {
   registros = registros.some((x) => x.id === r.id) ? registros.map((x) => (x.id === r.id ? r : x)) : [r, ...registros]
@@ -233,7 +236,11 @@ export function hojaDeRegistro(t: PendingTask): string | undefined {
     const permanentes = r.lab.dientes.filter((d) => /^\d+$/.test(d))
     propios = {
       expiration_date: fechaLarga(r.expiration), lab_name: r.lab.laboratorio, lab_phone: lab?.telefono ?? '-', lab_email: lab?.email ?? '-', lab_address: lab?.direccion ?? '-',
-      work_request: [r.lab.asap ? 'ASAP.' : '', r.lab.trabajo, r.lab.indicaciones.trim() && `Special instructions: ${r.lab.indicaciones.trim()}`].filter(Boolean).join(' '),
+      /* Un renglón por dato: ASAP, el trabajo, las indicaciones y los procedimientos vinculados (clinical-mode.md, 2026-11-27). */
+      work_request: [
+        r.lab.asap ? 'ASAP.' : '', r.lab.trabajo, r.lab.indicaciones.trim() && `Special instructions: ${r.lab.indicaciones.trim()}`,
+        ...procedimientosDe(r.lab.procedimientos, PROCEDIMIENTOS_LAB).map((x, i) => `${i ? '' : 'Procedures:\n'}${x.codigo} · ${x.nombre}${zona(x) !== '-' ? ` (${zona(x)})` : ''}`),
+      ].filter(Boolean).join('\n'),
       /* La plantilla dibuja una dentición: la que tiene dientes marcados (la permanente si hay de las dos). */
       dentition: permanentes.length || !r.lab.dientes.length ? 'Permanent' : 'Primary',
       teeth: r.lab.dientes.map((d) => ({ tooth: d, surfaces: (r.lab!.superficies[d] ?? []).join(', ') })),
@@ -254,7 +261,7 @@ export function hojaDeRegistro(t: PendingTask): string | undefined {
     const destino = proveedoresDerivacion().find((x) => x.nombre === d.proveedor)
     propios = {
       created_date: fechaLarga(r.register), asap: siNo(d.asap), mandatory: siNo(d.obligatoria),
-      contact_name: d.proveedor, contact_type: 'Dentist', contact_specialty: destino?.especialidad || '-', contact_phone: '-', contact_email: '-', contact_address: '-',
+      contact_name: d.proveedor, contact_type: 'Dentist', contact_specialty: destino?.especialidad || '-', contact_phone: destino?.telefono || '-', contact_email: destino?.email || '-', contact_address: destino?.direccion || '-',
       procedures: procedimientosDe(d.procedimientos, PROCEDIMIENTOS_REFERRAL).map((x) => ({ code: x.codigo, description: x.nombre, anatomic_area: zona(x), findings: [], diagnoses: [] })),
       referral_note: d.nota,
       attachments: d.adjuntos.map((a, i) => ({ annex_label: String.fromCharCode(65 + i), name: a.nombre, file_type: /\.pdf$/i.test(a.nombre) ? 'PDF' : 'Image', is_image: false, file_url: '' })),
