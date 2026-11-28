@@ -64,7 +64,7 @@ const CONFIG: Record<TipoRegistro, {
   estados: string[]
   Ficha: ComponentType<PropsFicha>
   columnas: DataTableColumn<Registro>[]
-  /** *Delete* va como tacho en la fila (Prescription y Referral, como red.dev) y no en el ⋮ (Lab order). */
+  /** *Delete* va como tacho en la fila (Referral, como red.dev) y no en el ⋮ (Lab order y Prescription; Julián, 2026-11-28). */
   tachoEnFila?: boolean
   /** Qué nombra a la fila para el lector de pantalla. */
   rotulo: (r: Registro) => string
@@ -77,7 +77,7 @@ const CONFIG: Record<TipoRegistro, {
     rotulo: (r) => `lab order for ${r.lab?.laboratorio || r.person}, ${r.state}, created ${r.register}`,
   },
   Prescriptions: {
-    nombre: 'prescription', plural: 'prescriptions', icono: IconoPastilla, Ficha: PrescriptionDetail, tachoEnFila: true,
+    nombre: 'prescription', plural: 'prescriptions', icono: IconoPastilla, Ficha: PrescriptionDetail,
     estados: ['Pending', 'Active', 'Expired', 'Canceled'],
     columnas: [
       proveedor('Provider'),

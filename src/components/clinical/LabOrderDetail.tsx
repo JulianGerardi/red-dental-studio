@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { FileText, Plus } from 'lucide-react'
+import { Plus } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { aviso } from '@/components/ui/toaster'
 import { Button } from '@/components/ui/button'
@@ -14,7 +14,7 @@ import { OBLIGATORIO } from '@/lib/validacion'
 import { RuedaSuperficies, superficiesDe, type SuperficieLab } from './dental/RuedaSuperficies'
 import { ArcadaAnatomica } from './dental/ArcadaAnatomica'
 import { NewLaboratoryDrawer } from './NewLaboratoryDrawer'
-import { Adjuntos, AvisosFicha, EncabezadoFicha, ProcedimientoResumen, ProcedimientosVinculados, type ProcedimientoFicha } from './FichaClinica'
+import { Adjuntos, AvisosFicha, BotonDocumento, EncabezadoFicha, ProcedimientoResumen, ProcedimientosVinculados, type ProcedimientoFicha } from './FichaClinica'
 import { LAB_VACIO, PROCEDIMIENTOS_LAB, agregarLaboratorio, guardarRegistro, hoy, laboratorios as listaLaboratorios, type Registro } from './registros'
 import type { Denticion, Laboratorio } from '@/data/laboratorios'
 import type { PendingTask } from '@/components/dashboard/PendingTaskCard'
@@ -143,7 +143,7 @@ export function LabOrderDetail({ registro, nuevo, onVolver, onAccion }: {
           </div>
         )}
         acciones={!nuevo && <>
-          {registro.pdf && <Button variant="secondary" onClick={() => onAccion(registro, 'PDF')}><FileText /> PDF</Button>}
+          <BotonDocumento registro={registro} onAccion={onAccion} />
           <MenuTarea task={registro} onAccion={accion} sin={['Edit']} />
         </>}
       />

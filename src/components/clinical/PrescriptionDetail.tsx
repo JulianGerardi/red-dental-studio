@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { FileText, Plus, Trash2 } from 'lucide-react'
+import { Plus, Trash2 } from 'lucide-react'
 import { aviso } from '@/components/ui/toaster'
 import { Button } from '@/components/ui/button'
 import { ConfirmDialog } from '@/components/ui/confirm-dialog'
@@ -15,8 +15,8 @@ import {
   type Medicacion,
 } from '@/data/recetas'
 import type { PendingTask } from '@/components/dashboard/PendingTaskCard'
-import { MenuTarea, TONO_ESTADO, accionesDe, esEditable, type AccionUI } from '@/components/dashboard/tareas'
-import { AvisosFicha, EncabezadoFicha } from './FichaClinica'
+import { MenuTarea, TONO_ESTADO, esEditable, type AccionUI } from '@/components/dashboard/tareas'
+import { AvisosFicha, BotonDocumento, EncabezadoFicha } from './FichaClinica'
 import { guardarRegistro, hoy, type Registro } from './registros'
 
 /* La ficha de una Prescription: la misma para New prescription, Edit y la vista de una receta que ya no se edita. Campos,
@@ -138,8 +138,8 @@ export function PrescriptionDetail({ registro, nuevo, onVolver, onAccion }: {
             {errorVence && <FieldError>{errorVence}</FieldError>}
           </div>
         )}
-        acciones={!nuevo && (registro.pdf || accionesDe(registro).some((x) => x !== 'Edit')) && <>
-          {registro.pdf && <Button variant="secondary" onClick={() => onAccion(registro, 'PDF')}><FileText /> PDF</Button>}
+        acciones={!nuevo && <>
+          <BotonDocumento registro={registro} onAccion={onAccion} />
           <MenuTarea task={registro} onAccion={accion} sin={['Edit']} />
         </>}
       />

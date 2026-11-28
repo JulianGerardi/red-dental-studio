@@ -141,19 +141,21 @@ test('Prescription: Filter por estado y provider, Expire en una Active y Delete 
   await screen.getByRole('button', /^Filter prescriptions(?! by)/).tap()
   await screen.getByRole('button', 'Clear all').tap()
   await screen.getByRole('menuitemcheckbox', /^Active/).press('Escape')
-  /* Delete es el tacho de la fila (como red.dev), no una opción del ⋮: Pending trae Edit, Activate y Cancel. */
+  /* Delete va en el ⋮ (Julián, 2026-11-28): Pending trae Edit, Activate, Cancel y Delete; la fila no tiene tacho. */
+  await expect(screen.getByRole('button', /^Delete the prescription/)).toHaveCount(0)
   await screen.getByRole('button', /^Actions for prescription of Clonazepam 1 mg, Pending/).tap()
-  await expect(screen.getByRole('menuitem', 'Delete')).toHaveCount(0)
-  await screen.getByRole('menuitem', 'Activate').press('Escape')
-  await screen.getByRole('button', /^Delete the prescription of Clonazepam 1 mg, Pending/).tap()
+  await screen.getByRole('menuitem', 'Delete').tap()
   await screen.getByRole('dialog', 'Delete prescription').getByRole('button', 'Confirm').tap()
   await expect(screen.getByText('The prescription has been successfully deleted.')).toBeVisible()
   await expect(screen.getByText(/Showing 1 to 6 of 6 results/)).toBeVisible()
-  /* Fuera de Pending el tacho está apagado y el ⋮ sólo trae Edit, apagado. */
-  await expect(screen.getByRole('button', /^Delete the prescription of .*Expired/).first()).toBeDisabled()
+  /* Fuera de Pending el ⋮ sólo trae Edit, apagado. */
   await screen.getByRole('button', /^Actions for prescription of .*Expired/).first().tap()
   await expect(screen.getByRole('menuitem')).toHaveCount(1)
   await expect(screen.getByRole('menuitem', 'Edit')).toHaveAttribute('aria-disabled', 'true')
+  await screen.getByRole('menu').press('Escape')
+  /* La ficha muestra el documento siempre, como red.dev: apagado mientras no existe. */
+  await screen.getByRole('row', /Expired/).first().tap()
+  await expect(screen.getByRole('button', /^PDF: The document is only available while the prescription is active/)).toHaveAttribute('aria-disabled', 'true')
 })
 
 /* Request desde la ficha deja la orden sin edición: lo que se cambió y no se guardó sale igual en el pedido, y lo creado

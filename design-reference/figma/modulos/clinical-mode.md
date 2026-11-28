@@ -4469,3 +4469,20 @@ historia nueva: son correcciones sobre CON-2214, CON-2212 y CON-2321 (y CON-2584
   Smith y no del primero de la lista.
 - Pendientes (baja): el foco se pierde después de borrar con el tacho de la fila; el tacho y el PDF apagados explican el
   motivo sólo con `title` (no por teclado); `ui/date-nav` conserva `vacio` / `onClear` sin uso.
+
+## CON-2212 · CON-2214 · CON-2321 · Delete de Prescription en el ⋮ y el documento siempre en la ficha (2026-11-28, 2ª vuelta)
+
+Julián: "en prescription el delete lo pondría dentro del elipsis" y "fijate en red que el documento cuando pongo editar
+alguna fila se muestra dentro del archivo, mismo caso para referral".
+
+1. **Prescription: Delete vuelve al ⋮** (Pending: Edit, Activate, Cancel, Delete), como Lab order; sale la columna del
+   tacho. Referral sigue con el tacho en la fila, como red.dev: a confirmar con Julián si también pasa al ⋮.
+2. **El documento siempre en la ficha** (`FichaClinica` › `BotonDocumento`), en las tres: en red.dev la ficha de Lab order
+   y la de Prescription muestran el botón del documento en todos los estados, apagado cuando no hay; la de Referral no lo
+   tiene y Julián lo pide igual. Prendido cuando el documento existe (la misma regla que la tabla); apagado, con el
+   motivo en un tooltip ("The document is generated when the referral is requested."). En New no va.
+
+### Anomalías
+
+1. En red.dev la ficha de Prescription prende el documento también en Expired y Cancelled, aunque la tabla sólo lo
+   prende en Active. Acá ficha y tabla siguen la misma regla (sólo Active).

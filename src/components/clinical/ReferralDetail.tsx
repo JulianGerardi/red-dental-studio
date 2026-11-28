@@ -1,5 +1,5 @@
 import { useState, type ReactNode } from 'react'
-import { FileText, Plus } from 'lucide-react'
+import { Plus } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { aviso } from '@/components/ui/toaster'
 import { Button } from '@/components/ui/button'
@@ -12,7 +12,7 @@ import type { DatosDerivacion, ProveedorDerivacion } from '@/data/clinical-mode'
 import type { PendingTask } from '@/components/dashboard/PendingTaskCard'
 import { MenuTarea, TONO_ESTADO, esEditable, type AccionUI } from '@/components/dashboard/tareas'
 import { NewProviderDrawer } from './NewProviderDrawer'
-import { Adjuntos, AvisosFicha, EncabezadoFicha, ProcedimientoResumen, ProcedimientosVinculados, type Adjunto } from './FichaClinica'
+import { Adjuntos, AvisosFicha, BotonDocumento, EncabezadoFicha, ProcedimientoResumen, ProcedimientosVinculados, type Adjunto } from './FichaClinica'
 import { PROCEDIMIENTOS_REFERRAL, agregarProveedor, guardarRegistro, hoy, proveedoresDerivacion, urge, type Registro } from './registros'
 
 /* La ficha de una Referral: la misma para New referral, Edit y la vista de una derivación que ya no se edita. Mismos datos
@@ -81,7 +81,7 @@ export function ReferralDetail({ registro, nuevo, onVolver, onAccion }: {
            van: red.dev no los muestra (Julián, 2026-11-28). */
         datos={nuevo ? undefined : [['Referring provider', registro.provider ?? '—'], ['Referral date', registro.register], ...(registro.expiration ? [['Expiration date', <span key="vence" className={cn(urge(registro) && 'text-dash-bad-fg')}>{registro.expiration}</span>] as [string, ReactNode]] : [])]}
         acciones={!nuevo && <>
-          {registro.pdf && <Button variant="secondary" onClick={() => onAccion(registro, 'PDF')}><FileText /> PDF</Button>}
+          <BotonDocumento registro={registro} onAccion={onAccion} />
           <MenuTarea task={registro} onAccion={accion} sin={['Edit']} />
         </>}
       />

@@ -1,7 +1,10 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react'
-import { ArrowLeft, Paperclip, Trash2, X } from 'lucide-react'
+import { ArrowLeft, FileText, Paperclip, Trash2, X } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Alert } from '@/components/ui/alert'
+import { Button } from '@/components/ui/button'
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
+import type { PendingTask } from '@/components/dashboard/PendingTaskCard'
 import { Chip } from '@/components/ui/chip'
 import { Pill, type PillTone } from '@/components/ui/pill'
 import { TONO_PROCEDIMIENTO } from './accionesProcedimiento'
@@ -64,6 +67,30 @@ export function EncabezadoFicha({ titulo, estado, tono, acciones, onVolver, volv
         </div>
       )}
     </div>
+  )
+}
+
+/* Por qué todavía (o ya) no hay documento, según el registro y su estado (clinical-mode.md, 2026-11-28). */
+const SIN_DOCUMENTO: Record<string, (estado: string) => string> = {
+  'Lab orders': (e) => (e === 'Pending' ? 'The document is generated when the lab order is requested.' : 'This lab order was canceled before it was requested: it has no document.'),
+  Prescriptions: (e) => (e === 'Pending' ? 'The document is available once the prescription is active.' : 'The document is only available while the prescription is active.'),
+  Referrals: (e) => (e === 'Pending' ? 'The document is generated when the referral is requested.' : 'The document is only available while the referral is requested.'),
+}
+
+/** El documento en el título de la ficha, como red.dev: siempre a la vista al editar o ver un registro; apagado (con el
+ *  motivo en un tooltip, también con el teclado) mientras no existe. */
+export function BotonDocumento({ registro, onAccion }: { registro: PendingTask; onAccion: (t: PendingTask, a: 'PDF') => void }) {
+  if (registro.pdf) return <Button variant="secondary" onClick={() => onAccion(registro, 'PDF')}><FileText /> PDF</Button>
+  const motivo = SIN_DOCUMENTO[registro.kind]?.(registro.state) ?? 'No document yet.'
+  return (
+    <TooltipProvider delayDuration={100}>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <Button variant="secondary" aria-disabled aria-label={`PDF: ${motivo}`} className="cursor-not-allowed opacity-50 hover:bg-surface active:bg-surface"><FileText /> PDF</Button>
+        </TooltipTrigger>
+        <TooltipContent side="bottom" className="max-w-[240px] text-center">{motivo}</TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
   )
 }
 
