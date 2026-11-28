@@ -3,7 +3,7 @@
 Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber el dev. El porqué de cada decisión está en
 `design-reference/figma/modulos/<módulo>.md`; lo anterior al 2026-10-06, en `git log` y en esos mismos archivos.
 
-## 2026-11-27
+## 2026-11-28
 
 ### Pending Task ya no pide un encuentro abierto (CON-2641, CON-2643) ([#220](https://github.com/JulianGerardi/red-dental-studio/pull/220))
 - **El ⋮ de cada tarea funciona siempre**, en el Dashboard y en el Patient Dashboard, igual que en Clinical Mode desde
@@ -20,6 +20,19 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
   nombre del paciente correcto y con los procedimientos vinculados (`.texto` de `pdfs/marco` conserva saltos de línea);
   lo creado con New entra a Pending task del paciente (`registros.creadosDe`); los errores se van al corregir el campo.
   Detalle en `modulos/clinical-mode.md` (2026-11-28).
+
+### Contadores: todos con el globo azul de la campana ([#224](https://github.com/JulianGerardi/red-dental-studio/pull/224))
+- **Un solo contador, `Globo`** (`components/dashboard/primitives`): círculo azul con número blanco, el de la campana.
+  Lo usan *Appointments*, *Waiting room*, *Rooms* y cada sala (Dashboard), *Today appointments* y *Recent patients*
+  (Patients) y las cuatro cards clínicas de la ficha.
+- **Props:** `n` y `texto: [singular, plural]` (tooltip y lector: "9 appointments to check in"); `invertido` sobre fondo
+  azul (card clínica abierta); `sinTooltip` dentro de un botón. En cero no se muestra; arriba de 99, "99+".
+- `OperatoryCard` deja su `<span>` propio y `PatientDetail` deja `ui/count`, que queda sólo en `FilaDetalle` y
+  `PermissionsPicker`.
+- Los títulos de los paneles cambian de nombre accesible (`Appointments 9 appointments to check in`): los e2e ya lo leen.
+- Decisión y fuentes en `modulos/dashboard.md` (2026-11-28).
+
+## 2026-11-27
 
 ### Fee schedules: el aviso de la fecha va al lado del campo ([#222](https://github.com/JulianGerardi/red-dental-studio/pull/222))
 - **Available from:** el aviso de qué pasa con la fecha (*Starts today* / *Starts on …*, `ui/alert`) va en la columna de al

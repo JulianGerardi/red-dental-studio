@@ -1242,3 +1242,33 @@ no coincidían con las de Appointments. Resuelve lo que quedó "para validar" el
 **A validar:** si el rótulo de 10 px se lee bien en la pantalla de recepción, que suele estar lejos, y si los 16 px
 entre cards no hacen que entren menos turnos de los que recepción necesita ver de un vistazo.
 
+## Contadores: un solo globo, el de la campana (2026-11-28)
+
+Julián: el globo azul de *Appointments*, *Waiting room* y *Rooms* (y el de las cards clínicas de la ficha) es el de la
+campana, pero "que tengo 6 rooms no lo veo como una notificación". Pidió primero ver cómo lo resuelven otras apps. Una
+primera vuelta (etiqueta celeste para todos los contadores, 2026-11-27) se descartó: lo que avisa tiene que verse
+**igual que la campana**.
+
+**Investigación:** ninguna de las guías leídas usa el mismo estilo para notificación y total. Atlassian: un badge, pero el
+relleno fuerte "for unread notification counts", y "use bold badges sparingly"; los totales, neutros. ServiceTitan
+(Anvil): el badge es "something requires a user's attention" y prohíbe usarlo para "the count of items within (a Tab or
+folder)". Primer: el número siempre al lado de un texto que diga qué se cuenta. Ant y Anvil: se esconde en cero, tope 99+,
+y `aria-label` con el contexto ("Cases with 6 items to review"). Slack: número cuando la cantidad decide la acción.
+
+1. **Primera vuelta (descartada el mismo día):** globo sólo en lo que hay que atender y número gris para los totales
+   (Rooms, Recent patients, cada sala). Julián: "confunde; dejemos todo círculos azules con número en blanco".
+2. **Queda un solo contador, el globo de la campana** (`Globo`, `dashboard/primitives`): *Appointments*, *Waiting room* y
+   *Rooms* (Dashboard), cada sala de *Rooms*, *Today appointments* y *Recent patients* (Patients) y las cuatro cards
+   clínicas de la ficha. Se aparta de lo que recomiendan Atlassian y Anvil (ver arriba) a favor de una sola forma.
+3. **Reglas del globo:** en cero no se muestra; arriba de 99, "99+"; tooltip y texto para el lector que dicen qué se cuenta
+   ("9 appointments to check in", "8 patients in the waiting room", "6 rooms", "6 appointments today" en cada sala). En
+   la sala vacía (Emergency) no hay globo: ya dice *No bookings*. En las cards clínicas (son
+   botones) va sólo el texto para el lector ("4 items on record"), sin tooltip. Sobre la card clínica abierta, azul el
+   número sobre `info-bg`.
+4. Quedan con `ui/count` (celeste) las cuentas de `FilaDetalle` y `PermissionsPicker`: no se tocaron en esta tanda.
+5. e2e: los títulos se leen con el texto nuevo (`Appointments 9 appointments to check in`); el Dashboard vacío ya no
+   muestra "Appointments 0".
+6. Sin historia de Jira: es una regla visual del design system.
+
+**A validar con usuarios:** si recepción entiende el globo de *Appointments* como "turnos que faltan llegar" (cuenta los
+que no hicieron check in, no los del día); y si con tantos globos azules juntos la campana sigue llamando la atención.

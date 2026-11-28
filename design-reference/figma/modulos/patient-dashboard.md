@@ -232,6 +232,9 @@ centro vertical igual al del título.
 El globo es ahora la pieza `Count` (`src/components/ui/count.tsx`, página *Elements / Counts* del Storybook), no un
 `<span>` suelto en `PatientDetail`: el design system es la fuente y la pantalla sólo la usa.
 
+**2026-11-28:** las cuatro cards pasan al globo azul relleno de la campana (`Globo`), que no se muestra en cero; ver
+dashboard.md (*Contadores: un solo globo, el de la campana*).
+
 ## Appointments: la misma card que las solicitudes de Scheduling (2026-10-12)
 
 Julián: "las card de appointment request y las de appointment que están en el patient dashboard deben tener el mismo

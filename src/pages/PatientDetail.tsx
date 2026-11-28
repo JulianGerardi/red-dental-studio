@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { ChevronDown, PersonStanding, Clipboard, Pill as PillIcon, ClipboardList, Activity, type LucideIcon } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import { Count } from '@/components/ui/count'
+import { Globo } from '@/components/dashboard/primitives'
 import { EmptyState } from '@/components/ui/empty-state'
 import { PatientSidePanel } from '@/components/patients/PatientSidePanel'
 import { PatientBreadcrumb } from '@/components/patients/PatientBreadcrumb'
@@ -130,7 +130,7 @@ export default function PatientDetail({ turnos = APPTS.length }: { turnos?: numb
                     <span className={cn('truncate text-[13px] font-semibold', activa ? 'text-white' : 'text-ink')}>
                       {label}
                     </span>
-                    <Count active={activa}>{items[label].length}</Count>
+                    <Globo n={items[label].length} texto={['item on record', 'items on record']} invertido={activa} sinTooltip />
                     <ChevronDown
                       className={cn(
                         'ml-auto size-4 shrink-0 transition-transform',
