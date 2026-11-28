@@ -76,10 +76,8 @@ const IMPORTES: Bloque = {
   nota: 'The patient portion includes {{deductible_applied}} of deductible. Estimates are not a guarantee of coverage or payment. Final insurance benefits and patient responsibility may vary.',
 }
 
-/* La nota clínica es texto (CON-2975): un finding de examen es "{finding} on #{tooth}/{surface} or location [details: (…)].({note})".
-   "Documents sent: Yes" sólo si se adjuntó un archivo a la orden. */
+/* La nota clínica es texto (CON-2975): un finding de examen es "{finding} on #{tooth}/{surface} or location [details: (…)].({note})". */
 const FINDING = '<li>{{finding}} on {{location}}{{#details}} [details: ({{details}})]{{/details}}.{{#note}} ({{note}}){{/note}}</li>'
-const DOCUMENTOS_ENVIADOS = '{{#document_sent}}<p><b>Documents sent:</b> Yes</p>{{/document_sent}}'
 
 /* El caso del ejemplo (Restorative plan), con los importes que calcula Estimate details (data/estimaciones): cobertura
    del 100 % en D1, 80 % en D2-D4, 85 % permitido y $50 de deducible. Fee = seguro + ajuste + paciente. */
@@ -96,15 +94,15 @@ export const PDFS: Pdf[] = [
     id: 'clinical-note',
     categoria: 'Clinical records',
     nombre: 'Clinical note',
-    cuando: 'Generate Clinical Note in Clinical Mode (as many times as needed until it is signed), or on its own when the encounter closes after 48 hours. View PDF in Pending tasks, Treatment history and patient documents.',
-    firma: 'Only the provider: name, date and time, and the content hash. Addenda are signed by their author.',
-    origen: 'propuesta',
+    cuando: 'Generate Clinical Note in Clinical Mode (as many times as needed until it is signed), or on its own when the encounter closes after 48 hours. View PDF in Patient Summary (the eye of each encounter), Pending tasks and patient documents; Download in Patient Summary.',
+    firma: 'Only the provider: name and date. Addenda are signed by their author.',
+    origen: 'app',
     completado: [
-      'Texts and order from the clinical note spec (CON-2975, CON-3081, CON-3605, CON-3668) and the notes generated in red.dev',
-      'Orders and workflows as label and value: the spec does not give their text',
-      'Additional Notes and Addenda (CON-2730), not in the spec',
+      'Sections, texts and order from the clinical notes of red.dev (Patient Summary, 2026-11-28): Medical History; Exams with Review of Systems, Vital Signs, Physical, Extraoral and Intraoral; Prescription; Lab Order; Additional Notes and the provider',
+      'Dental Assessment, Radiographic and Periodontal exams, Treatment Plan, Operative Report, Workflows, Referral and the encounter questionnaires: from Jira (CON-2975, CON-3081, CON-3605, CON-3668); not in the red.dev notes we saw',
+      'Addenda (CON-2730), after the signature',
     ],
-    jira: ['CON-2975', 'CON-3081', 'CON-3605', 'CON-3668', 'CON-2727', 'CON-2728', 'CON-2816', 'CON-2617', 'CON-1619', 'CON-2055', 'CON-2191', 'CON-2615', 'CON-2614', 'CON-2616', 'CON-2620', 'CON-2621', 'CON-2730', 'CON-2937', 'CON-2641', 'CON-2643', 'CON-4115'],
+    jira: ['CON-2975', 'CON-3081', 'CON-3605', 'CON-3668', 'CON-2727', 'CON-2728', 'CON-2730', 'CON-2731', 'CON-2816', 'CON-2617', 'CON-1619', 'CON-2055', 'CON-2191', 'CON-2615', 'CON-2614', 'CON-2616', 'CON-2620', 'CON-2621', 'CON-2937', 'CON-2641', 'CON-2643', 'CON-4115'],
     hoja: {
       tipo: 'Dental clinical note',
       titulo: '{{patient_name}}',
@@ -115,9 +113,6 @@ export const PDFS: Pdf[] = [
         ['Attending dentist', '{{provider_name}}'], ['Contact', '{{patient_phone}}'],
       ],
       secciones: [
-        { titulo: 'Vital Signs', si: 'has_vitals', bloques: [{ tipo: 'libre', html: `<p>Patient vitals were taken:</p>
-<ul class="lista">{{#height_in}}<li>Height {{height_in}} in, Weight {{weight_lb}} pounds; BMI {{bmi}}.</li>{{/height_in}}{{#blood_pressure}}<li>Blood pressure: {{blood_pressure}} mmHg.</li>{{/blood_pressure}}{{#heart_rate}}<li>Heart rate: {{heart_rate}} bpm.</li>{{/heart_rate}}{{#respiratory_rate}}<li>Respiratory rate: {{respiratory_rate}} rpm.</li>{{/respiratory_rate}}{{#temperature}}<li>Temperature: {{temperature}} °F.</li>{{/temperature}}{{#oxygen_saturation}}<li>Oxygen saturation: {{oxygen_saturation}} %.</li>{{/oxygen_saturation}}</ul>
-{{#out_of_range_values}}<p><b>Out of range values:</b> {{out_of_range_values}}.</p>{{/out_of_range_values}}{{#vitals_notes}}<p><b>Notes:</b> {{vitals_notes}}</p>{{/vitals_notes}}` }] },
         { titulo: 'Medical History', bloques: [
           { tipo: 'libre', html: `<p class="rotulo">Past medical conditions:{{^past_medical_conditions}} <span>Patient reports no known medical conditions.</span>{{/past_medical_conditions}}</p>
 <ul class="lista">{{#past_medical_conditions}}<li>{{name}} {{status}} ({{start_date}}).{{#notes}} {{notes}}{{/notes}}</li>{{/past_medical_conditions}}</ul>` },
@@ -125,10 +120,26 @@ export const PDFS: Pdf[] = [
           { tipo: 'lista', rotulo: 'Known allergies:', lista: 'known_allergies', vacio: 'No known allergies reported.', valor: 'Allergy to {{allergen}} ({{start_date}}).{{#notes}} {{notes}}{{/notes}}<ul class="lista">{{#reactions}}<li>{{category}} – {{symptom}}</li>{{/reactions}}{{#severity}}<li>Severity: {{severity}}</li>{{/severity}}</ul>' },
           { tipo: 'lista', rotulo: 'Past surgeries and/or hospitalizations:', lista: 'past_surgeries', vacio: 'No past surgeries or hospitalizations reported.', valor: '{{name}} ({{date}}).' },
           { tipo: 'narrativas', lista: 'encounter_questionnaires', titulo: '{{name}}', texto: '{{narrative}}' },
-          { tipo: 'libre', html: '{{#has_history_questionnaires}}<h3>Patient History</h3>{{/has_history_questionnaires}}' },
-          { tipo: 'narrativas', lista: 'history_questionnaires', titulo: '{{name}}', detalle: 'Completed on {{completed_at}}', texto: '{{narrative}}' },
+          { tipo: 'libre', html: '{{#has_history_questionnaires}}<h3>Patient History</h3>{{#history_questionnaires}}<div class="narrativa"><p class="narrativa-titulo">{{name}}<span>Completed on {{completed_at}}</span></p><p>{{narrative}}</p></div>{{/history_questionnaires}}{{/has_history_questionnaires}}' },
         ] },
-        { titulo: 'Exams', si: 'has_exams', bloques: [{ tipo: 'libre', html: `{{#exams}}<div class="bloque"><p class="bloque-titulo">{{exam_name}} ({{exam_date}}):</p><ul class="lista">{{#findings}}${FINDING}{{/findings}}</ul></div>{{/exams}}
+        { titulo: 'Exams', si: 'has_exams', bloques: [{ tipo: 'libre', html: `{{#has_ros}}<h3>Review of Systems (ROS)</h3>
+<p>The review of systems was performed to evaluate the presence or absence of symptoms across major body systems.</p>
+<table class="tabla"><thead><tr><th style="width:30%">System</th><th style="width:35%">Negative</th><th>Positive</th></tr></thead><tbody>{{#ros}}<tr><td>{{system}}</td><td>{{negative}}</td><td>{{positive}}</td></tr>{{/ros}}</tbody></table>{{/has_ros}}
+{{#has_vitals}}<h3>Vital Signs</h3>
+<p>Patient vitals were taken:</p>
+<table class="tabla"><thead><tr><th style="width:50%">Measurement</th><th>Value</th></tr></thead><tbody>{{#vitals}}<tr><td>{{measurement}}</td><td>{{value}}</td></tr>{{/vitals}}</tbody></table>
+{{#out_of_range_values}}<p><b>Out of range values:</b> {{out_of_range_values}}.</p>{{/out_of_range_values}}{{#vitals_notes}}<p><b>Notes:</b> {{vitals_notes}}</p>{{/vitals_notes}}{{/has_vitals}}
+{{#has_physical}}<h3>Physical Examination</h3>
+<p>A physical examination was performed to assess the patient’s overall health status.</p>
+{{#physical}}<p class="rotulo">{{area}}:</p><p>{{#positive}}Positive for <b>{{term}}</b>{{/positive}}{{^positive}}Negative for {{term}}{{/positive}}{{#note}} ({{note}}){{/note}}.</p>{{/physical}}{{/has_physical}}
+{{#has_extraoral}}<h3>Extraoral Examination</h3>
+<p>The extraoral examination revealed:</p>
+<ul class="lista">{{#extraoral_findings}}<li>{{finding}} on <b>{{location}}</b>{{#details}} ({{details}}){{/details}}.</li>{{/extraoral_findings}}</ul>
+<p>All other extraoral structures appeared normal.</p>{{/has_extraoral}}
+{{#has_intraoral}}<h3>Intraoral Examination</h3>
+<p>The intraoral examination identified:</p>
+<ul class="lista">{{#intraoral_findings}}<li>{{finding}} on <b>{{location}}</b>{{#details}} ({{details}}){{/details}}.</li>{{/intraoral_findings}}</ul>
+<p>All other intraoral structures appeared normal.</p>{{/has_intraoral}}
 {{#dental_assessment}}<div class="bloque"><p class="bloque-titulo">Dental Assessment ({{dental_assessment_date}}):</p>{{#dental_assessment_no_findings}}<p>The dental assessment showed no significant findings; dentition appears healthy.</p>{{/dental_assessment_no_findings}}<ul class="lista">{{#dental_assessment_findings}}${FINDING}{{/dental_assessment_findings}}</ul>{{#dental_assessment_reviewed}}<p>Dental assessment reviewed: stable with no changes from last exam; prior findings unchanged.{{#dental_assessment_review_note}} Note: {{dental_assessment_review_note}}{{/dental_assessment_review_note}}</p>{{/dental_assessment_reviewed}}</div>{{/dental_assessment}}
 {{#radiographic_exams}}<div class="bloque"><p class="bloque-titulo">Radiographic Examination ({{exam_date}}):</p>{{#no_findings}}<p>The radiographic examination indicated no abnormalities; all structures are within normal limits.</p>{{/no_findings}}{{#has_findings}}<p>The radiographic examination revealed:</p><ul class="lista">{{#findings}}${FINDING}{{/findings}}</ul>{{/has_findings}}{{#reviewed}}<p>Radiographic findings reviewed: stable and unchanged from prior radiographs; no new issues.{{#review_note}} Note: {{review_note}}{{/review_note}}</p>{{/reviewed}}</div>{{/radiographic_exams}}
 {{#periodontal_exams}}<div class="bloque"><p class="bloque-titulo">Periodontal Examination ({{exam_date}}):</p>{{#reviewed}}<p>Periodontal chart reviewed: no changes since prior charting; status stable.</p>{{/reviewed}}{{#new_charting}}<p>A new periodontal charting was performed, with the following clinically significant findings documented individually for each tooth and respective surfaces.</p>
@@ -149,29 +160,13 @@ export const PDFS: Pdf[] = [
         { titulo: 'Workflows', si: 'has_workflows', bloques: [
           { tipo: 'narrativas', lista: 'workflows', titulo: '{{workflow_name}}', texto: '{{narrative}}' },
         ] },
-        { titulo: 'Prescriptions', si: 'has_prescriptions', bloques: [
-          { tipo: 'tarjetas', lista: 'prescriptions', titulo: 'Prescription · {{status}}', campos: [
-            ['Medications', '{{#medications}}<span class="linea">{{drug_brand}} ({{drug}}) {{strength}} {{strength_unit}} {{dosage_form}}: {{dose}} {{dose_unit}}, {{frequency}}, for {{duration_number}} {{duration_unit}}</span>{{/medications}}'],
-            ['Indications', '{{indications}}'],
-          ], pie: DOCUMENTOS_ENVIADOS },
-        ] },
-        { titulo: 'Lab Orders', si: 'has_lab_orders', bloques: [
-          { tipo: 'tarjetas', lista: 'lab_orders', titulo: '{{laboratory}} · {{status}}', campos: [
-            ['Work requested', '{{work_requested}}'],
-            ['Procedures', '{{#lab_treatments}}<span class="linea">{{cdt_code}} {{description}} · {{anatomic_area}} · {{treatment_plan}}</span>{{/lab_treatments}}'],
-            ['Special instructions', '{{special_instructions}}'], ['ASAP', '{{asap}}'], ['Mandatory to continue treatment', '{{mandatory_to_continue_treatment}}'],
-            ['Expiration date', '{{expiration_date}}'],
-          ], pie: DOCUMENTOS_ENVIADOS },
-        ] },
-        { titulo: 'Referrals', si: 'has_referrals', bloques: [
-          { tipo: 'tarjetas', lista: 'referrals', titulo: '{{referral}} · {{specialties}} · {{status}}', campos: [
-            ['Procedures', '{{#referral_procedures}}<span class="linea">{{cdt_code}} {{description}} · {{anatomic_area}}</span>{{/referral_procedures}}'],
-            ['Notes', '{{notes}}'],
-          ], pie: DOCUMENTOS_ENVIADOS },
-        ] },
+        { titulo: 'Prescription', si: 'has_prescriptions', bloques: [{ tipo: 'libre', html: `<p>The following medication(s) was prescribed to the patient:</p>
+{{#prescriptions}}<div class="tarjeta">{{#medications}}<div class="bloque"><p><b>{{drug}}</b> {{strength}}.</p><p>Take {{dose}} {{frequency}} for {{duration}}.</p><p>Dosage form: {{dosage_form}}.</p></div>{{/medications}}{{#indications}}<p>Indications: {{indications}}</p>{{/indications}}<p>Documents sent: {{documents_sent}}</p></div>{{/prescriptions}}` }] },
+        { titulo: 'Lab Order', si: 'has_lab_orders', bloques: [{ tipo: 'libre', html: `{{#lab_orders}}<div class="tarjeta"><p>Lab order sent to {{laboratory}}.</p><p>Lab work requested: {{work_requested}}</p>{{#case}}<p><b>Case:</b> {{case}}</p>{{/case}}<ul class="lista">{{#lab_treatments}}<li>{{description}}{{#tooth}} — #{{tooth}}{{/tooth}}.</li>{{/lab_treatments}}</ul>{{#special_instructions}}<p>Special instructions: {{special_instructions}}</p>{{/special_instructions}}<p>Documents sent: {{documents_sent}}</p><p>Expected return: {{expected_return}}</p></div>{{/lab_orders}}` }] },
+        { titulo: 'Referral', si: 'has_referrals', bloques: [{ tipo: 'libre', html: `{{#referrals}}<div class="tarjeta"><p>Referral sent to {{referral}}{{#specialties}} ({{specialties}}){{/specialties}}.</p><ul class="lista">{{#referral_procedures}}<li>{{description}}{{#tooth}} — #{{tooth}}{{/tooth}}.</li>{{/referral_procedures}}</ul>{{#notes}}<p>Notes: {{notes}}</p>{{/notes}}<p>Documents sent: {{documents_sent}}</p></div>{{/referrals}}` }] },
         { titulo: 'Additional Notes', si: 'clinical_notes_html', bloques: [{ tipo: 'html', variable: 'clinical_notes_html' }] },
       ],
-      firmas: [{ ...PROVIDER, hash: true }],
+      firmas: [PROVIDER],
       posdata: [
         { titulo: 'Addenda', si: 'has_addenda', bloques: [
           { tipo: 'nota', texto: 'Added after the note was signed. They do not change the signed note.' },
@@ -180,110 +175,62 @@ export const PDFS: Pdf[] = [
       ],
       pie: 'Dental clinical note',
     },
+    /* El ejemplo es la nota más completa de red.dev que pasó Julián (2026-11-28), con el paciente de la ficha. */
     ejemplo: {
-      visit_date: 'November 25, 2026', visit_time: '09:00 AM to 09:45 AM',
+      visit_date: 'August 20, 2026', visit_time: '02:34 PM to 03:20 PM',
       auto_generated: false,
-      has_vitals: true,
-      height_in: '68', weight_lb: '187', bmi: '28.4', blood_pressure: '145/92', heart_rate: '74', respiratory_rate: '16', temperature: '98.4', oxygen_saturation: '98',
-      out_of_range_values: 'Blood pressure',
-      vitals_notes: 'Taken seated, before local anesthesia.',
-      past_medical_conditions: [{ name: 'Hypertension', status: 'Active', start_date: '03/15/2019', notes: 'Controlled with medication.' }],
+      past_medical_conditions: [{ name: 'Diabetes mellitus type 1', status: 'Chronic', start_date: '06/02/2026', notes: 'Controlled with insulin.' }],
       current_medications: [
-        { name: 'Lisinopril', dose: '10', unit: 'mg', frequency: 'once daily', status: 'Active', start_date: '03/15/2019', notes: 'The patient has to take it for life.' },
+        { name: 'Clonazepam', dose: '2', unit: 'mg', frequency: 'as needed', status: 'Suspended', start_date: '06/02/2026', notes: '' },
+        { name: 'Ibuprofen', dose: '400', unit: 'mg', frequency: 'as needed', status: 'Suspended', start_date: '07/02/2026', notes: '' },
       ],
       known_allergies: [
-        { allergen: 'latex', start_date: '01/01/2015', notes: 'Use nitrile gloves.', reactions: [{ category: 'Dermatological', symptom: 'Skin rash' }], severity: 'Mild' },
+        { allergen: 'sulfa drugs', start_date: '05/11/2026', notes: '', reactions: [{ category: 'Anaphylactic', symptom: 'Difficulty Breathing' }], severity: 'Moderate' },
+        { allergen: 'lidocaine', start_date: '06/02/2026', notes: '', reactions: [{ category: 'Anaphylactic', symptom: 'Difficulty Breathing' }, { category: 'Anaphylactic', symptom: 'Dizziness or Fainting' }], severity: 'Moderate' },
       ],
-      past_surgeries: [{ name: 'Appendectomy', date: '06/10/2012' }],
-      encounter_questionnaires: [
-        { name: 'Chief Complaint', narrative: 'Patient reports throbbing pain in the lower left back tooth for five days, worse when chewing and with cold drinks.' },
-        { name: 'Triage', narrative: 'Pain severity: 7/10. No facial swelling reported. Patient denies fever or difficulty swallowing.' },
-      ],
-      has_history_questionnaires: true,
-      history_questionnaires: [
-        { name: 'Family History', completed_at: 'November 20, 2026 at 10:15 AM', narrative: 'Patient reports a family history of diabetes in mother and hypertension in father.' },
-        { name: 'Oral History', completed_at: 'November 20, 2026 at 10:12 AM', narrative: 'Patient reports occasional gum bleeding during brushing and sensitivity to cold. Last dental visit two years ago.' },
-        { name: 'Social History', completed_at: 'November 20, 2026 at 10:16 AM', narrative: 'Patient reports no tobacco use and occasional alcohol consumption.' },
-      ],
+      past_surgeries: [{ name: 'Hip replacement', date: '12/01/2025' }],
+      encounter_questionnaires: [],
+      has_history_questionnaires: false,
+      history_questionnaires: [{ name: 'Family History', completed_at: 'August 20, 2026 at 2:30 PM', narrative: 'Patient reports a family history of diabetes.' }],
       has_exams: true,
-      exams: [
-        { exam_name: 'Intraoral Examination', exam_date: '11/25/2026', findings: [
-          { finding: 'Gingival inflammation', location: 'Left Mandibular Gingiva', details: 'Severity: Mild; Bleeding: Yes', note: '' },
-        ] },
+      has_ros: true,
+      ros: [{ system: 'General', negative: '-', positive: 'Abnormal weight gain (since the last visit)' }],
+      has_vitals: true,
+      vitals: [{ measurement: 'Height', value: '68 in' }, { measurement: 'Weight', value: '187 lbs' }, { measurement: 'BMI', value: '28.4' }],
+      out_of_range_values: '', vitals_notes: '',
+      has_physical: true,
+      physical: [
+        { area: 'General Appearance', positive: true, term: 'generally unwell', note: 'tired, poor sleep' },
+        { area: 'Neck', positive: false, term: 'tenderness of neck', note: '' },
       ],
-      dental_assessment: true, dental_assessment_date: '11/25/2026', dental_assessment_no_findings: false,
-      dental_assessment_findings: [{ finding: 'Deep caries', location: '#19/O, D', details: 'Extent: Deep', note: 'Caries close to the pulp.' }],
-      dental_assessment_reviewed: false, dental_assessment_review_note: '',
-      radiographic_exams: [
-        { exam_date: '11/25/2026', no_findings: false, has_findings: true, reviewed: false, review_note: '', findings: [
-          { finding: 'Periapical radiolucency', location: '#19', details: 'Size: 3 mm; Root: Mesial', note: 'Consistent with chronic apical periodontitis.' },
-        ] },
-        { exam_date: '05/12/2026', no_findings: false, has_findings: false, reviewed: true, review_note: 'Compared with today’s periapical image.', findings: [] },
+      has_extraoral: true,
+      extraoral_findings: [
+        { finding: 'Atrophy (morphologic abnormality)', location: 'Left Eye', details: 'quantity: solitary; symmetry: unilateral; size: small (e.g., 0.5 cm); shape: round; borders: well demarcated' },
+        { finding: 'Abscess (morphologic abnormality)', location: 'Right Temple Area', details: 'symmetry: bilateral' },
       ],
-      periodontal_exams: [
-        { exam_date: '11/25/2026', reviewed: false, new_charting: true,
-          has_probing_depths: true, probing_depths: [{ tooth: '18', surface: 'DB', value: '5' }, { tooth: '19', surface: 'B', value: '6' }],
-          has_gingival_margin: true, has_recession: true, recession: [{ tooth: '19', surface: 'L', value: '2' }], has_overgrowth: false, overgrowth: [],
-          has_bleeding: true, bleeding: [{ tooth: '19', surface: 'B' }, { tooth: '19', surface: 'DB' }], has_suppuration: false, suppuration: [] },
-      ],
-      has_treatment_plan: true,
-      has_treatment_cases: true,
-      treatment_cases: [
-        { name: 'Restorative plan', case_type: 'Definitive / Rehabilitation', recommended: true, total: '$2,430.00', decision: 'Accepted', visits: [
-          { visit_name: 'Visit 1', visit_cost: '$1,180.00', procedures: [
-            { code: 'D3330', description: 'Endodontic therapy, molar tooth', anatomic_area: '#19' },
-            { code: 'D1110', description: 'Prophylaxis, adult', anatomic_area: '' },
-          ] },
-          { visit_name: 'Visit 2', visit_cost: '$1,250.00', procedures: [{ code: 'D2740', description: 'Crown, porcelain/ceramic', anatomic_area: '#19' }] },
-        ] },
-        { name: 'Extraction and implant', case_type: 'Definitive / Rehabilitation', recommended: false, total: '$2,350.00', decision: 'Declined', visits: [
-          { visit_name: 'Visit 1', visit_cost: '$250.00', procedures: [{ code: 'D7140', description: 'Extraction, erupted tooth', anatomic_area: '#19' }] },
-          { visit_name: 'Visit 2', visit_cost: '$2,100.00', procedures: [{ code: 'D6010', description: 'Implant body, endosteal', anatomic_area: '#19' }] },
-        ] },
-      ],
-      consent_presented: true,
-      has_accepted_consents: true,
-      accepted_consents: [
-        { consent_name: 'Informed Consent for Dental Treatment', plan_name: 'Restorative plan' },
-        { consent_name: 'Informed Refusal of Dental Treatment', plan_name: 'Extraction and implant' },
-      ],
-      has_procedures: true,
-      procedures: [
-        { code: 'D0140', description: 'Limited oral evaluation – problem focused', location: '', status: 'completed' },
-        { code: 'D0220', description: 'Intraoral – periapical first radiographic image', location: '#19', status: 'completed' },
-        { code: 'D3221', description: 'Pulpal debridement, primary and permanent teeth', location: '#19', status: 'completed' },
-      ],
-      has_workflows: true,
-      workflows: [
-        { workflow_name: 'Local anesthesia', narrative: 'Inferior alveolar nerve block with 1.7 ml of 2% lidocaine with 1:100,000 epinephrine. Aspiration negative. Patient tolerated the procedure well.' },
-      ],
+      has_intraoral: true,
+      intraoral_findings: [{ finding: 'Abscess (morphologic abnormality)', location: 'Soft Palate', details: 'size: large (e.g., >2 cm)' }],
+      /* Lo que sigue viene de Jira y no estaba en las notas de red.dev que vimos: apagado en el ejemplo, con sus campos. */
+      dental_assessment: false, dental_assessment_date: '08/20/2026', dental_assessment_no_findings: false, dental_assessment_reviewed: false, dental_assessment_review_note: '',
+      dental_assessment_findings: [{ finding: 'Deep caries', location: '#19/O, D', details: 'Extent: Deep', note: '' }],
+      radiographic_exams: [], periodontal_exams: [],
+      has_treatment_plan: false, has_treatment_cases: false,
+      treatment_cases: [{ name: 'Restorative plan', case_type: 'Definitive / Rehabilitation', recommended: true, total: '$2,430.00', decision: 'Accepted', visits: [
+        { visit_name: 'Visit 1', visit_cost: '$1,180.00', procedures: [{ code: 'D3330', description: 'Endodontic therapy, molar tooth', anatomic_area: '#19' }] },
+      ] }],
+      consent_presented: false, has_accepted_consents: false, accepted_consents: [{ consent_name: 'Informed Consent for Dental Treatment', plan_name: 'Restorative plan' }],
+      has_procedures: false, procedures: [{ code: 'D2140', description: 'Amalgam – one surface, primary or permanent', location: '#32', status: 'completed' }],
+      has_workflows: false, workflows: [{ workflow_name: 'Local anesthesia', narrative: 'Infiltration with 1.7 ml of 2% lidocaine.' }],
       has_prescriptions: true,
-      prescriptions: [
-        { status: 'Active', indications: 'Take after meals. Stop ibuprofen if stomach pain appears.', document_sent: false, medications: [
-          { drug_brand: 'Amoxil', drug: 'Amoxicillin', strength: '500', strength_unit: 'mg', dosage_form: 'capsule', dose: '1', dose_unit: 'capsule', frequency: 'every 8 hours', duration_number: '7', duration_unit: 'days' },
-          { drug_brand: 'Advil', drug: 'Ibuprofen', strength: '400', strength_unit: 'mg', dosage_form: 'tablet', dose: '1', dose_unit: 'tablet', frequency: 'every 6 hours', duration_number: '3', duration_unit: 'days' },
-        ] },
-      ],
+      prescriptions: [{ documents_sent: 'No', indications: '', medications: [{ drug: 'Clonazepam', strength: '500 mg', dose: '1.0 applications', frequency: 'as needed', duration: '7 days', dosage_form: 'buccal tablet' }] }],
       has_lab_orders: true,
-      lab_orders: [
-        { laboratory: 'Olivos Laboratory', status: 'Requested', work_requested: 'Zirconia crown, shade A2.', special_instructions: 'Send the try-in before final glazing.', asap: 'No', mandatory_to_continue_treatment: 'Yes', expiration_date: '12/09/2026', document_sent: true, lab_treatments: [
-          { cdt_code: 'D2740', description: 'Crown, porcelain/ceramic', anatomic_area: '19', treatment_plan: 'Restorative plan' },
-        ] },
-      ],
-      has_referrals: true,
-      referrals: [
-        { referral: 'Dr. Mark Bennett', specialties: 'Endodontics', status: 'Sent', notes: 'Please evaluate #19 for root canal treatment before we place the crown.', document_sent: true, referral_procedures: [
-          { cdt_code: 'D3330', description: 'Endodontic therapy, molar tooth', anatomic_area: '19' },
-        ] },
-      ],
+      lab_orders: [{ laboratory: 'Olivos Laboratory', work_requested: 'Amalgam restoration model.', case: 'Restorative plan', special_instructions: 'Send the try-in before final polishing.', documents_sent: 'No', expected_return: '2026-09-30', lab_treatments: [{ description: 'Amalgam – one surface, primary or permanent', tooth: '32' }] }],
+      has_referrals: false, referrals: [{ referral: 'Dr. Mark Bennett', specialties: 'Endodontics', notes: 'Please evaluate #19.', documents_sent: 'No', referral_procedures: [{ description: 'Endodontic therapy, molar tooth', tooth: '19' }] }],
       clinical_notes_html: '<p>Patient responsibilities were discussed including but not limited to daily care, use/misuse, regular maintenance appointments, and routine examination of underlying oral tissues.</p><p>The patient was discharged to return home in satisfactory condition.</p>',
       ...FIRMADO_PROVIDER,
-      provider_signed_date: 'November 25, 2026 at 10:02 AM',
-      provider_signature_hash: 'sha256:9f2c4e1a7b3d5e8f0a6c2b9d4e7f1a3c5b8d0e2f4a6c8b1d3e5f7a9c0b2d4e6f',
+      provider_signed_date: 'August 20, 2026',
       has_addenda: true,
-      addenda: [
-        { author: 'Elena Martinez', created_at: 'November 26, 2026 at 8:40 AM', text: 'Patient called: pain went down to 2/10. Continue the antibiotic as prescribed.', signed_date: 'November 26, 2026' },
-      ],
+      addenda: [{ author: 'Elena Martinez', created_at: 'August 21, 2026 at 8:40 AM', text: 'Patient called: the abscess drained and pain went down. Keep the follow-up visit.', signed_date: 'August 21, 2026' }],
     },
   },
   {

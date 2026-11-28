@@ -15,6 +15,10 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 - **La nota es la plantilla *Clinical note* de `src/pdfs`** completada con los eventos del encuentro (`lib/historial` ›
   `datosNota`, `hojaNota`): la misma hoja en el visor y en *View PDF* (`abrirHoja`). Los datos de ejemplo
   (`data/historial`) usan los nombres de variable de la plantilla.
+- **La plantilla *Clinical note* (backend, `/pdfs/`) cambia al contenido de las notas de red.dev:** Exams con ROS, Vital
+  Signs (tablas), Physical, Extraoral e Intraoral; Prescription y Lab Order en singular con su texto; sin hash. Variables
+  nuevas y las que se van, en `modulos/pdfs.md` (2026-11-28). `public/pdfs/` regenerado.
+- **Columna Exams:** los signos vitales solos no cuentan (como red.dev).
 - **Nuevo en `ui/`:** `document-html` (`DocumentHtml`), la hoja HTML de una plantilla dentro del visor.
 - **Reglas:** la nota se firma con el encuentro Completed o Fulfilled y sólo la firma su provider; firmar pasa Completed a
   Fulfilled; *Add addendum* en toda nota firmada; un encuentro cancelado o una nota sin permiso no se abren ni se eligen.

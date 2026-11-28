@@ -4276,3 +4276,40 @@ corregido con esto:
 **Queda distinto:** la Clinical note de Pending Task (`pages/ClinicalNote`) sigue con el formato anterior. Pasarla a la
 misma plantilla es un cambio chico; espera el ok.
 
+### Tercera vuelta (2026-11-28): el contenido de las notas de red.dev
+
+Julián pasó dos Clinical Notes de red.dev en PDF (la más completa, del 08/20/2026, y una con sólo el peso, del
+08/13/2026) y los links a esas notas (`/treatment-history/<encounter>?page=2`). Los links piden login y no se pudieron
+abrir; los PDF sí. Con eso:
+
+1. **La plantilla *Clinical note* de `src/pdfs` pasa al contenido de red.dev**, con el diseño nuevo de los PDF (ver
+   `pdfs.md`). Orden de red.dev: *Medical History*; *Exams* con *Review of Systems (ROS)* (tabla System / Negative /
+   Positive), *Vital Signs* (tabla Measurement / Value; antes era una lista y una sección aparte), *Physical
+   Examination* (*Positive for …* / *Negative for …* por zona), *Extraoral Examination* (*The extraoral examination
+   revealed:* … *All other extraoral structures appeared normal.*) e *Intraoral Examination* (igual, con *identified*);
+   *Prescription* (*The following medication(s) was prescribed to the patient:*, la droga, *Take … for …*, *Dosage
+   form*, *Documents sent*); *Lab Order* (*Lab order sent to …*, *Lab work requested*, *Case* con sus procedimientos,
+   *Special instructions*, *Documents sent*, *Expected return*); *Additional Notes*; *Provider* con nombre y fecha.
+   *Prescription* y *Lab Order* en singular, como red.dev.
+2. **Sale lo que red.dev no imprime:** Chief Complaint, Triage, Patient History, Treatment Plan y Consent Summary,
+   Operative Report, Workflows y el hash de la firma. Dental Assessment, Radiographic, Periodontal y Referral quedan en la
+   plantilla porque los pide Jira (CON-2975), y sólo salen si el encuentro los tiene.
+3. **La columna *Exams* no cuenta los signos vitales:** la visita de red.dev que sólo tiene el peso trae *Exams* en la
+   nota, pero en la lista va con cruz (CON-2731: "si se cargó alguna condition o review exam"). Se suma un encuentro así
+   (08/12/2026, Andy Davis).
+4. **La columna *Procedures* no sale de la nota:** en la de red.dev el D2140 de la fila aparece dentro de la orden de
+   laboratorio (*Case*), no como un *Operative Report*. Cada encuentro tiene sus procedimientos aparte (`procedimientos`).
+5. Los encuentros de ejemplo (`data/historial`) usan los campos nuevos (`ros`, `vitals`, `physical`,
+   `extraoral_findings`, `intraoral_findings`…).
+
+**Anomalías de red.dev** (se copian donde aplica, se anotan):
+
+- La fecha de la nota de Andy Davis dice 08/13 y la fila de la lista, 08/12: es el corrimiento de zona horaria de
+  CON-3038.
+- En la lista de red.dev la fila del 08/20 tiene tilde en *Ref*, pero la nota no trae ninguna derivación.
+- *Take 1.0 applications as needed* y *Expected return: 2026-09-30* (fecha ISO, no MM/DD/YYYY): se copia el formato.
+- La firma de red.dev dice *Date:* vacío aunque la nota esté firmada.
+
+**Todavía sin ver en red.dev:** qué hace el ojo en una fila cancelada (red.dev muestra *Unsigned* también ahí), cómo
+se ven *Add addendum* y los addenda, y el *Download* de varias.
+

@@ -17,7 +17,7 @@ const firmar = async (screen: { getByRole: (r: string, n?: string | RegExp) => a
 
 test('La lista pagina de a 10, filtra por estado y un encuentro sin nota no se abre ni se elige', async ({ app, screen }) => {
   await app.open(LISTA)
-  await expect(screen.getByText(/Showing 1 to 10 of 22 results/)).toBeVisible()
+  await expect(screen.getByText(/Showing 1 to 10 of 23 results/)).toBeVisible()
   /* Cancelado: sin nota, sin ojo y sin casilla. Una nota ajena sin permiso, igual. */
   await expect(screen.getByText('No clinical note').first()).toBeVisible()
   await expect(screen.getByText('Access restricted')).toBeVisible()
@@ -37,7 +37,7 @@ test('El ojo abre la nota; al volver, la página y lo elegido siguen como estaba
   await app.open(LISTA)
   await screen.getByRole('checkbox', 'Select encounter of 11/20/2026, Root canal follow-up').tap()
   await screen.getByRole('button', 'Next page').tap()
-  await expect(screen.getByText(/Showing 11 to 20 of 22 results/)).toBeVisible()
+  await expect(screen.getByText(/Showing 11 to 20 of 23 results/)).toBeVisible()
   await screen.getByRole('button', ojo('08/05/2026')).tap()
   await expect(screen.getByRole('heading', 'Clinical note - Julio Perez')).toBeVisible()
   /* Firmada: sin Sign, con View PDF y Add addendum. */
@@ -45,7 +45,7 @@ test('El ojo abre la nota; al volver, la página y lo elegido siguen como estaba
   await expect(screen.getByRole('button', 'Add addendum')).toBeVisible()
   await expect(screen.getByRole('button', 'Sign clinical note')).toHaveCount(0)
   await screen.getByRole('button', 'Back to history').tap()
-  await expect(screen.getByText(/1 selected · Showing 11 to 20 of 22 results/)).toBeVisible()
+  await expect(screen.getByText(/1 selected · Showing 11 to 20 of 23 results/)).toBeVisible()
 })
 
 test('Una nota sin firmar de un encuentro Completed se firma con el login y el encuentro pasa a Fulfilled', async ({ app, screen }) => {
@@ -76,7 +76,7 @@ test('Con el encuentro en curso la nota se ve pero todavía no se firma; la de o
   await app.open(LISTA)
   /* El encuentro de hoy entra a la lista cuando empieza. */
   await screen.getByRole('button', 'Start encounter').tap()
-  await expect(screen.getByText(/Showing 1 to 10 of 23 results/)).toBeVisible()
+  await expect(screen.getByText(/Showing 1 to 10 of 24 results/)).toBeVisible()
   await expect(screen.getByRole('row', /11\/27\/2026/)).toContainText('In progress')
   await screen.getByRole('button', ojo('11/27/2026')).tap()
   await expect(screen.getByText(/can only be signed when the encounter is completed/)).toBeVisible()

@@ -1,7 +1,7 @@
 import { useMemo, useSyncExternalStore } from 'react'
 import { ENCUENTROS_HISTORIAL, ENCUENTRO_HOY, HISTORIA_PACIENTE, type Adenda, type EncuentroHistorial } from '@/data/historial'
 import { useEstadoEncuentro } from '@/lib/encuentro'
-import { hash, largo, mailProvider, paciente as datosPaciente } from '@/components/dashboard/documentoTarea'
+import { largo, mailProvider, paciente as datosPaciente } from '@/components/dashboard/documentoTarea'
 import { COMUNES, PDFS, htmlDe } from '@/pdfs/plantillas'
 import { completar, type Datos } from '@/pdfs/marco'
 
@@ -41,7 +41,7 @@ const hora = (d: Date) => d.toLocaleTimeString('en-US', { hour: 'numeric', minut
 /** La nota firmada no cambia más, y un encuentro Completed pasa a Fulfilled (CON-2727). */
 export function firmarNota(id: string) {
   const d = new Date()
-  cambiar(id, (e) => ({ ...e, nota: 'Signed', firmada: `${largo(d)} at ${hora(d)}`, estado: e.estado === 'Completed' ? 'Fulfilled' : e.estado }))
+  cambiar(id, (e) => ({ ...e, nota: 'Signed', firmada: largo(d), estado: e.estado === 'Completed' ? 'Fulfilled' : e.estado }))
 }
 
 /** Un addendum se suma al final, firmado por su autor, y no se edita ni se borra (CON-2730). */
@@ -54,11 +54,13 @@ export function agregarAdenda(id: string, adenda: Pick<Adenda, 'author' | 'text'
 export const encuentroCerrado = (e: EncuentroHistorial) => e.estado === 'Completed' || e.estado === 'Fulfilled'
 /** Hay nota para abrir o bajar: firmada o sin firmar. Un encuentro cancelado no tiene; una ajena puede estar restringida. */
 export const tieneNota = (e: EncuentroHistorial) => e.nota === 'Signed' || e.nota === 'Unsigned'
-/** En el encuentro hubo exámenes con hallazgos (la sección Exams de la nota, CON-3668). */
+/** La columna Exams: el encuentro cargó una condición o un examen (CON-2731). Los signos vitales solos no cuentan, como en
+ *  red.dev; la nota igual los muestra en Exams. */
 export const huboExamenes = ({ eventos: v }: EncuentroHistorial) =>
-  v.exams.length + v.dental_assessment_findings.length + v.radiographic_exams.length + v.periodontal_exams.length > 0
+  [v.ros, v.physical, v.extraoral_findings, v.intraoral_findings, v.dental_assessment_findings, v.radiographic_exams, v.periodontal_exams].some((x) => x.length > 0)
 
 const NOTAS_HTML = '<p>Patient responsibilities were discussed including but not limited to daily care, use/misuse, regular maintenance appointments, and routine examination of underlying oral tissues.</p><p>The patient was discharged to return home in satisfactory condition.</p>'
+const hay = (x: unknown[]) => x.length > 0
 
 /** Las variables de la plantilla Clinical note para un encuentro: sólo las secciones de lo que se hizo (CON-2975). */
 export function datosNota(e: EncuentroHistorial, paciente: string): Datos {
@@ -66,34 +68,30 @@ export function datosNota(e: EncuentroHistorial, paciente: string): Datos {
   const edad = Math.floor((Date.now() - p.nacimiento.getTime()) / 31557600000)
   const provider = e.provider.replace(/^Dr\.\s*/, '')
   const v = e.eventos
-  /* La nota que se generó sola no trae las narrativas de los workflows (CON-2937). */
-  const workflows = e.automatica ? [] : v.workflows
-  const firmada = e.nota === 'Signed' && e.firmada
   return {
     ...COMUNES,
     patient_name: paciente, patient_birth_date: `${largo(p.nacimiento)} (${edad} yrs)`, patient_phone: p.telefono, patient_email: p.email, patient_address: p.direccion,
     provider_name: provider, provider_email: mailProvider(provider),
     visit_date: largo(new Date(e.fecha)), visit_time: e.horario,
     auto_generated: !!e.automatica,
-    has_vitals: !!v.vitals, ...v.vitals,
     ...HISTORIA_PACIENTE,
-    encounter_questionnaires: v.encounter_questionnaires,
-    has_exams: huboExamenes(e),
-    exams: v.exams,
-    dental_assessment: v.dental_assessment_findings.length > 0, dental_assessment_date: e.fecha, dental_assessment_no_findings: false,
+    encounter_questionnaires: [], has_history_questionnaires: false, history_questionnaires: [],
+    has_exams: huboExamenes(e) || hay(v.vitals),
+    has_ros: hay(v.ros), ros: v.ros,
+    has_vitals: hay(v.vitals), vitals: v.vitals, out_of_range_values: '', vitals_notes: '',
+    has_physical: hay(v.physical), physical: v.physical,
+    has_extraoral: hay(v.extraoral_findings), extraoral_findings: v.extraoral_findings,
+    has_intraoral: hay(v.intraoral_findings), intraoral_findings: v.intraoral_findings,
+    dental_assessment: hay(v.dental_assessment_findings), dental_assessment_date: e.fecha, dental_assessment_no_findings: false,
     dental_assessment_findings: v.dental_assessment_findings, dental_assessment_reviewed: false, dental_assessment_review_note: '',
     radiographic_exams: v.radiographic_exams,
     periodontal_exams: v.periodontal_exams,
-    has_treatment_plan: !!v.treatment_plan, ...v.treatment_plan,
-    has_procedures: v.procedures.length > 0, procedures: v.procedures,
-    has_workflows: workflows.length > 0, workflows,
-    has_prescriptions: v.prescriptions.length > 0, prescriptions: v.prescriptions,
-    has_lab_orders: v.lab_orders.length > 0, lab_orders: v.lab_orders,
-    has_referrals: v.referrals.length > 0, referrals: v.referrals,
+    has_treatment_plan: false, has_procedures: false, procedures: [], has_workflows: false, workflows: [],
+    has_prescriptions: hay(v.prescriptions), prescriptions: v.prescriptions,
+    has_lab_orders: hay(v.lab_orders), lab_orders: v.lab_orders,
+    has_referrals: hay(v.referrals), referrals: v.referrals,
     clinical_notes_html: NOTAS_HTML,
-    /* Firmada: autor, fecha y el hash del contenido (CON-2727). */
-    provider_signed_date: firmada || '', provider_signature_image: '',
-    provider_signature_hash: firmada ? `sha256:${[0, 1, 2, 3, 4, 5, 6, 7].map((i) => hash(`${e.id}-${i}`).toString(16).padStart(8, '0')).join('')}` : '',
+    provider_signed_date: e.nota === 'Signed' ? e.firmada ?? '' : '', provider_signature_image: '',
     has_addenda: !!e.adendas?.length, addenda: e.adendas ?? [],
   }
 }

@@ -40,7 +40,7 @@ function NotaCelda({ nota }: Pick<EncuentroHistorial, 'nota'>) {
    medicaciones de una receta. El nombre y el estado, al pasar el mouse. Chip gris: el celeste se pierde en la fila elegida. */
 function ProcedimientosCelda({ e }: { e: EncuentroHistorial }) {
   const [abierto, setAbierto] = useState(false)
-  const todos = e.eventos.procedures
+  const todos = e.procedimientos
   if (!todos.length) return <span className="text-ink-muted">No procedures</span>
   const texto = (p: (typeof todos)[number]) => `${p.code} · ${p.description}${p.location ? ` · ${p.location}` : ''} [${p.status}]`
   const visibles = abierto ? todos : todos.slice(0, 1)
