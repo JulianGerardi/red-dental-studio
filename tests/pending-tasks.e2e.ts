@@ -22,13 +22,13 @@ test('Request pasa la orden a Requested y Cancel la saca de la lista', async ({ 
   /* Olivia Brooks está en el sillón: su encuentro está abierto. */
   await screen.getByRole('button', 'Actions for Lab order for Olivia Brooks').tap()
   await screen.getByRole('menuitem', 'Request').tap()
-  await screen.getByRole('dialog', 'Request lab order').getByRole('button', 'Mark as requested').tap()
+  await screen.getByRole('dialog', 'Request lab order').getByRole('button', 'Confirm').tap()
   await expect(screen.getByText('The lab order has been successfully marked as Requested.')).toBeVisible()
   await expect(screen.getByRole('button', 'Open PDF of the lab order for Olivia Brooks')).toBeVisible()
 
   await screen.getByRole('button', 'Actions for Lab order for Olivia Brooks').tap()
   await screen.getByRole('menuitem', 'Cancel').tap()
-  await screen.getByRole('dialog', 'Cancel lab order').getByRole('button', 'Cancel lab order').tap()
+  await screen.getByRole('dialog', 'Cancel lab order').getByRole('button', 'Confirm').tap()
   await expect(screen.getByRole('tab', 'Lab orders (1)')).toBeVisible()
 })
 
@@ -132,7 +132,7 @@ test('Una Referral Pending con encuentro abierto se edita, valida y se pide desd
 
   await screen.getByRole('button', 'Actions for Referral for Olivia Brooks').tap()
   await screen.getByRole('menuitem', 'Request').tap()
-  await screen.getByRole('dialog', 'Request referral').getByRole('button', 'Mark as requested').tap()
+  await screen.getByRole('dialog', 'Request referral').getByRole('button', 'Confirm').tap()
   await expect(screen.getByText('The referral has been successfully marked as Requested.')).toBeVisible()
   await expect(screen.getByText('This referral cannot be edited because it is not in an editable state.')).toBeVisible()
 })
@@ -162,6 +162,6 @@ test('Referral Requested: Complete pregunta y la saca de Pending Task', async ({
   await screen.getByRole('button', /^Actions for Referral/).tap()
   await expect(screen.getByRole('menuitem', 'Reject')).toBeVisible()
   await screen.getByRole('menuitem', 'Complete').tap()
-  await screen.getByRole('dialog', 'Complete referral').getByRole('button', 'Complete').tap()
+  await screen.getByRole('dialog', 'Complete referral').getByRole('button', 'Confirm').tap()
   await expect(screen.getByText('The referral has been successfully completed.')).toBeVisible()
 })

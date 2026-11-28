@@ -1,8 +1,8 @@
-/* Marco único de los PDFs: una hoja A4 (membrete, tipo y título, resumen, secciones numeradas, firmas y pie) con el
-   diseño de ui/document-sheet, y bloques fijos para el contenido. El backend la completa con Mustache (sólo variables,
+/* Marco único de los PDFs: una hoja A4 (membrete con los datos del documento a la derecha, tipo y título, secciones con el
+   título en azul, firmas y pie) con bloques fijos para el contenido. El backend la completa con Mustache (sólo variables,
    listas y secciones vacías/llenas) y la pasa a PDF con un motor HTML (Chromium, WeasyPrint…). Las decisiones, en
    design-reference/figma/modulos/pdfs.md. */
-import { diagramaBoca } from '../lib/diagramaBoca.ts'
+import { ARCADAS_RED, VISTA_ARCADAS } from '../components/clinical/dental/arcadasRed.ts'
 import type { Denticion } from '../data/laboratorios.ts'
 
 /* Colores de los tokens de @theme (src/index.css), en hex: la plantilla vive fuera de la app. */
@@ -14,8 +14,7 @@ export const COLOR = {
   tenue: '#a1a1aa', // ink-faint
   linea: '#e7e7e7', // line-row
   caja: '#f4f4f5', // surface-muted
-  encia: '#f8d5d1', // encia
-  diente: '#6390f0', // diente elegido del diagrama (como el PDF de la app)
+  diente: '#6390f0', // diente elegido del diagrama de arcadas
   franja: '#e8eef8', // brand-tint
 } as const
 
@@ -53,8 +52,9 @@ export type Bloque =
   | { tipo: 'imagenes'; lista: string; imagen: string; titulo: string; detalle: string; vacio: string }
   /** Casillas que marca el paciente al firmar: marcadas si `marcada` tiene valor. */
   | { tipo: 'casillas'; items: string[]; marcada: string; aviso?: string }
-  /** El diagrama de la boca con los dientes de `lista` en azul y, al lado, cada diente con sus superficies. Los campos de
-      cada ítem se llaman `tooth` y `surfaces`; la dentición (Permanent o Primary) va en `denticion`. */
+  /** Las arcadas de red.dev (el mismo dibujo que Teeth & surface en la app y que el PDF real) con los dientes de `lista`
+      en azul y, al lado, cada diente con sus superficies ("Tooth 3: D, O, M"). Los campos de cada ítem se llaman `tooth`
+      y `surfaces`; la dentición (Permanent o Primary) va en `denticion`. */
   | { tipo: 'boca'; lista: string; denticion: string }
 
 /** `si`: la sección sólo sale si esa variable tiene valor (la nota clínica no muestra lo que no pasó en la visita). Los
@@ -67,9 +67,10 @@ export type Hoja = {
   /** El tipo, chico y en azul: "Dental clinical note". */
   tipo: string
   titulo: string
-  /** A la derecha del membrete: rótulo y fecha. */
-  meta: Campo
-  resumen: Campo[]
+  /** Los datos del documento, a la derecha del membrete y alineados a la derecha, con la organización del PDF de
+      red.dev: primero quién lo emite (`nombre`, en negrita y sin rótulo) y debajo un renglón "Rótulo: valor" por dato
+      (el ID del documento, el contacto, las fechas). Un dato cuyo valor llega vacío no deja el rótulo suelto. */
+  encabezado: { nombre: string; datos: Campo[] }
   secciones: Seccion[]
   firmas?: Firma[]
   /** Un aviso debajo del título (la nota generada sola al cerrarse el encounter). */
@@ -96,15 +97,13 @@ function tabla({ lista, columnas, vacio, subtotal }: Omit<Extract<Bloque, { tipo
 </table>`
 }
 
-/* El diagrama en SVG de las dos denticiones; la plantilla muestra la que diga {{dentition}} y pinta los dientes de la
-   lista con CSS (Mustache no tiene condicionales por diente). Mismo dibujo que la hoja y el PDF de la app. */
+/* Las arcadas de red.dev en SVG, las dos denticiones; la plantilla muestra la que diga {{dentition}} y pinta los dientes
+   de la lista con CSS (Mustache no tiene condicionales por diente). `fondo` trae la encía, los números y los dientes;
+   encima va el contorno de cada diente, que es lo que se pinta. */
 function svgBoca(denticion: Denticion) {
-  const g = diagramaBoca(denticion)
-  const n = (x: number) => x.toFixed(1)
-  const arcadas = g.arcadas.map((a) => `<polyline points="${a.encia.map(([x, y]) => `${n(x)},${n(y)}`).join(' ')}" fill="none" stroke="${COLOR.encia}" stroke-width="${g.tam + 7}" stroke-linecap="round" stroke-linejoin="round"/>
-<text x="${n(a.cx)}" y="${n(a.cy + 3)}" text-anchor="middle" class="arcada">${a.nombre}</text>
-${a.dientes.map((t) => `<g data-tooth="${t.d}"><rect class="pieza" x="${n(t.x - g.tam / 2)}" y="${n(t.y - g.tam / 2)}" width="${g.tam}" height="${g.tam}" rx="${n(g.tam * 0.35)}"/><text x="${n(t.lx)}" y="${n(t.ly + 2.5)}" text-anchor="middle" class="num">${t.d}</text></g>`).join('')}`).join('\n')
-  return `<svg data-d="${denticion}" viewBox="0 0 ${g.ancho} ${n(g.alto)}" width="${g.ancho}" height="${n(g.alto)}" role="img" aria-label="${denticion} dentition">${arcadas}</svg>`
+  const a = ARCADAS_RED[denticion]
+  const dientes = a.dientes.map((t) => `<path class="pieza" data-tooth="${t.id}" d="${t.d}"${t.t ? ` transform="${t.t}"` : ''}/>`).join('')
+  return `<svg data-d="${denticion}" viewBox="${VISTA_ARCADAS}" role="img" aria-label="${denticion} dentition"><g transform="translate(-1 -2)" fill="none" fill-rule="evenodd"><g${a.transform ? ` transform="${a.transform}"` : ''}>${a.fondo}<g transform="${a.seleccion}">${dientes}</g></g></g></svg>`
 }
 
 function bloque(b: Bloque): string {
@@ -123,7 +122,7 @@ function bloque(b: Bloque): string {
     case 'tarjetas': return `{{#${b.lista}}}<div class="tarjeta"><p class="tarjeta-titulo">${b.titulo}</p>${campos(b.campos)}${b.pie ?? ''}</div>{{/${b.lista}}}`
     case 'imagenes': return `<div class="imagenes">{{#${b.lista}}}<figure><img src="${b.imagen}" alt="${b.titulo}"><figcaption><b>${b.titulo}</b><span>${b.detalle}</span></figcaption></figure>{{/${b.lista}}}</div>{{^${b.lista}}}<p class="nota">${esc(b.vacio)}</p>{{/${b.lista}}}`
     case 'casillas': return `<ul class="casillas">${b.items.map((i) => `<li><span class="casilla{{#${b.marcada}}} marcada{{/${b.marcada}}}">{{#${b.marcada}}}<svg viewBox="0 0 10 10" width="8" height="8"><path d="M2 5.2 4.2 7.4 8 2.8" fill="none" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>{{/${b.marcada}}}</span>${esc(i)}</li>`).join('')}</ul>${b.aviso ? `<p class="nota">${esc(b.aviso)}</p>` : ''}`
-    case 'boca': return `<style>{{#${b.lista}}}.boca [data-tooth="{{tooth}}"] .pieza{fill:${COLOR.diente};stroke:${COLOR.marca}}{{/${b.lista}}}</style>
+    case 'boca': return `<style>{{#${b.lista}}}.boca .pieza[data-tooth="{{tooth}}"]{fill:${COLOR.diente};fill-opacity:.55;stroke:${COLOR.marca};stroke-width:1.5}{{/${b.lista}}}</style>
 <div class="boca" data-dentition="${b.denticion}"><div class="dibujo">${svgBoca('Permanent')}${svgBoca('Primary')}</div>
 <dl class="campos">{{#${b.lista}}}<div><dt>Tooth {{tooth}}{{#surfaces}}:{{/surfaces}}</dt> <dd>{{surfaces}}</dd></div>{{/${b.lista}}}</dl></div>`
   }
@@ -151,15 +150,13 @@ p { margin: 0 0 4pt; }
 .clinica { display: flex; align-items: center; gap: 9pt; }
 .iniciales { display: grid; place-items: center; overflow: hidden; width: 30pt; height: 30pt; border-radius: 6pt; background: ${COLOR.marca}; color: #fff; font-weight: 700; font-size: 10.5pt; flex: none; }
 .datos b { display: block; font-size: 11pt; color: ${COLOR.tinta}; }
-.datos span, .meta { display: block; font-size: 8pt; line-height: 1.45; color: ${COLOR.apagado}; }
-.meta { text-align: right; white-space: nowrap; }
-.meta b { display: block; color: ${COLOR.tinta}; font-weight: 600; }
+.datos span { display: block; font-size: 8pt; line-height: 1.45; color: ${COLOR.apagado}; }
+.ficha { margin: 0; max-width: 58%; text-align: right; font-size: 8pt; line-height: 1.55; color: ${COLOR.texto}; }
+.ficha .quien { font-size: 9pt; font-weight: 600; color: ${COLOR.tinta}; }
+.ficha dt { display: inline; font-weight: 600; color: ${COLOR.tinta}; }
+.ficha dd { display: inline; margin: 0; overflow-wrap: anywhere; }
 .tipo { margin: 18pt 0 2pt; font-size: 7.5pt; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: ${COLOR.marca}; }
 h1 { margin: 0; font-size: 15pt; line-height: 1.25; font-weight: 700; color: ${COLOR.tinta}; }
-.resumen { display: grid; grid-template-columns: repeat(3, 1fr); margin-top: 13pt; border: .75pt solid ${COLOR.linea}; border-radius: 4pt; overflow: hidden; }
-.resumen div { padding: 6pt 8pt; border-right: .75pt solid ${COLOR.linea}; border-bottom: .75pt solid ${COLOR.linea}; margin: 0 -.75pt -.75pt 0; min-width: 0; }
-.resumen dt { font-size: 6.5pt; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: ${COLOR.apagado}; }
-.resumen dd { margin: 1pt 0 0; font-weight: 500; color: ${COLOR.tinta}; overflow-wrap: anywhere; }
 section { margin-top: 18pt; }
 h2 { margin: 0 0 5pt; font-size: 10.5pt; font-weight: 700; color: ${COLOR.marca}; break-after: avoid; }
 .aviso { margin: 8pt 0 0; font-size: 8pt; color: ${COLOR.apagado}; }
@@ -223,13 +220,12 @@ h2 + h3 { margin-top: 2pt; }
 .casilla { display: grid; place-items: center; flex: none; width: 9pt; height: 9pt; margin-top: 2pt; border: .75pt solid ${COLOR.apagado}; border-radius: 2pt; }
 .casilla.marcada { background: ${COLOR.marca}; border-color: ${COLOR.marca}; }
 .boca { display: flex; gap: 16pt; align-items: flex-start; break-inside: avoid; }
-.dibujo { flex: none; padding: 4pt; border-radius: 8pt; background: ${COLOR.caja}; }
-.dibujo svg { display: block; width: 128pt; height: auto; }
+.dibujo { flex: none; }
+.dibujo svg { display: block; width: 150pt; height: auto; overflow: visible; }
 .boca[data-dentition="Permanent"] svg[data-d="Primary"], .boca[data-dentition="Primary"] svg[data-d="Permanent"] { display: none; }
-.boca .pieza { fill: #fff; stroke: ${COLOR.tenue}; stroke-width: .8; }
-.boca .arcada { font-size: 8.5px; fill: ${COLOR.apagado}; }
-.boca .num { font-size: 6.5px; fill: ${COLOR.apagado}; }
-.boca svg[data-d="Primary"] .num { font-size: 8px; }
+/* El dibujo usa los tokens de la app; acá van en hex porque la plantilla vive fuera de ella. */
+.dibujo svg { --color-encia: #f8d5d1; --color-ink-faint: ${COLOR.tenue}; --color-ink-muted: ${COLOR.apagado}; --color-line-strong: #d4d4d8; --color-surface: #fff; --color-surface-muted: ${COLOR.caja}; font-family: ${FUENTE}; }
+.boca .pieza { fill: none; }
 .firmas { display: grid; grid-template-columns: 1fr 1fr; gap: 24pt; margin-top: 30pt; break-inside: avoid; }
 .firma { display: flex; flex-direction: column; gap: 1pt; font-size: 8pt; }
 .trazo { display: flex; align-items: flex-end; height: 40pt; padding-bottom: 3pt; margin-bottom: 3pt; border-bottom: .75pt solid ${COLOR.tinta}; }
@@ -269,11 +265,10 @@ export function armarHoja(h: Hoja): string {
 <main class="hoja">
 <header class="membrete">
 <div class="clinica"><span class="iniciales">{{practice_initials}}</span><div class="datos"><b>{{practice_name}}</b><span>{{location_name}} · {{location_address}}</span><span>{{practice_phone}} · {{practice_email}}</span></div></div>
-<p class="meta"><b>${esc(h.meta[0])}</b>${h.meta[1]}</p>
+<dl class="ficha"><div class="quien">${h.encabezado.nombre}</div>${h.encabezado.datos.map(([r, v]) => `<div><dt>${esc(r)}:</dt> <dd>${v}</dd></div>`).join('')}</dl>
 </header>
 <p class="tipo">${esc(h.tipo)}</p>
-<h1>${h.titulo}</h1>
-${h.aviso ? `${h.aviso}\n` : ''}<dl class="resumen">${h.resumen.map(([r, v]) => `<div><dt>${esc(r)}</dt><dd>${v}</dd></div>`).join('')}</dl>
+<h1>${h.titulo}</h1>${h.aviso ? `\n${h.aviso}` : ''}
 ${h.secciones.map(seccion).join('\n')}
 ${h.firmas?.length ? `<div class="firmas">${h.firmas.map(firma).join('')}</div>` : ''}
 ${(h.posdata ?? []).map(seccion).join('\n')}

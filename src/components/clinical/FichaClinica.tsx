@@ -192,9 +192,10 @@ export function ProcedimientoResumen({ p }: { p: ProcedimientoFicha }) {
   )
 }
 
-/** Los procedimientos vinculados, uno debajo del otro, cada uno con su tacho (si se puede editar). */
+/** Los procedimientos vinculados, uno debajo del otro, cada uno con su tacho (si se puede editar). Sin ninguno no se
+ *  muestra nada, como red.dev (Julián, 2026-11-28). */
 export function ProcedimientosVinculados({ items, onRemove, disabled }: { items: ProcedimientoFicha[]; onRemove: (p: ProcedimientoFicha) => void; disabled?: boolean }) {
-  if (!items.length) return <p className="text-[12px] text-ink-muted">No procedures linked.</p>
+  if (!items.length) return null
   return (
     <ul className="flex flex-col gap-2" aria-label="Linked procedures">
       {items.map((p) => (

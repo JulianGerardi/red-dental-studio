@@ -204,3 +204,39 @@ siguen saliendo de la especificación.
   sobre todo exámenes, órdenes y workflows.
 - Con odontólogos: si el BRAINS fijo del Consent Summary alcanza o esperan el detalle de cada plan.
 - Con recepción: si el paciente entiende *Adjustment* o conviene "Insurance discount".
+
+## 2026-11-28 · Encabezado como red.dev, Lab order completa y Referral (CON-2220, CON-2584, CON-2287, CON-2616)
+
+Julián: el PDF de la Lab order tiene que tener todo lo del documento de red.dev ("falta el lab order ID", "el gráfico
+que sea el mismo"), el de la Referral no estaba alineado y **en todos los PDF hay que respetar la organización de los
+datos del encabezado**, sin perder el diseño nuevo (títulos en azul, sin números ni cajas). Se bajaron los PDF reales de
+Lab order (8) y Prescription (1) de red.dev, en sólo lectura.
+
+1. **Encabezado en los 10 documentos** (`Hoja.encabezado`, reemplaza a `meta` y `resumen`): la clínica a la izquierda y,
+   a la derecha y alineado a la derecha, primero quién lo emite (en negrita, sin rótulo) y debajo un renglón "Rótulo:
+   valor" por dato, como red.dev. Sale el cuadro de resumen de tres columnas: sus datos están ahí. Los que repetían al
+   paciente con el título (cuando el título es el paciente) se sacaron.
+2. **Lab order, con lo del documento real y en su orden:** *Lab Order ID* (UUID), *Patient Phone*, *Email* y
+   *Expiration Date* en el encabezado; Patient Information, Receiving Laboratory, Provider Information, Dental Work
+   Request, Teeth & Surface Specifications, **Special Instructions** y **Documents Uploaded**. Sin dientes, sin
+   indicaciones o sin adjuntos, la sección no sale (`has_teeth`, `special_instructions`, `has_documents`).
+3. **El gráfico es el de red.dev**: las arcadas anatómicas (`clinical/dental/arcadasRed`, el mismo dibujo que Teeth &
+   surface en la app) con el diente pedido en azul y "Tooth 3: D, O, M" al lado. `lib/diagramaBoca` queda sólo para el PDF
+   viejo de la tarea.
+4. **Corrección:** el *Lab Order ID* lo había sacado el 27 por leer mal "es un número interno": va. La Prescription
+   recupera su *Prescription ID* (ocho caracteres en red.dev) y suma *Valid From* y Patient Information.
+5. **Documents Uploaded** (Lab order y Referral): archivo, tipo y peso, y el anexo donde va cada uno (los adjuntos siguen
+   como anexos, uno por hoja).
+6. **Referral:** Patient Information, Referred Provider, Provider Information, Procedures to refer, Referral note y
+   Documents Uploaded.
+
+### Anomalías
+
+1. **No se pudo ver el PDF real de una Referral**: el link de Julián es un `blob:` de su navegador y hoy ninguna Referral
+   de red.dev tiene el documento habilitado (la única era la que completó en el video). Se armó con las secciones de los
+   documentos reales de Lab order y Prescription. Falta confirmar si imprime un *Referral ID*.
+2. El documento de red.dev no imprime procedimientos ni ASAP en la Lab order; la app antepone "ASAP." al trabajo pedido
+   (decisión del 27, no se tocó).
+3. red.dev imprime el vencimiento como `2026-05-05` (Lab order) y `03-06-2026` (Prescription); la plantilla recibe la
+   fecha ya escrita.
+4. En red.dev el documento no tiene tipo ni título, pie, número de página ni firma; el diseño nuevo los mantiene.

@@ -4069,3 +4069,60 @@ del encuentro y del filtro de fecha.
 
 **A validar con usuarios:** si filtrar por mes alcanza o piden un rango libre; y si *Today* se entiende como "este mes"
 en una tabla.
+
+## CON-2214 · CON-2212 · CON-2321 · Lab order, Prescription y Referral como red.dev: ⋮, Confirm en azul, sólo Filter y fichas (2026-11-28)
+
+Devolución de Julián con cuatro videos de red.dev y los links a las tres pestañas. Se relevó red.dev en sólo lectura
+(menús por estado, los 12 diálogos, las fichas, New y los PDF reales) además de los videos; nada de esto está en una
+historia nueva: son correcciones sobre CON-2214, CON-2212 y CON-2321 (y CON-2584, CON-2356, CON-2220).
+
+### Qué cambió
+
+1. **El ⋮ de las tablas, como red.dev.** Encabezado *Options* y, fuera de Pending, **Edit sigue primero pero apagado**,
+   con el tooltip de red.dev ("This lab order can only be edited while Pending."). Un estado final muestra sólo ese Edit.
+   Sale *View*: la fila abre la ficha. Orden e íconos de red.dev (lucide):
+   - Lab order · Pending: Edit (pencil), Request (send), Cancel (ban), Delete (trash-2). Requested: Edit apagado, Reject
+     (circle-x), Deliver (package-check), Delay (clock), Cancel. Delayed (red.dev no tiene ninguna): Edit apagado, Reject,
+     Deliver, Cancel.
+   - Prescription · Pending: Edit, Activate (power), Cancel. Active: Edit apagado, Cancel, Expire (timer-off).
+   - Referral · Pending: Edit, Request, Cancel. Requested: Edit apagado, Complete (check-check), Reject, Cancel.
+   `ItemsTarea` / `MenuTarea` suman `editarApagado`; el ⋮ de la ficha y el de Pending Task siguen como estaban.
+2. **Delete de Prescription y Referral es el tacho de la fila** (columna *Delete*, entre el PDF y el ⋮, como red.dev), con
+   `ICONO_TACHO`; sólo en Pending (CON-2356), apagado en el resto. En Lab order sigue en el ⋮, como red.dev.
+3. **Toda pregunta se contesta con *Cancel* / *Confirm*, y el Confirm va en azul**, también en Reject, Cancel y Delete
+   ("pasamos todos los botones en vez de rojo azul"). Ícono de aviso en el título, como red.dev. Los textos no cambian.
+   Vale para las tres pestañas, sus fichas y Pending Task (comparten `PREGUNTAS`). El rojo queda en las opciones del ⋮.
+4. **La barra de la tabla trae sólo *Filter*** (a la izquierda, donde estaba) y *New …* a la derecha: salen el buscador y
+   el filtro de fecha. En las tres, como red.dev.
+5. **El documento, sin cambios** (ya seguía a red.dev): Lab order desde que se pide; Prescription mientras está Active;
+   Referral mientras está Requested (el código de red.dev: `documentId: "REQUESTED" === status ? … : undefined`). En
+   el resto, el ícono se ve apagado.
+6. **Fichas.**
+   - *New*: sin quién ni cuándo en el título (todavía no existe), en las tres.
+   - Lab order: *Delivery expiration date* sube al título, como en Prescription y en red.dev; *ASAP* queda debajo del
+     laboratorio.
+   - Prescription: los tres checks pasan a switch con Yes / No (`settings/primitives` › `Toggle`, que suma `disabled`);
+     *Add medication* pasa a **New medication**, botón azul; quitar una medicación es el tacho de sólo ícono al lado de
+     las pestañas.
+   - Referral: *ASAP* y *Mandatory to continue treatment* van debajo de *Procedures*; salen "Only planned procedures can
+     be referred." y "No procedures linked." (este último también en Lab order: es el mismo bloque).
+
+### Anomalías y supuestos
+
+1. **"El ícono del trash acomodalo como hicimos en waiting room"**: no encontré un tacho en Waiting Room. Se tomó como el
+   formato único del tacho (`ICONO_TACHO`, el de *Set working hours*): en la fila de la tabla y al lado de las pestañas
+   de medicación. A confirmar con Julián.
+2. **El documento de la Referral sólo existe en Requested** en red.dev (se apaga al completarla o rechazarla). Julián:
+   "el pdf sólo se puede ver si pasó del estado request": se leyó como esa misma regla. Si quiere que siga a la vista
+   después, es un cambio de una línea (`conPdf`).
+3. **Delete en red.dev dice *Continue*** en Prescription; acá, *Confirm* como el resto.
+4. **Estados:** red.dev escribe *Cancelled*; la app, *Canceled* (decisión anterior). No se tocó.
+5. **Filter de red.dev** trae además un rango de fechas adentro; Julián pidió sacar el filtro de fecha y no se sumó.
+6. El primer Escape sobre el Edit apagado cierra su tooltip y el segundo, el menú (igual que las opciones apagadas de
+   Pending Task).
+
+### Para validar
+
+- Con odontólogos: si alcanza con Edit apagado + abrir la fila para ver una orden que ya no se edita, o hace falta un
+  *View* explícito.
+- Con recepción: Confirm en azul para Cancel y Delete (acciones que no se deshacen): que no se confirme sin leer.

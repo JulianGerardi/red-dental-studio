@@ -210,6 +210,16 @@ const procedimientosDe = (ids: string[], catalogo: ProcedimientoFicha[]) => cata
 const zona = (p: ProcedimientoFicha) => (p.pieza && p.pieza !== '-' ? [p.pieza, p.superficie && p.superficie !== '-' ? p.superficie : ''].filter(Boolean).join(' · ') : p.ubicacion && p.ubicacion !== '-' ? p.ubicacion : '-')
 const fechaLarga = (s: string) => { const f = new Date(s); return s && !Number.isNaN(f.getTime()) ? largo(f) : s || '-' }
 const siNo = (v: boolean) => (v ? 'Yes' : 'No')
+/* Los IDs del documento, como los imprime red.dev: el de la Lab order es un UUID y el de la Prescription, ocho
+   caracteres. Acá salen del id del registro, siempre los mismos. */
+const hex = (semilla: string, n: number) => { let h = ''; for (let i = 0; h.length < n; i++) h += (hash(`${semilla}:${i}`) >>> 0).toString(16).padStart(8, '0'); return h.slice(0, n) }
+const uuidDe = (id: string) => hex(id, 32).replace(/^(.{8})(.{4})(.{4})(.{4})(.{12})$/, '$1-$2-$3-$4-$5')
+const peso = (b?: number) => (b === undefined ? '-' : b < 1024 * 1024 ? `${Math.max(1, Math.round(b / 1024))} KB` : `${(b / 1024 / 1024).toFixed(1)} MB`)
+/* Documents Uploaded y sus anexos: una imagen sin archivo a mano (mock) sale como hoja de anexo con su nombre. */
+const adjuntosDe = (lista: { nombre: string; bytes?: number }[]) => ({
+  has_documents: lista.length > 0,
+  attachments: lista.map((a, i) => ({ annex_label: String.fromCharCode(65 + i), name: a.nombre, file_type: /\.pdf$/i.test(a.nombre) ? 'PDF' : 'Image', file_size: peso(a.bytes), is_image: false, file_url: '' })),
+})
 const PLANTILLA: Record<TipoRegistro, string> = { 'Lab orders': 'lab-order', Prescriptions: 'prescription', Referrals: 'referral' }
 
 /** El HTML del documento de un registro (o de la tarea que todavía no se abrió); sin plantilla (Clinical note), nada. */
@@ -232,15 +242,17 @@ export function hojaDeRegistro(t: PendingTask): string | undefined {
     const lab = laboratorios().find((l) => l.nombre === r.lab!.laboratorio)
     const permanentes = r.lab.dientes.filter((d) => /^\d+$/.test(d))
     propios = {
-      expiration_date: fechaLarga(r.expiration), lab_name: r.lab.laboratorio, lab_phone: lab?.telefono ?? '-', lab_email: lab?.email ?? '-', lab_address: lab?.direccion ?? '-',
-      work_request: [r.lab.asap ? 'ASAP.' : '', r.lab.trabajo, r.lab.indicaciones.trim() && `Special instructions: ${r.lab.indicaciones.trim()}`].filter(Boolean).join(' '),
+      lab_order_id: uuidDe(r.id), expiration_date: fechaLarga(r.expiration), lab_name: r.lab.laboratorio, lab_phone: lab?.telefono ?? '-', lab_email: lab?.email ?? '-', lab_address: lab?.direccion ?? '-',
+      work_request: [r.lab.asap ? 'ASAP.' : '', r.lab.trabajo].filter(Boolean).join(' '), special_instructions: r.lab.indicaciones.trim(),
       /* La plantilla dibuja una dentición: la que tiene dientes marcados (la permanente si hay de las dos). */
       dentition: permanentes.length || !r.lab.dientes.length ? 'Permanent' : 'Primary',
+      has_teeth: r.lab.dientes.length > 0,
       teeth: r.lab.dientes.map((d) => ({ tooth: d, surfaces: (r.lab!.superficies[d] ?? []).join(', ') })),
+      ...adjuntosDe(r.lab.adjuntos),
     }
   } else if (r.receta) {
     propios = {
-      issued_date: fechaLarga(r.register), expiration_date: fechaLarga(r.expiration), additional_indications: r.receta.indicaciones,
+      prescription_id: hex(r.id, 8).toUpperCase(), issued_date: fechaLarga(r.register), expiration_date: fechaLarga(r.expiration), additional_indications: r.receta.indicaciones,
       medications: r.receta.medicaciones.map((m) => ({
         drug_name: m.nombre, strength: nombreMedicacion({ ...m, nombre: '' }), dosage_form: m.forma,
         dose: [m.dosis, unidadDeDosis(m.dosis, m.unidadDosis)].filter(Boolean).join(' '), route: m.via.toLowerCase(), frequency: m.frecuencia.toLowerCase(),
@@ -257,7 +269,7 @@ export function hojaDeRegistro(t: PendingTask): string | undefined {
       contact_name: d.proveedor, contact_type: 'Dentist', contact_specialty: destino?.especialidad || '-', contact_phone: '-', contact_email: '-', contact_address: '-',
       procedures: procedimientosDe(d.procedimientos, PROCEDIMIENTOS_REFERRAL).map((x) => ({ code: x.codigo, description: x.nombre, anatomic_area: zona(x), findings: [], diagnoses: [] })),
       referral_note: d.nota,
-      attachments: d.adjuntos.map((a, i) => ({ annex_label: String.fromCharCode(65 + i), name: a.nombre, file_type: /\.pdf$/i.test(a.nombre) ? 'PDF' : 'Image', is_image: false, file_url: '' })),
+      ...adjuntosDe(d.adjuntos),
       ...firmado,
     }
   }

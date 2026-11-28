@@ -5,6 +5,7 @@ import { expect } from 'e2e'
    sólo lectura) y la máquina de estados de cada uno, con las preguntas de red.dev y los avisos de Jira (CON-2214,
    CON-2212, CON-2321). Ver design-reference/figma/modulos/clinical-mode.md (2026-11-27). */
 
+/* 2026-11-28: sólo Filter en la barra, Edit apagado fuera de Pending, tacho en la fila y Cancel / Confirm en azul. */
 /* Sin Start encounter: en Clinical Mode estos registros no piden un encuentro abierto. */
 const abrir = async (app: { open: (u: string) => Promise<unknown> }, _screen: unknown, tab: string) => {
   await app.open(`/patients/john-smith/clinical-mode?tab=${encodeURIComponent(tab)}`)
@@ -26,27 +27,28 @@ test('Sin encuentro abierto se crea y se edita; lo que ya no está en Pending se
   await expect(screen.getByText('Read-only mode')).toHaveCount(0)
   await expect(screen.getByRole('button', 'Save')).toBeEnabled()
   await screen.getByRole('button', 'Back to prescriptions').tap()
-  /* Una receta Active no se edita, con o sin encuentro. */
+  /* Una receta Active no se edita, con o sin encuentro: en el ⋮, Edit está apagado (como red.dev) y la fila la abre en
+     sólo lectura. */
   await screen.getByRole('button', /^Actions for prescription of Ibuprofen 600 mg, Active/).tap()
-  await screen.getByRole('menuitem', 'View').tap()
+  await expect(screen.getByRole('menuitem', 'Edit')).toHaveAttribute('aria-disabled', 'true')
+  await screen.getByRole('menu').press('Escape')
+  await screen.getByText('Ibuprofen 600 mg').first().tap()
   await expect(screen.getByText('This prescription cannot be edited because it is not in an editable state.')).toBeVisible()
   await expect(screen.getByRole('button', 'Save')).toBeDisabled()
 })
 
-/* El filtro de fecha es el bloque del Dashboard (‹ Today › + calendario), por mes; la ✕ vuelve a All dates. */
-test('La fecha de la tabla filtra por mes y Clear date vuelve a todas', async ({ app, screen }) => {
-  await app.open('/patients/john-smith/clinical-mode?tab=Referral')
-  await expect(screen.getByText(/Showing 1 to 7 of 7 results/)).toBeVisible()
-  await screen.getByRole('button', 'Today').tap()
-  /* Los datos de ejemplo son de 2026: se llega a noviembre de 2026 desde el mes real, sea cual sea. */
-  const hoy = new Date()
-  const pasos = (2026 - hoy.getFullYear()) * 12 + (10 - hoy.getMonth())
-  for (let i = 0; i < Math.abs(pasos); i++) await screen.getByRole('button', pasos > 0 ? 'Next month' : 'Previous month').tap()
+/* Como red.dev, la barra de la tabla trae sólo Filter (a la izquierda) y New: sin buscador ni filtro de fecha. */
+test('La tabla sólo trae Filter: sin buscador ni filtro de fecha', async ({ app, screen }) => {
+  for (const [tab, plural] of [['Lab order', 'lab orders'], ['Prescription', 'prescriptions'], ['Referral', 'referrals']] as const) {
+    await abrir(app, screen, tab)
+    await expect(screen.getByRole('button', `Filter ${plural}`)).toBeVisible()
+    await expect(screen.getByRole('searchbox')).toHaveCount(0)
+    await expect(screen.getByRole('button', 'Today')).toHaveCount(0)
+  }
+  await screen.getByRole('button', 'Filter referrals').tap()
+  await screen.getByRole('menuitemcheckbox', /^Requested/).tap()
+  await screen.getByRole('menuitemcheckbox', /^Requested/).press('Escape')
   await expect(screen.getByText(/Showing 1 to 2 of 2 results/)).toBeVisible()
-  await screen.getByRole('button', 'Previous month').tap()
-  await expect(screen.getByText(/Showing 1 to 2 of 2 results/)).toBeVisible()
-  await screen.getByRole('button', 'Clear date').tap()
-  await expect(screen.getByText(/Showing 1 to 7 of 7 results/)).toBeVisible()
 })
 
 test('Prescription: New valida, crea en Pending, se edita, se activa y se cancela (CON-2230, CON-2354, CON-2355)', async ({ app, screen }) => {
@@ -78,12 +80,12 @@ test('Prescription: New valida, crea en Pending, se edita, se activa y se cancel
   await expect(screen.getByText('Take 1 tablet orally three times daily for 5 days').first()).toBeVisible()
 
   /* Una segunda medicación vacía frena el guardado y la pestaña la marca; se saca y guarda. */
-  await screen.getByRole('button', /Add medication/).tap()
+  await screen.getByRole('button', /New medication/).tap()
   await screen.getByRole('button', 'Save').tap()
   await expect(screen.getByText('Uncompleted fields')).toBeVisible()
   await screen.getByRole('button', /Remove medication/).tap()
   /* CON-2846: el paciente ya tiene Ibuprofen activo; con Update patient medications, Save pregunta si se reutiliza. */
-  await screen.getByRole('checkbox', 'Update patient medications').tap()
+  await screen.getByRole('switch', 'Update patient medications').tap()
   await screen.getByRole('button', 'Save').tap()
   await screen.getByRole('dialog', 'Medication already active').getByRole('button', 'Reuse existing medication').tap()
   await expect(screen.getByText('The prescription has been successfully created.')).toBeVisible()
@@ -101,21 +103,22 @@ test('Prescription: New valida, crea en Pending, se edita, se activa y se cancel
   /* Activate pregunta; ya Active no se edita, tiene PDF y sólo se cancela. */
   await screen.getByRole('button', /^Actions for prescription of Ibuprofen 600 mg, Pending/).tap()
   await screen.getByRole('menuitem', 'Activate').tap()
-  await screen.getByRole('dialog', 'Activate prescription').getByRole('button', 'Mark as active').tap()
+  await screen.getByRole('dialog', 'Activate prescription').getByRole('button', 'Confirm').tap()
   await expect(screen.getByText('The prescription has been successfully marked as Active.')).toBeVisible()
   /* El documento existe desde que está Active: el botón de la fila se prende. */
   await expect(screen.getByRole('button', /^View PDF of the prescription of Ibuprofen 600 mg, Active, created (?!10\/30)/)).toBeEnabled()
   await screen.getByRole('button', /^Actions for prescription of Ibuprofen 600 mg, Active, created (?!10\/30)/).tap()
-  await expect(screen.getByRole('menuitem', 'Edit')).toHaveCount(0)
+  await expect(screen.getByRole('menuitem', 'Edit')).toHaveAttribute('aria-disabled', 'true')
   await expect(screen.getByRole('menuitem', 'Expire')).toBeVisible()
   await screen.getByRole('menuitem', 'Cancel').tap()
-  await screen.getByRole('dialog', 'Cancel prescription').getByRole('button', 'Cancel prescription').tap()
+  /* Toda pregunta se contesta con Cancel / Confirm, en azul (red.dev). */
+  await screen.getByRole('dialog', 'Cancel prescription').getByRole('button', 'Confirm').tap()
   await expect(screen.getByText('The prescription has been successfully marked as Canceled.')).toBeVisible()
 })
 
 test('Prescription: Filter por estado y provider, Expire en una Active y Delete sólo en Pending (CON-2286, CON-2356)', async ({ app, screen }) => {
   await abrir(app, screen, 'Prescription')
-  /* Los filtros de red.dev: Status y Provider (y el rango de vencimiento). */
+  /* Los filtros: Status y Provider. */
   await screen.getByRole('button', 'Filter prescriptions').tap()
   await screen.getByRole('menuitemcheckbox', /^Active/).tap()
   await screen.getByRole('menuitemcheckbox', /Dr\. Daniel Anderson/).tap()
@@ -123,19 +126,24 @@ test('Prescription: Filter por estado y provider, Expire en una Active y Delete 
   await expect(screen.getByText(/Showing 1 to 1 of 1 results/)).toBeVisible()
   await screen.getByRole('button', /^Actions for prescription of Ibuprofen 600 mg, Active/).tap()
   await screen.getByRole('menuitem', 'Expire').tap()
-  await screen.getByRole('dialog', 'Expire prescription').getByRole('button', 'Mark as expired').tap()
+  await screen.getByRole('dialog', 'Expire prescription').getByRole('button', 'Confirm').tap()
   await expect(screen.getByText('The prescription has been successfully marked as Expired.')).toBeVisible()
   await screen.getByRole('button', /^Filter prescriptions(?! by)/).tap()
   await screen.getByRole('button', 'Clear all').tap()
   await screen.getByRole('menuitemcheckbox', /^Active/).press('Escape')
+  /* Delete es el tacho de la fila (como red.dev), no una opción del ⋮: Pending trae Edit, Activate y Cancel. */
   await screen.getByRole('button', /^Actions for prescription of Clonazepam 1 mg, Pending/).tap()
-  await screen.getByRole('menuitem', 'Delete').tap()
-  await screen.getByRole('dialog', 'Delete prescription').getByRole('button', 'Delete').tap()
+  await expect(screen.getByRole('menuitem', 'Delete')).toHaveCount(0)
+  await screen.getByRole('menuitem', 'Activate').press('Escape')
+  await screen.getByRole('button', /^Delete the prescription of Clonazepam 1 mg, Pending/).tap()
+  await screen.getByRole('dialog', 'Delete prescription').getByRole('button', 'Confirm').tap()
   await expect(screen.getByText('The prescription has been successfully deleted.')).toBeVisible()
   await expect(screen.getByText(/Showing 1 to 6 of 6 results/)).toBeVisible()
+  /* Fuera de Pending el tacho está apagado y el ⋮ sólo trae Edit, apagado. */
+  await expect(screen.getByRole('button', /^Delete the prescription of .*Expired/).first()).toBeDisabled()
   await screen.getByRole('button', /^Actions for prescription of .*Expired/).first().tap()
-  await expect(screen.getByRole('menuitem', 'Delete')).toHaveCount(0)
-  await expect(screen.getByRole('menuitem', 'View')).toBeVisible()
+  await expect(screen.getByRole('menuitem')).toHaveCount(1)
+  await expect(screen.getByRole('menuitem', 'Edit')).toHaveAttribute('aria-disabled', 'true')
 })
 
 test('Lab order: New crea en Pending; Request, Delay y Deliver siguen la máquina de estados (CON-2215, CON-2221, CON-2226)', async ({ app, screen }) => {
@@ -161,23 +169,22 @@ test('Lab order: New crea en Pending; Request, Delay y Deliver siguen la máquin
   const fila = (estado: string) => screen.getByRole('button', new RegExp(`^Actions for lab order for Smile Lab Studio, ${estado}`)).first()
   await fila('Pending').tap()
   await screen.getByRole('menuitem', 'Request').tap()
-  await screen.getByRole('dialog', 'Request lab order').getByRole('button', 'Mark as requested').tap()
+  await screen.getByRole('dialog', 'Request lab order').getByRole('button', 'Confirm').tap()
   await expect(screen.getByText('The lab order has been successfully marked as Requested.')).toBeVisible()
 
   await fila('Requested').tap()
-  await expect(screen.getByRole('menuitem', 'Edit')).toHaveCount(0)
+  await expect(screen.getByRole('menuitem', 'Edit')).toHaveAttribute('aria-disabled', 'true')
   await screen.getByRole('menuitem', 'Delay').tap()
-  await screen.getByRole('dialog', 'Delay lab order').getByRole('button', 'Mark as delayed').tap()
+  await screen.getByRole('dialog', 'Delay lab order').getByRole('button', 'Confirm').tap()
   await expect(screen.getByText('The lab order has been successfully marked as Delayed.')).toBeVisible()
 
   /* La ficha de una orden que ya no se edita: sólo lectura, con lo cargado y su ⋮. */
-  await fila('Delayed').tap()
-  await screen.getByRole('menuitem', 'View').tap()
+  await screen.getByText(/^Delayed$/).first().tap()
   await expect(screen.getByText('This lab order cannot be edited because it is not in an editable state.')).toBeVisible()
   await expect(screen.getByLabel(/Dental work requested/)).toHaveValue('Zirconia crown, shade A2.')
   await screen.getByRole('button', /^Actions for Lab order/).tap()
   await screen.getByRole('menuitem', 'Deliver').tap()
-  await screen.getByRole('dialog', 'Deliver lab order').getByRole('button', 'Mark as delivered').tap()
+  await screen.getByRole('dialog', 'Deliver lab order').getByRole('button', 'Confirm').tap()
   await expect(screen.getByText('The lab order has been successfully marked as Delivered.')).toBeVisible()
   await expect(screen.getByRole('button', /^Actions for Lab order/)).toHaveCount(0)
   await screen.getByRole('button', 'Back to lab orders').tap()
@@ -205,13 +212,13 @@ test('Referral: New crea en Pending, se pide y se rechaza (CON-2322, CON-2394, C
   await expect(screen.getByRole('textbox', /^Referral note/)).toHaveValue('Please evaluate for periodontal surgery.')
   await screen.getByRole('button', /^Actions for Referral/).tap()
   await screen.getByRole('menuitem', 'Request').tap()
-  await screen.getByRole('dialog', 'Request referral').getByRole('button', 'Mark as requested').tap()
+  await screen.getByRole('dialog', 'Request referral').getByRole('button', 'Confirm').tap()
   await expect(screen.getByText('The referral has been successfully marked as Requested.')).toBeVisible()
   await expect(screen.getByText('This referral cannot be edited because it is not in an editable state.')).toBeVisible()
   await expect(screen.getByRole('button', 'PDF')).toBeVisible()
   await screen.getByRole('button', /^Actions for Referral/).tap()
   await screen.getByRole('menuitem', 'Reject').tap()
-  await screen.getByRole('dialog', 'Reject referral').getByRole('button', 'Reject').tap()
+  await screen.getByRole('dialog', 'Reject referral').getByRole('button', 'Confirm').tap()
   await expect(screen.getByText('The referral has been successfully rejected.')).toBeVisible()
   await expect(screen.getByRole('button', 'PDF')).toHaveCount(0)
 })
@@ -226,7 +233,7 @@ test('Pending Task → Prescription: Complete this task abre la receta y Activat
   await expect(screen.getByText('Directions for use')).toBeVisible()
   await screen.getByRole('button', /^Actions for Prescription/).tap()
   await screen.getByRole('menuitem', 'Activate').tap()
-  await screen.getByRole('dialog', 'Activate prescription').getByRole('button', 'Mark as active').tap()
+  await screen.getByRole('dialog', 'Activate prescription').getByRole('button', 'Confirm').tap()
   await expect(screen.getByText('The prescription has been successfully marked as Active.')).toBeVisible()
   await expect(screen.getByRole('button', 'PDF')).toBeVisible()
 })

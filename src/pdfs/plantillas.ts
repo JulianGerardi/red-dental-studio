@@ -48,7 +48,6 @@ const PROVIDER: Firma = { rol: 'Provider', prefijo: 'provider' }
 const PACIENTE: Firma = { rol: 'Patient / legal guardian', prefijo: 'patient' }
 const FIRMADO_PROVIDER = { provider_signed_date: 'November 25, 2026', provider_signature_image: '' }
 const FIRMADO_PACIENTE = { patient_signed_date: 'November 25, 2026', patient_signature_image: '' }
-const RESUMEN_PACIENTE: [string, string][] = [['Patient', '{{patient_name}}'], ['Date of birth', '{{patient_birth_date}}'], ['Patient ID', '{{patient_id}}']]
 
 /* Patient acknowledgment del consentimiento: el mismo texto que la hoja de la app (settings/ConsentDocument). */
 const RECONOCIMIENTOS = [
@@ -81,6 +80,12 @@ const IMPORTES: Bloque = {
 const FINDING = '<li>{{finding}} on {{location}}{{#details}} [details: ({{details}})]{{/details}}.{{#note}} ({{note}}){{/note}}</li>'
 const DOCUMENTOS_ENVIADOS = '{{#document_sent}}<p><b>Documents sent:</b> Yes</p>{{/document_sent}}'
 
+/* Documents Uploaded, como el PDF de red.dev (archivo y peso) más el anexo donde va cada uno: los adjuntos siguen al
+   documento, cada uno en su hoja (`Hoja.anexos`; Julián, 2026-11-27). */
+const DOCUMENTOS: Bloque = { tipo: 'tabla', lista: 'attachments', vacio: 'No documents uploaded.', columnas: [
+  { titulo: 'Annex', valor: '{{annex_label}}', ancho: '12%' }, { titulo: 'File', valor: '{{name}}' }, { titulo: 'Type', valor: '{{file_type}}', ancho: '14%' }, { titulo: 'Size', valor: '{{file_size}}', derecha: true, ancho: '14%' },
+] }
+
 /* El caso del ejemplo (Restorative plan), con los importes que calcula Estimate details (data/estimaciones): cobertura
    del 100 % en D1, 80 % en D2-D4, 85 % permitido y $50 de deducible. Fee = seguro + ajuste + paciente. */
 const PROC_ENDODONCIA = { code: 'D3330', description: 'Endodontic therapy, molar tooth', anatomic_area: '19', fee: '$1,100.00', insurance_portion: '$708.00', insurance_adjustment: '$165.00', patient_portion: '$227.00', findings: [{ description: 'Periapical radiolucency' }], diagnoses: [{ code: 'K04.5', description: 'Chronic apical periodontitis' }] }
@@ -108,12 +113,8 @@ export const PDFS: Pdf[] = [
     hoja: {
       tipo: 'Dental clinical note',
       titulo: '{{patient_name}}',
-      meta: ['Date of visit', '{{visit_date}}'],
+      encabezado: { nombre: '{{provider_name}}', datos: [['Date of birth', '{{patient_birth_date}}'], ['Date of visit', '{{visit_date}} — {{visit_time}}'], ['Contact', '{{patient_phone}}']] },
       aviso: '{{#auto_generated}}<p class="aviso">Generated automatically when the encounter closed after 48 hours without activity. Workflow narratives are not included.</p>{{/auto_generated}}',
-      resumen: [
-        ['Patient name', '{{patient_name}}'], ['Date of birth', '{{patient_birth_date}}'], ['Date of visit', '{{visit_date}} — {{visit_time}}'],
-        ['Attending dentist', '{{provider_name}}'], ['Contact', '{{patient_phone}}'],
-      ],
       secciones: [
         { titulo: 'Vital Signs', si: 'has_vitals', bloques: [{ tipo: 'libre', html: `<p>Patient vitals were taken:</p>
 <ul class="lista">{{#height_in}}<li>Height {{height_in}} in, Weight {{weight_lb}} pounds; BMI {{bmi}}.</li>{{/height_in}}{{#blood_pressure}}<li>Blood pressure: {{blood_pressure}} mmHg.</li>{{/blood_pressure}}{{#heart_rate}}<li>Heart rate: {{heart_rate}} bpm.</li>{{/heart_rate}}{{#respiratory_rate}}<li>Respiratory rate: {{respiratory_rate}} rpm.</li>{{/respiratory_rate}}{{#temperature}}<li>Temperature: {{temperature}} °F.</li>{{/temperature}}{{#oxygen_saturation}}<li>Oxygen saturation: {{oxygen_saturation}} %.</li>{{/oxygen_saturation}}</ul>
@@ -298,8 +299,7 @@ export const PDFS: Pdf[] = [
     hoja: {
       tipo: 'Periodontal exam',
       titulo: '{{patient_name}}',
-      meta: ['Exam date', '{{exam_date}}'],
-      resumen: [...RESUMEN_PACIENTE, ['Exam date', '{{exam_date}}'], ['Provider', '{{provider_name}}'], ['Location', '{{location_name}}']],
+      encabezado: { nombre: '{{provider_name}}', datos: [['Date of birth', '{{patient_birth_date}}'], ['Patient ID', '{{patient_id}}'], ['Exam date', '{{exam_date}}'], ['Location', '{{location_name}}']] },
       secciones: [
         { titulo: 'Periodontal chart', bloques: [
           { tipo: 'tabla', lista: 'teeth', vacio: 'No teeth charted.', columnas: [
@@ -346,8 +346,7 @@ export const PDFS: Pdf[] = [
     hoja: {
       tipo: 'Radiographic exam',
       titulo: '{{patient_name}}',
-      meta: ['Exam date', '{{exam_date}}'],
-      resumen: [...RESUMEN_PACIENTE, ['Exam date', '{{exam_date}}'], ['Provider', '{{provider_name}}'], ['Images', '{{image_count}}']],
+      encabezado: { nombre: '{{provider_name}}', datos: [['Date of birth', '{{patient_birth_date}}'], ['Patient ID', '{{patient_id}}'], ['Exam date', '{{exam_date}}'], ['Images', '{{image_count}}']] },
       secciones: [
         { titulo: 'Images', bloques: [{ tipo: 'imagenes', lista: 'images', imagen: '{{image_url}}', titulo: '{{name}}', detalle: '{{taken_date}} · Teeth {{teeth}}', vacio: 'No images in this exam.' }] },
         { titulo: 'Findings', bloques: [{ tipo: 'tabla', lista: 'findings', vacio: 'No findings recorded.', columnas: [
@@ -374,33 +373,42 @@ export const PDFS: Pdf[] = [
     id: 'lab-order',
     categoria: 'Orders',
     nombre: 'Lab order',
-    cuando: 'When the lab order changes to Requested; PDF in Pending tasks and in the lab order.',
+    cuando: 'When the lab order changes to Requested; the document icon in the lab orders table, in the lab order and in Pending tasks.',
     firma: 'Not signed. It goes to the receiving laboratory.',
     origen: 'app',
-    jira: ['CON-2215', 'CON-2220', 'CON-2643', 'CON-4115'],
+    completado: ['Same data and order as the red.dev document; attachments also go as annexes, one page each'],
+    jira: ['CON-2215', 'CON-2220', 'CON-2584', 'CON-2643', 'CON-4115'],
     hoja: {
       tipo: 'Lab order',
       titulo: '{{patient_name}}',
-      meta: ['Expiration date', '{{expiration_date}}'],
-      resumen: [
-        ['Provider', '{{provider_name}}'], ['Laboratory', '{{lab_name}}'], ['Patient Phone', '{{patient_phone}}'],
-        ['Email', '{{provider_email}}'], ['Expiration Date', '{{expiration_date}}'],
-      ],
+      /* El encabezado del PDF de red.dev: provider, Lab Order ID, teléfono del paciente, mail del provider y vencimiento. */
+      encabezado: { nombre: '{{provider_name}}', datos: [['Lab Order ID', '{{lab_order_id}}'], ['Patient Phone', '{{patient_phone}}'], ['Email', '{{provider_email}}'], ['Expiration Date', '{{expiration_date}}']] },
       secciones: [
         { titulo: 'Patient Information', bloques: [{ tipo: 'campos', campos: [['Name', '{{patient_name}}'], ['Phone', '{{patient_phone}}'], ['Email', '{{patient_email}}'], ['Address', '{{patient_address}}']] }] },
         { titulo: 'Receiving Laboratory', bloques: [{ tipo: 'campos', campos: [['Name', '{{lab_name}}'], ['Phone', '{{lab_phone}}'], ['Email', '{{lab_email}}'], ['Address', '{{lab_address}}']] }] },
         { titulo: 'Provider Information', bloques: [{ tipo: 'campos', campos: [['Name', '{{provider_name}}'], ['Email', '{{provider_email}}']] }] },
         { titulo: 'Dental Work Request', bloques: [{ tipo: 'texto', texto: '{{work_request}}' }] },
-        { titulo: 'Teeth & Surface Specifications', bloques: [{ tipo: 'boca', lista: 'teeth', denticion: '{{dentition}}' }] },
+        /* Como el PDF de red.dev: sin dientes, sin indicaciones o sin adjuntos, la sección no sale. */
+        { titulo: 'Teeth & Surface Specifications', si: 'has_teeth', bloques: [{ tipo: 'boca', lista: 'teeth', denticion: '{{dentition}}' }] },
+        { titulo: 'Special Instructions', si: 'special_instructions', bloques: [{ tipo: 'texto', texto: '{{special_instructions}}' }] },
+        { titulo: 'Documents Uploaded', si: 'has_documents', bloques: [DOCUMENTOS] },
       ],
+      anexos: 'attachments',
       pie: 'Lab order',
     },
     ejemplo: {
+      lab_order_id: '019d699e-935f-7ee6-9945-46a1628442d0',
       expiration_date: 'December 9, 2026',
       lab_name: 'Olivos Laboratory', lab_phone: '+1 212 5550142', lab_email: 'orders@olivoslab.com', lab_address: '410 Park Ave, 3, New York, 10022, NY, US',
       work_request: 'Zirconia bridge, three units, shade B1.',
       dentition: 'Permanent',
+      has_teeth: true,
       teeth: [{ tooth: '19', surfaces: '' }, { tooth: '20', surfaces: 'O' }, { tooth: '21', surfaces: 'M, D' }],
+      special_instructions: 'Send the try-in before final glazing.',
+      has_documents: true,
+      attachments: [
+        { annex_label: 'A', name: 'Shade_photo_19.jpg', file_type: 'Image', file_size: '185 KB', is_image: true, file_url: '{{assets_url}}/sample-periapical.jpg' },
+      ],
     },
   },
   {
@@ -415,12 +423,11 @@ export const PDFS: Pdf[] = [
     hoja: {
       tipo: 'Prescription',
       titulo: '{{patient_name}}',
-      meta: ['Issued', '{{issued_date}}'],
-      resumen: [
-        ['Patient', '{{patient_name}}'], ['Date of birth', '{{patient_birth_date}}'], ['Phone', '{{patient_phone}}'],
-        ['Prescriber', '{{provider_name}}'], ['Expiration date', '{{expiration_date}}'],
-      ],
+      /* El encabezado del PDF de red.dev: provider, Prescription ID, teléfono del paciente, mail del provider, Valid From y vencimiento. */
+      encabezado: { nombre: '{{provider_name}}', datos: [['Prescription ID', '{{prescription_id}}'], ['Patient Phone', '{{patient_phone}}'], ['Email', '{{provider_email}}'], ['Valid From', '{{issued_date}}'], ['Expiration Date', '{{expiration_date}}']] },
       secciones: [
+        /* Como el PDF de red.dev, más la fecha de nacimiento (identifica al paciente en la farmacia). */
+        { titulo: 'Patient Information', bloques: [{ tipo: 'campos', campos: [['Name', '{{patient_name}}'], ['Date of birth', '{{patient_birth_date}}'], ['Phone', '{{patient_phone}}'], ['Email', '{{patient_email}}'], ['Address', '{{patient_address}}']] }] },
         { titulo: 'Medications', bloques: [{ tipo: 'tarjetas', lista: 'medications', titulo: '{{drug_name}} {{strength}} · {{dosage_form}}', campos: [
           ['Directions', '{{dose}} {{route}}, {{frequency}}, for {{duration}}'],
           ['Quantity to dispense', '{{quantity}}'], ['Refills', '{{refills}}'],
@@ -432,7 +439,7 @@ export const PDFS: Pdf[] = [
       pie: 'Prescription',
     },
     ejemplo: {
-      issued_date: 'November 25, 2026', expiration_date: 'May 25, 2027',
+      prescription_id: '019E8941', issued_date: 'November 25, 2026', expiration_date: 'May 25, 2027',
       medications: [
         { drug_name: 'Amoxicillin', strength: '500 mg', dosage_form: 'Capsule', dose: '1 capsule', route: 'oral', frequency: 'every 8 hours', duration: '7 days', quantity: '21', refills: '0', generic_substitution: 'Allowed', controlled_substance: 'No' },
         { drug_name: 'Ibuprofen', strength: '400 mg', dosage_form: 'Tablet', dose: '1 tablet', route: 'oral', frequency: 'every 6 hours', duration: '3 days', quantity: '12', refills: '0', generic_substitution: 'Allowed', controlled_substance: 'No' },
@@ -453,24 +460,19 @@ export const PDFS: Pdf[] = [
     hoja: {
       tipo: 'Referral',
       titulo: '{{patient_name}}',
-      meta: ['Created', '{{created_date}}'],
-      resumen: [
-        ['Patient', '{{patient_name}}'], ['Date of birth', '{{patient_birth_date}}'], ['Phone', '{{patient_phone}}'],
-        ['Referring provider', '{{provider_name}}'], ['ASAP', '{{asap}}'], ['Mandatory to continue treatment', '{{mandatory}}'],
-      ],
+      encabezado: { nombre: '{{provider_name}}', datos: [['Patient Phone', '{{patient_phone}}'], ['Email', '{{provider_email}}'], ['Created', '{{created_date}}'], ['ASAP', '{{asap}}'], ['Mandatory to continue treatment', '{{mandatory}}']] },
       secciones: [
-        { titulo: 'Referred to', bloques: [{ tipo: 'campos', campos: [
+        /* Las secciones de los documentos de red.dev (Lab order, Prescription): primero el paciente, después a quién
+           se deriva y quién deriva. */
+        { titulo: 'Patient Information', bloques: [{ tipo: 'campos', campos: [['Name', '{{patient_name}}'], ['Date of birth', '{{patient_birth_date}}'], ['Phone', '{{patient_phone}}'], ['Email', '{{patient_email}}'], ['Address', '{{patient_address}}']] }] },
+        { titulo: 'Referred Provider', bloques: [{ tipo: 'campos', campos: [
           ['Name', '{{contact_name}}'], ['Provider type', '{{contact_type}}'], ['Specialty', '{{contact_specialty}}'],
           ['Phone', '{{contact_phone}}'], ['Email', '{{contact_email}}'], ['Address', '{{contact_address}}'],
         ] }] },
+        { titulo: 'Provider Information', bloques: [{ tipo: 'campos', campos: [['Name', '{{provider_name}}'], ['Email', '{{provider_email}}']] }] },
         { titulo: 'Procedures to refer', bloques: [{ tipo: 'tabla', lista: 'procedures', vacio: 'No procedures selected.', columnas: COLS_PROCEDIMIENTO }] },
         { titulo: 'Referral note', bloques: [{ tipo: 'texto', texto: '{{referral_note}}' }] },
-        { titulo: 'Attachments', bloques: [
-          { tipo: 'tabla', lista: 'attachments', vacio: 'No attachments.', columnas: [
-            { titulo: 'Annex', valor: '{{annex_label}}', ancho: '12%' }, { titulo: 'File', valor: '{{name}}' }, { titulo: 'Type', valor: '{{file_type}}', ancho: '16%' },
-          ] },
-          { tipo: 'nota', texto: 'Each attachment follows this document as an annex, on its own page.' },
-        ] },
+        { titulo: 'Documents Uploaded', si: 'has_documents', bloques: [DOCUMENTOS] },
       ],
       firmas: [{ rol: 'Referring provider', prefijo: 'provider' }],
       anexos: 'attachments',
@@ -482,9 +484,10 @@ export const PDFS: Pdf[] = [
       contact_phone: '+1 646 5550110', contact_email: 'mbennett@rootcare.com', contact_address: '120 W 57th St, 8, New York, 10019, NY, US',
       procedures: [{ code: 'D3330', description: 'Endodontic therapy, molar tooth', anatomic_area: '19', findings: [{ description: 'Periapical radiolucency' }], diagnoses: [{ code: 'K04.5', description: 'Chronic apical periodontitis' }] }],
       referral_note: 'Periapical radiolucency on #19. Please evaluate for root canal treatment before we place the crown.',
+      has_documents: true,
       attachments: [
-        { annex_label: 'A', name: 'Periapical_19.jpg', file_type: 'Image', is_image: true, file_url: '{{assets_url}}/sample-periapical.jpg' },
-        { annex_label: 'B', name: 'Radiographic report.pdf', file_type: 'PDF', is_image: false, file_url: '' },
+        { annex_label: 'A', name: 'Periapical_19.jpg', file_type: 'Image', file_size: '185 KB', is_image: true, file_url: '{{assets_url}}/sample-periapical.jpg' },
+        { annex_label: 'B', name: 'Radiographic report.pdf', file_type: 'PDF', file_size: '412 KB', is_image: false, file_url: '' },
       ],
       ...FIRMADO_PROVIDER,
     },
@@ -501,8 +504,7 @@ export const PDFS: Pdf[] = [
     hoja: {
       tipo: 'Treatment plan',
       titulo: '{{case_name}}',
-      meta: ['Presented', '{{presented_date}}'],
-      resumen: [...RESUMEN_PACIENTE, ['Provider', '{{provider_name}}'], ['Status', '{{case_status}}'], ['Insurance', '{{insurance_name}}']],
+      encabezado: { nombre: '{{provider_name}}', datos: [['Patient', '{{patient_name}}'], ['Date of birth', '{{patient_birth_date}}'], ['Patient ID', '{{patient_id}}'], ['Status', '{{case_status}}'], ['Insurance', '{{insurance_name}}'], ['Presented', '{{presented_date}}']] },
       secciones: [
         { titulo: 'Procedures by visit', bloques: [{ tipo: 'grupos', lista: 'visits', titulo: '{{visit_name}}', tabla: {
           lista: 'procedures', vacio: 'No procedures.', columnas: [...COLS_PROCEDIMIENTO, ...COLS_IMPORTES],
@@ -534,8 +536,7 @@ export const PDFS: Pdf[] = [
     hoja: {
       tipo: 'Informed consent',
       titulo: '{{consent_title}}',
-      meta: ['Consent sent', '{{sent_date}}'],
-      resumen: [...RESUMEN_PACIENTE, ['Provider', '{{provider_name}}'], ['Appointment', '{{appointment}}'], ['Procedure', '{{procedure_name}}']],
+      encabezado: { nombre: '{{provider_name}}', datos: [['Patient', '{{patient_name}}'], ['Date of birth', '{{patient_birth_date}}'], ['Patient ID', '{{patient_id}}'], ['Appointment', '{{appointment}}'], ['Procedure', '{{procedure_name}}'], ['Consent sent', '{{sent_date}}']] },
       secciones: [
         { titulo: 'Diagnosis', bloques: [{ tipo: 'texto', texto: '{{diagnosis}}' }] },
         { titulo: 'Clinical findings', bloques: [{ tipo: 'texto', texto: '{{clinical_findings}}' }] },
@@ -567,8 +568,7 @@ export const PDFS: Pdf[] = [
     hoja: {
       tipo: 'Treatment acceptance consent',
       titulo: '{{case_name}}',
-      meta: ['Consent sent', '{{sent_date}}'],
-      resumen: [...RESUMEN_PACIENTE, ['Provider', '{{provider_name}}'], ['Treatment plan', '{{treatment_plan_name}}'], ['Patient portion', '{{total_patient_portion}}']],
+      encabezado: { nombre: '{{provider_name}}', datos: [['Patient', '{{patient_name}}'], ['Date of birth', '{{patient_birth_date}}'], ['Patient ID', '{{patient_id}}'], ['Treatment plan', '{{treatment_plan_name}}'], ['Patient portion', '{{total_patient_portion}}'], ['Consent sent', '{{sent_date}}']] },
       secciones: [
         { titulo: 'Accepted treatment', bloques: [{ tipo: 'tabla', lista: 'procedures', vacio: 'No procedures.', columnas: [...COLS_PROCEDIMIENTO, ...COLS_IMPORTES] }] },
         { titulo: 'Estimate', bloques: [IMPORTES] },
@@ -603,8 +603,7 @@ export const PDFS: Pdf[] = [
     hoja: {
       tipo: 'Informed refusal',
       titulo: '{{case_name}}',
-      meta: ['Consent sent', '{{sent_date}}'],
-      resumen: [...RESUMEN_PACIENTE, ['Provider', '{{provider_name}}'], ['Treatment plan', '{{treatment_plan_name}}'], ['Decision recorded', '{{decision_date}}']],
+      encabezado: { nombre: '{{provider_name}}', datos: [['Patient', '{{patient_name}}'], ['Date of birth', '{{patient_birth_date}}'], ['Patient ID', '{{patient_id}}'], ['Treatment plan', '{{treatment_plan_name}}'], ['Decision recorded', '{{decision_date}}'], ['Consent sent', '{{sent_date}}']] },
       secciones: [
         { titulo: 'Declined treatment', bloques: [{ tipo: 'tabla', lista: 'procedures', vacio: 'No procedures.', columnas: COLS_PROCEDIMIENTO }] },
         { titulo: 'Consent', bloques: [{ tipo: 'html', variable: 'consent_text_html' }] },
