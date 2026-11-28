@@ -16,6 +16,13 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
   filas miden lo mismo (`AppointmentRow` reserva el alto del botón) y se ven seis cards en cada columna (`TOPE.espera`
   5 → 6). Ya no queda hueco antes de "Show N more".
 
+### Fee schedules: el aviso de la fecha va al lado del campo ([#222](https://github.com/JulianGerardi/red-dental-studio/pull/222))
+- **Available from:** el aviso de qué pasa con la fecha (*Starts today* / *Starts on …*, `ui/alert`) va en la columna de al
+  lado, a la altura del campo; en celular, debajo. El error de fecha pasada queda debajo del campo.
+- **Versión Scheduled:** ese aviso sólo aparece si se cambia la fecha (sin cambios repetía el de arriba), y dice *as soon as
+  you save* en vez de *publish*.
+- *Create new version* sigue en el aviso de la versión activa (`action` de `ui/alert`) y suma el ícono `Plus`.
+
 ### End Encounter: sin rótulo y Edit / historial dentro del mismo drawer (CON-4157, CON-4156) ([#221](https://github.com/JulianGerardi/red-dental-studio/pull/221))
 - **`EndEncounterDrawer`** es un solo `Drawer` con tres vistas: la lista, *Edit procedure* y *Execution history*. Edit y
   el historial reemplazan el contenido (título, pestañas, contenido y pie) en vez de abrir otro drawer encima. *Cancel* /
