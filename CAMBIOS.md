@@ -15,6 +15,7 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
   de la separación entre cards (`WaitingRoomList`), que pasa a 16 px en las dos columnas (`ListGroup amplio`). Todas las
   filas miden lo mismo (`AppointmentRow` reserva el alto del botón) y se ven seis cards en cada columna (`TOPE.espera`
   5 → 6). Ya no queda hueco antes de "Show N more".
+- **Pending task en el celular** (Dashboard): las pestañas scrollean dentro de la card; antes *Referrals* quedaba cortada y sin alcance.
 - **Arreglos del recorrido de QA de Lab order, Prescription y Referral** (CON-2214, CON-2212, CON-2321): *Request* /
   *Activate* desde la ficha guardan antes los cambios pendientes (y validan); el documento de un registro nuevo sale a
   nombre del paciente correcto y con los procedimientos vinculados (`.texto` de `pdfs/marco` conserva saltos de línea);

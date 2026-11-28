@@ -434,9 +434,10 @@ export default function Dashboard() {
       <Panel
         title="Pending task" className="mt-4"
         controls={
-          <div className="flex flex-wrap items-center gap-2">
+          /* max-w-full + min-w-0: en el celular las pestañas scrollean dentro de la card en vez de cortarse (dashboard.md, 2026-11-28). */
+          <div className="flex max-w-full min-w-0 flex-wrap items-center gap-2">
             <Tabs
-              size="sm" aria-label="Filter tasks"
+              size="sm" aria-label="Filter tasks" className="max-w-full"
               tabs={[
                 { value: 'All', count: tareasDelProvider.length },
                 ...TASK_KINDS.map((k) => ({ value: k, count: tareasDelProvider.filter((t) => t.kind === k).length })),

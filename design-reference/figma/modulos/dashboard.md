@@ -1239,6 +1239,10 @@ no coincidían con las de Appointments. Resuelve lo que quedó "para validar" el
 5. **Sin cambios:** el orden, la cuenta de cada grupo, que cada etapa muestre al menos una (`repartir`), el filtro por
    *Visit stage*, y celular y tablet (los paneles van uno debajo del otro).
 
+**Celular (2026-11-28, recorrido de QA):** a 390 px las pestañas de Pending task (514 px) se cortaban dentro de la card y
+*Referrals* quedaba fuera de alcance: el contenedor no tenía tope de ancho y la card recorta. Ahora scrollean dentro de la
+card (`max-w-full min-w-0`), como en el Patient Dashboard.
+
 **A validar:** si el rótulo de 10 px se lee bien en la pantalla de recepción, que suele estar lejos, y si los 16 px
 entre cards no hacen que entren menos turnos de los que recepción necesita ver de un vistazo.
 
