@@ -6,6 +6,21 @@
 Sin historia de Jira. Regla transversal en `../README.md` (*Regla: breadcrumb y título van de la mano*). Edit carrier pasa a **el nombre del carrier** (*Aetna Dental Plans*) y Edit insurance plan a **el del plan** (*Acme Corp*), como el último tramo. El encabezado del editor de Fee schedules y Coverage tables es el ítem elegido (*UCR - Red* · Active · Default) en vez de *Edit fee schedule* / *Edit coverage table*. Resuelve el *Queda para decidir* de abajo.
 
 
+## Aviso de la fecha al lado del campo (2026-11-27)
+
+Sin historia de Jira (CON-1375 y CON-1151 no piden estos mensajes: salen del prototipo). Devolución de Julián con captura.
+
+1. **El aviso de *Available from* va al lado de la fecha**, en la columna libre de la derecha y a la altura del campo (antes
+   debajo, y el espacio de al lado quedaba vacío). En celular baja debajo del campo. Vale para *Starts today* y *Starts
+   on …*. El error de fecha pasada queda debajo del campo, como cualquier error.
+2. **En una Scheduled, el aviso de la fecha repetía el de arriba** (*Scheduled. Starts on 01/02/2027* y, debajo, *Starts on
+   01/02/2027*). Sin cambios en la fecha ya no se muestra: alcanza con el de arriba. Aparece cuando se **cambia** la fecha,
+   que es cuando dice algo nuevo (por ejemplo *Starts today*). En ese caso dice *as soon as you save*, no *publish*: una
+   Scheduled se guarda con *Save changes*.
+3. **Create new version** sigue adentro del aviso de la versión activa, a la derecha (`action` de `ui/alert`). Se probó
+   sacarlo arriba de la tabla, con las acciones, y Julián lo prefirió en el aviso. Suma el `Plus` de los botones que crean
+   algo (*New fee schedule*, *Add range*); deshabilitado conserva su tooltip.
+
 ## Aviso de la fecha con `ui/alert` y pill gris en el menú Version (2026-11-27)
 
 Sin historia de Jira. Devolución de Julián sobre el editor de Fee schedules, con captura y video.

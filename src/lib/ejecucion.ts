@@ -92,8 +92,9 @@ export function cambiarEstadoCita(id: string, estado: EstadoProcedimiento) {
   cambiar(id, (x) => ({ ...x, estado }))
 }
 
-export function guardarNotaCita(id: string, nota: string) {
-  cambiar(id, (x) => ({ ...x, nota }))
+/** Save de Edit procedure: nota, proveedor, vínculos y estimado. No toca el estado ni las fases. */
+export function guardarEdicionCita(id: string, cambios: Pick<Partial<ProcedimientoCita>, 'nota' | 'proveedor' | 'vinculados' | 'diagnosticos' | 'estimado'>) {
+  cambiar(id, (x) => ({ ...x, ...cambios }))
 }
 
 /** El encuentro de un registro. El que está en curso es de hoy y su nota todavía no se firmó. */

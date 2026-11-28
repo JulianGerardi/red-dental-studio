@@ -1,6 +1,7 @@
 import { useLayoutEffect, useRef, useState } from 'react'
 import { cn } from '@/lib/utils'
 import { TARJETA_INTERNA, TARJETA_PANEL } from '@/lib/estilos'
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 
 /* ── Escala tipográfica ──────────────────────────────────────────────
    El Figma usa 15/26/13px en el chrome exterior, pero adentro de los
@@ -19,8 +20,7 @@ export function Panel({
   scroll,
   children,
 }: {
-  /** String en casi todos los paneles; algunos -Today Appointments,
-      Recent Patients en Patients.tsx- le agregan un globo con el total. */
+  /** String en casi todos los paneles; algunos le suman el total (Globo o CuentaSuelta). */
   title: React.ReactNode
   controls?: React.ReactNode
   /** Arriba del título: el paciente elegido en Find Patient y los botones del paciente en Recent Billing Activity (Billing). */
@@ -126,12 +126,37 @@ export function StatusPill({
   )
 }
 
-/* La cuenta junto al título de un panel (Today Appointments y Recent Patients de Patients; Appointments, Waiting Room
-   y Rooms del Dashboard). */
-export function Globo({ n }: { n: number }) {
-  return (
-    <span className="bg-dash-blue flex h-5 min-w-5 shrink-0 items-center justify-center rounded-full px-1.5 text-[11px] font-semibold text-white">
-      {n}
+/* El único contador de la app, con el estilo de la campana: paneles del Dashboard y de Patients, salas y cards
+   clínicas de la ficha. Cero no se muestra; tope 99+ (dashboard.md, 2026-11-28). */
+export function Globo({ n, texto, invertido, sinTooltip }: {
+  n: number
+  /** Qué se cuenta, en singular y plural ("appointment to check in"): lo dicen el tooltip y el lector de pantalla. */
+  texto: [string, string]
+  /** Sobre un fondo azul (la card clínica abierta): blanco con el número azul. */
+  invertido?: boolean
+  /** Dentro de un botón no va tooltip: alcanza con el texto para el lector. */
+  sinTooltip?: boolean
+}) {
+  if (n <= 0) return null
+  const detalle = `${n} ${n === 1 ? texto[0] : texto[1]}`
+  const globo = (
+    <span
+      className={cn(
+        'flex h-5 min-w-5 shrink-0 items-center justify-center rounded-full px-1.5 text-[11px] leading-none font-semibold tabular-nums',
+        invertido ? 'bg-info-bg text-dash-blue' : 'bg-dash-blue text-white',
+      )}
+    >
+      <span aria-hidden>{n > 99 ? '99+' : n}</span>
+      <span className="sr-only">{detalle}</span>
     </span>
+  )
+  if (sinTooltip) return globo
+  return (
+    <TooltipProvider delayDuration={150}>
+      <Tooltip>
+        <TooltipTrigger asChild>{globo}</TooltipTrigger>
+        <TooltipContent className="bg-tooltip text-[12px] font-normal text-white">{detalle}</TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
   )
 }
