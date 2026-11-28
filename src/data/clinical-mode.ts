@@ -370,7 +370,7 @@ export const RADIOGRAFIAS: Radiografia[] = Array.from({ length: 20 }, (_, i) => 
 
 /* Referral (CON-2321): los contactos que se pueden elegir como Referral Provider, con su especialidad (CON-3128), y lo
    que trae cargado la derivación que abre Complete this task desde Pending Task (clinical-mode.md, 2026-11-25). */
-export type ProveedorDerivacion = { nombre: string; especialidad: string }
+export type ProveedorDerivacion = { nombre: string; especialidad: string; telefono?: string; email?: string; direccion?: string }
 export const PROVEEDORES_DERIVACION: ProveedorDerivacion[] = [
   { nombre: 'Dr. Laura Chen', especialidad: 'Endodontics' },
   { nombre: 'Dr. Omar Haddad', especialidad: 'Oral Surgery' },

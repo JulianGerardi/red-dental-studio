@@ -52,6 +52,8 @@ export default function ClinicalMode() {
   /* La tarea puede ser un registro creado acá con New: no está entre las de ejemplo, pero sí en su tabla. */
   const tareaPedida = buscarTarea(busqueda.get('task') ?? '') ?? registroDe(busqueda.get('task') ?? undefined)
   const patient = PATIENTS.find((p) => p.id === id) ?? PATIENTS[0]
+  /* La ficha de prueba (john-smith) no está en PATIENTS: su nombre es el de sus registros, no el del primero de la lista. */
+  const nombrePaciente = PATIENTS.some((p) => p.id === id) ? `${patient.first} ${patient.last}` : undefined
   /* Overwiev no es una pestaña más: es el estado inicial y el botón de la
      barra vuelve acá desde cualquier examen o registro. */
   const [enOverview, setEnOverview] = useState(!casoPedido && !tabPedida)
@@ -117,7 +119,7 @@ export default function ClinicalMode() {
     : pestana === 'Vitals'
       ? <ExamLayout findings={false}><VitalsPanel /></ExamLayout>
       : registroDePestana
-        ? <RegistrosPanel key={registroDePestana} kind={registroDePestana} paciente={PATIENTS.some((p) => p.id === id) ? `${patient.first} ${patient.last}` : undefined} pacienteId={id} tarea={tareaPedida?.kind === registroDePestana ? tareaPedida : undefined} />
+        ? <RegistrosPanel key={registroDePestana} kind={registroDePestana} paciente={nombrePaciente} pacienteId={id} tarea={tareaPedida?.kind === registroDePestana ? tareaPedida : undefined} />
         : pestana === 'Radiographic'
           ? <RadiographyPanel />
           : pestana === 'Treatment plan'
@@ -153,7 +155,7 @@ export default function ClinicalMode() {
     <div className="bg-page-background min-h-svh p-4 sm:p-[30px] lg:px-12">
       <div className="mx-auto w-full max-w-[1440px]">
       {/* Sin título visible: el h1 es para lectores de pantalla (auditoría de normalización, figma/README.md). */}
-      <h1 className="sr-only">Clinical Mode · {patient.first} {patient.last}</h1>
+      <h1 className="sr-only">Clinical Mode · {nombrePaciente ?? 'John Smith'}</h1>
       <ClinicalTopBar
         volverA={`/patients/${id ?? patient.id}`}
         encuentro={encuentro}

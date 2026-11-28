@@ -4158,7 +4158,27 @@ en pantalla antes de corregirlo. Los arreglos de formulario se aplican igual a P
 6. **Rueda de superficies:** la letra de arriba y la de abajo caían sobre la línea que separa las dos franjas de su
    zona; van en la franja de adentro.
 
-**Anotado y sin tocar** (detalles, no rompen el flujo): la tabla no se reordena cuando cambia *Last update*; volver de
+**Segunda pasada: Prescription y Referral** (mismo día, recorrido acotado de dos agentes, confirmado acá antes de tocar):
+
+7. **Activate con la medicación ya activa no activaba.** Desde el ⋮ de la ficha con cambios, la pregunta de CON-2846
+   (*Medication already active*) guardaba y volvía a la tabla sin seguir con *Activate*. Ahora *Reuse existing medication*
+   guarda y sigue con la pregunta de *Activate*.
+8. **La pregunta de CON-2846 se repetía en cada Save.** *Reuse existing medication* deja *Update patient medications* sin
+   tildar en esas medicaciones: el paciente ya la tiene, no hay que volver a sumarla. Si se vuelve a tildar, pregunta otra vez.
+9. **Vencimiento de la receta en el día de hoy:** decía *Date cannot be in the past*. CON-2230 pide de mañana a seis
+   meses; ahora dice *The expiration date must be after today.* y lo pasado sigue con *Date cannot be in the past*.
+10. **New provider no validaba el formato** (sí lo hacía New laboratory): mail (*Enter a valid email.*), ZIP sólo números,
+    *Area code* de 3 y *Number* de 7 dígitos, con los mismos mensajes. Y **sus datos no llegaban al documento**: *Referred
+    to* decía *Phone: - · Email: - · Address: -*; ahora lleva teléfono, mail y dirección del provider creado (los de
+    ejemplo no tienen esos datos y siguen con *-*).
+11. **El documento de la receta decía *Additional indications*** y la ficha *Additional instructions*: queda el de la ficha.
+12. **El título para lector de pantalla de Clinical Mode** decía *Mara Otero* en la ficha de prueba (mismo origen que el
+    punto 2); dice *John Smith*.
+13. **Tablet (768 px):** el buscador de las tres tablas se achicaba hasta mostrar *Sea*; con un ancho mínimo, la barra
+    baja de renglón.
+
+**Anotado y sin tocar** (detalles, no rompen el flujo): al pasar a Expired o Canceled, el PDF de la fila se apaga (es la
+regla de `conPdf`, a confirmar si el documento de una receta vencida tiene que seguir a mano); la tabla no se reordena cuando cambia *Last update*; volver de
 una ficha abierta desde la página 2 deja la tabla en la 1; cambiar de pestaña con una ficha nueva cargada la descarta sin
 avisar; el contador 0/500 se oculta mientras el campo muestra un error (es así en toda la app).
 

@@ -93,15 +93,25 @@ test('Prescription: New valida, crea en Pending, se edita, se activa y se cancel
   await screen.getByRole('button', /^Actions for prescription of Ibuprofen 400 mg, Pending/).tap()
   await screen.getByRole('menuitem', 'Edit').tap()
   await expect(screen.getByRole('textbox', /^Strength/)).toHaveValue('400')
+  /* Reuse ya respondió la pregunta: Update patient medications quedó sin tildar y no vuelve a preguntar. */
+  await expect(screen.getByRole('checkbox', 'Update patient medications')).toHaveAttribute('aria-checked', 'false')
   await screen.getByRole('textbox', /^Strength/).fill('600')
   await screen.getByRole('button', 'Save').tap()
-  await screen.getByRole('dialog', 'Medication already active').getByRole('button', 'Reuse existing medication').tap()
   await expect(screen.getByText('The prescription has been successfully updated.')).toBeVisible()
 
-  /* Activate pregunta; ya Active no se edita, tiene PDF y sólo se cancela. */
+  /* Activate desde la ficha con un cambio sin guardar y la medicación ya activa: pregunta si se reutiliza, guarda el
+     cambio y sigue con la pregunta de Activate (clinical-mode.md, 2026-11-28). */
   await screen.getByRole('button', /^Actions for prescription of Ibuprofen 600 mg, Pending/).tap()
+  await screen.getByRole('menuitem', 'Edit').tap()
+  await screen.getByRole('checkbox', 'Update patient medications').tap()
+  await screen.getByRole('textbox', /^Quantity to dispense/).fill('25')
+  await screen.getByRole('button', /^Actions for Prescription/).tap()
   await screen.getByRole('menuitem', 'Activate').tap()
+  await screen.getByRole('dialog', 'Medication already active').getByRole('button', 'Reuse existing medication').tap()
   await screen.getByRole('dialog', 'Activate prescription').getByRole('button', 'Mark as active').tap()
+  await expect(screen.getByText('Read-only mode')).toBeVisible()
+  await expect(screen.getByRole('textbox', /^Quantity to dispense/)).toHaveValue('25')
+  await screen.getByRole('button', 'Back to prescriptions').tap()
   await expect(screen.getByText('The prescription has been successfully marked as Active.')).toBeVisible()
   /* El documento existe desde que está Active: el botón de la fila se prende. */
   await expect(screen.getByRole('button', /^View PDF of the prescription of Ibuprofen 600 mg, Active, created (?!10\/30)/)).toBeEnabled()
@@ -140,6 +150,36 @@ test('Prescription: Filter por estado y provider, Expire en una Active y Delete 
 
 /* Request desde la ficha deja la orden sin edición: lo que se cambió y no se guardó sale igual en el pedido, y lo creado
    aparece en Pending task del paciente (clinical-mode.md, 2026-11-28). */
+/* New provider valida el formato como New laboratory, y su teléfono, mail y dirección llegan al documento (Referred to). */
+test('Referral: New provider valida el formato y sus datos salen en el documento', async ({ app, screen }) => {
+  await abrir(app, screen, 'Referral')
+  await screen.getByRole('button', /New referral/).tap()
+  await screen.getByRole('button', /New provider/).tap()
+  const drawer = screen.getByRole('dialog', 'New provider')
+  await drawer.getByPlaceholder('John').fill('Ana')
+  await drawer.getByPlaceholder('Doe').fill('Quiroga')
+  await drawer.getByPlaceholder('provider@email.com').fill('no-es-mail')
+  await drawer.getByRole('button', /Next step/).tap()
+  await expect(drawer.getByText('Enter a valid email.')).toBeVisible()
+  await drawer.getByPlaceholder('provider@email.com').fill('ana@quiroga.com')
+  await drawer.getByRole('button', /Next step/).tap()
+  await drawer.getByPlaceholder('Street name and number').fill('100 Main St')
+  await drawer.getByRole('button', 'Select your region').tap()
+  await screen.getByRole('button', 'Texas').tap()
+  await drawer.getByPlaceholder('Your city').fill('Austin')
+  await drawer.getByPlaceholder('Postal code (only numbers)').fill('ab78701')
+  await expect(drawer.getByPlaceholder('Postal code (only numbers)')).toHaveValue('78701')
+  await drawer.getByRole('button', /Next step/).tap()
+  await drawer.getByPlaceholder('555').fill('51')
+  await drawer.getByPlaceholder('000-0000').fill('5551234')
+  await drawer.getByRole('button', /Next step/).tap()
+  await expect(drawer.getByText('Enter 3 digits.')).toBeVisible()
+  await drawer.getByPlaceholder('555').fill('512')
+  await drawer.getByRole('button', /Next step/).tap()
+  await drawer.getByRole('button', /^Save/).tap()
+  await expect(screen.getByText('Ana Quiroga added and selected.')).toBeVisible()
+})
+
 test('Lab order: Request desde la ficha guarda los cambios pendientes y la orden entra a Pending task del paciente', async ({ app, screen }) => {
   await abrir(app, screen, 'Lab order')
   await screen.getByRole('button', /New lab order/).tap()

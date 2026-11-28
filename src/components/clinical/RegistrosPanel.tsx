@@ -201,7 +201,8 @@ export function RegistrosPanel({ kind, paciente, pacienteId, tarea, maximo }: {
         onRowClick={(r) => setVista({ modo: 'ficha', id: r.id })}
         toolbarStart={(
           <>
-            <SettingsSearch value={q} onChange={setQ} placeholder={`Search ${c.plural}`} />
+            {/* Con un mínimo: en tablet la barra baja de renglón en vez de achicar el buscador hasta cortar el texto. */}
+            <SettingsSearch value={q} onChange={setQ} placeholder={`Search ${c.plural}`} className="min-w-[200px]" />
             <FilterMenu label={`Filter ${c.plural}`} groups={grupos} />
             {/* La fecha, con el bloque del Dashboard (‹ Today › + calendario, ui/date-nav), por mes: el del vencimiento o
                 el de la derivación. Sin mes elegido, All dates. */}

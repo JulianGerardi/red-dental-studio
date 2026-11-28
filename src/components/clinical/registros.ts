@@ -261,7 +261,7 @@ export function hojaDeRegistro(t: PendingTask): string | undefined {
     const destino = proveedoresDerivacion().find((x) => x.nombre === d.proveedor)
     propios = {
       created_date: fechaLarga(r.register), asap: siNo(d.asap), mandatory: siNo(d.obligatoria),
-      contact_name: d.proveedor, contact_type: 'Dentist', contact_specialty: destino?.especialidad || '-', contact_phone: '-', contact_email: '-', contact_address: '-',
+      contact_name: d.proveedor, contact_type: 'Dentist', contact_specialty: destino?.especialidad || '-', contact_phone: destino?.telefono || '-', contact_email: destino?.email || '-', contact_address: destino?.direccion || '-',
       procedures: procedimientosDe(d.procedimientos, PROCEDIMIENTOS_REFERRAL).map((x) => ({ code: x.codigo, description: x.nombre, anatomic_area: zona(x), findings: [], diagnoses: [] })),
       referral_note: d.nota,
       attachments: d.adjuntos.map((a, i) => ({ annex_label: String.fromCharCode(65 + i), name: a.nombre, file_type: /\.pdf$/i.test(a.nombre) ? 'PDF' : 'Image', is_image: false, file_url: '' })),

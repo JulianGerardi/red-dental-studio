@@ -19,7 +19,9 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
   *Activate* desde la ficha guardan antes los cambios pendientes (y validan); el documento de un registro nuevo sale a
   nombre del paciente correcto y con los procedimientos vinculados (`.texto` de `pdfs/marco` conserva saltos de línea);
   lo creado con New entra a Pending task del paciente (`registros.creadosDe`); los errores se van al corregir el campo.
-  Detalle en `modulos/clinical-mode.md` (2026-11-28).
+  Activate con la medicación ya activa sigue después de *Reuse*; New provider valida mail, ZIP y teléfono y sus datos
+  llegan al PDF (`ProveedorDerivacion` suma `telefono`, `email`, `direccion`). Detalle en `modulos/clinical-mode.md`
+  (2026-11-28).
 
 ### Contadores: todos con el globo azul de la campana ([#224](https://github.com/JulianGerardi/red-dental-studio/pull/224))
 - **Un solo contador, `Globo`** (`components/dashboard/primitives`): círculo azul con número blanco, el de la campana.
