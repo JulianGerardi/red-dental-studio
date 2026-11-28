@@ -5,7 +5,7 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-11-28
 
-### Pending Task ya no pide un encuentro abierto (CON-2641, CON-2643) ([#220](https://github.com/JulianGerardi/red-dental-studio/pull/220))
+### Pending Task sin encuentro, Waiting room alineada y arreglos del recorrido de Lab order, Prescription y Referral (CON-2641, CON-2643, CON-2214, CON-2212, CON-2321) ([#220](https://github.com/JulianGerardi/red-dental-studio/pull/220))
 - **El ⋮ de cada tarea funciona siempre**, en el Dashboard y en el Patient Dashboard, igual que en Clinical Mode desde
   #219. Se van el estado apagado y el tooltip *…there is no open encounter for the selected patient*.
 - **Para el dev:** `ItemsTarea` y `MenuTarea` pierden `abierto`; `TaskRow` y `PendingTaskList`, `encuentroAbierto`; sale
