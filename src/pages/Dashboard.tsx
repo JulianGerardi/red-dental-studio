@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
 import { CalendarDays, Clock, Activity, ShieldQuestionMark, Pencil, UserX, CalendarX } from 'lucide-react'
-import { Globo, Panel } from '@/components/dashboard/primitives'
+import { CuentaSuelta, Globo, Panel } from '@/components/dashboard/primitives'
 import { EmptyState } from '@/components/ui/empty-state'
 import { FilterMenu } from '@/components/ui/filter-menu'
 import { PageTitle } from '@/components/ui/page-title'
@@ -350,7 +350,7 @@ export default function Dashboard() {
           scroll interno sin tope). */}
       <div className="mt-4 grid gap-4 lg:max-[1279px]:grid-cols-2 min-[1280px]:grid-cols-3">
         <Panel
-          title={<>Appointments <Globo n={turnos.length} /></>}
+          title={<>Appointments <Globo n={turnos.length} texto={['appointment to check in', 'appointments to check in']} /></>}
           controls={
             <FilterMenu
               label="Filter appointments" size="sm" tour="dash-filter"
@@ -395,7 +395,7 @@ export default function Dashboard() {
         </Panel>
 
         <Panel
-          title={<>Waiting room <Globo n={enEspera.length} /></>}
+          title={<>Waiting room <Globo n={enEspera.length} texto={['patient in the waiting room', 'patients in the waiting room']} /></>}
           controls={
             <FilterMenu
               label="Filter waiting room" size="sm"
@@ -422,7 +422,7 @@ export default function Dashboard() {
           )}
         </Panel>
 
-        <Panel title={<>Rooms <Globo n={dia.rooms.length} /></>}>
+        <Panel title={<>Rooms <CuentaSuelta n={dia.rooms.length} /></>}>
           <OperatoryList rooms={dia.rooms} turnos={dia.appointments} dia={dia} onSelect={(a, el) => pick(a, el)} />
         </Panel>
       </div>

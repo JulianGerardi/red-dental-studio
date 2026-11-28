@@ -1199,3 +1199,34 @@ Dashboard no le pasaba su día de la demo y comparaba con la fecha real: nunca e
    Antes Today quedaba gris apagado, que se leía como deshabilitado. Today lleva `aria-pressed`. En Scheduling cuenta el
    período: activo si la semana o el mes que se ve incluye hoy. Fuera de hoy, el bloque blanco de siempre.
 3. Sin historia de Jira: es un ajuste visual del componente.
+
+## Contadores: el globo es para lo que hay que atender (2026-11-28)
+
+Julián: el globo azul de *Appointments*, *Waiting room* y *Rooms* (y el de las cards clínicas de la ficha) es el de la
+campana, pero "que tengo 6 rooms no lo veo como una notificación". Pidió primero ver cómo lo resuelven otras apps. Una
+primera vuelta (etiqueta celeste para todos los contadores, 2026-11-27) se descartó: lo que avisa tiene que verse
+**igual que la campana**.
+
+**Investigación:** ninguna de las guías leídas usa el mismo estilo para notificación y total. Atlassian: un badge, pero el
+relleno fuerte "for unread notification counts", y "use bold badges sparingly"; los totales, neutros. ServiceTitan
+(Anvil): el badge es "something requires a user's attention" y prohíbe usarlo para "the count of items within (a Tab or
+folder)". Primer: el número siempre al lado de un texto que diga qué se cuenta. Ant y Anvil: se esconde en cero, tope 99+,
+y `aria-label` con el contexto ("Cases with 6 items to review"). Slack: número cuando la cantidad decide la acción.
+
+1. **Globo (azul relleno, el de la campana)** sólo en lo que hay que atender: *Appointments* (turnos por hacer check in),
+   *Waiting room* (Dashboard), *Today appointments* (Patients) y las cuatro cards clínicas de la ficha (Allergies, Medical
+   conditions, Medication, Past surgery). Es `Globo` (`dashboard/primitives`), una sola pieza.
+2. **Número suelto en gris** (`CuentaSuelta`, `ink-muted`) en lo que sólo cuenta cuánto hay: *Rooms* y *Recent patients*.
+   En cada sala, el número de turnos va con el ícono de calendario y en `dash-muted`, como su línea *Now / Next*: sin
+   ícono se leía "Operatory 1 6". Mantiene su tooltip (CON-4180).
+3. **Reglas del globo:** en cero no se muestra; arriba de 99, "99+"; tooltip y texto para el lector que dicen qué se cuenta
+   ("9 appointments to check in", "8 patients in the waiting room", "11 appointments today"). En las cards clínicas (son
+   botones) va sólo el texto para el lector ("4 items on record"), sin tooltip. Sobre la card clínica abierta, azul el
+   número sobre `info-bg`.
+4. Quedan con `ui/count` (celeste) las cuentas de `FilaDetalle` y `PermissionsPicker`: no se tocaron en esta tanda.
+5. e2e: los títulos se leen con el texto nuevo (`Appointments 9 appointments to check in`); el Dashboard vacío ya no
+   muestra "Appointments 0".
+6. Sin historia de Jira: es una regla visual del design system.
+
+**A validar con usuarios:** si recepción entiende el globo de *Appointments* como "turnos que faltan llegar" (cuenta los
+que no hicieron check in, no los del día); y si el número gris de *Rooms* se extraña como dato o pasa desapercibido.
