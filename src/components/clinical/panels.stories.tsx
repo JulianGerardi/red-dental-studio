@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import { LabOrderPanel as LegacyLabOrderPanel, PatientSummaryPanel, PrescriptionPanel, ReferralPanel, TreatmentPanel, TreatmentPlanPanel } from './panels'
+import { LabOrderPanel as LegacyLabOrderPanel, PrescriptionPanel, ReferralPanel, TreatmentPanel, TreatmentPlanPanel } from './panels'
+import { PatientSummaryPanel } from './PatientSummaryPanel'
 
 const meta = {
   title: 'Components/Clinical/Panels',

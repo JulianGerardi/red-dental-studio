@@ -4069,3 +4069,126 @@ del encuentro y del filtro de fecha.
 
 **A validar con usuarios:** si filtrar por mes alcanza o piden un rango libre; y si *Today* se entiende como "este mes"
 en una tabla.
+
+## CON-2731 · CON-2727 · CON-2728 · CON-2730 · Patient Summary: el flujo completo (2026-11-27)
+
+**Jira:** epic CON-2724 *Nota Clinica*. CON-2731 (la lista), CON-2728 y CON-2816 (la nota se genera al abrirla),
+CON-2937 (la que se genera sola a las 48 h), CON-2726 y CON-2727 (firma), CON-2730 (addendum), CON-3508 (quién ve y
+quién firma), CON-4158 (los textos *No clinical note* y *Access restricted*) y los bugs que fijan el comportamiento de la
+lista: CON-3016 (la pestaña se llama *Patient Summary*), CON-3773 (al volver se conserva la página), CON-3166 (el estado
+se actualiza sin recargar), CON-3023 (*Download started*), CON-3012 y CON-3539 (el tilde verde).
+
+Pedido de Julián: armar el flujo de `red.dev/…/clinical-mode/treatment-history` alineado a la app, sin piezas nuevas. La
+pestaña era el placeholder *Planned*. **red.dev pide login y no se pudo entrar desde la sesión**: la lista sale de la
+réplica que ya había en `clinical/panels.tsx` (hecha mirando red.dev), de sus rutas públicas
+(`/treatment-history` y `/treatment-history/:clinicalNoteId`) y de Jira; la nota y su PDF, de los videos del 2026-11-20
+(dashboard.md). Lo que no se pudo ver está en *A validar*.
+
+Código: `clinical/PatientSummaryPanel` (la tabla), `clinical/PatientSummaryNote` (lo que abre el ojo), `data/historial`
+(los encuentros de ejemplo) y `lib/historial` (firmar, addendum y el documento de cada encuentro). Se borra la réplica de
+`panels.tsx` y `TREATMENT_HISTORY` de `data/mock`.
+
+### La lista
+
+- **Mismas columnas que red.dev**, con `ui/data-table`: *Date* (con *Latest* en el más nuevo y la zona horaria debajo),
+  *Status*, *Clinical note*, *Reason for appt*, *Provider*, *Procedures*, *Exams*, *Ref*, *Lab*, *Prescription* y
+  *Actions* (el ojo). Pie estándar: *Showing 1 to 10 of N results*, *Rows per page* y paginador; 10 por página.
+- **Pills con los tonos de la app:** el encuentro, con los de los turnos (Fulfilled verde, Cancelled rojo) más In
+  progress azul, On hold ámbar, Completed violeta y Discharged gris (`TONO_ENCUENTRO`); la nota, *Signed* verde y
+  *Unsigned* ámbar, como en el historial de un procedimiento (End Encounter). Sin nota, *No clinical note*; sin permiso,
+  el candado y *Access restricted* (CON-4158).
+- **Procedures:** el primer código en un chip y el resto detrás de "+N", que los despliega en la fila (`ChipMas`, como
+  las medicaciones de una receta). El nombre, el diente y el estado, al pasar el mouse. Chip gris: el celeste se pierde
+  sobre la fila elegida.
+- **Exams, Ref, Lab y Prescription:** tilde verde si en el encuentro hubo (CON-3012, CON-3539). Las reglas son las de los
+  eventos del encuentro: una orden o derivación que salió de Pending, una receta que pasó a Active (CON-2614 a
+  CON-2616).
+- **Barra:** *Filter* (Status y Provider, CON-2731), la fecha y *Download*.
+- **Selección y Download:** casilla por fila y en el encabezado. *Download* baja un PDF por nota elegida
+  (`Dental Clinical Note - <paciente> - <fecha>.pdf`), con sus addenda, y avisa *Download started* (CON-3023). Sin nada
+  elegido avisa *Select at least one clinical note to download.*, como Documents.
+- **Sin nota o sin permiso** (encuentro cancelado; nota de otro provider sin *Read Clinical Note*): la fila se ve
+  atenuada, sin ojo ni casilla (`isRowDisabled`).
+- **El encuentro de hoy** entra a la lista cuando se toca *Start encounter* y toma su estado de la barra: In progress,
+  On hold y, al cerrarlo, Completed o Discharged (`cerrarEncuentroHoy`). *Review and sign* del diálogo de cierre lo deja
+  Fulfilled y Signed. Antes de empezar no aparece: Planned no se lista.
+
+### El ojo
+
+Abre la Clinical Note del encuentro en `ui/document-viewer`, a pantalla completa, **sin salir de la pestaña**: al volver,
+la página, los filtros y lo elegido siguen como estaban (CON-3773). La nota abierta va en la URL (`?note=<id>`), como la
+ruta de red.dev: se puede compartir y el Atrás del navegador la cierra. Tocar la fila hace lo mismo que el ojo.
+
+Siempre: *Back to history*, la fecha y el provider, *Clinical note - <paciente>*, la pill de la nota, *View PDF* y
+*Preparing document...* un momento. Lo demás depende del encuentro y de la nota:
+
+| Encuentro · nota | Aviso | Acción |
+|---|---|---|
+| In progress, On hold o Discharged · Unsigned | *The clinical note can only be signed when the encounter is completed. Until then it is generated again each time you open it.* (CON-2727, CON-2728) | Ninguna |
+| Completed · Unsigned, propia | *Signing this clinical note closes the encounter: it becomes Fulfilled and can no longer be changed.* | *Sign clinical note* |
+| Fulfilled · Unsigned, propia | *This clinical note is waiting for your signature.* | *Sign clinical note* |
+| Fulfilled a las 48 h · Unsigned, propia | *Generated automatically when the encounter closed after 48 hours without activity. Workflow narratives are not included. Review it before signing.* (CON-2937); la nota no trae Workflows | *Sign clinical note* |
+| Completed o Fulfilled · Unsigned, de otro provider | *Only <provider>, the provider of this encounter, can sign this clinical note.* (CON-3508) | Ninguna |
+| Fulfilled · Signed, propia | *Signed by <provider> on <fecha>. A signed note can't be changed; add an addendum to complement it.* | *Add addendum* |
+| Fulfilled · Signed, de otro provider | *Signed by <provider> on <fecha>. A signed note can't be changed.* | Ninguna |
+
+- **Firmar** pide el usuario y la contraseña otra vez (*Login to sign document*, el mismo diálogo de la nota de Pending
+  Task). Firmada, la nota no cambia más, el encuentro Completed pasa a Fulfilled y la lista lo muestra sin recargar
+  (CON-2727, CON-3166).
+- **Add addendum** (CON-2730): drawer de un solo campo y *Sign and save*, que también pide el login. Queda después de la
+  firma, con autor, fecha y *Signed electronically*; no se edita ni se borra. Se pueden sumar varios.
+- "Propia" es la del provider de la sesión (`PROVIDER_SESION`, el de la barra de la app). No hay permiso de firma: firma
+  quien atendió (CON-3306, cancelada, lo decía así; CON-3508 lo mantiene).
+
+### La nota y el PDF
+
+- El contenido lo arma `documentoEncuentro` y es **uno solo para la hoja de la pantalla y para el PDF**
+  (`VistaDocumento` y `pdfDeDocumento`): lo que se ve es lo que se baja.
+- **Secciones de red.dev, en su orden, sólo las de lo que se hizo** (CON-2975: "si alguna de las secciones no se realiza
+  se debe obviar"): *Vital Signs*, *Medical History*, *Exams*, *Operative Report* (`D3330 — … on #19 [in progress].`),
+  *Workflows*, *Prescriptions*, *Lab Orders*, *Referrals* y *Additional Notes*; la firma del provider y, después, los
+  *Addenda*. Sin firma del paciente (CON-2975).
+- **El PDF pasa de página**: `pdfDeDocumento` escribía todo en una; una nota con exámenes, órdenes y addenda no entra.
+  Ahora corta donde hace falta, numera *Page N of M*, parte las líneas largas de las listas y no deja el título de una
+  sección ni la firma solos. Sirve a todos los documentos que lo usan (la nota de Pending Task también).
+- `ui/document-sheet` suma `appendix` (lo que va después de las firmas, sin número) para los addenda.
+- *View PDF* abre la pestaña con *Preparing document, please wait...* y después el PDF, como red.dev.
+
+### Decisiones
+
+1. **La fecha se filtra con el bloque del Dashboard, por mes** (`ui/date-nav`), como Lab order, Prescription y Referral
+   desde la 6ª vuelta del mismo día. red.dev y CON-2731 piden un rango: queda en *A validar*, junto con el de las otras
+   tres tablas.
+2. **Filter con Status y Provider**: red.dev sólo tiene la fecha; CON-2731 pide los tres. Se usa el `FilterMenu` de las
+   tablas hermanas.
+3. **Lo que no hubo va con raya, no con cruz roja.** red.dev pone una cruz roja en Exams, Ref, Lab y Prescription. Una
+   visita sin orden de laboratorio no es un error, y cuatro columnas de cruces rojas tapan lo que importa: el tilde verde
+   de lo que sí se hizo. Con raya, como cualquier celda sin dato de la app.
+4. **El ojo queda a la vista**, no dentro de un ⋮: es la única acción de la fila y la que se usa siempre.
+5. **La columna se llama *Clinical note***, como en el resto de la app; red.dev dice *Clinic note* (anomalía).
+6. **Download habilitado siempre**: red.dev lo apaga sin selección, sin decir por qué. Acá avisa qué falta, como
+   Documents. El botón lleva la cantidad elegida.
+7. **Un PDF por nota**, no uno solo con todas: cada nota es un documento firmado aparte. Jira no lo define.
+
+### Anomalías y límites
+
+1. CON-2731 nombra la columna de recetas *Active*; red.dev, *Prescription*. Se deja la de red.dev.
+2. CON-3058 (bug): "al seleccionar *Date* deben marcarse todos los encounters de esa fecha". No queda claro qué control
+   es; la casilla del encabezado elige toda la página.
+3. *Review and sign* del cierre del encuentro firma sin mostrar la nota (Figma 4540:27072); CON-2726 dice que la muestra
+   y que firmar es otro paso. No se tocó: se propone aparte que abra esta misma nota con *Sign clinical note*.
+4. Cerrar el encuentro desde la ficha del paciente (no desde Clinical Mode) no deja la fila en la lista: sólo la barra de
+   Clinical Mode llama a `cerrarEncuentroHoy`.
+5. Los encuentros de la lista y los del historial de un procedimiento (`data/ejecucion`) son datos de ejemplo distintos.
+6. Las credenciales del login no se validan (CON-3648 pide que sean las del provider que firma).
+7. El paciente es el de la barra de Clinical Mode (Julio Perez), con cualquier id de la ruta.
+
+**A validar (con red.dev abierto y con usuarios):**
+
+- Qué hace el ojo de red.dev en un encuentro cancelado y en uno In progress, y si el detalle muestra algo más que *Back
+  to history*, *View PDF* y *Sign clinical note*.
+- Dónde está *Add addendum* en red.dev y cómo se ve el addendum en su PDF (acá sale de CON-2730).
+- Si *Download* de varias notas baja un archivo por nota, un ZIP o un PDF combinado.
+- Si el provider necesita ver el motivo de *Access restricted* o pedir el acceso desde la fila.
+- Si el filtro por mes alcanza para buscar una visita vieja o hace falta el rango (también en las otras tres tablas).
+- Si la raya en lugar de la cruz roja se lee bien como "no hubo".

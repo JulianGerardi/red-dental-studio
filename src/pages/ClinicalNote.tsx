@@ -63,8 +63,8 @@ export function VistaDocumento({ doc }: { doc: Documento }) {
           </dl>
         ) : 'listas' in s ? (
           <div className="flex flex-col gap-2">
-            {s.listas.map(([k, items]) => (
-              <div key={k}>
+            {s.listas.map(([k, items], i) => (
+              <div key={`${i}-${k}`}>
                 <p className="font-semibold text-ink">{k}</p>
                 <ul className="list-disc pl-5">{items.map((it) => <li key={it}>{it}</li>)}</ul>
               </div>
@@ -80,13 +80,32 @@ export function VistaDocumento({ doc }: { doc: Documento }) {
         ),
       }))}
       signatures={doc.sinFirma ? undefined : [{ role: 'Provider', name: doc.provider, signed: doc.firmado ? { date: doc.firmado, text: doc.provider } : undefined }]}
+      appendix={doc.adendas?.length ? {
+        title: 'Addenda',
+        note: 'Added after the note was signed. They do not change the signed note.',
+        content: (
+          <div className="flex flex-col gap-4">
+            {doc.adendas.map((a) => (
+              <div key={`${a.fecha}-${a.texto}`}>
+                <p className="flex flex-wrap items-baseline justify-between gap-x-3">
+                  <span className="font-semibold text-ink">Addendum by {a.autor}</span>
+                  <span className="text-[12px] text-ink-muted tabular-nums">{a.fecha}</span>
+                </p>
+                <p>{a.texto}</p>
+                <p className="text-[11px] text-ink-muted">Signed electronically by {a.autor} · {a.fecha}</p>
+              </div>
+            ))}
+          </div>
+        ),
+      } : undefined}
       footer={`${CLINICA.nombre} · ${doc.titulo} · ${doc.paciente}`}
     />
   )
 }
 
-/* Login to Sign Document: el usuario y la contraseña otra vez, por seguridad. Sign se habilita con los dos. */
-function FirmarDialog({ onCancel, onFirmar }: { onCancel: () => void; onFirmar: () => void }) {
+/* Login to Sign Document: el usuario y la contraseña otra vez, por seguridad. Sign se habilita con los dos. La misma
+   firma la nota del historial y sus addenda (clinical/PatientSummaryNote). */
+export function FirmarDialog({ onCancel, onFirmar }: { onCancel: () => void; onFirmar: () => void }) {
   const [email, setEmail] = useState('')
   const [clave, setClave] = useState('')
   const [ver, setVer] = useState(false)

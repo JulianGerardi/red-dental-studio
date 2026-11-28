@@ -148,3 +148,8 @@ Los tests usan locators (`screen.getByRole(...)`, `expect(...)`): no llaman a ni
   al Chromium que trae la máquina (`/opt/pw-browsers`).
 - No se instalaron la skill de e2e para agentes (`.claude/skills/e2e`) ni su servidor MCP (`.mcp.json`), que
   `npx e2e init` agrega por defecto.
+- `tests/patient-summary.e2e.ts` (2026-11-27, CON-2731 / CON-2727 / CON-2728 / CON-2730): Patient Summary pagina de a 10,
+  filtra por estado y un encuentro sin nota no se abre ni se elige; el ojo abre la nota y al volver siguen la página y lo
+  elegido; una nota de un encuentro Completed se firma con el login, el encuentro pasa a Fulfilled y se le suma un
+  addendum; con el encuentro en curso o de otro provider no hay *Sign clinical note*; Download pide elegir y avisa
+  *Download started*.

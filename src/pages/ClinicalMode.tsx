@@ -15,6 +15,7 @@ import { ProblemListFlotante } from '@/components/clinical/ProblemListFlotante'
 import { NavegacionClinica, examenDePestana, type DestinoClinico } from '@/components/clinical/RecordDetail'
 import { VitalsPanel } from '@/components/clinical/VitalsPanel'
 import { RegistrosPanel } from '@/components/clinical/RegistrosPanel'
+import { PatientSummaryPanel } from '@/components/clinical/PatientSummaryPanel'
 import type { TipoRegistro } from '@/components/clinical/registros'
 import { RadiographyPanel } from '@/components/clinical/RadiographyPanel'
 import { TreatmentPlanSection } from '@/components/clinical/TreatmentPlanSection'
@@ -123,6 +124,8 @@ export default function ClinicalMode() {
             ? <TreatmentPlanSection key={`${casoAbierto ?? 'todos'}-${estimadoAbierto}-${consentimientoAbierto}-${accionPendiente}`} casoInicial={casoAbierto} estimadoInicial={estimadoAbierto} consentimientoInicial={consentimientoAbierto} accionInicial={accionPendiente} />
             : pestana === 'Treatment'
             ? <TreatmentPanel onTreatmentPlan={() => irA('Treatment plan')} />
+            : pestana === 'Patient summary'
+            ? <PatientSummaryPanel />
             : pestana === 'Dental assessment'
               ? <DentalAssessmentExam />
               : pestana === 'Extraoral'

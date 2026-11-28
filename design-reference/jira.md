@@ -100,7 +100,7 @@ Documento: [figma/modulos/clinical-mode.md](figma/modulos/clinical-mode.md)
 - [CON-2212](https://confidetally.atlassian.net/browse/CON-2212) Prescription
 - [CON-2214](https://confidetally.atlassian.net/browse/CON-2214) Lab Order
 - [CON-2321](https://confidetally.atlassian.net/browse/CON-2321) Referral
-- [CON-2724](https://confidetally.atlassian.net/browse/CON-2724) Nota Clinica
+- [CON-2724](https://confidetally.atlassian.net/browse/CON-2724) Nota Clinica (CON-2726 firmar ahora o después · CON-2727 firmar · CON-2728 render · CON-2730 addendum · CON-2731 consultar encounter · CON-2732 tareas pendientes · CON-2937 cierre automático) · armado en Clinical Mode › Patient Summary (`clinical-mode.md`, 2026-11-27)
 - [CON-2793](https://confidetally.atlassian.net/browse/CON-2793) Encounter continuacion
 - [CON-900](https://confidetally.atlassian.net/browse/CON-900) Medical conditions
 - [CON-1751](https://confidetally.atlassian.net/browse/CON-1751) Cambios Procedure y Condition

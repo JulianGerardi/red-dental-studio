@@ -777,7 +777,11 @@ en la Clinical note (`VistaDocumento`). El PDF de la Clinical note (`documentoTa
 mismo diseño. Se va `settings/HojaConsentimientoPdf` (el formato de cards de red.dev del preview).
 
 **Para backend:** el PDF real lo genera el servidor; el formato de referencia es este (`pdfDeDocumento` lo muestra en
-una página A4 con Helvetica).
+A4 con Helvetica).
+
+**2026-11-27 (Patient Summary, clinical-mode.md):** `DocumentSheet` suma `appendix`, lo que va después de las firmas y
+sin número (los addenda de una clinical note, que no cambian la nota firmada). `pdfDeDocumento` pasa de página cuando el
+contenido no entra, con *Page N of M* en cada una.
 
 
 ## Regla: el tacho va en rojo, con un solo formato (2026-11-27)

@@ -36,5 +36,9 @@
   "components/clinical/RegistrosPanel.tsx#RegistrosPanel": "Lab order / Prescription / Referral (2026-11-27): se ve en Pages (Clinical Mode). Story propia al documentar la tanda.",
   "components/clinical/dental/ArcadaAnatomica.tsx#ArcadaAnatomica": "Teeth & surface de Lab order (2026-11-27): se ve en Pages (Clinical Mode). Story propia al documentar la tanda.",
   "components/ui/chip.tsx#ChipMas": "El \"+N\" de Working hours y de Medication (2026-11-27): se documenta en Elements / Chips al cerrar la tanda.",
-  "components/clinical/RegistrosPanel.tsx#MedicacionesCelda": "Lab order / Prescription / Referral (2026-11-27): se ve en Pages (Clinical Mode). Story propia al documentar la tanda."
+  "components/clinical/RegistrosPanel.tsx#MedicacionesCelda": "Lab order / Prescription / Referral (2026-11-27): se ve en Pages (Clinical Mode). Story propia al documentar la tanda.",
+  "components/clinical/PatientSummaryNote.tsx": "Patient Summary (2026-11-27): la nota que abre el ojo, sobre ui/document-viewer. Se ve en Pages (Clinical Mode) y en Components / Clinical / Panels. Story propia al documentar la tanda.",
+  "components/clinical/PatientSummaryPanel.tsx#NotaCelda": "Celda Clinical note de la tabla de Patient Summary. Se ve en Components / Clinical / Panels → Patient Summary.",
+  "components/clinical/PatientSummaryPanel.tsx#ProcedimientosCelda": "Celda Procedures de la tabla de Patient Summary (chip y +N). Se ve en Components / Clinical / Panels → Patient Summary.",
+  "components/clinical/PatientSummaryPanel.tsx#Hecho": "El tilde o la raya de Exams, Ref, Lab y Prescription en la tabla de Patient Summary. Se ve en Components / Clinical / Panels → Patient Summary."
 }
