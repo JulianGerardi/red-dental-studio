@@ -1,0 +1,1 @@
+import{n as e}from"./rolldown-runtime-DkW27tQK.js";import{t}from"./react-BZJXY1be.js";function n(e){a=e,o.forEach(e=>e())}function r(){let[,e]=(0,i.useState)(0);return(0,i.useEffect)(()=>{let t=()=>e(e=>e+1);return o.add(t),()=>{o.delete(t)}},[]),[a,n]}var i,a,o;function s(){return(s=e((()=>{i=t(),a=`sinEmpezar`,o=new Set})))()}export{n,r,s as t};

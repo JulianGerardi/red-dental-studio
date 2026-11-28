@@ -19,6 +19,8 @@ p { margin: 0 0 4pt; }
 .datos b { display: block; font-size: 11pt; color: #09090b; }
 .datos span, .meta { display: block; font-size: 8pt; line-height: 1.45; color: #71717a; }
 .meta { text-align: right; white-space: nowrap; }
+/* El texto libre conserva sus saltos de línea (notas, trabajo pedido). */
+.texto { white-space: pre-line; }
 .meta b { display: block; color: #09090b; font-weight: 600; }
 .tipo { margin: 18pt 0 2pt; font-size: 7.5pt; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: #1d56bc; }
 h1 { margin: 0; font-size: 15pt; line-height: 1.25; font-weight: 700; color: #09090b; }
@@ -138,7 +140,7 @@ h2 + h3 { margin-top: 2pt; }
 </section>
 <section>
 <h2>Dental Work Request</h2>
-<p>{{work_request}}</p>
+<p class="texto">{{work_request}}</p>
 </section>
 <section>
 <h2>Teeth &amp; Surface Specifications</h2>
